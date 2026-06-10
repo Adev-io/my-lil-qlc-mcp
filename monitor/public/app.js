@@ -33,8 +33,8 @@ scene.background = new THREE.Color(0x07080c);
 scene.fog = new THREE.FogExp2(0x07080c, 0.012);
 
 const camera = new THREE.PerspectiveCamera(55, innerWidth / innerHeight, 0.1, 500);
-const HOME_POS = new THREE.Vector3(0, 13, 26);
-const HOME_TARGET = new THREE.Vector3(0, 4, -4);
+const HOME_POS = new THREE.Vector3(0, 15, 31);
+const HOME_TARGET = new THREE.Vector3(0, 6, -3);
 camera.position.copy(HOME_POS);
 
 const controls = new OrbitControls(camera, renderer.domElement);
@@ -150,29 +150,31 @@ function buildFixtures(data) {
     if (def.kind === "par") {
       const body = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.55, 0.6, 16), bodyMat());
       const lit = new THREE.Mesh(new THREE.SphereGeometry(0.4, 16, 12), litMat());
-      const beam = makeBeam(4.5, 9);
-      beam.quaternion.setFromUnitVectors(NEG_Y, new THREE.Vector3(0, -0.86, 0.5).normalize());
+      const beam = makeBeam(2.4, 8);
+      beam.quaternion.setFromUnitVectors(NEG_Y, toThree(def.point || [0, 0, 1]).normalize());
       group.add(body, lit, beam);
       fx.lit = lit;
       fx.beam = beam;
       body.userData = { group, fx };
       pickTargets.push(body);
     } else if (def.kind === "bar") {
-      const body = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.32, 0.32), bodyMat());
+      const body = new THREE.Mesh(new THREE.BoxGeometry(2.9, 0.3, 0.3), bodyMat());
       const cells = [];
       for (let i = 0; i < 3; i++) {
-        const cell = new THREE.Mesh(new THREE.BoxGeometry(0.72, 0.26, 0.26), litMat());
-        cell.position.x = (i - 1) * 0.82;
+        // cells are LARGER than the body's cross-section so the lit colour always shows
+        // (a smaller cell tucked inside the dark body gets occluded — bars looked unlit).
+        const cell = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.52, 0.52), litMat());
+        cell.position.x = (i - 1) * 0.9;
+        cell.userData = { group, fx };
         group.add(cell);
         cells.push(cell);
+        pickTargets.push(cell);
       }
-      const beam = makeBeam(1.6, 4);
-      beam.quaternion.setFromUnitVectors(NEG_Y, new THREE.Vector3(0, 1, 0)); // uplight
+      const beam = makeBeam(1.3, 11);
+      beam.quaternion.setFromUnitVectors(NEG_Y, toThree(def.point || [0, 0, 1]).normalize());
       group.add(body, beam);
       fx.cells = cells;
       fx.beam = beam;
-      body.userData = { group, fx };
-      pickTargets.push(body);
     } else {
       // head
       const body = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.7, 1.1, 18), bodyMat());
@@ -223,7 +225,7 @@ function applyFrame(dmx) {
         setLit(cell, col, dim);
         sr += col[0]; sg += col[1]; sb += col[2];
       });
-      setBeam(fx.beam, [sr / 3, sg / 3, sb / 3], dim * 0.4);
+      setBeam(fx.beam, [sr / 3, sg / 3, sb / 3], dim * 0.55);
     } else {
       const dim = dmx[a + r.dim] / 255;
       const open = dmx[a + r.shutter] >= (data?.meta?.shutterOpenMin ?? 216);

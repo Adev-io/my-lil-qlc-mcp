@@ -38,12 +38,14 @@ interface MonitorFixture {
   channels: number;
   roles: Record<string, number | number[][]>;
   pos: Vec3; // default position (builder coords, ft) — overridable via monitor/layout.json
+  point?: Vec3; // static beam direction (builder unit vec) for par/bar; heads aim via pan/tilt
 }
 
 const fixtures: MonitorFixture[] = [];
 
-// 10 Rainbow pars @ addr 0,10,..,90 — a row across the back truss, washing the stage.
-const PAR_Y = Math.max(2, D - 2); // upstage row
+// 10 Rainbow pars @ addr 0,10,..,90 — ON THE FLOOR, pointing straight UP (uplight).
+// Real rig: a row of floor cans across the stage. (Drag in the monitor to re-space.)
+const PAR_Y = Math.max(1, D - 1.5); // upstage floor row (backdrop uplight)
 const parXs = Array.from({ length: 10 }, (_, i) => -(W / 2 - 1) + (i * (W - 2)) / 9);
 for (let i = 0; i < 10; i++) {
   fixtures.push({
@@ -53,13 +55,20 @@ for (let i = 0; i < 10; i++) {
     address: i * 10,
     channels: 10,
     roles: { dim: 0, strobe: 1, r: 2, g: 3, b: 4, w: 5, a: 6, uv: 7 },
-    pos: [round(parXs[i]), PAR_Y, HZ],
+    pos: [round(parXs[i]), PAR_Y, 0.1], // on the floor
+    point: [0, 0, 1], // beam straight up
   });
 }
 
-// 2 COLORband bars @ addr 100,113 — downstage low (foot/uplight), one each side.
+// 2 COLORband bars @ addr 100,113 — UP HIGH (>10 ft), one each side, angled 45° down-and-inward.
 const barAddr = [100, 113];
-const barXs = [-W / 4, W / 4];
+const BAR_Z = 11; // above 10 ft
+const D45 = Math.SQRT1_2; // cos/sin 45°
+// left bar throws toward audience-right + down; right bar mirrors (toward audience-left + down).
+const bars = [
+  { x: -W / 2, point: [D45, 0, -D45] as Vec3 },
+  { x: W / 2, point: [-D45, 0, -D45] as Vec3 },
+];
 for (let i = 0; i < barAddr.length; i++) {
   fixtures.push({
     id: 10 + i,
@@ -75,7 +84,8 @@ for (let i = 0; i < barAddr.length; i++) {
       ],
       dim: 12,
     },
-    pos: [round(barXs[i]), 0.5, DECK + 0.3],
+    pos: [round(bars[i].x), 0.5, BAR_Z],
+    point: [round(bars[i].point[0]), 0, round(bars[i].point[2])],
   });
 }
 

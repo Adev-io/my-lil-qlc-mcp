@@ -23,6 +23,10 @@ const padChOf = (caption: string): number | null => {
   return m ? Number(m[1]) : null;
 };
 
+// FixtureVal channel,value string for one scene + fixture (12 = Head L, 13 = Head R).
+const hv = (scene: string, id: 12 | 13): string =>
+  raw.match(new RegExp(`Name="${scene}">[^]*?<FixtureVal ID="${id}">([^<]*)<`))?.[1] || "";
+
 beforeAll(async () => {
   // Regenerate from source, then parse the real artifact.
   execSync("npx tsx scripts/build-show.ts", { cwd: ROOT, stdio: "inherit" });
@@ -152,8 +156,6 @@ describe("punk-rock-show generator", () => {
   it("aims the heads at the band from the 2026-06-09 stage geometry", () => {
     // Heads are fixtures 12 (L) and 13 (R). aim() turns a floor target (ft) into pan(ch0)/tilt(ch2)
     // DMX; values come from the 20x10 stage, ground trusses at the front corners (±10, 0, 8.5).
-    const hv = (scene: string, id: 12 | 13): string =>
-      raw.match(new RegExp(`Name="${scene}">[^]*?<FixtureVal ID="${id}">([^<]*)<`))?.[1] || "";
     // Singer → stage centre (0,3.3): the two heads converge symmetrically.
     expect(hv("Singer", 12).startsWith("0,162,2,103")).toBe(true);
     expect(hv("Singer", 13).startsWith("0,94,2,103")).toBe(true);
@@ -173,8 +175,8 @@ describe("punk-rock-show generator", () => {
       ["Singer", "Guitar", "Bass", "Drums", "Crowd Near", "Crowd Deep", "Stage Wash", "Park"]));
     for (const old of ["Center", "Wide", "Cross X", "Downstage", "Upstage", "Tight Center", "Wide Open"])
       expect(baseNames).not.toContain(old);
-    // positions no longer force colour/gobo — colour pads keep control
-    const singerL = raw.match(/Name="Singer">[^]*?<FixtureVal ID="12">([^<]*)</)?.[1] || "";
+    // channels 5/6 = colour/gobo — position scenes must NOT set them, so colour pads keep control
+    const singerL = hv("Singer", 12);
     expect(singerL).not.toContain("5,0");
     expect(singerL).not.toContain("6,0");
   });

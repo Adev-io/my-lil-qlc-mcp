@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Punk Rock Show — 3D Monitor</title>
+    <style>
+      :root { color-scheme: dark; }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; height: 100%; background: #07080c; color: #e8e8ee;
+        font: 13px/1.4 ui-monospace, "Cascadia Code", Consolas, monospace; overflow: hidden; }
+      #scene { position: fixed; inset: 0; }
+      #hud { position: fixed; top: 12px; left: 12px; z-index: 10; max-width: 280px;
+        background: rgba(12,14,20,.82); border: 1px solid #2a2f3e; border-radius: 8px;
+        padding: 10px 12px; backdrop-filter: blur(4px); }
+      #hud h1 { font-size: 13px; margin: 0 0 6px; letter-spacing: .04em; }
+      #hud .row { display: flex; justify-content: space-between; gap: 12px; margin: 2px 0; }
+      #hud .row span:last-child { color: #9fb4ff; }
+      .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+        margin-right: 6px; vertical-align: middle; }
+      .live { background: #3ad17a; } .stale { background: #d1a13a; } .down { background: #d14b4b; }
+      #hint { margin-top: 8px; color: #8a90a2; font-size: 11px; }
+      #controls { margin-top: 8px; display: flex; gap: 6px; flex-wrap: wrap; }
+      button { background: #1b2030; color: #cfe; border: 1px solid #36405a; border-radius: 6px;
+        padding: 5px 9px; cursor: pointer; font: inherit; }
+      button:hover { background: #232a3e; }
+      #saved { color: #3ad17a; font-size: 11px; margin-top: 4px; min-height: 14px; }
+    </style>
+    <script type="importmap">
+      { "imports": { "three": "/vendor/three.module.js" } }
+    </script>
+  </head>
+  <body>
+    <div id="scene"></div>
+    <div id="hud">
+      <h1>Punk Rock Show · 3D Monitor</h1>
+      <div class="row"><span><span id="statusDot" class="dot down"></span>Art-Net U0</span><span id="statusText">connecting…</span></div>
+      <div class="row"><span>Last frame</span><span id="age">—</span></div>
+      <div class="row"><span>Fixtures</span><span id="fxCount">—</span></div>
+      <div id="controls">
+        <button id="dragBtn">Move fixtures: OFF</button>
+        <button id="saveBtn">Save layout</button>
+        <button id="resetBtn">Reset view</button>
+      </div>
+      <div id="saved"></div>
+      <div id="hint">Drag to orbit · scroll to zoom · right-drag to pan. Turn on “Move fixtures” to drag a fixture across the floor, then Save layout.</div>
+    </div>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

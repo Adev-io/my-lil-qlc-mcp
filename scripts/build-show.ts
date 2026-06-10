@@ -258,7 +258,7 @@ function aim(side: "L" | "R", tx: number, ty: number, tz = AIM_Z): [number, numb
   const dx = tx - h.x, dy = ty - h.y;
   const panDeg = (Math.atan2(dx, dy) * 180) / Math.PI;                          // 0 = upstage, + = aud-right
   const deprDeg = (Math.atan2(h.z - tz, Math.hypot(dx, dy)) * 180) / Math.PI;   // ° below horizontal
-  if (deprDeg < 0)
+  if (deprDeg <= 0)
     throw new Error(`aim(${side}, ${tx}, ${ty}, ${tz}): beam at/above horizontal — roof violation`);
   return [clampDmx(128 + panDeg * PAN_DMX_PER_DEG),
           clampDmx(128 + (deprDeg - TILT_CENTRE_DEPR) * TILT_DMX_PER_DEG)];

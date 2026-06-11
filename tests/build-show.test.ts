@@ -1,12 +1,17 @@
 import { execSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
+import os from "node:os";
 import fs from "node:fs/promises";
 import { beforeAll, describe, expect, it } from "vitest";
 import { parseQxwFile } from "../src/qlc/qxwParser";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const QXW = path.join(ROOT, "punk-rock-show.qxw");
+// Generate into a temp dir (QLC_BUILD_OUT) so running tests never clobbers the
+// user's own generated show/docs at the repo root.
+const OUT = path.join(os.tmpdir(), `qlc-build-show-test-${process.pid}`);
+const QXW = path.join(OUT, "punk-rock-show.qxw");
+const EXAMPLE_RIG = path.join(ROOT, "rigs", "punk-rock-show.rig.json");
 
 let names: string[] = [];
 let baseNames: string[] = []; // names with the trailing " R#C#" pad-coordinate suffix stripped
@@ -28,8 +33,10 @@ const hv = (scene: string, id: 12 | 13): string =>
   raw.match(new RegExp(`Name="${scene}">[^]*?<FixtureVal ID="${id}">([^<]*)<`))?.[1] || "";
 
 beforeAll(async () => {
-  // Regenerate from source, then parse the real artifact.
-  execSync("npx tsx scripts/build-show.ts", { cwd: ROOT, stdio: "inherit" });
+  // Regenerate from source (the example rig), then parse the real artifact.
+  execSync(`npx tsx scripts/build-show.ts "${EXAMPLE_RIG}"`, {
+    cwd: ROOT, stdio: "inherit", env: { ...process.env, QLC_BUILD_OUT: OUT },
+  });
   const result = await parseQxwFile(QXW);
   expect(result.errors).toEqual([]);
   names = result.widgets.map((w) => w.name);
@@ -127,7 +134,7 @@ describe("punk-rock-show generator", () => {
   });
 
   it("switches pages from a dedicated pad (R8C8) + keyboard, not the dead top arrows", () => {
-    expect(raw).toContain('<Multipage PagesNum="2" CurrentPage="0"/>');
+    expect(raw).toContain('<Multipage PagesNum="3" CurrentPage="2"/>'); // 3 pages, boots on SIMPLE
     expect(raw).toContain('<PagesLoop>True</PagesLoop>');           // single Next pad wraps 2->1
     expect(raw).toContain('<Input Universe="1" Channel="146"/>');   // R8C8 bottom-right = page toggle
     expect(raw).toContain('<Key>PgDown</Key>');                     // keyboard backup (next)
@@ -197,7 +204,7 @@ describe("punk-rock-show generator", () => {
     }
   });
 
-  it("exposes all looks + sliders as OSC widgets (126 looks + 5 sliders)", () => {
-    expect(names.length).toBe(131);
+  it("exposes all looks + sliders as OSC widgets (160 looks + 5 sliders)", () => {
+    expect(names.length).toBe(165);
   });
 });

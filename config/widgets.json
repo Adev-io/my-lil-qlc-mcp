@@ -834,6 +834,223 @@
       "description": "Button: Punk Slam R8C7 (Input Universe 0, Channel 8728)"
     },
     {
+      "id": "352",
+      "name": "Opener R1C1",
+      "path": "/opener_r1c1",
+      "type": "button",
+      "description": "Button: Opener R1C1 (Input Universe 0, Channel 2450)"
+    },
+    {
+      "id": "354",
+      "name": "Verse Blue R1C2",
+      "path": "/verse_blue_r1c2",
+      "type": "button",
+      "description": "Button: Verse Blue R1C2 (Input Universe 0, Channel 12164)"
+    },
+    {
+      "id": "356",
+      "name": "Chorus Warm R1C3",
+      "path": "/chorus_warm_r1c3",
+      "type": "button",
+      "description": "Button: Chorus Warm R1C3 (Input Universe 0, Channel 23977)"
+    },
+    {
+      "id": "358",
+      "name": "Breakdown UV R1C4",
+      "path": "/breakdown_uv_r1c4",
+      "type": "button",
+      "description": "Button: Breakdown UV R1C4 (Input Universe 0, Channel 11053)"
+    },
+    {
+      "id": "360",
+      "name": "Anthem R1C5",
+      "path": "/anthem_r1c5",
+      "type": "button",
+      "description": "Button: Anthem R1C5 (Input Universe 0, Channel 34083)"
+    },
+    {
+      "id": "362",
+      "name": "Half Time R1C6",
+      "path": "/half_time_r1c6",
+      "type": "button",
+      "description": "Button: Half Time R1C6 (Input Universe 0, Channel 33227)"
+    },
+    {
+      "id": "364",
+      "name": "Green Room R1C7",
+      "path": "/green_room_r1c7",
+      "type": "button",
+      "description": "Button: Green Room R1C7 (Input Universe 0, Channel 11946)"
+    },
+    {
+      "id": "366",
+      "name": "Magenta Pop R1C8",
+      "path": "/magenta_pop_r1c8",
+      "type": "button",
+      "description": "Button: Magenta Pop R1C8 (Input Universe 0, Channel 17080)"
+    },
+    {
+      "id": "368",
+      "name": "Deep Verse R2C1",
+      "path": "/deep_verse_r2c1",
+      "type": "button",
+      "description": "Button: Deep Verse R2C1 (Input Universe 0, Channel 45584)"
+    },
+    {
+      "id": "370",
+      "name": "Sunset Jam R2C2",
+      "path": "/sunset_jam_r2c2",
+      "type": "button",
+      "description": "Button: Sunset Jam R2C2 (Input Universe 0, Channel 17780)"
+    },
+    {
+      "id": "372",
+      "name": "Big Finish R2C3",
+      "path": "/big_finish_r2c3",
+      "type": "button",
+      "description": "Button: Big Finish R2C3 (Input Universe 0, Channel 63703)"
+    },
+    {
+      "id": "374",
+      "name": "Cyan Wash R2C4",
+      "path": "/cyan_wash_r2c4",
+      "type": "button",
+      "description": "Button: Cyan Wash R2C4 (Input Universe 0, Channel 40369)"
+    },
+    {
+      "id": "376",
+      "name": "Purple Haze R2C5",
+      "path": "/purple_haze_r2c5",
+      "type": "button",
+      "description": "Button: Purple Haze R2C5 (Input Universe 0, Channel 18609)"
+    },
+    {
+      "id": "378",
+      "name": "Gold Ballad R2C6",
+      "path": "/gold_ballad_r2c6",
+      "type": "button",
+      "description": "Button: Gold Ballad R2C6 (Input Universe 0, Channel 54714)"
+    },
+    {
+      "id": "380",
+      "name": "Punk Slam R2C7",
+      "path": "/punk_slam_r2c7",
+      "type": "button",
+      "description": "Button: Punk Slam R2C7 (Input Universe 0, Channel 20834)"
+    },
+    {
+      "id": "382",
+      "name": "Red R4C1",
+      "path": "/red_r4c1",
+      "type": "button",
+      "description": "Button: Red R4C1 (Input Universe 0, Channel 26254)"
+    },
+    {
+      "id": "384",
+      "name": "Amber R4C2",
+      "path": "/amber_r4c2",
+      "type": "button",
+      "description": "Button: Amber R4C2 (Input Universe 0, Channel 47522)"
+    },
+    {
+      "id": "386",
+      "name": "Yellow R4C3",
+      "path": "/yellow_r4c3",
+      "type": "button",
+      "description": "Button: Yellow R4C3 (Input Universe 0, Channel 7534)"
+    },
+    {
+      "id": "388",
+      "name": "Green R4C4",
+      "path": "/green_r4c4",
+      "type": "button",
+      "description": "Button: Green R4C4 (Input Universe 0, Channel 45744)"
+    },
+    {
+      "id": "390",
+      "name": "Cyan R4C5",
+      "path": "/cyan_r4c5",
+      "type": "button",
+      "description": "Button: Cyan R4C5 (Input Universe 0, Channel 46084)"
+    },
+    {
+      "id": "392",
+      "name": "Blue R4C6",
+      "path": "/blue_r4c6",
+      "type": "button",
+      "description": "Button: Blue R4C6 (Input Universe 0, Channel 61665)"
+    },
+    {
+      "id": "394",
+      "name": "Magenta R4C7",
+      "path": "/magenta_r4c7",
+      "type": "button",
+      "description": "Button: Magenta R4C7 (Input Universe 0, Channel 5335)"
+    },
+    {
+      "id": "396",
+      "name": "White R4C8",
+      "path": "/white_r4c8",
+      "type": "button",
+      "description": "Button: White R4C8 (Input Universe 0, Channel 36209)"
+    },
+    {
+      "id": "398",
+      "name": "Head Circle R6C1",
+      "path": "/head_circle_r6c1",
+      "type": "button",
+      "description": "Button: Head Circle R6C1 (Input Universe 0, Channel 218)"
+    },
+    {
+      "id": "400",
+      "name": "Audience Sweep R6C2",
+      "path": "/audience_sweep_r6c2",
+      "type": "button",
+      "description": "Button: Audience Sweep R6C2 (Input Universe 0, Channel 60062)"
+    },
+    {
+      "id": "402",
+      "name": "Cross Zigzag R6C3",
+      "path": "/cross_zigzag_r6c3",
+      "type": "button",
+      "description": "Button: Cross Zigzag R6C3 (Input Universe 0, Channel 19397)"
+    },
+    {
+      "id": "404",
+      "name": "Head Sweep Slow R6C4",
+      "path": "/head_sweep_slow_r6c4",
+      "type": "button",
+      "description": "Button: Head Sweep Slow R6C4 (Input Universe 0, Channel 41485)"
+    },
+    {
+      "id": "406",
+      "name": "Head Sweep Fast R6C5",
+      "path": "/head_sweep_fast_r6c5",
+      "type": "button",
+      "description": "Button: Head Sweep Fast R6C5 (Input Universe 0, Channel 36091)"
+    },
+    {
+      "id": "408",
+      "name": "Figure 8 R6C6",
+      "path": "/figure_8_r6c6",
+      "type": "button",
+      "description": "Button: Figure 8 R6C6 (Input Universe 0, Channel 7356)"
+    },
+    {
+      "id": "410",
+      "name": "Pan Wave R6C7",
+      "path": "/pan_wave_r6c7",
+      "type": "button",
+      "description": "Button: Pan Wave R6C7 (Input Universe 0, Channel 1996)"
+    },
+    {
+      "id": "412",
+      "name": "Tilt Dip R6C8",
+      "path": "/tilt_dip_r6c8",
+      "type": "button",
+      "description": "Button: Tilt Dip R6C8 (Input Universe 0, Channel 7212)"
+    },
+    {
       "id": "212",
       "name": "Strobe All R8C1",
       "path": "/strobe_all_r8c1",
@@ -877,6 +1094,27 @@
     },
     {
       "id": "224",
+      "name": "Blackout R8C7",
+      "path": "/blackout_r8c7",
+      "type": "button",
+      "description": "Button: Blackout R8C7 (Input Universe 0, Channel 5839)"
+    },
+    {
+      "id": "414",
+      "name": "Strobe All R8C1",
+      "path": "/strobe_all_r8c1",
+      "type": "button",
+      "description": "Button: Strobe All R8C1 (Input Universe 0, Channel 53930)"
+    },
+    {
+      "id": "416",
+      "name": "Full On R8C5",
+      "path": "/full_on_r8c5",
+      "type": "button",
+      "description": "Button: Full On R8C5 (Input Universe 0, Channel 36342)"
+    },
+    {
+      "id": "418",
       "name": "Blackout R8C7",
       "path": "/blackout_r8c7",
       "type": "button",
@@ -929,5 +1167,5 @@
     }
   ],
   "generated": true,
-  "generatedAt": "2026-06-10T04:24:45.359Z"
+  "generatedAt": "2026-06-11T02:09:55.726Z"
 }

@@ -1,0 +1,77 @@
+{
+  "$schema": "./rig.schema.json",
+  "meta": {
+    "name": "Punk Rock Show",
+    "description": "Punk/alt-rock rig: 10x Rainbow Smart 2 Pro pars (floor uplight), 2x COLORband T3-BT bars (high sides), 2x Intimidator 375Z heads (front corner trusses).",
+    "author": "A_Development"
+  },
+  "stage": {
+    "widthFt": 20,
+    "depthFt": 10,
+    "deckHeightFt": 2.5,
+    "headHeightFt": 8.5,
+    "headSeparationFt": 20,
+    "notes": "2026-06-09 re-block: ground-standing trusses at the front stage corners, heads on top, roof close above — all aims below horizontal."
+  },
+  "performers": {
+    "vox": { "x": 0, "y": 3.3 },
+    "guitar": { "x": -5.6, "y": 2.7 },
+    "bass": { "x": 5.2, "y": 4.8 },
+    "drums": { "x": 7, "y": 7.5, "aimZ": 6 }
+  },
+  "fixtures": [
+    {
+      "kind": "par",
+      "namePrefix": "Rainbow Par",
+      "manufacturer": "Rainbow Lights",
+      "model": "Smart 2 Pro RGBWA+UV",
+      "mode": "10 Channel",
+      "channels": 10,
+      "count": 10,
+      "addresses": [0, 10, 20, 30, 40, 50, 60, 70, 80, 90],
+      "qxfFile": "fixtures/Rainbow-Lights-Smart-2-Pro-RGBWAUV.qxf",
+      "roles": { "dim": 0, "strobe": 1, "r": 2, "g": 3, "b": 4, "w": 5, "a": 6, "uv": 7, "macro": 8, "speed": 9 }
+    },
+    {
+      "kind": "bar",
+      "namePrefix": "Bar",
+      "manufacturer": "Chauvet",
+      "model": "COLORband T3 BT",
+      "mode": "13 Channel",
+      "channels": 13,
+      "count": 2,
+      "addresses": [100, 113],
+      "roles": { "cells": [[0, 1, 2], [3, 4, 5], [6, 7, 8]], "strobe": 9, "autoProg": 10, "speed": 11, "dim": 12 }
+    },
+    {
+      "kind": "head",
+      "namePrefix": "Head",
+      "manufacturer": "Chauvet",
+      "model": "Intimidator Spot 375Z IRC",
+      "mode": "15 channel",
+      "channels": 15,
+      "count": 2,
+      "addresses": [152, 167],
+      "roles": { "pan": 0, "panFine": 1, "tilt": 2, "tiltFine": 3, "ptSpeed": 4, "color": 5, "gobo": 6, "goboRot": 7, "prism": 8, "focus": 9, "dim": 10, "shutter": 11, "ctrl": 12, "mov": 13, "zoom": 14 },
+      "beam": { "panRangeDeg": 540, "tiltRangeDeg": 270, "tiltCentreDeprDeg": 37.5, "shutterOpen": 255, "shutterOpenMin": 216 },
+      "colorWheel": { "white": 0, "orange": 8, "lime": 16, "cyan": 24, "red": 36, "green": 44, "magenta": 50, "yellow": 60 },
+      "goboSlots": [11, 19, 27, 35, 43, 51, 59]
+    }
+  ],
+  "controller": {
+    "launchpad": true,
+    "model": "Novation Launchpad Mini MK3",
+    "profile": "Novation Launchpad Mini MK3",
+    "inputUid": "2",
+    "inputLine": "2",
+    "outputUid": "3",
+    "outputLine": "3"
+  },
+  "dmxOutput": {
+    "plugin": "ArtNet",
+    "universe": 0,
+    "transmitMode": "Standard",
+    "outputIp": null,
+    "notes": "no outputIP -> broadcast. Pknight CR011R node at 10.201.6.100/24 via USB GbE NIC (static 10.201.6.1/24); ArtNet lines sort ascending by IP string."
+  }
+}

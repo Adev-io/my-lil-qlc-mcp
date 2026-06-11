@@ -1,12 +1,14 @@
 /*
- * build-show.ts — generates punk-rock-show.qxw + PATCH-CHART.md for the
- * punk/alt-rock rig (10x Rainbow Smart 2 Pro, 4x COLORband T3-BT, 2x 375Z).
+ * build-show.ts — generates <show>.qxw + PATCH-CHART.md + SETUP-MANUAL.html
+ * from a rig config (rig.json — see scripts/rig.ts and rigs/punk-rock-show.rig.json).
  *
- * Why a generator: ~50 scenes/chasers x up to 16 fixtures + ~100 VC buttons
- * with CRC-16 OSC hashes is infeasible to hand-author and easy to get wrong.
- * Tweak the DATA TABLES below and re-run to rebuild. Run:
- *     npx tsx scripts/build-show.ts
- * then: npm run generate:widgets ./punk-rock-show.qxw config/widgets.json
+ * Why a generator: ~50 scenes/chasers x N fixtures + ~100 VC buttons with
+ * CRC-16 OSC hashes is infeasible to hand-author and easy to get wrong.
+ * The RIG (fixtures, addresses, stage geometry) comes from rig.json; the SHOW
+ * DESIGN (colours, looks, presets, pad layout — the DATA TABLES below) lives
+ * here. Tweak either and re-run to rebuild:
+ *     npx tsx scripts/build-show.ts [path/to/rig.json]
+ * then: npm run generate:widgets ./<show>.qxw config/widgets.json
  *
  * XML shapes mirror QLC+'s own saveXML (engine/src + ui/src/virtualconsole)
  * and the worked example intervalPI.qxw. Control model is "dual button":
@@ -15,13 +17,21 @@
  * feedback) — QLC+ VCButton persists only one input source per button.
  */
 
-import { writeFileSync, chmodSync, existsSync } from "fs";
+import { writeFileSync, chmodSync, existsSync, mkdirSync } from "fs";
 import { fileURLToPath } from "url";
 import path from "path";
 import { renderManual } from "./manual.js";
+import { loadRig, slugify } from "./rig.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO = path.resolve(__dirname, "..");
+
+const { rig, rigPath } = loadRig(process.argv[2]);
+const SHOW_SLUG = slugify(rig.meta.name);
+const QXW_FILE = `${SHOW_SLUG}.qxw`;
+// Tests (and CI) can redirect output away from the repo root.
+const OUT = process.env.QLC_BUILD_OUT ? path.resolve(process.env.QLC_BUILD_OUT) : REPO;
+mkdirSync(OUT, { recursive: true });
 
 // ----------------------------------------------------------------------------
 // CRC-16-CCITT, byte-identical to Utils::getChecksum (plugins/interfaces/utils.h)
@@ -83,15 +93,19 @@ function dimOf(v: number): number {
 // ----------------------------------------------------------------------------
 // Fixture channel maps (0-indexed within each fixture footprint)
 // ----------------------------------------------------------------------------
-// Rainbow Smart 2 Pro 10ch: 0 Dim 1 Strobe 2 R 3 G 4 B 5 W 6 A 7 UV 8 Macro 9 Speed
-// (rig-verified 2026-06-09: White@old-ch4 lit BLUE, Red@old-ch1 went DARK -> colors sit at 2..7,
-//  strobe is ch1, NOT ch7 as the original def assumed)
-// COLORband T3-BT 13ch:     0..8 = 3 RGB cells, 9 Strobe, 10 AutoProg, 11 Speed, 12 Dim
-// Intimidator 375Z 15ch:    0 Pan 1 PanF 2 Tilt 3 TiltF 4 PTSpeed 5 Color 6 Gobo
-//                           7 GoboRot 8 Prism 9 Focus 10 Dim 11 Shutter 12 Ctrl 13 Mov 14 Zoom
-const SHUTTER_OPEN = 255; // 375Z 216-255 = open
-const HEAD_COLOR = {
+// The VALUE BUILDERS below (parVal/barVal/headVal and the raw-pair FX) assume the
+// per-kind role LAYOUT of the reference fixtures (see rigs/punk-rock-show.rig.json):
+//   par 10ch:  0 Dim 1 Strobe 2 R 3 G 4 B 5 W 6 A 7 UV 8 Macro 9 Speed
+//   bar 13ch:  0..8 = 3 RGB cells, 9 Strobe, 10 AutoProg, 11 Speed, 12 Dim
+//   head 15ch: 0 Pan 1 PanF 2 Tilt 3 TiltF 4 PTSpeed 5 Color 6 Gobo
+//              7 GoboRot 8 Prism 9 Focus 10 Dim 11 Shutter 12 Ctrl 13 Mov 14 Zoom
+// A fixture with a DIFFERENT layout needs builder edits (qlc-show-designer agent's job);
+// counts, addresses, names, stage geometry and head wheel/gobo data all come from rig.json.
+const headGroup = rig.fixtures.find((g) => g.kind === "head");
+const SHUTTER_OPEN = headGroup?.beam?.shutterOpen ?? 255;
+const HEAD_COLOR: Record<string, number> = {
   white: 0, orange: 8, lime: 16, cyan: 24, red: 36, green: 44, magenta: 50, yellow: 60,
+  ...(headGroup?.colorWheel ?? {}),
 };
 
 interface Fixture {
@@ -101,17 +115,15 @@ interface Fixture {
 
 const fixtures: Fixture[] = [];
 let fxId = 0;
-for (let i = 0; i < 10; i++)
-  fixtures.push({ id: fxId++, manuf: "Rainbow Lights", model: "Smart 2 Pro RGBWA+UV",
-    mode: "10 Channel", name: `Rainbow Par ${i + 1}`, address: i * 10, channels: 10, kind: "par" });
-const barAddr = [100, 113]; // 2 bars (was 4) — rig reduced 2026-06-09
-for (let i = 0; i < barAddr.length; i++)
-  fixtures.push({ id: fxId++, manuf: "Chauvet", model: "COLORband T3 BT",
-    mode: "13 Channel", name: `Bar ${i + 1}`, address: barAddr[i], channels: 13, kind: "bar" });
-const headAddr = [152, 167];
-for (let i = 0; i < 2; i++)
-  fixtures.push({ id: fxId++, manuf: "Chauvet", model: "Intimidator Spot 375Z IRC",
-    mode: "15 channel", name: `Head ${i === 0 ? "L" : "R"}`, address: headAddr[i], channels: 15, kind: "head" });
+for (const g of rig.fixtures) {
+  const prefix = g.namePrefix ?? g.kind.charAt(0).toUpperCase() + g.kind.slice(1);
+  for (let i = 0; i < g.count; i++) {
+    // Two heads keep the classic L/R names; any other count numbers them.
+    const suffix = g.kind === "head" && g.count === 2 ? (i === 0 ? "L" : "R") : `${i + 1}`;
+    fixtures.push({ id: fxId++, manuf: g.manufacturer, model: g.model, mode: g.mode,
+      name: `${prefix} ${suffix}`, address: g.addresses[i], channels: g.channels, kind: g.kind });
+  }
+}
 
 const pars = fixtures.filter((f) => f.kind === "par");
 const bars = fixtures.filter((f) => f.kind === "bar");
@@ -137,6 +149,9 @@ function addScene(name: string, vals: FixVal[], fadeIn = 120, fadeOut = 120): nu
   return id;
 }
 function addChaser(name: string, stepNames: string[], hold: number, fade = 0, direction = "Forward", runOrder = "Loop"): number {
+  // A rig without the relevant fixture kind produces zero steps (e.g. "Bar Chase" with no
+  // bars) — skip the chaser entirely; its pad is dropped too (see the funcIdByName filters).
+  if (stepNames.length === 0) return -1;
   const id = funcId++;
   const steps = stepNames.map((n) => {
     const sid = funcIdByName.get(n);
@@ -244,11 +259,15 @@ function splitVals(parA: number[], barA: number[], parB: number[], barB: number[
 // opposite side), negate the pan term in aim(); if beams sit globally high or low, nudge
 // TILT_CENTRE_DEPR; AIM_Z / STAGE_DECK raise/lower where the beam centres on a body.
 // ----------------------------------------------------------------------------
-const HEAD_XYZ = { L: { x: -10, y: 0, z: 8.5 }, R: { x: 10, y: 0, z: 8.5 } };
-const PAN_DMX_PER_DEG = 255 / 540;   // 0.4722
-const TILT_DMX_PER_DEG = 255 / 270;  // 0.9444
-const TILT_CENTRE_DEPR = 37.5;       // depression (° below horizontal) that reads tilt DMX 128
-const STAGE_DECK = 2.5;              // stage deck height above the floor (ft)
+const STAGE_W = rig.stage.widthFt;
+const STAGE_D = rig.stage.depthFt;
+const HEAD_SEP = rig.stage.headSeparationFt ?? STAGE_W;
+const HEAD_Z = rig.stage.headHeightFt;
+const HEAD_XYZ = { L: { x: -HEAD_SEP / 2, y: 0, z: HEAD_Z }, R: { x: HEAD_SEP / 2, y: 0, z: HEAD_Z } };
+const PAN_DMX_PER_DEG = 255 / (headGroup?.beam?.panRangeDeg ?? 540);    // 0.4722 on the 375Z
+const TILT_DMX_PER_DEG = 255 / (headGroup?.beam?.tiltRangeDeg ?? 270);  // 0.9444 on the 375Z
+const TILT_CENTRE_DEPR = headGroup?.beam?.tiltCentreDeprDeg ?? 37.5; // depression (° below horizontal) that reads tilt DMX 128
+const STAGE_DECK = rig.stage.deckHeightFt;   // stage deck height above the floor (ft)
 const AIM_Z = STAGE_DECK + 4;        // beam centres on a performer's chest/face (ft above floor)
 const clampDmx = (v: number) => Math.max(0, Math.min(255, Math.round(v)));
 
@@ -268,16 +287,24 @@ function aim(side: "L" | "R", tx: number, ty: number, tz = AIM_Z): [number, numb
 function aimBoth(tx: number, ty: number, tz = AIM_Z): { l: [number, number]; r: [number, number] } {
   return { l: aim("L", tx, ty, tz), r: aim("R", tx, ty, tz) };
 }
-// Named aim points from the 2026-06-09 stage truth (resolved once, reused by positions + presets).
+// Named aim points (resolved once, reused by positions + presets). Performer positions come
+// from rig.performers when present; otherwise sensible defaults scaled to the stage size.
+const P = {
+  vox:    rig.performers?.vox    ?? { x: 0,               y: STAGE_D * 0.33 },
+  guitar: rig.performers?.guitar ?? { x: -STAGE_W * 0.28, y: STAGE_D * 0.27 },
+  bass:   rig.performers?.bass   ?? { x: STAGE_W * 0.26,  y: STAGE_D * 0.48 },
+  drums:  rig.performers?.drums  ?? { x: STAGE_W * 0.35,  y: STAGE_D * 0.75, aimZ: STAGE_DECK + 3.5 },
+};
 const AIM = {
-  singer:    aimBoth(0, 3.3),                            // vocalist, centre stage
-  guitar:    aimBoth(-5.6, 2.7),                         // front left
-  bass:      aimBoth(5.2, 4.8),                          // mid right
-  drums:     aimBoth(7, 7.5, STAGE_DECK + 3.5),          // back right, seated height
+  singer:    aimBoth(P.vox.x, P.vox.y, P.vox.aimZ ?? AIM_Z),
+  guitar:    aimBoth(P.guitar.x, P.guitar.y, P.guitar.aimZ ?? AIM_Z),
+  bass:      aimBoth(P.bass.x, P.bass.y, P.bass.aimZ ?? AIM_Z),
+  drums:     aimBoth(P.drums.x, P.drums.y, P.drums.aimZ ?? AIM_Z),
   crowdNear: aimBoth(0, -6, 5),                          // ~6 ft into the crowd, beams cross
   crowdDeep: aimBoth(0, -18, 5.5),                       // ~18 ft out
-  wash:  { l: aim("L", -5, 5), r: aim("R", 5, 5) },      // each head washes its own half
-  cross: { l: aim("L", 5, 4),  r: aim("R", -5, 4) },     // beams cross at centre (presets/zigzag)
+  // each head washes its own half / beams cross at centre (presets/zigzag)
+  wash:  { l: aim("L", -STAGE_W / 4, STAGE_D / 2), r: aim("R", STAGE_W / 4, STAGE_D / 2) },
+  cross: { l: aim("L", STAGE_W / 4, STAGE_D * 0.4),  r: aim("R", -STAGE_W / 4, STAGE_D * 0.4) },
 };
 
 // HEAD positions (pan/tilt per head) — aimed at the band and the crowd (2026-06-09 re-block).
@@ -329,7 +356,7 @@ for (const b of BAND) addScene(b.name, b.build());
 // Head positions
 for (const p of POSITIONS)
   addScene(p.name, heads.map((f, i) =>
-    headVal(f.id, { pan: (i === 0 ? p.l : p.r)[0], tilt: (i === 0 ? p.l : p.r)[1], dim: p.name === "Park" ? 0 : 255, shutter: SHUTTER_OPEN, focus: 128, zoom: p.zoom ?? 128 })));
+    headVal(f.id, { pan: (i % 2 === 0 ? p.l : p.r)[0], tilt: (i % 2 === 0 ? p.l : p.r)[1], dim: p.name === "Park" ? 0 : 255, shutter: SHUTTER_OPEN, focus: 128, zoom: p.zoom ?? 128 })));
 // Head beams
 for (const b of BEAMS)
   addScene(b.name, heads.map((f) =>
@@ -376,20 +403,21 @@ addScene("Sound Active", [
 // ============================================================================
 function addHeadScene(name: string, l: [number, number], r: [number, number]) {
   addScene(name, heads.map((f, i) => headVal(f.id, {
-    pan: (i === 0 ? l : r)[0], tilt: (i === 0 ? l : r)[1],
+    pan: (i % 2 === 0 ? l : r)[0], tilt: (i % 2 === 0 ? l : r)[1],
     dim: 255, shutter: SHUTTER_OPEN, color: HEAD_COLOR.white, gobo: 0, focus: 128, zoom: 128,
   })));
 }
 // Head Circle — band↔crowd orbit: guitar → singer → bass on stage, then back across the
 // near crowd (z 5 = standing faces). Always below horizontal (roof guard enforces).
 const CIRCLE_PTS: [number, number, number?][] = [
-  [-5.6, 2.7], [0, 3.3], [5.2, 4.8], [6, -6, 5], [0, -6, 5], [-6, -6, 5],
+  [P.guitar.x, P.guitar.y], [P.vox.x, P.vox.y], [P.bass.x, P.bass.y],
+  [6, -6, 5], [0, -6, 5], [-6, -6, 5],
 ];
 CIRCLE_PTS.forEach((p, i) => { const a = aimBoth(p[0], p[1], p[2] ?? AIM_Z); addHeadScene(`hCirc ${i+1}`, a.l, a.r); });
 addChaser("Head Circle", CIRCLE_PTS.map((_, i) => `hCirc ${i+1}`), 150, 600);
 // Audience Sweep — heads sweep left↔right across the near crowd at face height.
-// (Old z=8 target is ABOVE the new 8.5 ft heads at distance — the roof guard would throw.)
-const SWEEP_PTS: [number, number][] = [[-7,-6],[0,-6],[7,-6]];
+// (A z=8 target can sit ABOVE the heads at distance — the roof guard would throw.)
+const SWEEP_PTS: [number, number][] = [[-STAGE_W * 0.35, -6], [0, -6], [STAGE_W * 0.35, -6]];
 SWEEP_PTS.forEach((p, i) => { const a = aimBoth(p[0], p[1], 5); addHeadScene(`hSweep ${i+1}`, a.l, a.r); });
 addChaser("Audience Sweep", SWEEP_PTS.map((_, i) => `hSweep ${i+1}`), 100, 700, "Forward", "PingPong");
 // Cross Zigzag — beams crossed (L→audience-right, R→audience-left), zig between back and front.
@@ -425,7 +453,7 @@ const PX_RAINBOW: number[][] = [
 ];
 pars.forEach((f, i) => {
   const others = pars.filter((o) => o.id !== f.id).map((o) => parOff(o.id));
-  addScene(`Par Px ${i+1}`, [parVal(f.id, PX_RAINBOW[i]), ...others]);
+  addScene(`Par Px ${i+1}`, [parVal(f.id, PX_RAINBOW[i % PX_RAINBOW.length]), ...others]);
 });
 addChaser("Par Run",      pars.map((_, i) => `Par Px ${i+1}`), 110);
 addChaser("Pixel Bounce", pars.map((_, i) => `Par Px ${i+1}`), 80, 40, "Forward", "PingPong");
@@ -438,16 +466,17 @@ addChaser("Kill Strobe", ["White Hit", "PB Off"], 60);
 addScene("Pars Odd",  pars.map((f, i) => i % 2 === 0 ? parVal(f.id, [0,0,0,255,0,0]) : parOff(f.id)), 0, 0);
 addScene("Pars Even", pars.map((f, i) => i % 2 === 1 ? parVal(f.id, [0,0,0,255,0,0]) : parOff(f.id)), 0, 0);
 addChaser("Alt Flash", ["Pars Odd", "Pars Even"], 120);
-// Build Drop — stack pars -> peak -> blackout
-const buildN = (n: number) => pars.map((f, i) => i < n ? parVal(f.id, [255,0,0,0,0,0]) : parOff(f.id));
-addScene("Bld 1", buildN(2), 0, 0);
-addScene("Bld 2", buildN(4), 0, 0);
-addScene("Bld 3", buildN(7), 0, 0);
-addScene("Bld 4", buildN(10), 0, 0);
-addScene("Bld Peak", [...pars.map((f) => parVal(f.id, [0,0,0,255,0,0])), ...bars.map((f) => barVal(f.id, [255,255,255]))], 0, 0);
-addChaser("Build Drop", ["Bld 1","Bld 2","Bld 3","Bld 4","Bld Peak","PB Off"], 200);
-// Bar Scroll — RGBMatrix "Stripes" magenta across the Bars group (id 0)
-addMatrix("Bar Scroll", 0, "Stripes", argb(255, 0, 255), 450);
+// Build Drop — stack pars -> peak -> blackout. Steps scale with the par count
+// (2/4/7/10 on a 10-par rig); skipped entirely on a rig with no pars.
+if (pars.length > 0) {
+  const buildN = (n: number) => pars.map((f, i) => i < n ? parVal(f.id, [255,0,0,0,0,0]) : parOff(f.id));
+  const bldSteps = [0.2, 0.4, 0.7, 1].map((frac) => Math.max(1, Math.round(frac * pars.length)));
+  bldSteps.forEach((n, i) => addScene(`Bld ${i + 1}`, buildN(n), 0, 0));
+  addScene("Bld Peak", [...pars.map((f) => parVal(f.id, [0,0,0,255,0,0])), ...bars.map((f) => barVal(f.id, [255,255,255]))], 0, 0);
+  addChaser("Build Drop", ["Bld 1","Bld 2","Bld 3","Bld 4","Bld Peak","PB Off"], 200);
+}
+// Bar Scroll — RGBMatrix "Stripes" magenta across the Bars group (id 0); needs bars to exist
+if (bars.length > 0) addMatrix("Bar Scroll", 0, "Stripes", argb(255, 0, 255), 450);
 // Bar Bounce — page-1 fill (r6 c7): ping-pong the bars (reuses Bar Step scenes)
 addChaser("Bar Bounce", bars.map((_, i) => `Bar Step ${i + 1}`), 140, 0, "Forward", "PingPong");
 
@@ -459,36 +488,39 @@ addChaser("Bar Bounce", bars.map((_, i) => `Bar Step ${i + 1}`), 140, 0, "Forwar
 // r0 PARS colour / r1 BARS colour — touch ONLY their group's channels (independent groups)
 COLORS.forEach((c) => addScene(`Pars ${c.name}`, pars.map((f) => parVal(f.id, c.par))));
 COLORS.forEach((c) => addScene(`Bars ${c.name}`, bars.map((f) => barVal(f.id, c.bar))));
-// r2 HEADS colour — full centred open beam in each wheel colour
-const HCOL: [string, number][] = [
-  ["Heads White", 0], ["Heads Orange", 8], ["Heads Lime", 16], ["Heads Cyan", 24],
-  ["Heads Red", 36], ["Heads Green", 44], ["Heads Magenta", 50], ["Heads Yellow", 60],
-];
+// r2 HEADS colour — full centred open beam in each wheel colour (first 8 wheel slots from the rig)
+const HCOL: [string, number][] = Object.entries(HEAD_COLOR)
+  .slice(0, 8)
+  .map(([k, v]) => [`Heads ${k.charAt(0).toUpperCase()}${k.slice(1)}`, v]);
 HCOL.forEach(([n, col]) => addScene(n, heads.map((f, i) => {
-  const a = i === 0 ? AIM.singer.l : AIM.singer.r;
+  const a = i % 2 === 0 ? AIM.singer.l : AIM.singer.r;
   return headVal(f.id, { pan: a[0], tilt: a[1], color: col, gobo: 0, dim: 255, shutter: SHUTTER_OPEN, focus: 128, zoom: 128 });
 })));
-// r3 HEADS gobo — centred white beam through each gobo slot, plus prism
-const GOBOZ: [string, number][] = [
-  ["Gobo 1", 11], ["Gobo 2", 19], ["Gobo 3", 27], ["Gobo 4", 35], ["Gobo 5", 43], ["Gobo 6", 51], ["Gobo 7", 59],
-];
+// r3 HEADS gobo — centred white beam through each gobo slot, plus prism (slots from the rig)
+const GOBOZ: [string, number][] = (headGroup?.goboSlots ?? [11, 19, 27, 35, 43, 51, 59])
+  .slice(0, 7)
+  .map((g, i) => [`Gobo ${i + 1}`, g]);
 GOBOZ.forEach(([n, g]) => addScene(n, heads.map((f, i) => {
-  const a = i === 0 ? AIM.singer.l : AIM.singer.r;
+  const a = i % 2 === 0 ? AIM.singer.l : AIM.singer.r;
   return headVal(f.id, { pan: a[0], tilt: a[1], color: HEAD_COLOR.white, gobo: g, prism: 0, dim: 255, shutter: SHUTTER_OPEN, focus: 128 });
 })));
 addScene("Prism", heads.map((f, i) => {
-  const a = i === 0 ? AIM.singer.l : AIM.singer.r;
+  const a = i % 2 === 0 ? AIM.singer.l : AIM.singer.r;
   return headVal(f.id, { pan: a[0], tilt: a[1], color: HEAD_COLOR.white, gobo: 0, prism: 10, dim: 255, shutter: SHUTTER_OPEN, focus: 128 });
 }));
 // r4 HEADS movement — 3 NEW chasers (the existing 5 are reused by the page-2 buttons)
-const FIG8_PTS: [number, number][] = [[-2,4.8],[0,3.3],[2,1.8],[2,4.8],[0,3.3],[-2,1.8]];
+// Figure 8 orbits the vocalist position (±2 ft x, ±1.5 ft y)
+const FIG8_PTS: [number, number][] = [
+  [P.vox.x - 2, P.vox.y + 1.5], [P.vox.x, P.vox.y], [P.vox.x + 2, P.vox.y - 1.5],
+  [P.vox.x + 2, P.vox.y + 1.5], [P.vox.x, P.vox.y], [P.vox.x - 2, P.vox.y - 1.5],
+];
 FIG8_PTS.forEach((p, i) => { const a = aimBoth(p[0], p[1]); addHeadScene(`fig8 ${i+1}`, a.l, a.r); });
 addChaser("Figure 8", FIG8_PTS.map((_, i) => `fig8 ${i+1}`), 180, 600);
-const PANW_PTS: [number, number][] = [[-7,4],[0,4],[7,4]];
+const PANW_PTS: [number, number][] = [[-STAGE_W * 0.35, STAGE_D * 0.4], [0, STAGE_D * 0.4], [STAGE_W * 0.35, STAGE_D * 0.4]];
 PANW_PTS.forEach((p, i) => { const a = aimBoth(p[0], p[1]); addHeadScene(`panw ${i+1}`, a.l, a.r); });
 addChaser("Pan Wave", PANW_PTS.map((_, i) => `panw ${i+1}`), 220, 200, "Forward", "PingPong");
-{ const a = aimBoth(0, 8); addHeadScene("tiltd 1", a.l, a.r); }  // beams back (drum line)
-{ const a = aimBoth(0, 2); addHeadScene("tiltd 2", a.l, a.r); }  // beams front (singer line)
+{ const a = aimBoth(0, STAGE_D * 0.8); addHeadScene("tiltd 1", a.l, a.r); }  // beams back (drum line)
+{ const a = aimBoth(0, STAGE_D * 0.2); addHeadScene("tiltd 2", a.l, a.r); }  // beams front (singer line)
 addChaser("Tilt Dip", ["tiltd 1", "tiltd 2"], 260, 200, "Forward", "PingPong");
 // r5 CHASES 2 — new chasers over existing scenes (no new scenes)
 addChaser("Rainbow Fast",   ["Red","Amber","Yellow","Green","Cyan","Blue","Magenta"], 140);
@@ -496,9 +528,13 @@ addChaser("Strobe Rainbow", ["Red","White","Blue","White","Green","White"], 90);
 addChaser("Chase Up",       bars.map((_, i) => `Bar Step ${i + 1}`), 120);
 addChaser("Chase Down",     bars.map((_, i) => `Bar Step ${i + 1}`).reverse(), 120);
 addChaser("Two Tone",       ["Red Blue Split","Magenta Cyan"], 500);
-addChaser("Par Sparkle",    ["Par Px 1","Par Px 6","Par Px 3","Par Px 9","Par Px 2","Par Px 7","Par Px 4","Par Px 10","Par Px 5","Par Px 8"], 90);
+// Par Sparkle — pixel scenes in a halves-interleave (1,6,2,7,... on a 10-par rig)
+const sparkleOrder = pars.map((_, k) =>
+  k % 2 === 0 ? k / 2 : Math.ceil(pars.length / 2) + (k - 1) / 2);
+addChaser("Par Sparkle",    sparkleOrder.map((i) => `Par Px ${i + 1}`), 90);
 addChaser("Color Pop",      ["Stab Hit","PB Off","White Hit","PB Off"], 130);
-addChaser("Mega Build",     ["Bld 1","Bld 2","Bld 3","Bld 4","Bld Peak","PB Off"], 170);
+if (pars.length > 0)
+  addChaser("Mega Build",   ["Bld 1","Bld 2","Bld 3","Bld 4","Bld Peak","PB Off"], 170);
 // r6-r7 SONG presets — full-stage scenes (wash + heads), one song-look at a time
 // Head aim per song-look references a named geometry point (see AIM above), so presets
 // track the real stage too: center=band, drums=upstage hit, vox=downstage hit, wide/cross.
@@ -522,7 +558,7 @@ const PRESETS: { name: string; par: number[]; bar: number[]; hc: number; gobo: n
 ];
 PRESETS.forEach((p) => { const a = AIM[p.aim]; addScene(p.name, [
   ...washVals(p.par, p.bar),
-  ...heads.map((f, i) => headVal(f.id, { pan: (i === 0 ? a.l : a.r)[0], tilt: (i === 0 ? a.l : a.r)[1], color: p.hc, gobo: p.gobo, dim: 255, shutter: SHUTTER_OPEN, focus: 128 })),
+  ...heads.map((f, i) => headVal(f.id, { pan: (i % 2 === 0 ? a.l : a.r)[0], tilt: (i % 2 === 0 ? a.l : a.r)[1], color: p.hc, gobo: p.gobo, dim: 255, shutter: SHUTTER_OPEN, focus: 128 })),
 ], 200, 200); });
 
 // ----------------------------------------------------------------------------
@@ -603,7 +639,7 @@ function renderButtons(frameName: string, page: number): string[] {
 }
 
 interface NavOpt { nextInput?: number; prevInput?: number; nextKey?: string; prevKey?: string; loop?: boolean; }
-interface FrameOpts { page?: number; showHeader?: boolean; multipage?: number; nav?: NavOpt; }
+interface FrameOpts { page?: number; showHeader?: boolean; multipage?: number; currentPage?: number; nav?: NavOpt; }
 function frame(tag: "SoloFrame" | "Frame", caption: string, id: number, x: number, y: number, w: number, h: number, inner: string[], opts: FrameOpts = {}): string {
   const pageAttr = opts.page !== undefined ? ` Page="${opts.page}"` : "";
   // Multipage + page-nav (vcframe.cpp loadXML / loadXMLSources). <Next>/<Previous> each take an
@@ -612,7 +648,7 @@ function frame(tag: "SoloFrame" | "Frame", caption: string, id: number, x: numbe
   // PagesLoop=True lets that single Next pad wrap 2->1 (a one-pad toggle). vcframe's page-match
   // uses (page()<<16)|ch where page() is THIS frame's page in its parent (0 — the root's only
   // page), so the match is page-independent and the toggle works from either page.
-  const multipage = opts.multipage ? `\n    <Multipage PagesNum="${opts.multipage}" CurrentPage="0"/>` : "";
+  const multipage = opts.multipage ? `\n    <Multipage PagesNum="${opts.multipage}" CurrentPage="${opts.currentPage ?? 0}"/>` : "";
   const navSrc = (input?: number, key?: string) =>
     [input !== undefined ? `     <Input Universe="1" Channel="${input}"/>` : "",
      key ? `     <Key>${key}</Key>` : ""].filter(Boolean).join("\n");
@@ -699,8 +735,12 @@ const DYN: { n: string; led: number; bg: number[] }[][] = [
     { n: "Cross Zigzag", led: 106, bg: [200, 0, 160] }, { n: "Park All", led: 18, bg: [120, 80, 0] },
   ],
 ];
-DYN.forEach((row, ri) => row.forEach((d, i) =>
-  place({ caption: d.n, funcName: d.n, action: "Toggle", padRow: 4 + ri, padCol: i, led: d.led, bg: d.bg, frame: "DYNAMICS" })));
+// Skip pads whose function was conditionally dropped (no bars -> no Bar Chase, etc.);
+// the original column index is kept so the grid layout stays stable with gaps.
+DYN.forEach((row, ri) => row.forEach((d, i) => {
+  if (!funcIdByName.has(d.n)) return;
+  place({ caption: d.n, funcName: d.n, action: "Toggle", padRow: 4 + ri, padCol: i, led: d.led, bg: d.bg, frame: "DYNAMICS" });
+}));
 // CONTROL (non-solo, row 7): FX flash (c0-3) + Full On / Sound Active / Blackout (c4-6).
 // c7 (R8C8) carries NO look — it is the page-flip pad (the "Pages" frame's Next input, ch 146).
 place({ caption: "Strobe All",   funcName: "Strobe All",   action: "Flash",    padRow: 7, padCol: 0, led: 6,   bg: [255, 255, 255], frame: "CONTROL" });
@@ -731,10 +771,29 @@ MOVE.forEach((n, i) => place({ caption: n, funcName: n, action: "Toggle", padRow
 
 // r5 CHASES 2 — own solo frame
 const CH2 = ["Rainbow Fast", "Strobe Rainbow", "Chase Up", "Chase Down", "Two Tone", "Par Sparkle", "Color Pop", "Mega Build"];
-CH2.forEach((n, i) => place({ caption: n, funcName: n, action: "Toggle", padRow: 5, padCol: i, led: 42, bg: [120, 40, 160], frame: "CHASE2", page: 1 }));
+CH2.forEach((n, i) => {
+  if (!funcIdByName.has(n)) return; // dropped with its fixture kind (e.g. no bars -> no Chase Up)
+  place({ caption: n, funcName: n, action: "Toggle", padRow: 5, padCol: i, led: 42, bg: [120, 40, 160], frame: "CHASE2", page: 1 });
+});
 
 // r6-r7 SONG presets — full-stage, solo (one song look)
 PRESETS.forEach((p, i) => place({ caption: p.name, funcName: p.name, action: "Toggle", padRow: 6 + Math.floor(i / 8), padCol: i % 8, led: p.led, bg: p.bar, frame: "PRESETS", page: 1 }));
+
+// ============================================================================
+// SIMPLE PAGE (page index 2) — the "get through the show" page. The show BOOTS here
+// (CurrentPage=2); the R8C8 pad then cycles SIMPLE -> page1 -> page2 -> SIMPLE. It reuses
+// existing functions ONLY (PRESET scenes, COLORS washes, MOVE chasers) — no new looks, and
+// pages 0/1 are untouched. Each button reuses a function but gets its own pad + OSC path;
+// multipage isolation gates the shared pad channels (same trick the page1/page2 reuse uses).
+//   r0-1 PRESETS (home base) | r3 WASH colour | r5 MOVE | r7 utility (+ R8C8 page-flip)
+// ============================================================================
+PRESETS.forEach((p, i) => place({ caption: p.name, funcName: p.name, action: "Toggle", padRow: Math.floor(i / 8), padCol: i % 8, led: p.led, bg: p.bar, frame: "SIMPLE-PRESETS", page: 2 }));
+COLORS.forEach((c, i) => place({ caption: c.name, funcName: c.name, action: "Toggle", padRow: 3, padCol: i, led: c.led, bg: c.bg, frame: "SIMPLE-WASH", page: 2 }));
+MOVE.forEach((n, i) => place({ caption: n, funcName: n, action: "Toggle", padRow: 5, padCol: i, led: 82, bg: [0, 120, 220], frame: "SIMPLE-MOVE", page: 2 }));
+// utility (row 7, non-solo): big strobe hit, full-on, blackout. c7 is the page-flip pad (no look).
+place({ caption: "Strobe All", funcName: "Strobe All", action: "Flash",    padRow: 7, padCol: 0, led: 6,  bg: [255, 255, 255], frame: "SIMPLE-CONTROL", page: 2 });
+place({ caption: "Full On",    funcName: "Full On",    action: "Toggle",   padRow: 7, padCol: 4, led: 6,  bg: [255, 255, 255], frame: "SIMPLE-CONTROL", page: 2 });
+place({ caption: "Blackout",                           action: "Blackout", padRow: 7, padCol: 6, led: 10, bg: [40, 40, 40],    frame: "SIMPLE-CONTROL", page: 2 });
 
 // ----------------------------------------------------------------------------
 // Assemble XML
@@ -742,7 +801,7 @@ PRESETS.forEach((p, i) => place({ caption: p.name, funcName: p.name, action: "To
 // Fixture group: the bars as a (bars*3)-pixel horizontal canvas (each T3-BT exposes 3 heads).
 interface FixGroup { id: number; name: string; size: [number, number]; heads: { x: number; y: number; fixture: number; head: number }[]; }
 const fixtureGroups: FixGroup[] = [];
-{
+if (bars.length > 0) {
   const gh: FixGroup["heads"] = [];
   bars.forEach((f, bi) => { for (let h = 0; h < 3; h++) gh.push({ x: bi * 3 + h, y: 0, fixture: f.id, head: h }); });
   fixtureGroups.push({ id: 0, name: "Bars", size: [bars.length * 3, 1], heads: gh });
@@ -809,6 +868,8 @@ ${steps}
 // (multipage hides the off-page frames).
 function frameBBox(name: string) {
   const ps = placed.filter((p) => p.frame === name);
+  if (ps.length === 0)
+    throw new Error(`Frame "${name}" has no buttons — this rig dropped every look in it; remove the frame or add fixtures`);
   const cols = ps.map((p) => p.col), rows = ps.map((p) => p.row);
   return {
     x: 10 + Math.min(...cols) * 96 - 4,
@@ -822,6 +883,9 @@ const bWS = frameBBox("WASH-STATIC"), bHS = frameBBox("HEADS-STATIC"), bDyn = fr
 // Page-2 bands
 const bPars = frameBBox("PARS"), bBars = frameBBox("BARS"), bH2 = frameBBox("HEADS2"),
       bCh2 = frameBBox("CHASE2"), bPre = frameBBox("PRESETS");
+// SIMPLE-page bands (page index 2)
+const bSPre = frameBBox("SIMPLE-PRESETS"), bSWash = frameBBox("SIMPLE-WASH"),
+      bSMove = frameBBox("SIMPLE-MOVE"), bSCtl = frameBBox("SIMPLE-CONTROL");
 // FADERS (page 2): per-group Dim masters (own the dimmer channels the builders no longer set;
 // default 255 = full) + Strobe Rate + Heads Zoom. Master Dim = the built-in GrandMaster (global,
 // Properties below). The frame sits to the RIGHT of the grid; slider X is relative to the frame.
@@ -830,13 +894,14 @@ const strobeChans = [
   ...bars.map((f) => ({ fixture: f.id, ch: 9 })),
   ...heads.map((f) => ({ fixture: f.id, ch: 11 })),
 ];
-const faderBtns = [
-  sliderXml(900, "Pars Dim", 12, pars.map((f) => ({ fixture: f.id, ch: 0 })), 255, "/pars_dim"),
-  sliderXml(901, "Bars Dim", 84, bars.map((f) => ({ fixture: f.id, ch: 12 })), 255, "/bars_dim"),
-  sliderXml(902, "Heads Dim", 156, heads.map((f) => ({ fixture: f.id, ch: 10 })), 255, "/heads_dim"),
-  sliderXml(903, "Strobe Rate", 228, strobeChans, 0, "/strobe_rate"),
-  sliderXml(904, "Heads Zoom", 300, heads.map((f) => ({ fixture: f.id, ch: 14 })), 128, "/heads_zoom"),
-];
+// One fader slot (72px) per group that exists on this rig; X positions reflow left-to-right.
+const faderDefs: { id: number; caption: string; chans: { fixture: number; ch: number }[]; value: number; osc: string }[] = [];
+if (pars.length)  faderDefs.push({ id: 900, caption: "Pars Dim",  chans: pars.map((f) => ({ fixture: f.id, ch: 0 })),  value: 255, osc: "/pars_dim" });
+if (bars.length)  faderDefs.push({ id: 901, caption: "Bars Dim",  chans: bars.map((f) => ({ fixture: f.id, ch: 12 })), value: 255, osc: "/bars_dim" });
+if (heads.length) faderDefs.push({ id: 902, caption: "Heads Dim", chans: heads.map((f) => ({ fixture: f.id, ch: 10 })), value: 255, osc: "/heads_dim" });
+faderDefs.push({ id: 903, caption: "Strobe Rate", chans: strobeChans, value: 0, osc: "/strobe_rate" });
+if (heads.length) faderDefs.push({ id: 904, caption: "Heads Zoom", chans: heads.map((f) => ({ fixture: f.id, ch: 14 })), value: 128, osc: "/heads_zoom" });
+const faderBtns = faderDefs.map((d, i) => sliderXml(d.id, d.caption, 12 + i * 72, d.chans, d.value, d.osc));
 
 // All sub-frames live inside ONE multipage GRID frame — NOT the root frame. The root VC frame is
 // built with no header (m_hbox == NULL); setMultipageMode() dereferences that header layout ->
@@ -852,13 +917,18 @@ const gridInner = [
   frame("SoloFrame", "HEADS2", 6, bH2.x, bH2.y, bH2.w, bH2.h, renderButtons("HEADS2", 1), { page: 1 }),
   frame("SoloFrame", "CHASE2", 7, bCh2.x, bCh2.y, bCh2.w, bCh2.h, renderButtons("CHASE2", 1), { page: 1 }),
   frame("SoloFrame", "PRESETS", 8, bPre.x, bPre.y, bPre.w, bPre.h, renderButtons("PRESETS", 1), { page: 1 }),
-  frame("Frame", "FADERS", 9, 800, 8, 372, 360, faderBtns, { page: 1 }),
+  frame("Frame", "FADERS", 9, 800, 8, 12 + faderDefs.length * 72, 360, faderBtns, { page: 1 }),
+  // SIMPLE page (index 2) — boots first; reuses existing functions, four row-bands
+  frame("SoloFrame", "PRESETS (songs)", 11, bSPre.x, bSPre.y, bSPre.w, bSPre.h, renderButtons("SIMPLE-PRESETS", 2), { page: 2 }),
+  frame("SoloFrame", "WASH (colour)", 12, bSWash.x, bSWash.y, bSWash.w, bSWash.h, renderButtons("SIMPLE-WASH", 2), { page: 2 }),
+  frame("SoloFrame", "MOVE", 13, bSMove.x, bSMove.y, bSMove.w, bSMove.h, renderButtons("SIMPLE-MOVE", 2), { page: 2 }),
+  frame("Frame", "CONTROL", 14, bSCtl.x, bSCtl.y, bSCtl.w, bSCtl.h, renderButtons("SIMPLE-CONTROL", 2), { page: 2 }),
 ];
 // Page switch: the bottom-right grid pad (R8C8 = MIDI ch 146) toggles pages from the Launchpad
 // (PagesLoop wraps 2->1, so one pad cycles), plus PgDn/PgUp on the computer keyboard as a backup.
 // That pad fires no look on either page (Panic / Glow Out were dropped to free it).
 const grid = frame("Frame", "Pages", 10, 0, 0, 1180, 460, gridInner,
-  { multipage: 2, nav: { nextInput: 146, nextKey: "PgDown", prevKey: "PgUp", loop: true } });
+  { multipage: 3, currentPage: 2, nav: { nextInput: 146, nextKey: "PgDown", prevKey: "PgUp", loop: true } });
 
 const vc = `<VirtualConsole>
  <Frame Caption="">
@@ -877,24 +947,26 @@ ${grid}
  </Properties>
 </VirtualConsole>`;
 
-// Local MIDI device binding for the Launchpad Mini MK3. QLC+'s Win32 MIDI plugin
-// uses the winmm device INDEX as the UID (see plugins/midi/src/win32 extractUID).
-// On THIS machine the Launchpad's "LPMiniMK3 MIDI" port enumerates as input idx 1 /
-// output idx 2. If a replug/reboot reorders MIDI devices, update these (or remap in
-// QLC+ Inputs/Outputs). Set IN/OUT uid+line to "None"/"0" to leave it unmapped.
-// Use the SECOND MIDI port (MIDIIN2 / MIDIOUT2) — the dedicated Programmer-mode port the
-// Mini MK3 always routes pad data to (and that QLC+ must use to drive the pad LEDs). winmm
-// indices on this machine: MIDIIN2 = input idx 2, MIDIOUT2 = output idx 3.
-const LP_IN_UID = "2", LP_IN_LINE = "2";    // Input    -> "MIDIIN2 (LPMiniMK3 MIDI)"
-const LP_OUT_UID = "3", LP_OUT_LINE = "3";  // Feedback -> "MIDIOUT2 (LPMiniMK3 MIDI)" (drives pad LEDs)
+// Local MIDI device binding for the Launchpad (rig.controller). QLC+'s Win32 MIDI plugin
+// uses the winmm device INDEX as the UID (see plugins/midi/src/win32 extractUID). If a
+// replug/reboot reorders MIDI devices, update the rig's UIDs/lines (or remap in QLC+
+// Inputs/Outputs). On a Mini MK3, use the SECOND MIDI port (MIDIIN2 / MIDIOUT2) — the
+// dedicated Programmer-mode port pads transmit on (and that QLC+ must use for pad LEDs).
+const LP = rig.controller ?? { launchpad: false, inputUid: "None", inputLine: "0", outputUid: "None", outputLine: "0" };
+const LP_IN_UID = LP.launchpad ? LP.inputUid : "None", LP_IN_LINE = LP.launchpad ? LP.inputLine : "0";
+const LP_OUT_UID = LP.launchpad ? LP.outputUid : "None", LP_OUT_LINE = LP.launchpad ? LP.outputLine : "0";
+const LP_PROFILE = LP.launchpad ? (LP.profile ?? "Novation Launchpad Mini MK3") : null;
 
 // 2D Monitor stage layout (positions in mm on a 5x5m grid) so the Fixture Monitor's
-// 2D view shows the rig laid out: 10 pars front row, 2 bars mid, 2 heads upstage.
-// Element/attr names per engine/src/monitorproperties.cpp (DisplayMode 1 = Graphics/2D).
+// 2D view shows the rig laid out: pars front row, bars mid, heads upstage — each kind
+// spread evenly. Element/attr names per engine/src/monitorproperties.cpp (DisplayMode 1 = 2D).
+function spread(i: number, n: number): number {
+  return Math.round((5000 * (i + 0.5)) / Math.max(1, n));
+}
 function fxPos(f: Fixture): { x: number; y: number } {
-  if (f.kind === "par") return { x: 250 + pars.indexOf(f) * 475, y: 3800 };
-  if (f.kind === "bar") return { x: 625 + bars.indexOf(f) * 1250, y: 2400 };
-  return { x: heads.indexOf(f) === 0 ? 1450 : 3550, y: 900 };
+  if (f.kind === "par") return { x: spread(pars.indexOf(f), pars.length), y: 3800 };
+  if (f.kind === "bar") return { x: spread(bars.indexOf(f), bars.length), y: 2400 };
+  return { x: spread(heads.indexOf(f), heads.length), y: 900 };
 }
 const monitorXml = `  <Monitor DisplayMode="1" ShowLabels="1">
    <Grid Width="5" Height="4" Depth="4" Units="0"/>
@@ -903,34 +975,34 @@ ${fixtures
   .join("\n")}
   </Monitor>`;
 
+const dmxOut = rig.dmxOutput ?? { plugin: "ArtNet", universe: 0, transmitMode: "Standard", outputIp: null };
+const outputIpAttr = dmxOut.outputIp ? ` outputIP="${esc(dmxOut.outputIp)}"` : "";
+const dmxNote = dmxOut.notes ? `<!-- ${esc(dmxOut.notes)} -->` : `<!-- no outputIP -> broadcast -->`;
+const launchpadUniverse = LP.launchpad
+  ? `   <Universe Name="Launchpad" ID="1" Profile="${esc(LP_PROFILE!)}">
+    <Input Plugin="MIDI" UID="${LP_IN_UID}" Line="${LP_IN_LINE}"/>
+    <Feedback Plugin="MIDI" UID="${LP_OUT_UID}" Line="${LP_OUT_LINE}"/>
+   </Universe>`
+  : `   <Universe Name="Controller" ID="1"/>`;
 const qxw = `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE Workspace>
 <Workspace xmlns="http://www.qlcplus.org/Workspace" CurrentWindow="VirtualConsole">
  <Creator>
   <Name>Q Light Controller Plus</Name>
   <Version>4.14.3</Version>
-  <Author>A_Development</Author>
+  <Author>${esc(rig.meta.author ?? "QLCPlus-MCP")}</Author>
  </Creator>
  <Engine>
   <InputOutputMap>
    <BeatGenerator BeatType="Disabled" BPM="0"/>
    <Universe Name="Stage" ID="0">
     <Input Plugin="OSC" UID="None" Line="0"/>
-    <Output Plugin="ArtNet" UID="None" Line="0">
-     <PluginParameters outputUni="0" transmitMode="Standard"/><!-- no outputIP -> broadcast
-          10.201.6.255; node (v2.7 fw) ignored unicast ArtDmx despite RJ45 activity -->
-    </Output><!-- Pknight CR011R node: OLED + ARP + MAC-identity confirmed at 10.201.6.100/24
-         (MAC 02-4D-48-C9-06-64 encodes 201.6.100; Pknight MACs embed the IP).
-         Node settings verified 2026-06-09: Transmit=Artnet->dmx, Universe/SubNet/Net all 0.
-         Requires the USB GbE NIC ("Ethernet 3") set static 10.201.6.1/24.
-         ArtNet lines sort ascending by IP STRING -> 10.201.6.1 is Line 0 (before 10.62.x Wi-Fi).
-         ANY NIC/IP change reshuffles this; verify selected line at http://localhost:9999/config -->
+    <Output Plugin="${esc(dmxOut.plugin)}" UID="None" Line="0">
+     <PluginParameters outputUni="${dmxOut.universe}" transmitMode="${esc(dmxOut.transmitMode)}"${outputIpAttr}/>
+    </Output>${dmxNote}
     <Feedback Plugin="OSC" UID="None" Line="0"/>
    </Universe>
-   <Universe Name="Launchpad" ID="1" Profile="Novation Launchpad Mini MK3">
-    <Input Plugin="MIDI" UID="${LP_IN_UID}" Line="${LP_IN_LINE}"/>
-    <Feedback Plugin="MIDI" UID="${LP_OUT_UID}" Line="${LP_OUT_LINE}"/>
-   </Universe>
+${launchpadUniverse}
   </InputOutputMap>
 ${fixtures.map(fixtureXml).join("\n")}
 ${fixtureGroups.map(fixtureGroupXml).join("\n")}
@@ -945,7 +1017,7 @@ ${monitorXml}
 // which once overwrote this generated file with a stale build. Read-only stops that — edit
 // build-show.ts and regenerate to change the show; don't Save inside QLC+. (Clear RO before writing
 // so a re-run can overwrite.)
-const qxwPath = path.join(REPO, "punk-rock-show.qxw");
+const qxwPath = path.join(OUT, QXW_FILE);
 if (existsSync(qxwPath)) { try { chmodSync(qxwPath, 0o666); } catch { /* not RO yet */ } }
 writeFileSync(qxwPath, qxw, "utf8");
 try { chmodSync(qxwPath, 0o444); } catch { /* best-effort write-protect */ }
@@ -984,9 +1056,10 @@ function lookIndex(): string {
   return `${head}\n${rows}`;
 }
 
-const chart = `# Punk/Alt-Rock Show — Patch Chart & Launchpad Map
+const chart = `# ${rig.meta.name} — Patch Chart & Launchpad Map
 
-Generated by scripts/build-show.ts. Output: Art-Net **Universe 0** (one DMX universe,
+Generated by scripts/build-show.ts from ${path.basename(rigPath)}. Output: ${dmxOut.plugin}
+**Universe ${dmxOut.universe}** (one DMX universe,
 ${fixtures.reduce((a, f) => Math.max(a, f.address + f.channels), 0)} of 512 channels used).
 
 ## DMX patch — set each light to its START address
@@ -996,22 +1069,27 @@ ${fixtures.reduce((a, f) => Math.max(a, f.address + f.channels), 0)} of 512 chan
 ${patchRows()}
 \`\`\`
 
-Addresses are spaced (Rainbow every 10, bars every 13, heads every 15) so a mode change
-won't force a re-patch. All fixtures on one universe.
+Leave headroom between fixture addresses where you can, so a mode change won't force a
+re-patch. All fixtures on one universe.
 
 ## Launchpad Mini MK3 — 8x8 grid (Programmer Mode)
 
-Two pages. **Press the bottom-right pad (R8C8) to flip between Page 1 and Page 2** — that corner
-pad is the page-toggle on both pages and fires no look. (The Mini MK3's top →/← arrows don't
-transmit on the Programmer port, so a real grid pad owns the switch.) On the computer keyboard,
-**PgDn / PgUp** also switch pages.
+Three pages. The show **boots on the SIMPLE page**. **Press the bottom-right pad (R8C8) to cycle
+pages** — SIMPLE → Page 1 → Page 2 → SIMPLE. That corner pad is the page-toggle on every page and
+fires no look. (The Mini MK3's top →/← arrows don't transmit on the Programmer port, so a real grid
+pad owns the switch.) On the computer keyboard, **PgDn / PgUp** also switch pages.
 
-### Page 1
+### SIMPLE — the show boots here (presets + one colour + one movement)
+\`\`\`
+${gridAscii(2)}
+\`\`\`
+
+### Page 1 (cycle with the R8C8 pad)
 \`\`\`
 ${gridAscii(0)}
 \`\`\`
 
-### Page 2 (flip with the R8C8 pad)
+### Page 2 (cycle with the R8C8 pad)
 \`\`\`
 ${gridAscii(1)}
 \`\`\`
@@ -1024,7 +1102,8 @@ built-in GrandMaster (top-right of the console) and dims everything globally.
 
 Sorted by page, then row, then column. **R/C** = the 8×8 pad coordinate (1-indexed, top-left =
 R1C1); **Pad** = the Launchpad MIDI channel; **OSC** = the dashboard path. Each on-screen button's
-caption shows its R/C after the name (e.g. \`Red R1C1\`).
+caption shows its R/C after the name (e.g. \`Red R1C1\`). The **Pg** column is the internal page
+index — **Pg 3 = the SIMPLE page**, which the show boots on (cycle order: SIMPLE → 1 → 2).
 
 ${lookIndex()}
 
@@ -1036,14 +1115,14 @@ ${lookIndex()}
   \`qlc_button_press\`. Bindings are pre-baked (CRC-16 of the path); no Auto-Detect needed.
 `;
 
-writeFileSync(path.join(REPO, "PATCH-CHART.md"), chart, "utf8");
+writeFileSync(path.join(OUT, "PATCH-CHART.md"), chart, "utf8");
 
 // ----------------------------------------------------------------------------
 // SETUP-MANUAL.html (self-contained user manual)
 // ----------------------------------------------------------------------------
 const maxCh = fixtures.reduce((a, f) => Math.max(a, f.address + f.channels), 0);
 writeFileSync(
-  path.join(REPO, "SETUP-MANUAL.html"),
+  path.join(OUT, "SETUP-MANUAL.html"),
   renderManual({
     placed,
     fixtures: fixtures.map((f) => ({
@@ -1051,10 +1130,13 @@ writeFileSync(
     })),
     maxCh,
     counts: { fixtures: fixtures.length, functions: funcs.length, looks: placed.length },
+    showName: rig.meta.name,
+    qxwFile: QXW_FILE,
+    qxfFiles: rig.fixtures.map((g) => g.qxfFile).filter((p): p is string => !!p),
   }),
   "utf8",
 );
 
 console.log(`OK  crc16 check passed (0x906e); crc16("/rainbow")=${crc16("/rainbow")}`);
-console.log(`    fixtures=${fixtures.length}  functions=${funcs.length}  buttons=${btnId - 100}`);
-console.log(`    wrote punk-rock-show.qxw, PATCH-CHART.md, SETUP-MANUAL.html`);
+console.log(`    rig=${path.basename(rigPath)}  fixtures=${fixtures.length}  functions=${funcs.length}  buttons=${btnId - 100}`);
+console.log(`    wrote ${QXW_FILE}, PATCH-CHART.md, SETUP-MANUAL.html`);

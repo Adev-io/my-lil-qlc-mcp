@@ -16,6 +16,9 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "format": "prettier --write 'src/**/*.ts'",
+    "generate": "tsx scripts/generate-all.ts",
+    "generate:show": "tsx scripts/build-show.ts",
+    "generate:monitor": "tsx scripts/build-monitor.ts",
     "generate:widgets": "tsx src/qlc/generateWidgets.ts"
   },
   "dependencies": {

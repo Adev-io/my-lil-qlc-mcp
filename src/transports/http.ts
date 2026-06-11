@@ -2,6 +2,7 @@ import { type ToolDefinition, MCPServer } from "mcp-use/server";
 import { getLogger } from "../logger.js";
 import { Config } from "../config.js";
 import { registerAgentPrompt } from "../agentPrompt.js";
+import { registerDashboard } from "../dashboard/registerDashboard.js";
 
 function getConnectableHost(host: string): string {
   if (host === "0.0.0.0" || host === "::") {
@@ -33,7 +34,13 @@ export async function startHttpServer(
 
   if (config.authMode === "bearer") {
     server.app.use("*", async (c, next) => {
-      if (c.req.path === "/health") {
+      // /health and the dashboard page itself are public; the dashboard's
+      // /dashboard/api/* control endpoints stay behind the bearer check.
+      if (
+        c.req.path === "/health" ||
+        c.req.path === "/dashboard" ||
+        c.req.path === "/dashboard/"
+      ) {
         return await next();
       }
 
@@ -60,6 +67,8 @@ export async function startHttpServer(
       uptime: process.uptime(),
     })
   );
+
+  registerDashboard(server, tools, config);
 
   await server.listen(config.httpPort);
 
@@ -92,6 +101,7 @@ export async function startHttpServer(
       config.httpMcpPath
   );
   logger.info("Health endpoint: http://" + config.httpHost + ":" + config.httpPort + "/health");
+  logger.info("Dashboard: http://" + connectableHost + ":" + config.httpPort + "/dashboard");
   logger.info("Agent MCP URL: " + mcpUrl);
   logger.info("Agent health URL: " + healthUrl);
   if (config.authMode === "bearer") {

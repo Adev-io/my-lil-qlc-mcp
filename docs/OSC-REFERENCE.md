@@ -214,7 +214,7 @@ Important nuance: OSC over UDP has no built-in acknowledgement. A successful sen
 2. **Normalize Values** - Use 0-1 for all slider-type controls
 3. **DMX Channel Format** - Always use zero-based addressing in paths
 4. **Error Handling** - Implement retry logic for network-based connections
-5. **Logging** - Enable debug logging to trace OSC communication. Each outgoing OSC write logs a line like `[WRITE_OSC] 192.168.0.160:7700 /black args=[1]`; dry-run writes use `[WRITE_OSC_DRY_RUN]`. Each incoming feedback packet logs as `[READ_OSC] <source-host>:<source-port> <path> args=<json-array>`.
+5. **Logging** - Enable debug logging to trace OSC communication. Each outgoing OSC write logs a line like `[WRITE_OSC] 127.0.0.1:7700 /black args=[1]`; dry-run writes use `[WRITE_OSC_DRY_RUN]`. Each incoming feedback packet logs as `[READ_OSC] <source-host>:<source-port> <path> args=<json-array>`.
 
 ## Common Issues
 

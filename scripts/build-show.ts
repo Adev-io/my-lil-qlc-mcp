@@ -11,7 +11,7 @@
  * then: npm run generate:widgets ./<show>.qxw config/widgets.json
  *
  * XML shapes mirror QLC+'s own saveXML (engine/src + ui/src/virtualconsole)
- * and the worked example intervalPI.qxw. Control model is "dual button":
+ * and a hand-verified QLC+ 4 example project. Control model is "dual button":
  * every look has ONE OSC button (Universe 0, Channel=crc16(path)) for the
  * MCP/dashboard AND ONE Launchpad button (Universe 1, Channel=pad, with LED
  * feedback) — QLC+ VCButton persists only one input source per button.

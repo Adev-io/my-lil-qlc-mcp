@@ -1,0 +1,24 @@
+# dependencies / build output
+node_modules
+dist/
+.mcp-use
+
+# machine-specific config — the rig-setup-wizard writes these per machine
+config/.env
+.env
+rig.json
+
+# QLC+ litter (QLC+ Save / autosave must never land in git — the show is generated)
+*.autosave.qxw
+*.qxw.temp
+*.qxw.bak*
+*.bak-*
+
+# local scratch
+garbage.txt
+tmp-*.mjs
+.baseline/
+resources
+.superpowers/
+# session execution notes (machine-specific paths) — design specs DO ship
+docs/superpowers/plans/

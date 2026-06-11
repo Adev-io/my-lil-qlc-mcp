@@ -1,0 +1,408 @@
+{
+  "meta": {
+    "universe": 0,
+    "units": "ft",
+    "coords": "origin=front-centre floor; +X audience-right, +Y upstage, +Z up",
+    "stage": {
+      "width": 20,
+      "depth": 10,
+      "deck": 2.5
+    },
+    "head": {
+      "panRange": 540,
+      "tiltRange": 270,
+      "tiltCentreDepr": 37.5,
+      "panCentreUpstage": true
+    },
+    "shutterOpenMin": 216,
+    "generatedFrom": "scripts/build-monitor.ts"
+  },
+  "fixtures": [
+    {
+      "id": 0,
+      "name": "Par 1",
+      "kind": "par",
+      "address": 0,
+      "channels": 10,
+      "roles": {
+        "dim": 0,
+        "strobe": 1,
+        "r": 2,
+        "g": 3,
+        "b": 4,
+        "w": 5,
+        "a": 6,
+        "uv": 7
+      },
+      "pos": [
+        -9,
+        8.5,
+        0.1
+      ],
+      "point": [
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "id": 1,
+      "name": "Par 2",
+      "kind": "par",
+      "address": 10,
+      "channels": 10,
+      "roles": {
+        "dim": 0,
+        "strobe": 1,
+        "r": 2,
+        "g": 3,
+        "b": 4,
+        "w": 5,
+        "a": 6,
+        "uv": 7
+      },
+      "pos": [
+        -7,
+        8.5,
+        0.1
+      ],
+      "point": [
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Par 3",
+      "kind": "par",
+      "address": 20,
+      "channels": 10,
+      "roles": {
+        "dim": 0,
+        "strobe": 1,
+        "r": 2,
+        "g": 3,
+        "b": 4,
+        "w": 5,
+        "a": 6,
+        "uv": 7
+      },
+      "pos": [
+        -5,
+        8.5,
+        0.1
+      ],
+      "point": [
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Par 4",
+      "kind": "par",
+      "address": 30,
+      "channels": 10,
+      "roles": {
+        "dim": 0,
+        "strobe": 1,
+        "r": 2,
+        "g": 3,
+        "b": 4,
+        "w": 5,
+        "a": 6,
+        "uv": 7
+      },
+      "pos": [
+        -3,
+        8.5,
+        0.1
+      ],
+      "point": [
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Par 5",
+      "kind": "par",
+      "address": 40,
+      "channels": 10,
+      "roles": {
+        "dim": 0,
+        "strobe": 1,
+        "r": 2,
+        "g": 3,
+        "b": 4,
+        "w": 5,
+        "a": 6,
+        "uv": 7
+      },
+      "pos": [
+        -1,
+        8.5,
+        0.1
+      ],
+      "point": [
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Par 6",
+      "kind": "par",
+      "address": 50,
+      "channels": 10,
+      "roles": {
+        "dim": 0,
+        "strobe": 1,
+        "r": 2,
+        "g": 3,
+        "b": 4,
+        "w": 5,
+        "a": 6,
+        "uv": 7
+      },
+      "pos": [
+        1,
+        8.5,
+        0.1
+      ],
+      "point": [
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "id": 6,
+      "name": "Par 7",
+      "kind": "par",
+      "address": 60,
+      "channels": 10,
+      "roles": {
+        "dim": 0,
+        "strobe": 1,
+        "r": 2,
+        "g": 3,
+        "b": 4,
+        "w": 5,
+        "a": 6,
+        "uv": 7
+      },
+      "pos": [
+        3,
+        8.5,
+        0.1
+      ],
+      "point": [
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "id": 7,
+      "name": "Par 8",
+      "kind": "par",
+      "address": 70,
+      "channels": 10,
+      "roles": {
+        "dim": 0,
+        "strobe": 1,
+        "r": 2,
+        "g": 3,
+        "b": 4,
+        "w": 5,
+        "a": 6,
+        "uv": 7
+      },
+      "pos": [
+        5,
+        8.5,
+        0.1
+      ],
+      "point": [
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "id": 8,
+      "name": "Par 9",
+      "kind": "par",
+      "address": 80,
+      "channels": 10,
+      "roles": {
+        "dim": 0,
+        "strobe": 1,
+        "r": 2,
+        "g": 3,
+        "b": 4,
+        "w": 5,
+        "a": 6,
+        "uv": 7
+      },
+      "pos": [
+        7,
+        8.5,
+        0.1
+      ],
+      "point": [
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "id": 9,
+      "name": "Par 10",
+      "kind": "par",
+      "address": 90,
+      "channels": 10,
+      "roles": {
+        "dim": 0,
+        "strobe": 1,
+        "r": 2,
+        "g": 3,
+        "b": 4,
+        "w": 5,
+        "a": 6,
+        "uv": 7
+      },
+      "pos": [
+        9,
+        8.5,
+        0.1
+      ],
+      "point": [
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "id": 10,
+      "name": "Bar 1",
+      "kind": "bar",
+      "address": 100,
+      "channels": 13,
+      "roles": {
+        "cells": [
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            3,
+            4,
+            5
+          ],
+          [
+            6,
+            7,
+            8
+          ]
+        ],
+        "dim": 12
+      },
+      "pos": [
+        -10,
+        0.5,
+        11
+      ],
+      "point": [
+        0.71,
+        0,
+        -0.71
+      ]
+    },
+    {
+      "id": 11,
+      "name": "Bar 2",
+      "kind": "bar",
+      "address": 113,
+      "channels": 13,
+      "roles": {
+        "cells": [
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            3,
+            4,
+            5
+          ],
+          [
+            6,
+            7,
+            8
+          ]
+        ],
+        "dim": 12
+      },
+      "pos": [
+        10,
+        0.5,
+        11
+      ],
+      "point": [
+        -0.71,
+        0,
+        -0.71
+      ]
+    },
+    {
+      "id": 12,
+      "name": "Head L",
+      "kind": "head",
+      "address": 152,
+      "channels": 15,
+      "roles": {
+        "pan": 0,
+        "tilt": 2,
+        "color": 5,
+        "gobo": 6,
+        "dim": 10,
+        "shutter": 11,
+        "zoom": 14
+      },
+      "pos": [
+        -10,
+        0,
+        8.5
+      ]
+    },
+    {
+      "id": 13,
+      "name": "Head R",
+      "kind": "head",
+      "address": 167,
+      "channels": 15,
+      "roles": {
+        "pan": 0,
+        "tilt": 2,
+        "color": 5,
+        "gobo": 6,
+        "dim": 10,
+        "shutter": 11,
+        "zoom": 14
+      },
+      "pos": [
+        10,
+        0,
+        8.5
+      ]
+    }
+  ]
+}

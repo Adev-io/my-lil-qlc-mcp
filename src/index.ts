@@ -5,6 +5,7 @@ import { loadConfig } from "./config.js";
 import { createAgentPromptTool } from "./agentPrompt.js";
 import { initLogger, getLogger } from "./logger.js";
 import { initOsc } from "./osc/oscClient.js";
+import { startLaunchpadLeds } from "./launchpad/leds.js";
 import { loadWidgetConfig } from "./qlc/widgetResolver.js";
 import { startStdioServer } from "./transports/stdio.js";
 import { startHttpServer } from "./transports/http.js";
@@ -69,6 +70,16 @@ async function main() {
     // Load widget configuration
     logger.info("Loading widget configuration...");
     await loadWidgetConfig(config.qlcWidgetsFile);
+
+    // Launchpad LEDs — drive the Mini MK3 pads ourselves over RGB SysEx (Windows + Launchpad only;
+    // internally gated and never throws, so non-rig installs just skip it).
+    try {
+      await startLaunchpadLeds(config);
+    } catch (error) {
+      logger.warn(
+        `Launchpad LED driver init failed: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
 
     // Create tools
     logger.info("Registering MCP tools...");

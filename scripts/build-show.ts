@@ -561,6 +561,173 @@ PRESETS.forEach((p) => { const a = AIM[p.aim]; addScene(p.name, [
   ...heads.map((f, i) => headVal(f.id, { pan: (i % 2 === 0 ? a.l : a.r)[0], tilt: (i % 2 === 0 ? a.l : a.r)[1], color: p.hc, gobo: p.gobo, dim: 255, shutter: SHUTTER_OPEN, focus: 128 })),
 ], 200, 200); });
 
+// ============================================================================
+// ENERGY LADDER (2026-06-10) — 3 pages, ONE positional grammar, escalating energy.
+// Each page is a full 8x8: rows 0-2 = 24 openers, rows 3-4 = 16 verse/chorus (these 40 BASE
+// looks render per-tier into 120 scenes), row 5 = 8 strobes, row 6 = 8 chasers, row 7 = 8
+// utility (rows 5-7 REUSE existing functions — no new scenes). A pad keeps its song-moment
+// meaning on every page; only its energy escalates (P1 chill -> P2 driving -> P3 full-send).
+// ============================================================================
+const TIERS = [0, 1, 2];
+
+// Nearest Launchpad palette value for an [r,g,b] — LED feedback only (operator is colorblind, so
+// hue is cosmetic; position + brightness carry the meaning). Palette per the profile colour table.
+const LP_PALETTE: [number, number[]][] = [
+  [10, [255, 0, 0]], [18, [255, 90, 0]], [26, [255, 220, 0]], [42, [0, 220, 0]],
+  [66, [0, 200, 120]], [74, [0, 200, 200]], [82, [0, 60, 255]], [94, [40, 0, 200]],
+  [106, [255, 0, 200]], [114, [255, 80, 160]], [6, [255, 255, 255]],
+];
+function ledFor(rgb: number[]): number {
+  let best = 6, bd = Infinity;
+  for (const [v, c] of LP_PALETTE) {
+    const d = (c[0] - rgb[0]) ** 2 + (c[1] - rgb[1]) ** 2 + (c[2] - rgb[2]) ** 2;
+    if (d < bd) { bd = d; best = v; }
+  }
+  return best;
+}
+
+// Per-tier colour transforms applied to each base par [r,g,b,w,a,uv] / bar [r,g,b].
+const isWhitePar = (p: number[]) => p[0] === 0 && p[1] === 0 && p[2] === 0 && p[3] > 0 && p[4] === 0 && p[5] === 0;
+function tierPar(par: number[], t: number): number[] {
+  if (t === 0) { // chill: half-bright; warm-dim the pure-white look; UV (idx 5) untouched
+    if (isWhitePar(par)) return [0, 0, 0, 110, 40, 0];
+    return par.map((v, i) => (i === 5 ? v : Math.round(v * 0.5)));
+  }
+  if (t === 1) return par;                                  // driving: base
+  const p = [...par]; p[3] = Math.max(p[3], 90); return p;  // full-send: white punch
+}
+function tierBar(bar: number[], t: number): number[] {
+  if (t === 0) {
+    if (bar[0] === 255 && bar[1] === 255 && bar[2] === 255) return [120, 90, 60];
+    return bar.map((v) => Math.round(v * 0.5));
+  }
+  if (t === 1) return bar;
+  const mx = Math.max(...bar);
+  return mx === 0 ? bar : bar.map((v) => Math.round((v * 255) / mx)); // lift peak to 255
+}
+// Texture slots escalate gobo: open -> breakup -> prism. Non-texture stays open on every tier.
+function tierGobo(texture: boolean, t: number): { gobo: number; prism: number } {
+  if (!texture || t === 0) return { gobo: 0, prism: 0 };
+  if (t === 1) return { gobo: (headGroup?.goboSlots ?? [11])[0], prism: 0 };
+  return { gobo: 0, prism: 10 };
+}
+
+// BASE looks (40): rows 0-2 = 24 openers, rows 3-4 = 16 verse/chorus. {par,bar} are the P2
+// (driving) base; the tier transforms render P1/P3. hc = head wheel colour; texture = gobo slot.
+interface BaseLook {
+  slot: string; aim: keyof typeof AIM; par: number[]; bar: number[]; hc: number; texture: boolean;
+  split?: { parB: number[]; barB: number[] };
+}
+const BASE: BaseLook[] = [
+  // R1 — whole band, full wash (both heads wash the stage)
+  { slot: "Band White",   aim: "wash", par: [0, 0, 0, 255, 0, 0],   bar: [255, 255, 255], hc: 0,  texture: false },
+  { slot: "Band Red",     aim: "wash", par: [255, 0, 0, 0, 0, 0],   bar: [255, 0, 0],     hc: 36, texture: false },
+  { slot: "Band Amber",   aim: "wash", par: [0, 0, 0, 0, 255, 0],   bar: [255, 80, 0],    hc: 8,  texture: false },
+  { slot: "Band Green",   aim: "wash", par: [0, 255, 0, 0, 0, 0],   bar: [0, 255, 0],     hc: 44, texture: false },
+  { slot: "Band Cyan",    aim: "wash", par: [0, 255, 255, 0, 0, 0], bar: [0, 255, 255],   hc: 24, texture: false },
+  { slot: "Band Blue",    aim: "wash", par: [0, 0, 255, 0, 0, 0],   bar: [0, 0, 255],     hc: 24, texture: false },
+  { slot: "Band Magenta", aim: "wash", par: [255, 0, 255, 0, 0, 0], bar: [255, 0, 255],   hc: 50, texture: false },
+  { slot: "Band UV",      aim: "wash", par: [0, 0, 0, 0, 0, 255],   bar: [60, 0, 120],    hc: 50, texture: false },
+  // R2 — front line / member spotlights
+  { slot: "Singer White", aim: "singer", par: [0, 0, 0, 255, 0, 0],   bar: [255, 255, 255], hc: 0,  texture: false },
+  { slot: "Singer Red",   aim: "singer", par: [255, 0, 0, 0, 0, 0],   bar: [255, 0, 0],     hc: 36, texture: false },
+  { slot: "Guitar Amber", aim: "guitar", par: [0, 0, 0, 0, 255, 0],   bar: [255, 80, 0],    hc: 8,  texture: false },
+  { slot: "Guitar Mag",   aim: "guitar", par: [255, 0, 255, 0, 0, 0], bar: [255, 0, 255],   hc: 50, texture: false },
+  { slot: "Bass Blue",    aim: "bass",   par: [0, 0, 255, 0, 0, 0],   bar: [0, 0, 255],     hc: 24, texture: false },
+  { slot: "Bass Green",   aim: "bass",   par: [0, 255, 0, 0, 0, 0],   bar: [0, 255, 0],     hc: 44, texture: false },
+  { slot: "Cross White",  aim: "cross",  par: [0, 0, 0, 255, 0, 0],   bar: [255, 255, 255], hc: 0,  texture: false },
+  { slot: "Cross Split",  aim: "cross",  par: [255, 0, 0, 0, 0, 0],   bar: [255, 0, 0],     hc: 36, texture: false, split: { parB: [0, 0, 255, 0, 0, 0], barB: [0, 0, 255] } },
+  // R3 — texture / back / drums / crowd
+  { slot: "Singer Tex",   aim: "singer",    par: [0, 0, 0, 0, 255, 0],   bar: [255, 80, 0],    hc: 8,  texture: true },
+  { slot: "Band Grn Tex", aim: "wash",      par: [0, 255, 0, 0, 0, 0],   bar: [0, 255, 0],     hc: 44, texture: true },
+  { slot: "Drums Red",    aim: "drums",     par: [255, 0, 0, 0, 0, 0],   bar: [255, 0, 0],     hc: 36, texture: false },
+  { slot: "Drums Blue",   aim: "drums",     par: [0, 0, 255, 0, 0, 0],   bar: [0, 0, 255],     hc: 24, texture: false },
+  { slot: "Cross Tex",    aim: "cross",     par: [255, 0, 255, 0, 0, 0], bar: [255, 0, 255],   hc: 50, texture: true },
+  { slot: "Band Wht Tex", aim: "wash",      par: [0, 0, 0, 255, 0, 0],   bar: [255, 255, 255], hc: 0,  texture: true },
+  { slot: "Crowd White",  aim: "crowdNear", par: [0, 0, 0, 255, 0, 0],   bar: [255, 255, 255], hc: 0,  texture: false },
+  { slot: "Crowd Mag",    aim: "crowdDeep", par: [255, 0, 255, 0, 0, 0], bar: [255, 0, 255],   hc: 50, texture: false },
+  // R4 — verses (cool)
+  { slot: "Vrs Sng Blue", aim: "singer", par: [0, 0, 255, 0, 0, 0],     bar: [0, 0, 255],     hc: 24, texture: false },
+  { slot: "Vrs Drm Deep", aim: "drums",  par: [0, 0, 200, 10, 0, 0],    bar: [0, 10, 160],    hc: 24, texture: false },
+  { slot: "Vrs Wsh Cool", aim: "wash",   par: [0, 40, 255, 60, 0, 0],   bar: [40, 80, 255],   hc: 24, texture: false },
+  { slot: "Vrs Sng Cyan", aim: "singer", par: [0, 255, 255, 0, 0, 0],   bar: [0, 255, 255],   hc: 24, texture: false },
+  { slot: "Vrs Purple",   aim: "singer", par: [120, 0, 255, 0, 0, 0],   bar: [120, 0, 200],   hc: 50, texture: true },
+  { slot: "Vrs Green",    aim: "singer", par: [0, 255, 0, 0, 0, 0],     bar: [0, 255, 0],     hc: 44, texture: true },
+  { slot: "Vrs Gold",     aim: "singer", par: [255, 160, 0, 0, 80, 0], bar: [255, 160, 0],    hc: 60, texture: false },
+  { slot: "Vrs Wsh UV",   aim: "wash",   par: [0, 0, 0, 0, 0, 255],     bar: [60, 0, 120],    hc: 50, texture: false },
+  // R5 — choruses (warm / lift)
+  { slot: "Cho Warm",     aim: "wash",   par: [0, 0, 0, 40, 255, 0],    bar: [255, 80, 0],    hc: 8,  texture: false },
+  { slot: "Cho Warm2",    aim: "wash",   par: [255, 30, 0, 40, 200, 0], bar: [255, 70, 10],   hc: 8,  texture: false },
+  { slot: "Cho Sunset",   aim: "wash",   par: [255, 20, 40, 0, 120, 0], bar: [255, 40, 30],   hc: 60, texture: false },
+  { slot: "Cho MagCyan",  aim: "wash",   par: [255, 0, 255, 0, 0, 0],   bar: [255, 0, 255],   hc: 50, texture: false, split: { parB: [0, 255, 255, 0, 0, 0], barB: [0, 255, 255] } },
+  { slot: "Cho Sng Amb",  aim: "singer", par: [0, 0, 0, 0, 255, 0],     bar: [255, 80, 0],    hc: 8,  texture: false },
+  { slot: "Cho Magenta",  aim: "wash",   par: [255, 0, 255, 0, 0, 0],   bar: [255, 0, 255],   hc: 50, texture: false },
+  { slot: "Cho White",    aim: "wash",   par: [0, 0, 0, 255, 0, 0],     bar: [255, 255, 255], hc: 0,  texture: false },
+  { slot: "Cho Cross",    aim: "cross",  par: [255, 0, 0, 0, 0, 0],     bar: [255, 0, 0],     hc: 36, texture: false, split: { parB: [0, 0, 255, 0, 0, 0], barB: [0, 0, 255] } },
+];
+
+// Band-member focus = WIDE beam: a generous pool that keeps the performer lit even if they move,
+// instead of a hard pin. Area looks (wash / crowd / cross) leave zoom to the Heads Zoom fader.
+const MEMBER_AIMS = new Set<keyof typeof AIM>(["singer", "guitar", "bass", "drums"]);
+const MEMBER_ZOOM = 200; // wide (matches the crowd-wide POSITIONS tier); tune on the rig
+
+// Generate the 120 tier scenes (40 BASE x 3 tiers), named "<slot> L<tier>". Mirrors the PRESETS
+// builder: per-group wash (or split) + both heads aimed at the slot's target with its wheel colour
+// and the tier's gobo/prism.
+for (const t of TIERS) {
+  for (const s of BASE) {
+    const a = AIM[s.aim];
+    const g = tierGobo(s.texture, t);
+    const wash = s.split
+      ? splitVals(tierPar(s.par, t), tierBar(s.bar, t), tierPar(s.split.parB, t), tierBar(s.split.barB, t))
+      : washVals(tierPar(s.par, t), tierBar(s.bar, t));
+    addScene(`${s.slot} L${t + 1}`, [
+      ...wash,
+      ...heads.map((f, i) => headVal(f.id, {
+        pan: (i % 2 === 0 ? a.l : a.r)[0], tilt: (i % 2 === 0 ? a.l : a.r)[1],
+        color: s.hc, gobo: g.gobo, prism: g.prism, dim: 255, shutter: SHUTTER_OPEN, focus: 128,
+        zoom: MEMBER_AIMS.has(s.aim) ? MEMBER_ZOOM : undefined,
+      })),
+    ], 200, 200);
+  }
+}
+
+// Row 5 STROBES / hits (non-solo, momentary Flash) + Row 6 CHASERS (solo, Toggle). Each slot maps
+// to an EXISTING function per tier (slow/soft -> medium -> fast/hard). No new functions are created.
+const STROBES: { label: string; fns: [string, string, string]; led: number; bg: number[] }[] = [
+  { label: "Strobe",     fns: ["Color Stab", "Strobe Color", "Strobe All"],     led: 6,   bg: [255, 255, 255] },
+  { label: "Col Strobe", fns: ["Two Tone", "Strobe Rainbow", "Strobe Rainbow"], led: 106, bg: [255, 0, 160] },
+  { label: "Rnbw Hit",   fns: ["Slow Cycle", "Strobe Color", "Kill Strobe"],    led: 42,  bg: [80, 40, 160] },
+  { label: "Kill",       fns: ["Color Stab", "Alt Flash", "Kill Strobe"],       led: 6,   bg: [255, 255, 255] },
+  { label: "UV Pop",     fns: ["UV Pop", "UV Pop", "UV Pop"],                   led: 90,  bg: [120, 0, 220] },
+  { label: "Col Burst",  fns: ["Color Burst", "Color Burst", "Color Burst"],    led: 106, bg: [255, 0, 160] },
+  { label: "Alt Flash",  fns: ["Alt Flash", "Alt Flash", "Strobe Color"],       led: 18,  bg: [255, 120, 0] },
+  { label: "White Hit",  fns: ["White Hit", "White Hit", "Kill Strobe"],        led: 6,   bg: [255, 255, 255] },
+];
+const CHASERS: { label: string; fns: [string, string, string] }[] = [
+  { label: "Col Cycle",  fns: ["Slow Cycle", "Rainbow", "Rainbow Fast"] },
+  { label: "Police",     fns: ["Two Tone", "Police", "Police"] },
+  { label: "Build",      fns: ["Bounce", "Build Drop", "Mega Build"] },
+  { label: "Par Dyn",    fns: ["Pars Morph", "Par Run", "Par Sparkle"] },
+  { label: "Head Sweep", fns: ["Head Sweep Slow", "Audience Sweep", "Head Sweep Fast"] },
+  { label: "Cross Fig",  fns: ["Tilt Dip", "Figure 8", "Cross Zigzag"] },
+  { label: "Bar Dyn",    fns: ["Bars Morph", "Bar Chase", "Bar Bounce"] },
+  { label: "Sparkle",    fns: ["Pixel Bounce", "Par Run", "Par Sparkle"] },
+];
+
+// Row 7 UTILITY (non-solo) — IDENTICAL on every page (the stable safety layer; does NOT escalate).
+// 7 buttons in cols 0-6 (all existing functions/actions); col 7 (R8C8) carries no button — it is
+// the page-flip Next input. The per-tier "L<n>" suffix only keeps each page's OSC path unique.
+const UTILITY: { label: string; col: number; fn: string | null; action: string; led: number; bg: number[] }[] = [
+  { label: "Strobe All",   col: 0, fn: "Strobe All",     action: "Flash",    led: 6,  bg: [255, 255, 255] },
+  { label: "Blinder",      col: 1, fn: "Blinder",        action: "Flash",    led: 6,  bg: [255, 255, 255] },
+  { label: "Sound Active", col: 2, fn: "Sound Active",   action: "Toggle",   led: 26, bg: [200, 200, 0] },
+  { label: "Park All",     col: 3, fn: "Park All",       action: "Toggle",   led: 18, bg: [120, 80, 0] },
+  { label: "Heads Black",  col: 4, fn: "Heads Blackout", action: "Toggle",   led: 6,  bg: [30, 30, 30] },
+  { label: "Blackout",     col: 5, fn: null,             action: "Blackout", led: 10, bg: [40, 40, 40] },
+  { label: "Full On",      col: 6, fn: "Full On",        action: "Toggle",   led: 6,  bg: [255, 255, 255] },
+];
+
 // ----------------------------------------------------------------------------
 // Virtual Console — frames + dual buttons
 // ----------------------------------------------------------------------------
@@ -618,13 +785,16 @@ function renderButtons(frameName: string, page: number): string[] {
     const x = 4 + (p.col - minCol) * 96;
     const y = 4 + (p.row - minRow) * 50;
     const bg = argb(p.bg[0], p.bg[1], p.bg[2]);
+    // Label text is BLACK on every pad EXCEPT the two dark blackout pads (R8C5 Heads Blackout, R8C6
+    // Blackout), which keep WHITE text so they stay legible on their near-black backgrounds.
+    const fg = p.row === 7 && (p.col === 4 || p.col === 5) ? argb(255, 255, 255) : argb(0, 0, 0);
     const fIdAttr = p.funcName !== undefined ? `\n      <Function ID="${funcIdByName.get(p.funcName)}"/>` : "";
     const btn = (id: number, input: string) =>
 `    <Button Caption="${esc(p.display)}" ID="${id}" Icon="">
       <WindowState Visible="True" X="${x}" Y="${y}" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
-       <ForegroundColor>Default</ForegroundColor>
+       <ForegroundColor>${fg}</ForegroundColor>
        <BackgroundColor>${bg}</BackgroundColor>
        <BackgroundImage>None</BackgroundImage>
        <Font>Default</Font>
@@ -633,6 +803,10 @@ function renderButtons(frameName: string, page: number): string[] {
       ${input}
     </Button>`;
     out.push(btn(p.oscId, `<Input Universe="0" Channel="${p.crc}"/>`));
+    // Universe-1 INPUT mapping = the pad press that fires this button. QLC+ is now MIDI-input-only on
+    // the Launchpad (no <Feedback> universe), so these LowerValue/UpperValue feedback velocities are
+    // inert — the MCP server's launchpad module drives the pad LEDs itself over RGB SysEx instead.
+    // (dimOf/ledFor below are now vestigial: they only feed these unused attrs. Left as-is — harmless.)
     out.push(btn(p.midiId, `<Input Universe="1" Channel="${p.pad}" LowerValue="${dimOf(p.led)}" UpperValue="${p.led}"/>`));
   }
   return out;
@@ -700,100 +874,43 @@ ${channels}
 }
 
 // ============================================================================
-// PAGE 1 — four NON-OVERLAPPING solo bands. QLC+ frames are opaque (can't be made
-// transparent: QColor forces alpha opaque, vcwidget.cpp:883), so each solo group must own
-// a CONTIGUOUS block of rows or the top frame hides the others. Layout (design plan):
-//   rows 0-1 WASH-STATIC | rows 2-3 HEADS-STATIC | rows 4-6 DYNAMICS | row 7 CONTROL
+// ENERGY-LADDER PLACEMENT — 3 pages, ONE positional grammar, escalating energy. Per tier t:
+// BASE (solo, rows 0-4 = 24 openers + 16 verse/chorus), STROBES (non-solo, row 5), CHASERS
+// (solo, row 6), UTILITY (non-solo, row 7). QLC+ frames are opaque, so the four bands are
+// CONTIGUOUS non-overlapping rows. R8C8 fires no look — it is the multipage page-flip pad
+// (ch 146). Every caption carries an " L<tier>" suffix so each page's OSC path is unique (the
+// same R#C# repeats across pages by design).
 // ============================================================================
-// WASH-STATIC (solo): colours (r0) + band looks (r1) — pick one base wash
-COLORS.forEach((c, i) => place({ caption: c.name, funcName: c.name, action: "Toggle", padRow: 0, padCol: i, led: c.led, bg: c.bg, frame: "WASH-STATIC" }));
-BAND.forEach((b, i) => place({ caption: b.name, funcName: b.name, action: "Toggle", padRow: 1, padCol: i, led: b.led, bg: b.bg, frame: "WASH-STATIC" }));
-// HEADS-STATIC (solo): positions (r2) + beams/gobo (r3) — pick one head look
-POSITIONS.forEach((p, i) => place({ caption: p.name, funcName: p.name, action: "Toggle", padRow: 2, padCol: i, led: p.led, bg: p.bg, frame: "HEADS-STATIC" }));
-BEAMS.forEach((b, i) => place({ caption: b.name, funcName: b.name, action: "Toggle", padRow: 3, padCol: i, led: b.led, bg: b.bg, frame: "HEADS-STATIC" }));
-// DYNAMICS (solo, ONE effect at a time): chases (r4) / autos+stabs+pixel (r5) / builds+head-moves+park (r6)
-const DYN: { n: string; led: number; bg: number[] }[][] = [
-  [ // r4 — chases + bar effects
-    { n: "Rainbow", led: 42, bg: [80, 40, 160] }, { n: "Police", led: 42, bg: [80, 40, 160] },
-    { n: "Strobe Color", led: 42, bg: [80, 40, 160] }, { n: "Bar Chase", led: 42, bg: [80, 40, 160] },
-    { n: "Bounce", led: 42, bg: [80, 40, 160] }, { n: "Slow Cycle", led: 42, bg: [80, 40, 160] },
-    { n: "Bar Scroll", led: 74, bg: [0, 200, 200] }, { n: "Bar Bounce", led: 66, bg: [0, 200, 120] },
-  ],
-  [ // r5 — wash dynamics: autos, morphs, stabs, pixel
-    { n: "Pars Auto", led: 42, bg: [0, 200, 0] }, { n: "Bars Auto", led: 26, bg: [220, 200, 0] },
-    { n: "Pars Morph", led: 42, bg: [0, 160, 0] }, { n: "Bars Morph", led: 26, bg: [180, 160, 0] },
-    { n: "Color Stab", led: 106, bg: [255, 0, 200] }, { n: "Kill Strobe", led: 6, bg: [255, 255, 255] },
-    { n: "Par Run", led: 114, bg: [255, 0, 160] }, { n: "Pixel Bounce", led: 114, bg: [255, 0, 160] },
-  ],
-  [ // r6 — builds + song presets + head movement + park
-    { n: "Alt Flash", led: 18, bg: [255, 120, 0] }, { n: "Build Drop", led: 10, bg: [255, 0, 0] },
-    // Item B (2026-06-09): 3 one-tap song presets surfaced onto page 1 (distracted-operator safety net),
-    // replacing Head Sweep Slow/Fast + Head Circle — those 3 still live on page-2 HEADS2, so no loss.
-    // They reuse the page-2 PRESET scenes (extra duplicate OSC path each, cosmetic, like the head dups).
-    { n: "Opener", led: 6, bg: [255, 255, 255] }, { n: "Chorus Warm", led: 18, bg: [255, 80, 0] },
-    { n: "Breakdown UV", led: 90, bg: [60, 0, 120] }, { n: "Audience Sweep", led: 82, bg: [0, 60, 200] },
-    { n: "Cross Zigzag", led: 106, bg: [200, 0, 160] }, { n: "Park All", led: 18, bg: [120, 80, 0] },
-  ],
-];
-// Skip pads whose function was conditionally dropped (no bars -> no Bar Chase, etc.);
-// the original column index is kept so the grid layout stays stable with gaps.
-DYN.forEach((row, ri) => row.forEach((d, i) => {
-  if (!funcIdByName.has(d.n)) return;
-  place({ caption: d.n, funcName: d.n, action: "Toggle", padRow: 4 + ri, padCol: i, led: d.led, bg: d.bg, frame: "DYNAMICS" });
-}));
-// CONTROL (non-solo, row 7): FX flash (c0-3) + Full On / Sound Active / Blackout (c4-6).
-// c7 (R8C8) carries NO look — it is the page-flip pad (the "Pages" frame's Next input, ch 146).
-place({ caption: "Strobe All",   funcName: "Strobe All",   action: "Flash",    padRow: 7, padCol: 0, led: 6,   bg: [255, 255, 255], frame: "CONTROL" });
-place({ caption: "Blinder",      funcName: "Blinder",      action: "Flash",    padRow: 7, padCol: 1, led: 6,   bg: [255, 255, 255], frame: "CONTROL" });
-place({ caption: "UV Pop",       funcName: "UV Pop",       action: "Flash",    padRow: 7, padCol: 2, led: 90,  bg: [120, 0, 220],   frame: "CONTROL" });
-place({ caption: "Color Burst",  funcName: "Color Burst",  action: "Flash",    padRow: 7, padCol: 3, led: 106, bg: [255, 0, 160],   frame: "CONTROL" });
-place({ caption: "Full On",      funcName: "Full On",      action: "Toggle",   padRow: 7, padCol: 4, led: 6,   bg: [255, 255, 255], frame: "CONTROL" });
-place({ caption: "Sound Active", funcName: "Sound Active", action: "Toggle",   padRow: 7, padCol: 5, led: 26,  bg: [200, 200, 0],   frame: "CONTROL" });
-place({ caption: "Blackout",                               action: "Blackout", padRow: 7, padCol: 6, led: 10,  bg: [40, 40, 40],    frame: "CONTROL" });
+for (const t of TIERS) {
+  const L = `L${t + 1}`;
+  const fB = `BASE-${L}`, fS = `STROBE-${L}`, fC = `CHASE-${L}`, fU = `CTRL-${L}`;
+  // rows 0-4 — 40 BASE looks (solo). idx 0-23 openers (r0-2), 24-39 verse/chorus (r3-4).
+  BASE.forEach((s, idx) => {
+    const name = `${s.slot} ${L}`;
+    place({ caption: name, funcName: name, action: "Toggle",
+      padRow: Math.floor(idx / 8), padCol: idx % 8, led: ledFor(s.bar), bg: s.bar, frame: fB, page: t });
+  });
+  // row 5 — STROBES / hits (non-solo, momentary Flash overlays a running chaser). Skip a pad whose
+  // tier function was dropped on this rig (e.g. a bar chaser on a bar-less rig) — keeps it generic.
+  STROBES.forEach((s, i) => {
+    if (!funcIdByName.has(s.fns[t])) return;
+    place({ caption: `${s.label} ${L}`, funcName: s.fns[t], action: "Flash",
+      padRow: 5, padCol: i, led: s.led, bg: s.bg, frame: fS, page: t });
+  });
+  // row 6 — CHASERS (solo, Toggle; one running effect at a time, riding on the base look)
+  CHASERS.forEach((s, i) => {
+    if (!funcIdByName.has(s.fns[t])) return;
+    place({ caption: `${s.label} ${L}`, funcName: s.fns[t], action: "Toggle",
+      padRow: 6, padCol: i, led: 42, bg: [80, 40, 160], frame: fC, page: t });
+  });
+  // row 7 — UTILITY (non-solo); 7 buttons in cols 0-6, col 7 (R8C8) is the page-flip nav input
+  UTILITY.forEach((u) => place({ caption: `${u.label} ${L}`, funcName: u.fn ?? undefined, action: u.action,
+    padRow: 7, padCol: u.col, led: u.led, bg: u.bg, frame: fU, page: t }));
+}
 
-// ============================================================================
-// PAGE 2 — 5 solo bands (already row-contiguous = non-overlapping) + the FADERS frame.
-// Reuses the same 64 pad channels; multipage isolation keeps page-1/page-2 pads apart.
-//   r0 PARS | r1 BARS | r2-4 HEADS2 | r5 CHASE2 | r6-7 PRESETS
-// ============================================================================
-// r0 PARS colour / r1 BARS colour — independent per-group solo frames
-COLORS.forEach((c, i) => place({ caption: `Pars ${c.name}`, funcName: `Pars ${c.name}`, action: "Toggle", padRow: 0, padCol: i, led: c.led, bg: c.bg, frame: "PARS", page: 1 }));
-COLORS.forEach((c, i) => place({ caption: `Bars ${c.name}`, funcName: `Bars ${c.name}`, action: "Toggle", padRow: 1, padCol: i, led: c.led, bg: c.bg, frame: "BARS", page: 1 }));
-
-// r2 HEADS colour / r3 HEADS gobo / r4 HEADS movement — all one HEADS2 solo frame (one head look)
-const HEAD_LED = [6, 18, 42, 74, 10, 42, 106, 26];
-const HEAD_BG: number[][] = [[230,230,230],[255,140,0],[120,255,0],[0,220,220],[255,0,0],[0,220,0],[255,0,200],[255,220,0]];
-HCOL.forEach(([n], i) => place({ caption: n, funcName: n, action: "Toggle", padRow: 2, padCol: i, led: HEAD_LED[i], bg: HEAD_BG[i], frame: "HEADS2", page: 1 }));
-const GOBO_BTN = [...GOBOZ.map(([n]) => n), "Prism"];
-GOBO_BTN.forEach((n, i) => place({ caption: n, funcName: n, action: "Toggle", padRow: 3, padCol: i, led: 74, bg: [0, 160, 200], frame: "HEADS2", page: 1 }));
-const MOVE = ["Head Circle", "Audience Sweep", "Cross Zigzag", "Head Sweep Slow", "Head Sweep Fast", "Figure 8", "Pan Wave", "Tilt Dip"];
-MOVE.forEach((n, i) => place({ caption: n, funcName: n, action: "Toggle", padRow: 4, padCol: i, led: 82, bg: [0, 120, 220], frame: "HEADS2", page: 1 }));
-
-// r5 CHASES 2 — own solo frame
-const CH2 = ["Rainbow Fast", "Strobe Rainbow", "Chase Up", "Chase Down", "Two Tone", "Par Sparkle", "Color Pop", "Mega Build"];
-CH2.forEach((n, i) => {
-  if (!funcIdByName.has(n)) return; // dropped with its fixture kind (e.g. no bars -> no Chase Up)
-  place({ caption: n, funcName: n, action: "Toggle", padRow: 5, padCol: i, led: 42, bg: [120, 40, 160], frame: "CHASE2", page: 1 });
-});
-
-// r6-r7 SONG presets — full-stage, solo (one song look)
-PRESETS.forEach((p, i) => place({ caption: p.name, funcName: p.name, action: "Toggle", padRow: 6 + Math.floor(i / 8), padCol: i % 8, led: p.led, bg: p.bar, frame: "PRESETS", page: 1 }));
-
-// ============================================================================
-// SIMPLE PAGE (page index 2) — the "get through the show" page. The show BOOTS here
-// (CurrentPage=2); the R8C8 pad then cycles SIMPLE -> page1 -> page2 -> SIMPLE. It reuses
-// existing functions ONLY (PRESET scenes, COLORS washes, MOVE chasers) — no new looks, and
-// pages 0/1 are untouched. Each button reuses a function but gets its own pad + OSC path;
-// multipage isolation gates the shared pad channels (same trick the page1/page2 reuse uses).
-//   r0-1 PRESETS (home base) | r3 WASH colour | r5 MOVE | r7 utility (+ R8C8 page-flip)
-// ============================================================================
-PRESETS.forEach((p, i) => place({ caption: p.name, funcName: p.name, action: "Toggle", padRow: Math.floor(i / 8), padCol: i % 8, led: p.led, bg: p.bar, frame: "SIMPLE-PRESETS", page: 2 }));
-COLORS.forEach((c, i) => place({ caption: c.name, funcName: c.name, action: "Toggle", padRow: 3, padCol: i, led: c.led, bg: c.bg, frame: "SIMPLE-WASH", page: 2 }));
-MOVE.forEach((n, i) => place({ caption: n, funcName: n, action: "Toggle", padRow: 5, padCol: i, led: 82, bg: [0, 120, 220], frame: "SIMPLE-MOVE", page: 2 }));
-// utility (row 7, non-solo): big strobe hit, full-on, blackout. c7 is the page-flip pad (no look).
-place({ caption: "Strobe All", funcName: "Strobe All", action: "Flash",    padRow: 7, padCol: 0, led: 6,  bg: [255, 255, 255], frame: "SIMPLE-CONTROL", page: 2 });
-place({ caption: "Full On",    funcName: "Full On",    action: "Toggle",   padRow: 7, padCol: 4, led: 6,  bg: [255, 255, 255], frame: "SIMPLE-CONTROL", page: 2 });
-place({ caption: "Blackout",                           action: "Blackout", padRow: 7, padCol: 6, led: 10, bg: [40, 40, 40],    frame: "SIMPLE-CONTROL", page: 2 });
+// (The former Page-2 per-group layout and SIMPLE page are replaced by the energy-ladder tier
+// loop above. The page-2 scene library — Pars/Bars/Heads colours, gobos, the extra chasers — is
+// still generated above and reused by the strobe/chaser rows; any now-orphaned scenes are harmless.)
 
 // ----------------------------------------------------------------------------
 // Assemble XML
@@ -878,15 +995,8 @@ function frameBBox(name: string) {
     h: (Math.max(...rows) - Math.min(...rows)) * 50 + 52,
   };
 }
-// Page-1 bands
-const bWS = frameBBox("WASH-STATIC"), bHS = frameBBox("HEADS-STATIC"), bDyn = frameBBox("DYNAMICS"), bCtl = frameBBox("CONTROL");
-// Page-2 bands
-const bPars = frameBBox("PARS"), bBars = frameBBox("BARS"), bH2 = frameBBox("HEADS2"),
-      bCh2 = frameBBox("CHASE2"), bPre = frameBBox("PRESETS");
-// SIMPLE-page bands (page index 2)
-const bSPre = frameBBox("SIMPLE-PRESETS"), bSWash = frameBBox("SIMPLE-WASH"),
-      bSMove = frameBBox("SIMPLE-MOVE"), bSCtl = frameBBox("SIMPLE-CONTROL");
-// FADERS (page 2): per-group Dim masters (own the dimmer channels the builders no longer set;
+// (Per-tier frame bounding boxes are computed inside the gridInner loop below.)
+// FADERS: per-group Dim masters (own the dimmer channels the builders no longer set;
 // default 255 = full) + Strobe Rate + Heads Zoom. Master Dim = the built-in GrandMaster (global,
 // Properties below). The frame sits to the RIGHT of the grid; slider X is relative to the frame.
 const strobeChans = [
@@ -903,32 +1013,31 @@ faderDefs.push({ id: 903, caption: "Strobe Rate", chans: strobeChans, value: 0, 
 if (heads.length) faderDefs.push({ id: 904, caption: "Heads Zoom", chans: heads.map((f) => ({ fixture: f.id, ch: 14 })), value: 128, osc: "/heads_zoom" });
 const faderBtns = faderDefs.map((d, i) => sliderXml(d.id, d.caption, 12 + i * 72, d.chans, d.value, d.osc));
 
-// All sub-frames live inside ONE multipage GRID frame — NOT the root frame. The root VC frame is
+// FADERS frame — moved to the ROOT VC frame (a sibling of the multipage grid, see `vc` below)
+// so the sliders show on ALL three pages. Sits to the RIGHT of the 8-col grid.
+const fadersFrame = frame("Frame", "FADERS", 9, 805, 8, 12 + faderDefs.length * 72, 360, faderBtns);
+
+// The 12 sub-frames live inside ONE multipage GRID frame — NOT the root frame. The root VC frame is
 // built with no header (m_hbox == NULL); setMultipageMode() dereferences that header layout ->
 // QLC+ 4.14.4 segfaults on load. A normal child frame has header infra even with ShowHeader=False,
-// so multipage is safe there. GRID sits at (0,0); page switch = the bottom-right pad (R8C8 = ch146).
-const gridInner = [
-  frame("SoloFrame", "WASH (colours)", 0, bWS.x, bWS.y, bWS.w, bWS.h, renderButtons("WASH-STATIC", 0), { page: 0 }),
-  frame("SoloFrame", "HEADS (static)", 1, bHS.x, bHS.y, bHS.w, bHS.h, renderButtons("HEADS-STATIC", 0), { page: 0 }),
-  frame("SoloFrame", "DYNAMICS", 2, bDyn.x, bDyn.y, bDyn.w, bDyn.h, renderButtons("DYNAMICS", 0), { page: 0 }),
-  frame("Frame", "CONTROL", 3, bCtl.x, bCtl.y, bCtl.w, bCtl.h, renderButtons("CONTROL", 0), { page: 0 }),
-  frame("SoloFrame", "PARS", 4, bPars.x, bPars.y, bPars.w, bPars.h, renderButtons("PARS", 1), { page: 1 }),
-  frame("SoloFrame", "BARS", 5, bBars.x, bBars.y, bBars.w, bBars.h, renderButtons("BARS", 1), { page: 1 }),
-  frame("SoloFrame", "HEADS2", 6, bH2.x, bH2.y, bH2.w, bH2.h, renderButtons("HEADS2", 1), { page: 1 }),
-  frame("SoloFrame", "CHASE2", 7, bCh2.x, bCh2.y, bCh2.w, bCh2.h, renderButtons("CHASE2", 1), { page: 1 }),
-  frame("SoloFrame", "PRESETS", 8, bPre.x, bPre.y, bPre.w, bPre.h, renderButtons("PRESETS", 1), { page: 1 }),
-  frame("Frame", "FADERS", 9, 800, 8, 12 + faderDefs.length * 72, 360, faderBtns, { page: 1 }),
-  // SIMPLE page (index 2) — boots first; reuses existing functions, four row-bands
-  frame("SoloFrame", "PRESETS (songs)", 11, bSPre.x, bSPre.y, bSPre.w, bSPre.h, renderButtons("SIMPLE-PRESETS", 2), { page: 2 }),
-  frame("SoloFrame", "WASH (colour)", 12, bSWash.x, bSWash.y, bSWash.w, bSWash.h, renderButtons("SIMPLE-WASH", 2), { page: 2 }),
-  frame("SoloFrame", "MOVE", 13, bSMove.x, bSMove.y, bSMove.w, bSMove.h, renderButtons("SIMPLE-MOVE", 2), { page: 2 }),
-  frame("Frame", "CONTROL", 14, bSCtl.x, bSCtl.y, bSCtl.w, bSCtl.h, renderButtons("SIMPLE-CONTROL", 2), { page: 2 }),
-];
-// Page switch: the bottom-right grid pad (R8C8 = MIDI ch 146) toggles pages from the Launchpad
-// (PagesLoop wraps 2->1, so one pad cycles), plus PgDn/PgUp on the computer keyboard as a backup.
-// That pad fires no look on either page (Panic / Glow Out were dropped to free it).
-const grid = frame("Frame", "Pages", 10, 0, 0, 1180, 460, gridInner,
-  { multipage: 3, currentPage: 2, nav: { nextInput: 146, nextKey: "PgDown", prevKey: "PgUp", loop: true } });
+// so multipage is safe there. Each tier's four frames are non-overlapping row-bands (rows 0-4 / 5 /
+// 6 / 7); all three tiers share screen space but live on different pages, so multipage hides the
+// off-page frames. Boots on Page 1 (CurrentPage=0); R8C8 (ch146) cycles 1->2->3->1 (PagesLoop wraps).
+const gridInner: string[] = [];
+for (const t of TIERS) {
+  const L = `L${t + 1}`;
+  const fB = `BASE-${L}`, fS = `STROBE-${L}`, fC = `CHASE-${L}`, fU = `CTRL-${L}`;
+  const bB = frameBBox(fB), bS = frameBBox(fS), bC = frameBBox(fC), bU = frameBBox(fU);
+  const id = 20 + t * 4;
+  gridInner.push(
+    frame("SoloFrame", `BASE ${L}`,    id,     bB.x, bB.y, bB.w, bB.h, renderButtons(fB, t), { page: t }),
+    frame("Frame",     `STROBE ${L}`,  id + 1, bS.x, bS.y, bS.w, bS.h, renderButtons(fS, t), { page: t }),
+    frame("SoloFrame", `CHASE ${L}`,   id + 2, bC.x, bC.y, bC.w, bC.h, renderButtons(fC, t), { page: t }),
+    frame("Frame",     `UTILITY ${L}`, id + 3, bU.x, bU.y, bU.w, bU.h, renderButtons(fU, t), { page: t }),
+  );
+}
+const grid = frame("Frame", "Pages", 10, 0, 0, 800, 440, gridInner,
+  { multipage: 3, currentPage: 0, nav: { nextInput: 146, nextKey: "PgDown", prevKey: "PgUp", loop: true } });
 
 const vc = `<VirtualConsole>
  <Frame Caption="">
@@ -940,9 +1049,10 @@ const vc = `<VirtualConsole>
    <Font>Default</Font>
   </Appearance>
 ${grid}
+${fadersFrame}
  </Frame>
  <Properties>
-  <Size Width="1180" Height="470"/>
+  <Size Width="1190" Height="470"/>
   <GrandMaster ChannelMode="Intensity" ValueMode="Reduce" SliderMode="Normal"/>
  </Properties>
 </VirtualConsole>`;
@@ -978,6 +1088,12 @@ ${fixtures
 const dmxOut = rig.dmxOutput ?? { plugin: "ArtNet", universe: 0, transmitMode: "Standard", outputIp: null };
 const outputIpAttr = dmxOut.outputIp ? ` outputIP="${esc(dmxOut.outputIp)}"` : "";
 const dmxNote = dmxOut.notes ? `<!-- ${esc(dmxOut.notes)} -->` : `<!-- no outputIP -> broadcast -->`;
+// QLC+ drives the Launchpad LEDs via MIDI feedback (the original design): each pad button carries
+// LowerValue (dim palette variant, idle) / UpperValue (bright, active) velocities, so a pad waits
+// dim and lights full while its look runs. The MCP SysEx LED driver (src/launchpad/leds.ts) is the
+// alternative path, but it depends on QLC+ OSC feedback, which this QLC+ install never emits
+// (verified 2026-06-11 with scripts/_osc-probe.ts: zero feedback datagrams) — keep it disabled
+// (LAUNCHPAD_LEDS=0) while the <Feedback> line below owns the port.
 const launchpadUniverse = LP.launchpad
   ? `   <Universe Name="Launchpad" ID="1" Profile="${esc(LP_PROFILE!)}">
     <Input Plugin="MIDI" UID="${LP_IN_UID}" Line="${LP_IN_LINE}"/>
@@ -1021,6 +1137,35 @@ const qxwPath = path.join(OUT, QXW_FILE);
 if (existsSync(qxwPath)) { try { chmodSync(qxwPath, 0o666); } catch { /* not RO yet */ } }
 writeFileSync(qxwPath, qxw, "utf8");
 try { chmodSync(qxwPath, 0o444); } catch { /* best-effort write-protect */ }
+
+// ----------------------------------------------------------------------------
+// config/launchpad-leds.json — the LED map the MCP server's launchpad module reads to drive the pads
+// itself over RGB SysEx. With QLC+ now MIDI-input-only, we own the Launchpad LEDs. One entry per
+// placed pad: note = MK3 programmer-mode note (= the QLC+ universe-1 pad channel - 128), the OSC path
+// + crc so the module can resolve a pad from QLC+'s OSC feedback, the page (energy tier), the look's
+// RGB (idle = x0.5, active = x1.0), and whether the action is momentary (Flash).
+// ----------------------------------------------------------------------------
+if (LP.launchpad) {
+  const pads = placed.map((p) => ({
+    note: p.pad - 128,
+    crc: p.crc,
+    path: p.osc,
+    page: p.page,
+    rgb: [p.bg[0], p.bg[1], p.bg[2]],
+    momentary: p.action === "Flash",
+  }));
+  const cfgDir = path.join(OUT, "config");
+  mkdirSync(cfgDir, { recursive: true });
+  writeFileSync(
+    path.join(cfgDir, "launchpad-leds.json"),
+    JSON.stringify(
+      { note: "note = QLC+ universe-1 pad channel - 128 (Mini MK3 programmer-mode note); rgb 0-255", pads },
+      null,
+      2,
+    ) + "\n",
+    "utf8",
+  );
+}
 
 // ----------------------------------------------------------------------------
 // PATCH-CHART.md (ASCII)
@@ -1074,36 +1219,44 @@ re-patch. All fixtures on one universe.
 
 ## Launchpad Mini MK3 — 8x8 grid (Programmer Mode)
 
-Three pages. The show **boots on the SIMPLE page**. **Press the bottom-right pad (R8C8) to cycle
-pages** — SIMPLE → Page 1 → Page 2 → SIMPLE. That corner pad is the page-toggle on every page and
-fires no look. (The Mini MK3's top →/← arrows don't transmit on the Programmer port, so a real grid
-pad owns the switch.) On the computer keyboard, **PgDn / PgUp** also switch pages.
+**Three pages, one grammar — an ENERGY LADDER.** Every page uses the **same pad layout**; a pad
+keeps its song-moment meaning on all three, just redesigned hotter each level: **Page 1 = Level 1
+(chill)**, **Page 2 = Level 2 (driving)**, **Page 3 = Level 3 (full-send)**. The show **boots on
+Page 1**. **Press the bottom-right pad (R8C8) to ramp energy** — it cycles **Page 1 → 2 → 3 → 1**,
+so you can raise a song's intensity without moving your fingers. That corner pad fires no look. (The
+Mini MK3's top →/← arrows don't transmit on the Programmer port, so a real grid pad owns the switch.)
+On the computer keyboard, **PgDn / PgUp** also switch pages. The bottom row (**R8**, utility:
+Strobe All · Blinder · Sound Active · Park All · Heads Blackout · Blackout · Full On) is **identical
+on every page** — the stable safety layer that does not escalate.
 
-### SIMPLE — the show boots here (presets + one colour + one movement)
-\`\`\`
-${gridAscii(2)}
-\`\`\`
-
-### Page 1 (cycle with the R8C8 pad)
+### Page 1 — Level 1 · chill (the show boots here)
 \`\`\`
 ${gridAscii(0)}
 \`\`\`
 
-### Page 2 (cycle with the R8C8 pad)
+### Page 2 — Level 2 · driving (tap R8C8 to ramp up)
 \`\`\`
 ${gridAscii(1)}
 \`\`\`
 
-Pads light in their look color when active (LED feedback). On Page 2 the console shows five faders
-(Pars Dim, Bars Dim, Heads Dim, Strobe Rate, Heads Zoom), all default full; Master Dim is the
-built-in GrandMaster (top-right of the console) and dims everything globally.
+### Page 3 — Level 3 · full-send (tap R8C8 again)
+\`\`\`
+${gridAscii(2)}
+\`\`\`
+
+Pads glow at **~50%** in their look colour when idle; the **active** look in each row jumps to
+**100%** (a clear brightness step so the live look is unmistakable). The LEDs are driven by
+the MCP server's launchpad module over RGB SysEx (QLC+ reads the pad presses only). The console shows five
+faders to the **right of the grid — Pars Dim, Bars Dim, Heads Dim, Strobe Rate, Heads Zoom — visible
+on every page** (all default full); Master Dim is the built-in GrandMaster (top-right of the console)
+and dims everything globally.
 
 ## Look index — every pad (locate / update)
 
 Sorted by page, then row, then column. **R/C** = the 8×8 pad coordinate (1-indexed, top-left =
 R1C1); **Pad** = the Launchpad MIDI channel; **OSC** = the dashboard path. Each on-screen button's
-caption shows its R/C after the name (e.g. \`Red R1C1\`). The **Pg** column is the internal page
-index — **Pg 3 = the SIMPLE page**, which the show boots on (cycle order: SIMPLE → 1 → 2).
+caption shows its energy tier + R/C after the name (e.g. \`Band Red L1 R1C2\`). The **Pg** column is
+the energy tier — **Pg 1 = Level 1 (chill)**, the page the show boots on (cycle order: 1 → 2 → 3).
 
 ${lookIndex()}
 
@@ -1139,4 +1292,4 @@ writeFileSync(
 
 console.log(`OK  crc16 check passed (0x906e); crc16("/rainbow")=${crc16("/rainbow")}`);
 console.log(`    rig=${path.basename(rigPath)}  fixtures=${fixtures.length}  functions=${funcs.length}  buttons=${btnId - 100}`);
-console.log(`    wrote ${QXW_FILE}, PATCH-CHART.md, SETUP-MANUAL.html`);
+console.log(`    wrote ${QXW_FILE}, PATCH-CHART.md, SETUP-MANUAL.html${LP.launchpad ? ", config/launchpad-leds.json" : ""}`);

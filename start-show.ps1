@@ -2,20 +2,22 @@
 #  One-shot full launcher for the QLC+ lighting stack.
 #  Brings up every connection in the rig, in order:
 #
-#    QLC+ (your rig.json show)  -> Launchpad MIDI in + LED feedback
+#    QLC+ (your rig.json show)  -> Launchpad MIDI IN (pad presses only)
 #                               -> Art-Net  Universe 0  (to 3D monitor + real rig)
 #                               -> OSC in   (driven by the MCP server)
 #    MCP server (HTTP mode)     -> dashboard + OSC control  -> QLC+ :9000
+#                               -> Launchpad LED OUT (RGB SysEx via a winmm sidecar)
 #    3D monitor                 -> listens to Art-Net U0     -> Three.js on :7800
 #
 #  Then opens the 3D monitor and the dashboard in the browser.
 #  Idempotent: skips any piece already up. Each long-running piece runs
 #  in its own window so it survives independently of this script.
 #
-#  The Launchpad is auto-engaged (Programmer Mode via SysEx, see
-#  engage-launchpad.ps1) and QLC+ starts in Operate mode, so the pads
-#  light and respond with no manual steps. If pads ever stay dark, the
-#  Launchpad likely dropped off USB — reseat it and re-run this script.
+#  The Launchpad LEDs are driven by QLC+ MIDI feedback (the show's <Feedback> line): idle pads wait
+#  dim, the active look lights full until toggled off. This needs Programmer Mode engaged BEFORE
+#  QLC+ opens the MIDI ports — step 0 below runs engage-launchpad.ps1. If pads stay dark, reseat
+#  the Launchpad USB and re-run this script. (The MCP SysEx LED driver stays LAUNCHPAD_LEDS=0 in
+#  config/.env — it needs QLC+ OSC feedback, which this QLC+ install never emits.)
 # ============================================================
 $ErrorActionPreference = 'Stop'
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
@@ -77,18 +79,17 @@ if (-not (Get-Command npx -ErrorAction SilentlyContinue)) {
   exit 1
 }
 
-# 1. QLC+ — owns Launchpad MIDI, Art-Net U0 out, OSC in.
-#    Engage the Launchpad (Programmer Mode) FIRST, while the MIDI port is
-#    still free, then launch QLC+ in Operate mode so input + LED feedback are live.
+# 0. Launchpad Programmer Mode — engage BEFORE QLC+ opens the MIDI ports so QLC+'s profile
+#    (pad notes 11..88) can read presses and light the pads via MIDI feedback.
+if ($useLaunchpad -and -not (Get-Process qlcplus -ErrorAction SilentlyContinue)) {
+  & (Join-Path $here 'engage-launchpad.ps1')
+}
+
+# 1. QLC+ — reads Launchpad MIDI IN (pad presses), lights the pads via MIDI feedback (the show's
+#    <Feedback> line: dim idle / bright active), Art-Net U0 out + OSC in.
 if (Get-Process qlcplus -ErrorAction SilentlyContinue) {
-  Write-Host '  -> QLC+ already running (Launchpad left as-is)' -ForegroundColor DarkGray
+  Write-Host '  -> QLC+ already running' -ForegroundColor DarkGray
 } elseif ($qlc) {
-  if ($useLaunchpad) {
-    Write-Host '  -> engaging Launchpad (Programmer Mode) ...' -ForegroundColor Green
-    & (Join-Path $here 'engage-launchpad.ps1')
-  } else {
-    Write-Host '  -> no Launchpad in rig.json (skipping engage)' -ForegroundColor DarkGray
-  }
   Write-Host '  -> launching QLC+ (Operate) ...' -ForegroundColor Green
   Start-Process $qlc -ArgumentList '--open', $show, '--operate'
 } else {
@@ -124,5 +125,5 @@ if ($monOk) { Start-Process $monUrl }  else { Write-Host '  [!] 3D monitor did n
 if ($mcpOk) { Start-Process $dashUrl } else { Write-Host '  [!] MCP/dashboard did not answer' -ForegroundColor Yellow }
 
 Write-Host ''
-Write-Host '  Up. Launchpad engaged + QLC+ in Operate. If pads are dark, reseat the Launchpad USB and re-run.' -ForegroundColor Cyan
+Write-Host '  Up. QLC+ in Operate; the MCP server drives the Launchpad LEDs. If pads are dark, check the MCP window or reseat the Launchpad USB, then re-run.' -ForegroundColor Cyan
 Write-Host ''

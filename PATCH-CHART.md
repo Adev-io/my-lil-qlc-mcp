@@ -29,241 +29,278 @@ re-patch. All fixtures on one universe.
 
 ## Launchpad Mini MK3 — 8x8 grid (Programmer Mode)
 
-Three pages. The show **boots on the SIMPLE page**. **Press the bottom-right pad (R8C8) to cycle
-pages** — SIMPLE → Page 1 → Page 2 → SIMPLE. That corner pad is the page-toggle on every page and
-fires no look. (The Mini MK3's top →/← arrows don't transmit on the Programmer port, so a real grid
-pad owns the switch.) On the computer keyboard, **PgDn / PgUp** also switch pages.
+**Three pages, one grammar — an ENERGY LADDER.** Every page uses the **same pad layout**; a pad
+keeps its song-moment meaning on all three, just redesigned hotter each level: **Page 1 = Level 1
+(chill)**, **Page 2 = Level 2 (driving)**, **Page 3 = Level 3 (full-send)**. The show **boots on
+Page 1**. **Press the bottom-right pad (R8C8) to ramp energy** — it cycles **Page 1 → 2 → 3 → 1**,
+so you can raise a song's intensity without moving your fingers. That corner pad fires no look. (The
+Mini MK3's top →/← arrows don't transmit on the Programmer port, so a real grid pad owns the switch.)
+On the computer keyboard, **PgDn / PgUp** also switch pages. The bottom row (**R8**, utility:
+Strobe All · Blinder · Sound Active · Park All · Heads Blackout · Blackout · Full On) is **identical
+on every page** — the stable safety layer that does not escalate.
 
-### SIMPLE — the show boots here (presets + one colour + one movement)
+### Page 1 — Level 1 · chill (the show boots here)
 ```
-  | Opener       | Verse Blue   | Chorus Warm  | Breakdown UV | Anthem       | Half Time    | Green Room   | Magenta Pop  |
+  | Band White L | Band Red L1  | Band Amber L | Band Green L | Band Cyan L1 | Band Blue L1 | Band Magenta | Band UV L1   |
   ------------------------------------------------------------------------------------------------------------------------
-  | Deep Verse   | Sunset Jam   | Big Finish   | Cyan Wash    | Purple Haze  | Gold Ballad  | Punk Slam    |              |
+  | Singer White | Singer Red L | Guitar Amber | Guitar Mag L | Bass Blue L1 | Bass Green L | Cross White  | Cross Split  |
   ------------------------------------------------------------------------------------------------------------------------
-  |              |              |              |              |              |              |              |              |
+  | Singer Tex L | Band Grn Tex | Drums Red L1 | Drums Blue L | Cross Tex L1 | Band Wht Tex | Crowd White  | Crowd Mag L1 |
   ------------------------------------------------------------------------------------------------------------------------
-  | Red          | Amber        | Yellow       | Green        | Cyan         | Blue         | Magenta      | White        |
+  | Vrs Sng Blue | Vrs Drm Deep | Vrs Wsh Cool | Vrs Sng Cyan | Vrs Purple L | Vrs Green L1 | Vrs Gold L1  | Vrs Wsh UV L |
   ------------------------------------------------------------------------------------------------------------------------
-  |              |              |              |              |              |              |              |              |
+  | Cho Warm L1  | Cho Warm2 L1 | Cho Sunset L | Cho MagCyan  | Cho Sng Amb  | Cho Magenta  | Cho White L1 | Cho Cross L1 |
   ------------------------------------------------------------------------------------------------------------------------
-  | Head Circle  | Audience Swe | Cross Zigzag | Head Sweep S | Head Sweep F | Figure 8     | Pan Wave     | Tilt Dip     |
+  | Strobe L1    | Col Strobe L | Rnbw Hit L1  | Kill L1      | UV Pop L1    | Col Burst L1 | Alt Flash L1 | White Hit L1 |
   ------------------------------------------------------------------------------------------------------------------------
-  |              |              |              |              |              |              |              |              |
+  | Col Cycle L1 | Police L1    | Build L1     | Par Dyn L1   | Head Sweep L | Cross Fig L1 | Bar Dyn L1   | Sparkle L1   |
   ------------------------------------------------------------------------------------------------------------------------
-  | Strobe All   |              |              |              | Full On      |              | Blackout     |              |
-```
-
-### Page 1 (cycle with the R8C8 pad)
-```
-  | Red          | Amber        | Yellow       | Green        | Cyan         | Blue         | Magenta      | White        |
-  ------------------------------------------------------------------------------------------------------------------------
-  | Warm Wash    | Cool Wash    | Red Blue Spl | UV Blackligh | Magenta Cyan | Sunset       | Deep Blue Ve | White Static |
-  ------------------------------------------------------------------------------------------------------------------------
-  | Singer       | Guitar       | Bass         | Drums        | Crowd Near   | Crowd Deep   | Stage Wash   | Park         |
-  ------------------------------------------------------------------------------------------------------------------------
-  | Breakup Gobo | Gobo Cycle   | Prism        | Color Cycle  | Red Beam     | Blue Beam    | Open Spot    | Heads Blacko |
-  ------------------------------------------------------------------------------------------------------------------------
-  | Rainbow      | Police       | Strobe Color | Bar Chase    | Bounce       | Slow Cycle   | Bar Scroll   | Bar Bounce   |
-  ------------------------------------------------------------------------------------------------------------------------
-  | Pars Auto    | Bars Auto    | Pars Morph   | Bars Morph   | Color Stab   | Kill Strobe  | Par Run      | Pixel Bounce |
-  ------------------------------------------------------------------------------------------------------------------------
-  | Alt Flash    | Build Drop   | Opener       | Chorus Warm  | Breakdown UV | Audience Swe | Cross Zigzag | Park All     |
-  ------------------------------------------------------------------------------------------------------------------------
-  | Strobe All   | Blinder      | UV Pop       | Color Burst  | Full On      | Sound Active | Blackout     |              |
+  | Strobe All L | Blinder L1   | Sound Active | Park All L1  | Heads Black  | Blackout L1  | Full On L1   |              |
 ```
 
-### Page 2 (cycle with the R8C8 pad)
+### Page 2 — Level 2 · driving (tap R8C8 to ramp up)
 ```
-  | Pars Red     | Pars Amber   | Pars Yellow  | Pars Green   | Pars Cyan    | Pars Blue    | Pars Magenta | Pars White   |
+  | Band White L | Band Red L2  | Band Amber L | Band Green L | Band Cyan L2 | Band Blue L2 | Band Magenta | Band UV L2   |
   ------------------------------------------------------------------------------------------------------------------------
-  | Bars Red     | Bars Amber   | Bars Yellow  | Bars Green   | Bars Cyan    | Bars Blue    | Bars Magenta | Bars White   |
+  | Singer White | Singer Red L | Guitar Amber | Guitar Mag L | Bass Blue L2 | Bass Green L | Cross White  | Cross Split  |
   ------------------------------------------------------------------------------------------------------------------------
-  | Heads White  | Heads Orange | Heads Lime   | Heads Cyan   | Heads Red    | Heads Green  | Heads Magent | Heads Yellow |
+  | Singer Tex L | Band Grn Tex | Drums Red L2 | Drums Blue L | Cross Tex L2 | Band Wht Tex | Crowd White  | Crowd Mag L2 |
   ------------------------------------------------------------------------------------------------------------------------
-  | Gobo 1       | Gobo 2       | Gobo 3       | Gobo 4       | Gobo 5       | Gobo 6       | Gobo 7       | Prism        |
+  | Vrs Sng Blue | Vrs Drm Deep | Vrs Wsh Cool | Vrs Sng Cyan | Vrs Purple L | Vrs Green L2 | Vrs Gold L2  | Vrs Wsh UV L |
   ------------------------------------------------------------------------------------------------------------------------
-  | Head Circle  | Audience Swe | Cross Zigzag | Head Sweep S | Head Sweep F | Figure 8     | Pan Wave     | Tilt Dip     |
+  | Cho Warm L2  | Cho Warm2 L2 | Cho Sunset L | Cho MagCyan  | Cho Sng Amb  | Cho Magenta  | Cho White L2 | Cho Cross L2 |
   ------------------------------------------------------------------------------------------------------------------------
-  | Rainbow Fast | Strobe Rainb | Chase Up     | Chase Down   | Two Tone     | Par Sparkle  | Color Pop    | Mega Build   |
+  | Strobe L2    | Col Strobe L | Rnbw Hit L2  | Kill L2      | UV Pop L2    | Col Burst L2 | Alt Flash L2 | White Hit L2 |
   ------------------------------------------------------------------------------------------------------------------------
-  | Opener       | Verse Blue   | Chorus Warm  | Breakdown UV | Anthem       | Half Time    | Green Room   | Magenta Pop  |
+  | Col Cycle L2 | Police L2    | Build L2     | Par Dyn L2   | Head Sweep L | Cross Fig L2 | Bar Dyn L2   | Sparkle L2   |
   ------------------------------------------------------------------------------------------------------------------------
-  | Deep Verse   | Sunset Jam   | Big Finish   | Cyan Wash    | Purple Haze  | Gold Ballad  | Punk Slam    |              |
+  | Strobe All L | Blinder L2   | Sound Active | Park All L2  | Heads Black  | Blackout L2  | Full On L2   |              |
 ```
 
-Pads light in their look color when active (LED feedback). On Page 2 the console shows five faders
-(Pars Dim, Bars Dim, Heads Dim, Strobe Rate, Heads Zoom), all default full; Master Dim is the
-built-in GrandMaster (top-right of the console) and dims everything globally.
+### Page 3 — Level 3 · full-send (tap R8C8 again)
+```
+  | Band White L | Band Red L3  | Band Amber L | Band Green L | Band Cyan L3 | Band Blue L3 | Band Magenta | Band UV L3   |
+  ------------------------------------------------------------------------------------------------------------------------
+  | Singer White | Singer Red L | Guitar Amber | Guitar Mag L | Bass Blue L3 | Bass Green L | Cross White  | Cross Split  |
+  ------------------------------------------------------------------------------------------------------------------------
+  | Singer Tex L | Band Grn Tex | Drums Red L3 | Drums Blue L | Cross Tex L3 | Band Wht Tex | Crowd White  | Crowd Mag L3 |
+  ------------------------------------------------------------------------------------------------------------------------
+  | Vrs Sng Blue | Vrs Drm Deep | Vrs Wsh Cool | Vrs Sng Cyan | Vrs Purple L | Vrs Green L3 | Vrs Gold L3  | Vrs Wsh UV L |
+  ------------------------------------------------------------------------------------------------------------------------
+  | Cho Warm L3  | Cho Warm2 L3 | Cho Sunset L | Cho MagCyan  | Cho Sng Amb  | Cho Magenta  | Cho White L3 | Cho Cross L3 |
+  ------------------------------------------------------------------------------------------------------------------------
+  | Strobe L3    | Col Strobe L | Rnbw Hit L3  | Kill L3      | UV Pop L3    | Col Burst L3 | Alt Flash L3 | White Hit L3 |
+  ------------------------------------------------------------------------------------------------------------------------
+  | Col Cycle L3 | Police L3    | Build L3     | Par Dyn L3   | Head Sweep L | Cross Fig L3 | Bar Dyn L3   | Sparkle L3   |
+  ------------------------------------------------------------------------------------------------------------------------
+  | Strobe All L | Blinder L3   | Sound Active | Park All L3  | Heads Black  | Blackout L3  | Full On L3   |              |
+```
+
+Pads glow at **~50%** in their look colour when idle; the **active** look in each row jumps to
+**100%** (a clear brightness step so the live look is unmistakable). The LEDs are driven by
+the MCP server's launchpad module over RGB SysEx (QLC+ reads the pad presses only). The console shows five
+faders to the **right of the grid — Pars Dim, Bars Dim, Heads Dim, Strobe Rate, Heads Zoom — visible
+on every page** (all default full); Master Dim is the built-in GrandMaster (top-right of the console)
+and dims everything globally.
 
 ## Look index — every pad (locate / update)
 
 Sorted by page, then row, then column. **R/C** = the 8×8 pad coordinate (1-indexed, top-left =
 R1C1); **Pad** = the Launchpad MIDI channel; **OSC** = the dashboard path. Each on-screen button's
-caption shows its R/C after the name (e.g. `Red R1C1`). The **Pg** column is the internal page
-index — **Pg 3 = the SIMPLE page**, which the show boots on (cycle order: SIMPLE → 1 → 2).
+caption shows its energy tier + R/C after the name (e.g. `Band Red L1 R1C2`). The **Pg** column is
+the energy tier — **Pg 1 = Level 1 (chill)**, the page the show boots on (cycle order: 1 → 2 → 3).
 
 | Look | Pg | R/C | Pad | OSC |
 |------|----|-----|-----|-----|
-| Red | 1 | R1C1 | 209 | `/red_r1c1` |
-| Amber | 1 | R1C2 | 210 | `/amber_r1c2` |
-| Yellow | 1 | R1C3 | 211 | `/yellow_r1c3` |
-| Green | 1 | R1C4 | 212 | `/green_r1c4` |
-| Cyan | 1 | R1C5 | 213 | `/cyan_r1c5` |
-| Blue | 1 | R1C6 | 214 | `/blue_r1c6` |
-| Magenta | 1 | R1C7 | 215 | `/magenta_r1c7` |
-| White | 1 | R1C8 | 216 | `/white_r1c8` |
-| Warm Wash | 1 | R2C1 | 199 | `/warm_wash_r2c1` |
-| Cool Wash | 1 | R2C2 | 200 | `/cool_wash_r2c2` |
-| Red Blue Split | 1 | R2C3 | 201 | `/red_blue_split_r2c3` |
-| UV Blacklight | 1 | R2C4 | 202 | `/uv_blacklight_r2c4` |
-| Magenta Cyan | 1 | R2C5 | 203 | `/magenta_cyan_r2c5` |
-| Sunset | 1 | R2C6 | 204 | `/sunset_r2c6` |
-| Deep Blue Verse | 1 | R2C7 | 205 | `/deep_blue_verse_r2c7` |
-| White Static | 1 | R2C8 | 206 | `/white_static_r2c8` |
-| Singer | 1 | R3C1 | 189 | `/singer_r3c1` |
-| Guitar | 1 | R3C2 | 190 | `/guitar_r3c2` |
-| Bass | 1 | R3C3 | 191 | `/bass_r3c3` |
-| Drums | 1 | R3C4 | 192 | `/drums_r3c4` |
-| Crowd Near | 1 | R3C5 | 193 | `/crowd_near_r3c5` |
-| Crowd Deep | 1 | R3C6 | 194 | `/crowd_deep_r3c6` |
-| Stage Wash | 1 | R3C7 | 195 | `/stage_wash_r3c7` |
-| Park | 1 | R3C8 | 196 | `/park_r3c8` |
-| Breakup Gobo | 1 | R4C1 | 179 | `/breakup_gobo_r4c1` |
-| Gobo Cycle | 1 | R4C2 | 180 | `/gobo_cycle_r4c2` |
-| Prism | 1 | R4C3 | 181 | `/prism_r4c3` |
-| Color Cycle | 1 | R4C4 | 182 | `/color_cycle_r4c4` |
-| Red Beam | 1 | R4C5 | 183 | `/red_beam_r4c5` |
-| Blue Beam | 1 | R4C6 | 184 | `/blue_beam_r4c6` |
-| Open Spot | 1 | R4C7 | 185 | `/open_spot_r4c7` |
-| Heads Blackout | 1 | R4C8 | 186 | `/heads_blackout_r4c8` |
-| Rainbow | 1 | R5C1 | 169 | `/rainbow_r5c1` |
-| Police | 1 | R5C2 | 170 | `/police_r5c2` |
-| Strobe Color | 1 | R5C3 | 171 | `/strobe_color_r5c3` |
-| Bar Chase | 1 | R5C4 | 172 | `/bar_chase_r5c4` |
-| Bounce | 1 | R5C5 | 173 | `/bounce_r5c5` |
-| Slow Cycle | 1 | R5C6 | 174 | `/slow_cycle_r5c6` |
-| Bar Scroll | 1 | R5C7 | 175 | `/bar_scroll_r5c7` |
-| Bar Bounce | 1 | R5C8 | 176 | `/bar_bounce_r5c8` |
-| Pars Auto | 1 | R6C1 | 159 | `/pars_auto_r6c1` |
-| Bars Auto | 1 | R6C2 | 160 | `/bars_auto_r6c2` |
-| Pars Morph | 1 | R6C3 | 161 | `/pars_morph_r6c3` |
-| Bars Morph | 1 | R6C4 | 162 | `/bars_morph_r6c4` |
-| Color Stab | 1 | R6C5 | 163 | `/color_stab_r6c5` |
-| Kill Strobe | 1 | R6C6 | 164 | `/kill_strobe_r6c6` |
-| Par Run | 1 | R6C7 | 165 | `/par_run_r6c7` |
-| Pixel Bounce | 1 | R6C8 | 166 | `/pixel_bounce_r6c8` |
-| Alt Flash | 1 | R7C1 | 149 | `/alt_flash_r7c1` |
-| Build Drop | 1 | R7C2 | 150 | `/build_drop_r7c2` |
-| Opener | 1 | R7C3 | 151 | `/opener_r7c3` |
-| Chorus Warm | 1 | R7C4 | 152 | `/chorus_warm_r7c4` |
-| Breakdown UV | 1 | R7C5 | 153 | `/breakdown_uv_r7c5` |
-| Audience Sweep | 1 | R7C6 | 154 | `/audience_sweep_r7c6` |
-| Cross Zigzag | 1 | R7C7 | 155 | `/cross_zigzag_r7c7` |
-| Park All | 1 | R7C8 | 156 | `/park_all_r7c8` |
-| Strobe All | 1 | R8C1 | 139 | `/strobe_all_r8c1` |
-| Blinder | 1 | R8C2 | 140 | `/blinder_r8c2` |
-| UV Pop | 1 | R8C3 | 141 | `/uv_pop_r8c3` |
-| Color Burst | 1 | R8C4 | 142 | `/color_burst_r8c4` |
-| Full On | 1 | R8C5 | 143 | `/full_on_r8c5` |
-| Sound Active | 1 | R8C6 | 144 | `/sound_active_r8c6` |
-| Blackout | 1 | R8C7 | 145 | `/blackout_r8c7` |
-| Pars Red | 2 | R1C1 | 209 | `/pars_red_r1c1` |
-| Pars Amber | 2 | R1C2 | 210 | `/pars_amber_r1c2` |
-| Pars Yellow | 2 | R1C3 | 211 | `/pars_yellow_r1c3` |
-| Pars Green | 2 | R1C4 | 212 | `/pars_green_r1c4` |
-| Pars Cyan | 2 | R1C5 | 213 | `/pars_cyan_r1c5` |
-| Pars Blue | 2 | R1C6 | 214 | `/pars_blue_r1c6` |
-| Pars Magenta | 2 | R1C7 | 215 | `/pars_magenta_r1c7` |
-| Pars White | 2 | R1C8 | 216 | `/pars_white_r1c8` |
-| Bars Red | 2 | R2C1 | 199 | `/bars_red_r2c1` |
-| Bars Amber | 2 | R2C2 | 200 | `/bars_amber_r2c2` |
-| Bars Yellow | 2 | R2C3 | 201 | `/bars_yellow_r2c3` |
-| Bars Green | 2 | R2C4 | 202 | `/bars_green_r2c4` |
-| Bars Cyan | 2 | R2C5 | 203 | `/bars_cyan_r2c5` |
-| Bars Blue | 2 | R2C6 | 204 | `/bars_blue_r2c6` |
-| Bars Magenta | 2 | R2C7 | 205 | `/bars_magenta_r2c7` |
-| Bars White | 2 | R2C8 | 206 | `/bars_white_r2c8` |
-| Heads White | 2 | R3C1 | 189 | `/heads_white_r3c1` |
-| Heads Orange | 2 | R3C2 | 190 | `/heads_orange_r3c2` |
-| Heads Lime | 2 | R3C3 | 191 | `/heads_lime_r3c3` |
-| Heads Cyan | 2 | R3C4 | 192 | `/heads_cyan_r3c4` |
-| Heads Red | 2 | R3C5 | 193 | `/heads_red_r3c5` |
-| Heads Green | 2 | R3C6 | 194 | `/heads_green_r3c6` |
-| Heads Magenta | 2 | R3C7 | 195 | `/heads_magenta_r3c7` |
-| Heads Yellow | 2 | R3C8 | 196 | `/heads_yellow_r3c8` |
-| Gobo 1 | 2 | R4C1 | 179 | `/gobo_1_r4c1` |
-| Gobo 2 | 2 | R4C2 | 180 | `/gobo_2_r4c2` |
-| Gobo 3 | 2 | R4C3 | 181 | `/gobo_3_r4c3` |
-| Gobo 4 | 2 | R4C4 | 182 | `/gobo_4_r4c4` |
-| Gobo 5 | 2 | R4C5 | 183 | `/gobo_5_r4c5` |
-| Gobo 6 | 2 | R4C6 | 184 | `/gobo_6_r4c6` |
-| Gobo 7 | 2 | R4C7 | 185 | `/gobo_7_r4c7` |
-| Prism | 2 | R4C8 | 186 | `/prism_r4c8` |
-| Head Circle | 2 | R5C1 | 169 | `/head_circle_r5c1` |
-| Audience Sweep | 2 | R5C2 | 170 | `/audience_sweep_r5c2` |
-| Cross Zigzag | 2 | R5C3 | 171 | `/cross_zigzag_r5c3` |
-| Head Sweep Slow | 2 | R5C4 | 172 | `/head_sweep_slow_r5c4` |
-| Head Sweep Fast | 2 | R5C5 | 173 | `/head_sweep_fast_r5c5` |
-| Figure 8 | 2 | R5C6 | 174 | `/figure_8_r5c6` |
-| Pan Wave | 2 | R5C7 | 175 | `/pan_wave_r5c7` |
-| Tilt Dip | 2 | R5C8 | 176 | `/tilt_dip_r5c8` |
-| Rainbow Fast | 2 | R6C1 | 159 | `/rainbow_fast_r6c1` |
-| Strobe Rainbow | 2 | R6C2 | 160 | `/strobe_rainbow_r6c2` |
-| Chase Up | 2 | R6C3 | 161 | `/chase_up_r6c3` |
-| Chase Down | 2 | R6C4 | 162 | `/chase_down_r6c4` |
-| Two Tone | 2 | R6C5 | 163 | `/two_tone_r6c5` |
-| Par Sparkle | 2 | R6C6 | 164 | `/par_sparkle_r6c6` |
-| Color Pop | 2 | R6C7 | 165 | `/color_pop_r6c7` |
-| Mega Build | 2 | R6C8 | 166 | `/mega_build_r6c8` |
-| Opener | 2 | R7C1 | 149 | `/opener_r7c1` |
-| Verse Blue | 2 | R7C2 | 150 | `/verse_blue_r7c2` |
-| Chorus Warm | 2 | R7C3 | 151 | `/chorus_warm_r7c3` |
-| Breakdown UV | 2 | R7C4 | 152 | `/breakdown_uv_r7c4` |
-| Anthem | 2 | R7C5 | 153 | `/anthem_r7c5` |
-| Half Time | 2 | R7C6 | 154 | `/half_time_r7c6` |
-| Green Room | 2 | R7C7 | 155 | `/green_room_r7c7` |
-| Magenta Pop | 2 | R7C8 | 156 | `/magenta_pop_r7c8` |
-| Deep Verse | 2 | R8C1 | 139 | `/deep_verse_r8c1` |
-| Sunset Jam | 2 | R8C2 | 140 | `/sunset_jam_r8c2` |
-| Big Finish | 2 | R8C3 | 141 | `/big_finish_r8c3` |
-| Cyan Wash | 2 | R8C4 | 142 | `/cyan_wash_r8c4` |
-| Purple Haze | 2 | R8C5 | 143 | `/purple_haze_r8c5` |
-| Gold Ballad | 2 | R8C6 | 144 | `/gold_ballad_r8c6` |
-| Punk Slam | 2 | R8C7 | 145 | `/punk_slam_r8c7` |
-| Opener | 3 | R1C1 | 209 | `/opener_r1c1` |
-| Verse Blue | 3 | R1C2 | 210 | `/verse_blue_r1c2` |
-| Chorus Warm | 3 | R1C3 | 211 | `/chorus_warm_r1c3` |
-| Breakdown UV | 3 | R1C4 | 212 | `/breakdown_uv_r1c4` |
-| Anthem | 3 | R1C5 | 213 | `/anthem_r1c5` |
-| Half Time | 3 | R1C6 | 214 | `/half_time_r1c6` |
-| Green Room | 3 | R1C7 | 215 | `/green_room_r1c7` |
-| Magenta Pop | 3 | R1C8 | 216 | `/magenta_pop_r1c8` |
-| Deep Verse | 3 | R2C1 | 199 | `/deep_verse_r2c1` |
-| Sunset Jam | 3 | R2C2 | 200 | `/sunset_jam_r2c2` |
-| Big Finish | 3 | R2C3 | 201 | `/big_finish_r2c3` |
-| Cyan Wash | 3 | R2C4 | 202 | `/cyan_wash_r2c4` |
-| Purple Haze | 3 | R2C5 | 203 | `/purple_haze_r2c5` |
-| Gold Ballad | 3 | R2C6 | 204 | `/gold_ballad_r2c6` |
-| Punk Slam | 3 | R2C7 | 205 | `/punk_slam_r2c7` |
-| Red | 3 | R4C1 | 179 | `/red_r4c1` |
-| Amber | 3 | R4C2 | 180 | `/amber_r4c2` |
-| Yellow | 3 | R4C3 | 181 | `/yellow_r4c3` |
-| Green | 3 | R4C4 | 182 | `/green_r4c4` |
-| Cyan | 3 | R4C5 | 183 | `/cyan_r4c5` |
-| Blue | 3 | R4C6 | 184 | `/blue_r4c6` |
-| Magenta | 3 | R4C7 | 185 | `/magenta_r4c7` |
-| White | 3 | R4C8 | 186 | `/white_r4c8` |
-| Head Circle | 3 | R6C1 | 159 | `/head_circle_r6c1` |
-| Audience Sweep | 3 | R6C2 | 160 | `/audience_sweep_r6c2` |
-| Cross Zigzag | 3 | R6C3 | 161 | `/cross_zigzag_r6c3` |
-| Head Sweep Slow | 3 | R6C4 | 162 | `/head_sweep_slow_r6c4` |
-| Head Sweep Fast | 3 | R6C5 | 163 | `/head_sweep_fast_r6c5` |
-| Figure 8 | 3 | R6C6 | 164 | `/figure_8_r6c6` |
-| Pan Wave | 3 | R6C7 | 165 | `/pan_wave_r6c7` |
-| Tilt Dip | 3 | R6C8 | 166 | `/tilt_dip_r6c8` |
-| Strobe All | 3 | R8C1 | 139 | `/strobe_all_r8c1` |
-| Full On | 3 | R8C5 | 143 | `/full_on_r8c5` |
-| Blackout | 3 | R8C7 | 145 | `/blackout_r8c7` |
+| Band White L1 | 1 | R1C1 | 209 | `/band_white_l1_r1c1` |
+| Band Red L1 | 1 | R1C2 | 210 | `/band_red_l1_r1c2` |
+| Band Amber L1 | 1 | R1C3 | 211 | `/band_amber_l1_r1c3` |
+| Band Green L1 | 1 | R1C4 | 212 | `/band_green_l1_r1c4` |
+| Band Cyan L1 | 1 | R1C5 | 213 | `/band_cyan_l1_r1c5` |
+| Band Blue L1 | 1 | R1C6 | 214 | `/band_blue_l1_r1c6` |
+| Band Magenta L1 | 1 | R1C7 | 215 | `/band_magenta_l1_r1c7` |
+| Band UV L1 | 1 | R1C8 | 216 | `/band_uv_l1_r1c8` |
+| Singer White L1 | 1 | R2C1 | 199 | `/singer_white_l1_r2c1` |
+| Singer Red L1 | 1 | R2C2 | 200 | `/singer_red_l1_r2c2` |
+| Guitar Amber L1 | 1 | R2C3 | 201 | `/guitar_amber_l1_r2c3` |
+| Guitar Mag L1 | 1 | R2C4 | 202 | `/guitar_mag_l1_r2c4` |
+| Bass Blue L1 | 1 | R2C5 | 203 | `/bass_blue_l1_r2c5` |
+| Bass Green L1 | 1 | R2C6 | 204 | `/bass_green_l1_r2c6` |
+| Cross White L1 | 1 | R2C7 | 205 | `/cross_white_l1_r2c7` |
+| Cross Split L1 | 1 | R2C8 | 206 | `/cross_split_l1_r2c8` |
+| Singer Tex L1 | 1 | R3C1 | 189 | `/singer_tex_l1_r3c1` |
+| Band Grn Tex L1 | 1 | R3C2 | 190 | `/band_grn_tex_l1_r3c2` |
+| Drums Red L1 | 1 | R3C3 | 191 | `/drums_red_l1_r3c3` |
+| Drums Blue L1 | 1 | R3C4 | 192 | `/drums_blue_l1_r3c4` |
+| Cross Tex L1 | 1 | R3C5 | 193 | `/cross_tex_l1_r3c5` |
+| Band Wht Tex L1 | 1 | R3C6 | 194 | `/band_wht_tex_l1_r3c6` |
+| Crowd White L1 | 1 | R3C7 | 195 | `/crowd_white_l1_r3c7` |
+| Crowd Mag L1 | 1 | R3C8 | 196 | `/crowd_mag_l1_r3c8` |
+| Vrs Sng Blue L1 | 1 | R4C1 | 179 | `/vrs_sng_blue_l1_r4c1` |
+| Vrs Drm Deep L1 | 1 | R4C2 | 180 | `/vrs_drm_deep_l1_r4c2` |
+| Vrs Wsh Cool L1 | 1 | R4C3 | 181 | `/vrs_wsh_cool_l1_r4c3` |
+| Vrs Sng Cyan L1 | 1 | R4C4 | 182 | `/vrs_sng_cyan_l1_r4c4` |
+| Vrs Purple L1 | 1 | R4C5 | 183 | `/vrs_purple_l1_r4c5` |
+| Vrs Green L1 | 1 | R4C6 | 184 | `/vrs_green_l1_r4c6` |
+| Vrs Gold L1 | 1 | R4C7 | 185 | `/vrs_gold_l1_r4c7` |
+| Vrs Wsh UV L1 | 1 | R4C8 | 186 | `/vrs_wsh_uv_l1_r4c8` |
+| Cho Warm L1 | 1 | R5C1 | 169 | `/cho_warm_l1_r5c1` |
+| Cho Warm2 L1 | 1 | R5C2 | 170 | `/cho_warm2_l1_r5c2` |
+| Cho Sunset L1 | 1 | R5C3 | 171 | `/cho_sunset_l1_r5c3` |
+| Cho MagCyan L1 | 1 | R5C4 | 172 | `/cho_magcyan_l1_r5c4` |
+| Cho Sng Amb L1 | 1 | R5C5 | 173 | `/cho_sng_amb_l1_r5c5` |
+| Cho Magenta L1 | 1 | R5C6 | 174 | `/cho_magenta_l1_r5c6` |
+| Cho White L1 | 1 | R5C7 | 175 | `/cho_white_l1_r5c7` |
+| Cho Cross L1 | 1 | R5C8 | 176 | `/cho_cross_l1_r5c8` |
+| Strobe L1 | 1 | R6C1 | 159 | `/strobe_l1_r6c1` |
+| Col Strobe L1 | 1 | R6C2 | 160 | `/col_strobe_l1_r6c2` |
+| Rnbw Hit L1 | 1 | R6C3 | 161 | `/rnbw_hit_l1_r6c3` |
+| Kill L1 | 1 | R6C4 | 162 | `/kill_l1_r6c4` |
+| UV Pop L1 | 1 | R6C5 | 163 | `/uv_pop_l1_r6c5` |
+| Col Burst L1 | 1 | R6C6 | 164 | `/col_burst_l1_r6c6` |
+| Alt Flash L1 | 1 | R6C7 | 165 | `/alt_flash_l1_r6c7` |
+| White Hit L1 | 1 | R6C8 | 166 | `/white_hit_l1_r6c8` |
+| Col Cycle L1 | 1 | R7C1 | 149 | `/col_cycle_l1_r7c1` |
+| Police L1 | 1 | R7C2 | 150 | `/police_l1_r7c2` |
+| Build L1 | 1 | R7C3 | 151 | `/build_l1_r7c3` |
+| Par Dyn L1 | 1 | R7C4 | 152 | `/par_dyn_l1_r7c4` |
+| Head Sweep L1 | 1 | R7C5 | 153 | `/head_sweep_l1_r7c5` |
+| Cross Fig L1 | 1 | R7C6 | 154 | `/cross_fig_l1_r7c6` |
+| Bar Dyn L1 | 1 | R7C7 | 155 | `/bar_dyn_l1_r7c7` |
+| Sparkle L1 | 1 | R7C8 | 156 | `/sparkle_l1_r7c8` |
+| Strobe All L1 | 1 | R8C1 | 139 | `/strobe_all_l1_r8c1` |
+| Blinder L1 | 1 | R8C2 | 140 | `/blinder_l1_r8c2` |
+| Sound Active L1 | 1 | R8C3 | 141 | `/sound_active_l1_r8c3` |
+| Park All L1 | 1 | R8C4 | 142 | `/park_all_l1_r8c4` |
+| Heads Black L1 | 1 | R8C5 | 143 | `/heads_black_l1_r8c5` |
+| Blackout L1 | 1 | R8C6 | 144 | `/blackout_l1_r8c6` |
+| Full On L1 | 1 | R8C7 | 145 | `/full_on_l1_r8c7` |
+| Band White L2 | 2 | R1C1 | 209 | `/band_white_l2_r1c1` |
+| Band Red L2 | 2 | R1C2 | 210 | `/band_red_l2_r1c2` |
+| Band Amber L2 | 2 | R1C3 | 211 | `/band_amber_l2_r1c3` |
+| Band Green L2 | 2 | R1C4 | 212 | `/band_green_l2_r1c4` |
+| Band Cyan L2 | 2 | R1C5 | 213 | `/band_cyan_l2_r1c5` |
+| Band Blue L2 | 2 | R1C6 | 214 | `/band_blue_l2_r1c6` |
+| Band Magenta L2 | 2 | R1C7 | 215 | `/band_magenta_l2_r1c7` |
+| Band UV L2 | 2 | R1C8 | 216 | `/band_uv_l2_r1c8` |
+| Singer White L2 | 2 | R2C1 | 199 | `/singer_white_l2_r2c1` |
+| Singer Red L2 | 2 | R2C2 | 200 | `/singer_red_l2_r2c2` |
+| Guitar Amber L2 | 2 | R2C3 | 201 | `/guitar_amber_l2_r2c3` |
+| Guitar Mag L2 | 2 | R2C4 | 202 | `/guitar_mag_l2_r2c4` |
+| Bass Blue L2 | 2 | R2C5 | 203 | `/bass_blue_l2_r2c5` |
+| Bass Green L2 | 2 | R2C6 | 204 | `/bass_green_l2_r2c6` |
+| Cross White L2 | 2 | R2C7 | 205 | `/cross_white_l2_r2c7` |
+| Cross Split L2 | 2 | R2C8 | 206 | `/cross_split_l2_r2c8` |
+| Singer Tex L2 | 2 | R3C1 | 189 | `/singer_tex_l2_r3c1` |
+| Band Grn Tex L2 | 2 | R3C2 | 190 | `/band_grn_tex_l2_r3c2` |
+| Drums Red L2 | 2 | R3C3 | 191 | `/drums_red_l2_r3c3` |
+| Drums Blue L2 | 2 | R3C4 | 192 | `/drums_blue_l2_r3c4` |
+| Cross Tex L2 | 2 | R3C5 | 193 | `/cross_tex_l2_r3c5` |
+| Band Wht Tex L2 | 2 | R3C6 | 194 | `/band_wht_tex_l2_r3c6` |
+| Crowd White L2 | 2 | R3C7 | 195 | `/crowd_white_l2_r3c7` |
+| Crowd Mag L2 | 2 | R3C8 | 196 | `/crowd_mag_l2_r3c8` |
+| Vrs Sng Blue L2 | 2 | R4C1 | 179 | `/vrs_sng_blue_l2_r4c1` |
+| Vrs Drm Deep L2 | 2 | R4C2 | 180 | `/vrs_drm_deep_l2_r4c2` |
+| Vrs Wsh Cool L2 | 2 | R4C3 | 181 | `/vrs_wsh_cool_l2_r4c3` |
+| Vrs Sng Cyan L2 | 2 | R4C4 | 182 | `/vrs_sng_cyan_l2_r4c4` |
+| Vrs Purple L2 | 2 | R4C5 | 183 | `/vrs_purple_l2_r4c5` |
+| Vrs Green L2 | 2 | R4C6 | 184 | `/vrs_green_l2_r4c6` |
+| Vrs Gold L2 | 2 | R4C7 | 185 | `/vrs_gold_l2_r4c7` |
+| Vrs Wsh UV L2 | 2 | R4C8 | 186 | `/vrs_wsh_uv_l2_r4c8` |
+| Cho Warm L2 | 2 | R5C1 | 169 | `/cho_warm_l2_r5c1` |
+| Cho Warm2 L2 | 2 | R5C2 | 170 | `/cho_warm2_l2_r5c2` |
+| Cho Sunset L2 | 2 | R5C3 | 171 | `/cho_sunset_l2_r5c3` |
+| Cho MagCyan L2 | 2 | R5C4 | 172 | `/cho_magcyan_l2_r5c4` |
+| Cho Sng Amb L2 | 2 | R5C5 | 173 | `/cho_sng_amb_l2_r5c5` |
+| Cho Magenta L2 | 2 | R5C6 | 174 | `/cho_magenta_l2_r5c6` |
+| Cho White L2 | 2 | R5C7 | 175 | `/cho_white_l2_r5c7` |
+| Cho Cross L2 | 2 | R5C8 | 176 | `/cho_cross_l2_r5c8` |
+| Strobe L2 | 2 | R6C1 | 159 | `/strobe_l2_r6c1` |
+| Col Strobe L2 | 2 | R6C2 | 160 | `/col_strobe_l2_r6c2` |
+| Rnbw Hit L2 | 2 | R6C3 | 161 | `/rnbw_hit_l2_r6c3` |
+| Kill L2 | 2 | R6C4 | 162 | `/kill_l2_r6c4` |
+| UV Pop L2 | 2 | R6C5 | 163 | `/uv_pop_l2_r6c5` |
+| Col Burst L2 | 2 | R6C6 | 164 | `/col_burst_l2_r6c6` |
+| Alt Flash L2 | 2 | R6C7 | 165 | `/alt_flash_l2_r6c7` |
+| White Hit L2 | 2 | R6C8 | 166 | `/white_hit_l2_r6c8` |
+| Col Cycle L2 | 2 | R7C1 | 149 | `/col_cycle_l2_r7c1` |
+| Police L2 | 2 | R7C2 | 150 | `/police_l2_r7c2` |
+| Build L2 | 2 | R7C3 | 151 | `/build_l2_r7c3` |
+| Par Dyn L2 | 2 | R7C4 | 152 | `/par_dyn_l2_r7c4` |
+| Head Sweep L2 | 2 | R7C5 | 153 | `/head_sweep_l2_r7c5` |
+| Cross Fig L2 | 2 | R7C6 | 154 | `/cross_fig_l2_r7c6` |
+| Bar Dyn L2 | 2 | R7C7 | 155 | `/bar_dyn_l2_r7c7` |
+| Sparkle L2 | 2 | R7C8 | 156 | `/sparkle_l2_r7c8` |
+| Strobe All L2 | 2 | R8C1 | 139 | `/strobe_all_l2_r8c1` |
+| Blinder L2 | 2 | R8C2 | 140 | `/blinder_l2_r8c2` |
+| Sound Active L2 | 2 | R8C3 | 141 | `/sound_active_l2_r8c3` |
+| Park All L2 | 2 | R8C4 | 142 | `/park_all_l2_r8c4` |
+| Heads Black L2 | 2 | R8C5 | 143 | `/heads_black_l2_r8c5` |
+| Blackout L2 | 2 | R8C6 | 144 | `/blackout_l2_r8c6` |
+| Full On L2 | 2 | R8C7 | 145 | `/full_on_l2_r8c7` |
+| Band White L3 | 3 | R1C1 | 209 | `/band_white_l3_r1c1` |
+| Band Red L3 | 3 | R1C2 | 210 | `/band_red_l3_r1c2` |
+| Band Amber L3 | 3 | R1C3 | 211 | `/band_amber_l3_r1c3` |
+| Band Green L3 | 3 | R1C4 | 212 | `/band_green_l3_r1c4` |
+| Band Cyan L3 | 3 | R1C5 | 213 | `/band_cyan_l3_r1c5` |
+| Band Blue L3 | 3 | R1C6 | 214 | `/band_blue_l3_r1c6` |
+| Band Magenta L3 | 3 | R1C7 | 215 | `/band_magenta_l3_r1c7` |
+| Band UV L3 | 3 | R1C8 | 216 | `/band_uv_l3_r1c8` |
+| Singer White L3 | 3 | R2C1 | 199 | `/singer_white_l3_r2c1` |
+| Singer Red L3 | 3 | R2C2 | 200 | `/singer_red_l3_r2c2` |
+| Guitar Amber L3 | 3 | R2C3 | 201 | `/guitar_amber_l3_r2c3` |
+| Guitar Mag L3 | 3 | R2C4 | 202 | `/guitar_mag_l3_r2c4` |
+| Bass Blue L3 | 3 | R2C5 | 203 | `/bass_blue_l3_r2c5` |
+| Bass Green L3 | 3 | R2C6 | 204 | `/bass_green_l3_r2c6` |
+| Cross White L3 | 3 | R2C7 | 205 | `/cross_white_l3_r2c7` |
+| Cross Split L3 | 3 | R2C8 | 206 | `/cross_split_l3_r2c8` |
+| Singer Tex L3 | 3 | R3C1 | 189 | `/singer_tex_l3_r3c1` |
+| Band Grn Tex L3 | 3 | R3C2 | 190 | `/band_grn_tex_l3_r3c2` |
+| Drums Red L3 | 3 | R3C3 | 191 | `/drums_red_l3_r3c3` |
+| Drums Blue L3 | 3 | R3C4 | 192 | `/drums_blue_l3_r3c4` |
+| Cross Tex L3 | 3 | R3C5 | 193 | `/cross_tex_l3_r3c5` |
+| Band Wht Tex L3 | 3 | R3C6 | 194 | `/band_wht_tex_l3_r3c6` |
+| Crowd White L3 | 3 | R3C7 | 195 | `/crowd_white_l3_r3c7` |
+| Crowd Mag L3 | 3 | R3C8 | 196 | `/crowd_mag_l3_r3c8` |
+| Vrs Sng Blue L3 | 3 | R4C1 | 179 | `/vrs_sng_blue_l3_r4c1` |
+| Vrs Drm Deep L3 | 3 | R4C2 | 180 | `/vrs_drm_deep_l3_r4c2` |
+| Vrs Wsh Cool L3 | 3 | R4C3 | 181 | `/vrs_wsh_cool_l3_r4c3` |
+| Vrs Sng Cyan L3 | 3 | R4C4 | 182 | `/vrs_sng_cyan_l3_r4c4` |
+| Vrs Purple L3 | 3 | R4C5 | 183 | `/vrs_purple_l3_r4c5` |
+| Vrs Green L3 | 3 | R4C6 | 184 | `/vrs_green_l3_r4c6` |
+| Vrs Gold L3 | 3 | R4C7 | 185 | `/vrs_gold_l3_r4c7` |
+| Vrs Wsh UV L3 | 3 | R4C8 | 186 | `/vrs_wsh_uv_l3_r4c8` |
+| Cho Warm L3 | 3 | R5C1 | 169 | `/cho_warm_l3_r5c1` |
+| Cho Warm2 L3 | 3 | R5C2 | 170 | `/cho_warm2_l3_r5c2` |
+| Cho Sunset L3 | 3 | R5C3 | 171 | `/cho_sunset_l3_r5c3` |
+| Cho MagCyan L3 | 3 | R5C4 | 172 | `/cho_magcyan_l3_r5c4` |
+| Cho Sng Amb L3 | 3 | R5C5 | 173 | `/cho_sng_amb_l3_r5c5` |
+| Cho Magenta L3 | 3 | R5C6 | 174 | `/cho_magenta_l3_r5c6` |
+| Cho White L3 | 3 | R5C7 | 175 | `/cho_white_l3_r5c7` |
+| Cho Cross L3 | 3 | R5C8 | 176 | `/cho_cross_l3_r5c8` |
+| Strobe L3 | 3 | R6C1 | 159 | `/strobe_l3_r6c1` |
+| Col Strobe L3 | 3 | R6C2 | 160 | `/col_strobe_l3_r6c2` |
+| Rnbw Hit L3 | 3 | R6C3 | 161 | `/rnbw_hit_l3_r6c3` |
+| Kill L3 | 3 | R6C4 | 162 | `/kill_l3_r6c4` |
+| UV Pop L3 | 3 | R6C5 | 163 | `/uv_pop_l3_r6c5` |
+| Col Burst L3 | 3 | R6C6 | 164 | `/col_burst_l3_r6c6` |
+| Alt Flash L3 | 3 | R6C7 | 165 | `/alt_flash_l3_r6c7` |
+| White Hit L3 | 3 | R6C8 | 166 | `/white_hit_l3_r6c8` |
+| Col Cycle L3 | 3 | R7C1 | 149 | `/col_cycle_l3_r7c1` |
+| Police L3 | 3 | R7C2 | 150 | `/police_l3_r7c2` |
+| Build L3 | 3 | R7C3 | 151 | `/build_l3_r7c3` |
+| Par Dyn L3 | 3 | R7C4 | 152 | `/par_dyn_l3_r7c4` |
+| Head Sweep L3 | 3 | R7C5 | 153 | `/head_sweep_l3_r7c5` |
+| Cross Fig L3 | 3 | R7C6 | 154 | `/cross_fig_l3_r7c6` |
+| Bar Dyn L3 | 3 | R7C7 | 155 | `/bar_dyn_l3_r7c7` |
+| Sparkle L3 | 3 | R7C8 | 156 | `/sparkle_l3_r7c8` |
+| Strobe All L3 | 3 | R8C1 | 139 | `/strobe_all_l3_r8c1` |
+| Blinder L3 | 3 | R8C2 | 140 | `/blinder_l3_r8c2` |
+| Sound Active L3 | 3 | R8C3 | 141 | `/sound_active_l3_r8c3` |
+| Park All L3 | 3 | R8C4 | 142 | `/park_all_l3_r8c4` |
+| Heads Black L3 | 3 | R8C5 | 143 | `/heads_black_l3_r8c5` |
+| Blackout L3 | 3 | R8C6 | 144 | `/blackout_l3_r8c6` |
+| Full On L3 | 3 | R8C7 | 145 | `/full_on_l3_r8c7` |
 
 ## Control surfaces
 

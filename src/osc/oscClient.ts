@@ -15,6 +15,14 @@ let feedbackOscInstance: OscInstance | null = null;
 
 const RECENT_FEEDBACK_LIMIT = 25;
 
+// Optional listener for every QLC+ OSC feedback message. The Launchpad LED driver registers here so
+// it can light pads from widget state without binding a second socket on the feedback port (:9000).
+type FeedbackHook = (path: string | null, args: unknown[] | null) => void;
+let feedbackHook: FeedbackHook | null = null;
+export function setFeedbackHook(hook: FeedbackHook | null): void {
+  feedbackHook = hook;
+}
+
 export interface OscSendResult {
   success: boolean;
   message: string;
@@ -120,6 +128,14 @@ function recordFeedback(message: any, info?: any): void {
   logger.debug(
     `[READ_OSC] ${source ?? "unknown"} ${path ?? "unknown"} args=${JSON.stringify(args ?? [])}`
   );
+
+  if (feedbackHook) {
+    try {
+      feedbackHook(path, args);
+    } catch (err) {
+      logger.warn(`OSC feedback hook error: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  }
 }
 
 async function initFeedbackListener(config: Config): Promise<void> {

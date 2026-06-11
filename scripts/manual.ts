@@ -21,25 +21,16 @@ export interface ManualData {
   qxfFiles: string[]; // custom fixture definitions to install (repo-relative paths)
 }
 
+// Energy-ladder frames are named "<BAND>-L<tier>" (BASE-L1, STROBE-L2 …); colour + note key on the band.
+const bandOf = (frame: string): string => frame.replace(/-L\d+$/, "");
 const FRAME_COLOR: Record<string, string> = {
-  "WASH-STATIC": "#5b9cff", "HEADS-STATIC": "#36d399", "DYNAMICS": "#a78bfa", "CONTROL": "#ff6b6b",
-  PARS: "#5b9cff", BARS: "#a78bfa", HEADS2: "#36d399", CHASE2: "#f472b6", PRESETS: "#fbbf24",
-  "SIMPLE-PRESETS": "#fbbf24", "SIMPLE-WASH": "#5b9cff", "SIMPLE-MOVE": "#36d399", "SIMPLE-CONTROL": "#ff6b6b",
+  BASE: "#5b9cff", STROBE: "#ff6b6b", CHASE: "#a78bfa", CTRL: "#36d399",
 };
 const FRAME_NOTE: Record<string, string> = {
-  "WASH-STATIC": "Pars + bars colour / band. Solo — pick one.",
-  "HEADS-STATIC": "Head positions + beams / gobo. Solo — pick one.",
-  "DYNAMICS": "Chases, movements, autos + 3 song presets. Solo — ONE at a time.",
-  "CONTROL": "FX flash + Full On / Sound Active / Blackout.",
-  PARS: "Pars colour only — independent of bars/heads.",
-  BARS: "Bars colour only — independent of pars/heads.",
-  HEADS2: "Heads: colour / gobo / movement. Solo.",
-  CHASE2: "More chases. Solo — one at a time.",
-  PRESETS: "Full-stage song looks. Solo — one at a time.",
-  "SIMPLE-PRESETS": "Full-stage song looks — your home base. Solo — one at a time.",
-  "SIMPLE-WASH": "Whole-rig colour. Solo — pick one.",
-  "SIMPLE-MOVE": "Head movement. Solo — one at a time.",
-  "SIMPLE-CONTROL": "Strobe hit · Full On · Blackout.",
+  BASE: "Openers (R1-3) + verses/choruses (R4-5) — full looks. Solo: one base look at a time.",
+  STROBE: "Strobes / hits (R6). Tap = momentary, overlays the running chaser.",
+  CHASE: "Chasers (R7). Solo: one running effect at a time, riding on the base look.",
+  CTRL: "Utility (R8, same on every page): Strobe All · Blinder · Sound Active · Park All · Heads Blackout · Blackout · Full On.",
 };
 
 function esc(s: string): string {
@@ -135,8 +126,8 @@ function asciiDataFlow(): string {
   Launchpad pad  --USB-->   MIDIIN2  --> VC button (MIDI) --+
    (Programmer mode)        (port 2)                        |
                                                             +--> Function --> Art-Net U0 --> rig
-  Launchpad LED  <--USB--   MIDIOUT2 <-- LED feedback ------+        |
-   30% idle / 100% live     (port 2)                                 |
+  Launchpad LED  <--USB--   MCP server --RGB SysEx (winmm)-->        |
+   50% idle / 100% active   (owns MIDI OUT; QLC+ = input only)       |
                             OSC :7700 <--Wi-Fi-- iPad dashboard ------+
                                          VC button (OSC)   /look_r#c#
 
@@ -150,7 +141,7 @@ function asciiRows(): string {
    bottom row = lowest  notes 11-18       R8 (bottom) = control    <- ch 139
 
   => the row order is REVERSED in software so the TOP row = your main colours.
-  LED feedback:  idle look = 30% brightness   |   firing look = 100%.`;
+  LEDs (driven by the MCP server, not QLC+):  idle = 50%  |  active look = 100%.`;
 }
 
 function gridHtml(placed: ManualPlaced[], page: number): string {
@@ -168,7 +159,7 @@ function gridHtml(placed: ManualPlaced[], page: number): string {
         cells += `<div class="pad empty"><span class="rc">R${r + 1}C${c + 1}</span></div>`;
         continue;
       }
-      cells += `<div class="pad" style="background:${rgb(g.bg)};color:${textOn(g.bg)};box-shadow:inset 0 0 0 2px ${FRAME_COLOR[g.frame] || "#888"}">` +
+      cells += `<div class="pad" style="background:${rgb(g.bg)};color:${textOn(g.bg)};box-shadow:inset 0 0 0 2px ${FRAME_COLOR[bandOf(g.frame)] || "#888"}">` +
         `<span class="rc">R${r + 1}C${c + 1}</span>` +
         `<span class="nm">${esc(g.caption)}</span>` +
         `<span class="tp">${esc(g.ftype)}</span></div>`;
@@ -184,15 +175,13 @@ function legendHtml(frames: string[]): string {
 }
 
 function lookRows(placed: ManualPlaced[], page: number): string {
-  const order = page === 0 ? ["WASH-STATIC", "HEADS-STATIC", "DYNAMICS", "CONTROL"]
-    : page === 1 ? ["PARS", "BARS", "HEADS2", "CHASE2", "PRESETS"]
-    : ["SIMPLE-PRESETS", "SIMPLE-WASH", "SIMPLE-MOVE", "SIMPLE-CONTROL"];
+  const order = ["BASE", "STROBE", "CHASE", "CTRL"];
   return [...placed]
     .filter((g) => g.page === page)
-    .sort((a, b) => order.indexOf(a.frame) - order.indexOf(b.frame) || a.row - b.row || a.col - b.col)
+    .sort((a, b) => order.indexOf(bandOf(a.frame)) - order.indexOf(bandOf(b.frame)) || a.row - b.row || a.col - b.col)
     .map((g) => `<tr>
       <td><span class="dot" style="background:${rgb(g.bg)}"></span>${esc(g.caption)}</td>
-      <td><span class="tag" style="border-color:${FRAME_COLOR[g.frame]};color:${FRAME_COLOR[g.frame]}">${g.frame}</span></td>
+      <td><span class="tag" style="border-color:${FRAME_COLOR[bandOf(g.frame)]};color:${FRAME_COLOR[bandOf(g.frame)]}">${bandOf(g.frame)}</span></td>
       <td>${esc(g.ftype)}${g.action === "Flash" ? " · hold" : ""}</td>
       <td class="mono">P${g.page + 1} R${g.row + 1}C${g.col + 1} · ch ${g.pad}</td>
       <td class="mono">${esc(g.osc)}</td>
@@ -350,9 +339,9 @@ export function renderManual(d: ManualData): string {
       <pre>C:\\QLC+4\\qlcplus.exe --open ${esc(d.qxwFile)} -p -w</pre>
       <p><code>--open &lt;file&gt;</code> loads the project (a bare path is <b>ignored</b>),
         <code>-p</code> = start in Operate mode, <code>-w</code> = web API on :9999. Then the
-        <b>Virtual Console</b> opens on the <b>SIMPLE page</b> (presets + one colour + one movement);
-        the R8C8 pad or PgDn/PgUp cycles to <b>Page 1</b> (WASH · HEADS · DYNAMICS · CONTROL) and
-        <b>Page 2</b> (per-group colour, presets, faders).</p>
+        <b>Virtual Console</b> opens on <b>Page 1 (Level 1 — chill)</b>; the R8C8 pad or PgDn/PgUp ramps
+        energy to <b>Page 2 (Level 2 — driving)</b> and <b>Page 3 (Level 3 — full-send)</b>, then wraps
+        back. All three pages share the same pad layout; five faders sit to the right of the grid.</p>
     </section>
 
     <section id="s2"><h2><span class="num">2</span> Address the lights</h2>
@@ -385,16 +374,16 @@ ${addressBullets(d.fixtures)}
         Applies instantly, nothing to save.</div>
     </section>
 
-    <section id="s4"><h2><span class="num">4</span> Launchpad Mini MK3 → MIDI + LED feedback</h2>
-      <p><b>Use the SECOND MIDI port.</b> The project pre‑binds the Launchpad universe to
-        <code>MIDIIN2 (LPMiniMK3 MIDI)</code> / <code>MIDIOUT2</code> — the Mini MK3's dedicated
-        Programmer‑mode port. (Port 1, <code>LPMiniMK3 MIDI</code>, only works if the pad's "MIDI
-        Destination" is set to <i>both ports</i>, so it's unreliable — always use the second port.)
-        Windows assigns the device a numeric index that can shift on replug/reboot; if pads don't
-        respond, open <b>Inputs/Outputs ▸ Launchpad</b> and re‑select <b>Input = MIDIIN2</b> and
-        <b>Feedback = MIDIOUT2</b>.</p>
+    <section id="s4"><h2><span class="num">4</span> Launchpad Mini MK3 → MIDI IN only (the MCP drives the LEDs)</h2>
+      <p><b>QLC+ reads pad presses; it does NOT light the pads.</b> The MCP server's launchpad module
+        owns the Launchpad MIDI output and lights every pad itself over RGB SysEx (idle 50%, the active
+        look at 100%) — see <code>src/launchpad/leds.ts</code>. In QLC+'s
+        <b>Inputs/Outputs ▸ Launchpad</b>, set <b>Input = MIDIIN2 (LPMiniMK3 MIDI)</b> and
+        <b>leave Feedback EMPTY</b> — binding Feedback would fight the module for the MIDI OUT port.
+        Windows' numeric device index can shift on replug/reboot; if presses stop registering,
+        re‑select <b>Input = MIDIIN2</b>. If pads stay dark, reseat the USB and restart the MCP server.</p>
 
-      <h3>Put the Launchpad in Programmer Mode (required)</h3>
+      <h3>Programmer Mode (set automatically by the MCP — manual fallback below)</h3>
       <ol class="steps">
         <li><b>Hold</b> the <b>Session</b> button (top‑row round button) and keep holding it.</li>
         <li>While still holding Session, press the <b>bottom button of the right‑edge column</b> —
@@ -406,11 +395,12 @@ ${addressBullets(d.fixtures)}
       <div class="note">⚠️ <b>Do not tap Session while playing.</b> It drops the Launchpad back to
         Session mode and the pads go dead (QLC+ stops receiving). Fix: hold <b>Session</b> →
         <b>Stop&nbsp;Solo&nbsp;Mute</b> again. This is the one thing that knocks the rig out.</div>
-      <p>Pads glow <b>dim</b> in each look's color when idle and <b>bright</b> when the look is firing.
-        The grid reads <b>top row = full‑rig colours</b> (Red→White) down to the dynamic / chase / master
-        banks at the bottom. The <b>physical Launchpad, the QLC+ on‑screen console, and the dashboard
-        all share this exact 8×8</b>, so a look sits in the same spot on all three.
-        See the <a href="#map">Launchpad map</a> for what each pad does.</p>
+      <p>Pads glow at <b>50%</b> in their look colour when idle; the <b>active</b> look in each row
+        jumps to <b>100%</b> so the live look is unmistakable. The grid reads <b>top rows =
+        openers</b> (whole‑band hues + member spotlights),
+        then verses/choruses, strobes, chasers, and the <b>utility row at the bottom</b>. The <b>physical
+        Launchpad, the QLC+ on‑screen console, and the dashboard all share this exact 8×8</b>, so a look
+        sits in the same spot on all three. See the <a href="#map">Launchpad map</a> for what each pad does.</p>
     </section>
 
     <section id="s5"><h2><span class="num">5</span> Load test (5 min, before doors)</h2>
@@ -461,43 +451,38 @@ ${addressBullets(d.fixtures)}
       <p>See the <a href="#map">Launchpad map</a> for what every pad does on each page.</p>
     </section>
 
-    <section id="map"><h2><span class="num">11</span> Launchpad map — 3 pages</h2>
+    <section id="map"><h2><span class="num">11</span> Launchpad map — the energy ladder (3 pages)</h2>
       <p>The 8×8 grid exactly as it sits on the Launchpad (<b>row 1 = top</b>). The physical Launchpad,
-        the QLC+ on‑screen console, and the dashboard all use this <b>same layout</b>. There are now
-        <b>three pages</b> and the show <b>boots on the SIMPLE page</b>: <b>press the bottom‑right pad
-        (R8C8) to cycle</b> SIMPLE → Page 1 → Page 2 → SIMPLE — that corner pad is the page‑toggle on
-        every page and fires no look. (The Mini MK3's top →/← arrows don't transmit on the Programmer
-        port, so a real grid pad owns the switch.) On the computer keyboard, <b>PgDn / PgUp</b> also
-        switch pages. Each button's caption shows its <b>R#C# pad coordinate</b> after the name (e.g.
-        "Opener R1C1"); outline color = its solo group; labels are position‑based — read the <b>name</b>,
-        not the color.</p>
-      <h3>SIMPLE — the show boots here</h3>
-      <p style="margin:0 0 8px">The "get through the show" page. <b>PRESETS</b> (rows 1-2) are full-stage
-        song looks — your home base; tap one and the whole rig is set. Then optionally add <b>one</b>
-        <b>WASH</b> colour (row 4) and <b>one</b> <b>MOVE</b> (row 6). Row 8 has a Strobe hit, Full On and
-        Blackout.</p>
-      <div class="legend">${legendHtml(["SIMPLE-PRESETS", "SIMPLE-WASH", "SIMPLE-MOVE", "SIMPLE-CONTROL"])}</div>
-      ${gridHtml(d.placed, 2)}
-      <h3>Page 1 — full‑rig <span style="font-weight:400">(cycle with the R8C8 pad)</span></h3>
-      <p style="margin:0 0 8px">Four solo bands stacked top‑to‑bottom: <b>WASH</b> (rows 1‑2) and
-        <b>HEADS</b> (rows 3‑4) are independent — set one wash and one head look together. <b>DYNAMICS</b>
-        (rows 5‑7) is a single solo group: chases, autos and head‑movements run <b>one at a time</b>.
-        <b>CONTROL</b> (row 8) holds the FX flashes + Full On / Sound Active / Blackout.</p>
-      <div class="legend">${legendHtml(["WASH-STATIC", "HEADS-STATIC", "DYNAMICS", "CONTROL"])}</div>
+        the QLC+ on‑screen console, and the dashboard all use this <b>same layout</b>. All three pages
+        share <b>one positional grammar</b> — a pad keeps its song‑moment meaning on every page, just
+        redesigned hotter each level. The show <b>boots on Page 1 (Level 1)</b>; <b>press the
+        bottom‑right pad (R8C8) to ramp energy</b> — it cycles <b>Page 1 → 2 → 3 → 1</b>, so you raise a
+        song's intensity without moving your fingers. That corner pad fires no look. (The Mini MK3's top
+        →/← arrows don't transmit on the Programmer port, so a real grid pad owns the switch.)
+        <b>PgDn / PgUp</b> also switch pages. Each button's caption shows its <b>tier + R#C#</b> after the
+        name (e.g. "Band Red L1 R1C2"); idle pads glow at 50% and the <b>active</b> look at <b>100%</b>. Read
+        by <b>position</b>, not colour.</p>
+      <p style="margin:0 0 8px">Every page, same rows: <b>R1‑3 openers</b> (whole‑band hues + member
+        spotlights + texture/crowd), <b>R4‑5 verses/choruses</b>, <b>R6 strobes/hits</b>, <b>R7 chasers</b>,
+        <b>R8 utility</b> (identical on every page — the stable safety layer).</p>
+      <div class="legend">${legendHtml(["BASE", "STROBE", "CHASE", "CTRL"])}</div>
+      <h3>Page 1 — Level 1 · chill <span style="font-weight:400">(boots here)</span></h3>
       ${gridHtml(d.placed, 0)}
-      <h3>Page 2 — per‑group + presets <span style="font-weight:400">(cycle with the R8C8 pad)</span></h3>
-      <div class="legend">${legendHtml(["PARS", "BARS", "HEADS2", "CHASE2", "PRESETS"])}</div>
+      <h3>Page 2 — Level 2 · driving <span style="font-weight:400">(tap R8C8 to ramp up)</span></h3>
       ${gridHtml(d.placed, 1)}
-      <div class="note">Page 2 shows five console faders: <b>Pars Dim · Bars Dim · Heads Dim</b>
-        (per‑group masters — default full, pull one down to dim that group), plus <b>Strobe Rate</b> and
-        <b>Heads Zoom</b>. <b>Master Dim</b> is the built‑in GrandMaster (top‑right — dims everything).</div>
+      <h3>Page 3 — Level 3 · full‑send <span style="font-weight:400">(tap R8C8 again)</span></h3>
+      ${gridHtml(d.placed, 2)}
+      <div class="note">Five console faders sit to the <b>right of the grid, visible on every page</b>:
+        <b>Pars Dim · Bars Dim · Heads Dim</b> (per‑group masters — default full, pull one down to dim
+        that group), plus <b>Strobe Rate</b> and <b>Heads Zoom</b>. <b>Master Dim</b> is the built‑in
+        GrandMaster (top‑right — dims everything).</div>
       <h3>Every pad — settings</h3>
       <table>
-        <thead><tr><th>Look</th><th>Frame</th><th>Type</th><th>Page · pad · LP ch</th><th>OSC path</th></tr></thead>
+        <thead><tr><th>Look</th><th>Band</th><th>Type</th><th>Page · pad · LP ch</th><th>OSC path</th></tr></thead>
         <tbody>
-${lookRows(d.placed, 2)}
 ${lookRows(d.placed, 0)}
 ${lookRows(d.placed, 1)}
+${lookRows(d.placed, 2)}
         </tbody>
       </table>
     </section>
@@ -516,20 +501,21 @@ ${patchRows(d.fixtures)}
         <b>two</b> buttons pointing at the <b>same function</b>: one bound to the Launchpad (MIDI,
         with LED feedback) and one bound to OSC for the MCP/dashboard. The dashboard's
         <code>widgets.json</code> only lists the OSC buttons, so each look shows once.</p>
-      <p>The grid is <b>three pages</b> of 8×8; the show <b>boots on SIMPLE</b>. Cycle with the
-        <b>bottom-right pad (R8C8)</b> or <b>PgDn / PgUp</b> (SIMPLE → Page 1 → Page 2 → SIMPLE). Each
-        page's looks sit in non-overlapping bands:</p>
+      <p>The grid is an <b>energy ladder</b>: <b>three pages</b> of 8×8 that share one positional
+        grammar, each a hotter energy tier. The show <b>boots on Page 1 (Level 1)</b>; the
+        <b>bottom-right pad (R8C8)</b> or <b>PgDn / PgUp</b> ramps energy (Page 1 → 2 → 3 → 1, wrapping).
+        Each page's looks sit in non-overlapping row bands:</p>
       <ul>
-        <li><b>SIMPLE</b> (boots here) — the minimal "get through the show" page: 15 song PRESETS (rows
-          1-2, your home base), one WASH colour row (row 4), one MOVE row (row 6), and a utility row
-          (Strobe / Full On / Blackout). Reuses the same looks as the advanced pages.</li>
-        <li><b>Page 1</b> — WASH (colours / band washes) and HEADS (positions / beams) are independent
-          Solo bands, so one wash <i>and</i> one head look run together; DYNAMICS is a single Solo band,
-          so only <b>one</b> chase / movement / auto plays at a time; CONTROL (row 8) holds the FX
-          flashes plus Full On, Sound Active and Blackout.</li>
-        <li><b>Page 2</b> — per-group colour (PARS solo, BARS solo — independent), HEADS (colour / gobo /
-          movement), a second chase bank, and 15 song PRESETS, plus <b>5 faders</b>: Pars Dim, Bars Dim,
-          Heads Dim, Strobe Rate, Heads Zoom.</li>
+        <li><b>Rows 1-5 · BASE</b> (Solo — one base look at a time): rows 1-3 openers (whole-band hues,
+          member spotlights, texture/crowd) and rows 4-5 verses/choruses. These 40 looks render at three
+          energy levels — P1 deep/cool, P2 saturated, P3 hot + white punch.</li>
+        <li><b>Row 6 · STROBES</b> (non-solo): momentary hits that overlay a running chaser. <b>Row 7 ·
+          CHASERS</b> (Solo — one running effect at a time, riding on the base look). Both escalate slow →
+          medium → fast/hard with the tier.</li>
+        <li><b>Row 8 · UTILITY</b> — <b>identical on every page</b> (the stable safety layer, does not
+          escalate): Strobe All · Blinder · Sound Active · Park All · Heads Blackout · Blackout · Full On.
+          R8C8 is the energy-up page flip. Plus <b>5 faders</b> to the right (Pars/Bars/Heads Dim, Strobe
+          Rate, Heads Zoom), visible on every page.</li>
       </ul>
       <p><b>Brightness:</b> every scene drives its own master dimmer to full, so looks light up on their
         own — including the bars. The three Dim faders on page 2 are <i>overrides</i>: leave them up for

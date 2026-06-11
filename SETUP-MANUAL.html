@@ -80,8 +80,8 @@
         Then load-test and you're live.</p>
       <div class="kpi">
         <div><b>14</b>fixtures</div>
-        <div><b>160</b>looks</div>
-        <div><b>176</b>functions</div>
+        <div><b>189</b>looks</div>
+        <div><b>296</b>functions</div>
         <div><b>182/512</b>DMX channels</div>
         <div><b>1</b>universe</div>
       </div>
@@ -148,9 +148,9 @@
       <pre>C:\QLC+4\qlcplus.exe --open punk-rock-show.qxw -p -w</pre>
       <p><code>--open &lt;file&gt;</code> loads the project (a bare path is <b>ignored</b>),
         <code>-p</code> = start in Operate mode, <code>-w</code> = web API on :9999. Then the
-        <b>Virtual Console</b> opens on the <b>SIMPLE page</b> (presets + one colour + one movement);
-        the R8C8 pad or PgDn/PgUp cycles to <b>Page 1</b> (WASH · HEADS · DYNAMICS · CONTROL) and
-        <b>Page 2</b> (per-group colour, presets, faders).</p>
+        <b>Virtual Console</b> opens on <b>Page 1 (Level 1 — chill)</b>; the R8C8 pad or PgDn/PgUp ramps
+        energy to <b>Page 2 (Level 2 — driving)</b> and <b>Page 3 (Level 3 — full-send)</b>, then wraps
+        back. All three pages share the same pad layout; five faders sit to the right of the grid.</p>
     </section>
 
     <section id="s2"><h2><span class="num">2</span> Address the lights</h2>
@@ -185,16 +185,16 @@
         Applies instantly, nothing to save.</div>
     </section>
 
-    <section id="s4"><h2><span class="num">4</span> Launchpad Mini MK3 → MIDI + LED feedback</h2>
-      <p><b>Use the SECOND MIDI port.</b> The project pre‑binds the Launchpad universe to
-        <code>MIDIIN2 (LPMiniMK3 MIDI)</code> / <code>MIDIOUT2</code> — the Mini MK3's dedicated
-        Programmer‑mode port. (Port 1, <code>LPMiniMK3 MIDI</code>, only works if the pad's "MIDI
-        Destination" is set to <i>both ports</i>, so it's unreliable — always use the second port.)
-        Windows assigns the device a numeric index that can shift on replug/reboot; if pads don't
-        respond, open <b>Inputs/Outputs ▸ Launchpad</b> and re‑select <b>Input = MIDIIN2</b> and
-        <b>Feedback = MIDIOUT2</b>.</p>
+    <section id="s4"><h2><span class="num">4</span> Launchpad Mini MK3 → MIDI IN only (the MCP drives the LEDs)</h2>
+      <p><b>QLC+ reads pad presses; it does NOT light the pads.</b> The MCP server's launchpad module
+        owns the Launchpad MIDI output and lights every pad itself over RGB SysEx (idle 50%, the active
+        look at 100%) — see <code>src/launchpad/leds.ts</code>. In QLC+'s
+        <b>Inputs/Outputs ▸ Launchpad</b>, set <b>Input = MIDIIN2 (LPMiniMK3 MIDI)</b> and
+        <b>leave Feedback EMPTY</b> — binding Feedback would fight the module for the MIDI OUT port.
+        Windows' numeric device index can shift on replug/reboot; if presses stop registering,
+        re‑select <b>Input = MIDIIN2</b>. If pads stay dark, reseat the USB and restart the MCP server.</p>
 
-      <h3>Put the Launchpad in Programmer Mode (required)</h3>
+      <h3>Programmer Mode (set automatically by the MCP — manual fallback below)</h3>
       <ol class="steps">
         <li><b>Hold</b> the <b>Session</b> button (top‑row round button) and keep holding it.</li>
         <li>While still holding Session, press the <b>bottom button of the right‑edge column</b> —
@@ -206,11 +206,12 @@
       <div class="note">⚠️ <b>Do not tap Session while playing.</b> It drops the Launchpad back to
         Session mode and the pads go dead (QLC+ stops receiving). Fix: hold <b>Session</b> →
         <b>Stop&nbsp;Solo&nbsp;Mute</b> again. This is the one thing that knocks the rig out.</div>
-      <p>Pads glow <b>dim</b> in each look's color when idle and <b>bright</b> when the look is firing.
-        The grid reads <b>top row = full‑rig colours</b> (Red→White) down to the dynamic / chase / master
-        banks at the bottom. The <b>physical Launchpad, the QLC+ on‑screen console, and the dashboard
-        all share this exact 8×8</b>, so a look sits in the same spot on all three.
-        See the <a href="#map">Launchpad map</a> for what each pad does.</p>
+      <p>Pads glow at <b>50%</b> in their look colour when idle; the <b>active</b> look in each row
+        jumps to <b>100%</b> so the live look is unmistakable. The grid reads <b>top rows =
+        openers</b> (whole‑band hues + member spotlights),
+        then verses/choruses, strobes, chasers, and the <b>utility row at the bottom</b>. The <b>physical
+        Launchpad, the QLC+ on‑screen console, and the dashboard all share this exact 8×8</b>, so a look
+        sits in the same spot on all three. See the <a href="#map">Launchpad map</a> for what each pad does.</p>
     </section>
 
     <section id="s5"><h2><span class="num">5</span> Load test (5 min, before doors)</h2>
@@ -276,8 +277,8 @@
   Launchpad pad  --USB--&gt;   MIDIIN2  --&gt; VC button (MIDI) --+
    (Programmer mode)        (port 2)                        |
                                                             +--&gt; Function --&gt; Art-Net U0 --&gt; rig
-  Launchpad LED  &lt;--USB--   MIDIOUT2 &lt;-- LED feedback ------+        |
-   30% idle / 100% live     (port 2)                                 |
+  Launchpad LED  &lt;--USB--   MCP server --RGB SysEx (winmm)--&gt;        |
+   50% idle / 100% active   (owns MIDI OUT; QLC+ = input only)       |
                             OSC :7700 &lt;--Wi-Fi-- iPad dashboard ------+
                                          VC button (OSC)   /look_r#c#
 
@@ -292,1163 +293,1361 @@
    bottom row = lowest  notes 11-18       R8 (bottom) = control    &lt;- ch 139
 
   =&gt; the row order is REVERSED in software so the TOP row = your main colours.
-  LED feedback:  idle look = 30% brightness   |   firing look = 100%.</pre>
+  LEDs (driven by the MCP server, not QLC+):  idle = 50%  |  active look = 100%.</pre>
       <p>See the <a href="#map">Launchpad map</a> for what every pad does on each page.</p>
     </section>
 
-    <section id="map"><h2><span class="num">11</span> Launchpad map — 3 pages</h2>
+    <section id="map"><h2><span class="num">11</span> Launchpad map — the energy ladder (3 pages)</h2>
       <p>The 8×8 grid exactly as it sits on the Launchpad (<b>row 1 = top</b>). The physical Launchpad,
-        the QLC+ on‑screen console, and the dashboard all use this <b>same layout</b>. There are now
-        <b>three pages</b> and the show <b>boots on the SIMPLE page</b>: <b>press the bottom‑right pad
-        (R8C8) to cycle</b> SIMPLE → Page 1 → Page 2 → SIMPLE — that corner pad is the page‑toggle on
-        every page and fires no look. (The Mini MK3's top →/← arrows don't transmit on the Programmer
-        port, so a real grid pad owns the switch.) On the computer keyboard, <b>PgDn / PgUp</b> also
-        switch pages. Each button's caption shows its <b>R#C# pad coordinate</b> after the name (e.g.
-        "Opener R1C1"); outline color = its solo group; labels are position‑based — read the <b>name</b>,
-        not the color.</p>
-      <h3>SIMPLE — the show boots here</h3>
-      <p style="margin:0 0 8px">The "get through the show" page. <b>PRESETS</b> (rows 1-2) are full-stage
-        song looks — your home base; tap one and the whole rig is set. Then optionally add <b>one</b>
-        <b>WASH</b> colour (row 4) and <b>one</b> <b>MOVE</b> (row 6). Row 8 has a Strobe hit, Full On and
-        Blackout.</p>
-      <div class="legend"><span class="lg"><i style="background:#fbbf24"></i>SIMPLE-PRESETS <small>Full-stage song looks — your home base. Solo — one at a time.</small></span><span class="lg"><i style="background:#5b9cff"></i>SIMPLE-WASH <small>Whole-rig colour. Solo — pick one.</small></span><span class="lg"><i style="background:#36d399"></i>SIMPLE-MOVE <small>Head movement. Solo — one at a time.</small></span><span class="lg"><i style="background:#ff6b6b"></i>SIMPLE-CONTROL <small>Strobe hit · Full On · Blackout.</small></span></div>
-      <div class="grid8"><div class="pad" style="background:rgb(255,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #fbbf24"><span class="rc">R1C1</span><span class="nm">Opener</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,0,255);color:#f3f6fc;box-shadow:inset 0 0 0 2px #fbbf24"><span class="rc">R1C2</span><span class="nm">Verse Blue</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,80,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #fbbf24"><span class="rc">R1C3</span><span class="nm">Chorus Warm</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(60,0,120);color:#f3f6fc;box-shadow:inset 0 0 0 2px #fbbf24"><span class="rc">R1C4</span><span class="nm">Breakdown UV</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #fbbf24"><span class="rc">R1C5</span><span class="nm">Anthem</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,0,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #fbbf24"><span class="rc">R1C6</span><span class="nm">Half Time</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,255,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #fbbf24"><span class="rc">R1C7</span><span class="nm">Green Room</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,0,255);color:#f3f6fc;box-shadow:inset 0 0 0 2px #fbbf24"><span class="rc">R1C8</span><span class="nm">Magenta Pop</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,10,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #fbbf24"><span class="rc">R2C1</span><span class="nm">Deep Verse</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,40,30);color:#f3f6fc;box-shadow:inset 0 0 0 2px #fbbf24"><span class="rc">R2C2</span><span class="nm">Sunset Jam</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #fbbf24"><span class="rc">R2C3</span><span class="nm">Big Finish</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #fbbf24"><span class="rc">R2C4</span><span class="nm">Cyan Wash</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(120,0,200);color:#f3f6fc;box-shadow:inset 0 0 0 2px #fbbf24"><span class="rc">R2C5</span><span class="nm">Purple Haze</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,160,0);color:#10131a;box-shadow:inset 0 0 0 2px #fbbf24"><span class="rc">R2C6</span><span class="nm">Gold Ballad</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,0,255);color:#f3f6fc;box-shadow:inset 0 0 0 2px #fbbf24"><span class="rc">R2C7</span><span class="nm">Punk Slam</span><span class="tp">Scene</span></div><div class="pad empty"><span class="rc">R2C8</span></div><div class="pad empty"><span class="rc">R3C1</span></div><div class="pad empty"><span class="rc">R3C2</span></div><div class="pad empty"><span class="rc">R3C3</span></div><div class="pad empty"><span class="rc">R3C4</span></div><div class="pad empty"><span class="rc">R3C5</span></div><div class="pad empty"><span class="rc">R3C6</span></div><div class="pad empty"><span class="rc">R3C7</span></div><div class="pad empty"><span class="rc">R3C8</span></div><div class="pad" style="background:rgb(255,0,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R4C1</span><span class="nm">Red</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,120,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R4C2</span><span class="nm">Amber</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,220,0);color:#10131a;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R4C3</span><span class="nm">Yellow</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,220,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R4C4</span><span class="nm">Green</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,220,220);color:#10131a;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R4C5</span><span class="nm">Cyan</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,60,255);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R4C6</span><span class="nm">Blue</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,0,200);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R4C7</span><span class="nm">Magenta</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R4C8</span><span class="nm">White</span><span class="tp">Scene</span></div><div class="pad empty"><span class="rc">R5C1</span></div><div class="pad empty"><span class="rc">R5C2</span></div><div class="pad empty"><span class="rc">R5C3</span></div><div class="pad empty"><span class="rc">R5C4</span></div><div class="pad empty"><span class="rc">R5C5</span></div><div class="pad empty"><span class="rc">R5C6</span></div><div class="pad empty"><span class="rc">R5C7</span></div><div class="pad empty"><span class="rc">R5C8</span></div><div class="pad" style="background:rgb(0,120,220);color:#f3f6fc;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R6C1</span><span class="nm">Head Circle</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(0,120,220);color:#f3f6fc;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R6C2</span><span class="nm">Audience Sweep</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(0,120,220);color:#f3f6fc;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R6C3</span><span class="nm">Cross Zigzag</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(0,120,220);color:#f3f6fc;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R6C4</span><span class="nm">Head Sweep Slow</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(0,120,220);color:#f3f6fc;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R6C5</span><span class="nm">Head Sweep Fast</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(0,120,220);color:#f3f6fc;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R6C6</span><span class="nm">Figure 8</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(0,120,220);color:#f3f6fc;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R6C7</span><span class="nm">Pan Wave</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(0,120,220);color:#f3f6fc;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R6C8</span><span class="nm">Tilt Dip</span><span class="tp">Chaser</span></div><div class="pad empty"><span class="rc">R7C1</span></div><div class="pad empty"><span class="rc">R7C2</span></div><div class="pad empty"><span class="rc">R7C3</span></div><div class="pad empty"><span class="rc">R7C4</span></div><div class="pad empty"><span class="rc">R7C5</span></div><div class="pad empty"><span class="rc">R7C6</span></div><div class="pad empty"><span class="rc">R7C7</span></div><div class="pad empty"><span class="rc">R7C8</span></div><div class="pad" style="background:rgb(255,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #ff6b6b"><span class="rc">R8C1</span><span class="nm">Strobe All</span><span class="tp">Scene</span></div><div class="pad empty"><span class="rc">R8C2</span></div><div class="pad empty"><span class="rc">R8C3</span></div><div class="pad empty"><span class="rc">R8C4</span></div><div class="pad" style="background:rgb(255,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #ff6b6b"><span class="rc">R8C5</span><span class="nm">Full On</span><span class="tp">Scene</span></div><div class="pad empty"><span class="rc">R8C6</span></div><div class="pad" style="background:rgb(40,40,40);color:#f3f6fc;box-shadow:inset 0 0 0 2px #ff6b6b"><span class="rc">R8C7</span><span class="nm">Blackout</span><span class="tp">Action</span></div><div class="pad" style="background:#222a3a;color:#cdd7ea;box-shadow:inset 0 0 0 2px #8a97ad"><span class="rc">R8C8</span><span class="nm">⇄ PAGE</span><span class="tp">cycle</span></div></div>
-      <h3>Page 1 — full‑rig <span style="font-weight:400">(cycle with the R8C8 pad)</span></h3>
-      <p style="margin:0 0 8px">Four solo bands stacked top‑to‑bottom: <b>WASH</b> (rows 1‑2) and
-        <b>HEADS</b> (rows 3‑4) are independent — set one wash and one head look together. <b>DYNAMICS</b>
-        (rows 5‑7) is a single solo group: chases, autos and head‑movements run <b>one at a time</b>.
-        <b>CONTROL</b> (row 8) holds the FX flashes + Full On / Sound Active / Blackout.</p>
-      <div class="legend"><span class="lg"><i style="background:#5b9cff"></i>WASH-STATIC <small>Pars + bars colour / band. Solo — pick one.</small></span><span class="lg"><i style="background:#36d399"></i>HEADS-STATIC <small>Head positions + beams / gobo. Solo — pick one.</small></span><span class="lg"><i style="background:#a78bfa"></i>DYNAMICS <small>Chases, movements, autos + 3 song presets. Solo — ONE at a time.</small></span><span class="lg"><i style="background:#ff6b6b"></i>CONTROL <small>FX flash + Full On / Sound Active / Blackout.</small></span></div>
-      <div class="grid8"><div class="pad" style="background:rgb(255,0,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R1C1</span><span class="nm">Red</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,120,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R1C2</span><span class="nm">Amber</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,220,0);color:#10131a;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R1C3</span><span class="nm">Yellow</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,220,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R1C4</span><span class="nm">Green</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,220,220);color:#10131a;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R1C5</span><span class="nm">Cyan</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,60,255);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R1C6</span><span class="nm">Blue</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,0,200);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R1C7</span><span class="nm">Magenta</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R1C8</span><span class="nm">White</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,90,20);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R2C1</span><span class="nm">Warm Wash</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(40,80,255);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R2C2</span><span class="nm">Cool Wash</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(180,0,120);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R2C3</span><span class="nm">Red Blue Split</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(80,0,180);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R2C4</span><span class="nm">UV Blacklight</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(180,0,180);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R2C5</span><span class="nm">Magenta Cyan</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,40,60);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R2C6</span><span class="nm">Sunset</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,20,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R2C7</span><span class="nm">Deep Blue Verse</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R2C8</span><span class="nm">White Static</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(230,230,230);color:#10131a;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R3C1</span><span class="nm">Singer</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,80,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R3C2</span><span class="nm">Guitar</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,180,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R3C3</span><span class="nm">Bass</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,60,200);color:#f3f6fc;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R3C4</span><span class="nm">Drums</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,0,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R3C5</span><span class="nm">Crowd Near</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(120,0,220);color:#f3f6fc;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R3C6</span><span class="nm">Crowd Deep</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,160,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R3C7</span><span class="nm">Stage Wash</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(40,40,40);color:#f3f6fc;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R3C8</span><span class="nm">Park</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(200,160,0);color:#10131a;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R4C1</span><span class="nm">Breakup Gobo</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,180,80);color:#f3f6fc;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R4C2</span><span class="nm">Gobo Cycle</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,160,200);color:#f3f6fc;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R4C3</span><span class="nm">Prism</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(200,0,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R4C4</span><span class="nm">Color Cycle</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,0,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R4C5</span><span class="nm">Red Beam</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,120,220);color:#f3f6fc;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R4C6</span><span class="nm">Blue Beam</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(230,230,230);color:#10131a;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R4C7</span><span class="nm">Open Spot</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(30,30,30);color:#f3f6fc;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R4C8</span><span class="nm">Heads Blackout</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(80,40,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R5C1</span><span class="nm">Rainbow</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(80,40,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R5C2</span><span class="nm">Police</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(80,40,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R5C3</span><span class="nm">Strobe Color</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(80,40,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R5C4</span><span class="nm">Bar Chase</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(80,40,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R5C5</span><span class="nm">Bounce</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(80,40,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R5C6</span><span class="nm">Slow Cycle</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(0,200,200);color:#f3f6fc;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R5C7</span><span class="nm">Bar Scroll</span><span class="tp">RGBMatrix</span></div><div class="pad" style="background:rgb(0,200,120);color:#f3f6fc;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R5C8</span><span class="nm">Bar Bounce</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(0,200,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R6C1</span><span class="nm">Pars Auto</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(220,200,0);color:#10131a;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R6C2</span><span class="nm">Bars Auto</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,160,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R6C3</span><span class="nm">Pars Morph</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(180,160,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R6C4</span><span class="nm">Bars Morph</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(255,0,200);color:#f3f6fc;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R6C5</span><span class="nm">Color Stab</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(255,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R6C6</span><span class="nm">Kill Strobe</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(255,0,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R6C7</span><span class="nm">Par Run</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(255,0,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R6C8</span><span class="nm">Pixel Bounce</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(255,120,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R7C1</span><span class="nm">Alt Flash</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(255,0,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R7C2</span><span class="nm">Build Drop</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(255,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R7C3</span><span class="nm">Opener</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,80,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R7C4</span><span class="nm">Chorus Warm</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(60,0,120);color:#f3f6fc;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R7C5</span><span class="nm">Breakdown UV</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,60,200);color:#f3f6fc;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R7C6</span><span class="nm">Audience Sweep</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(200,0,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R7C7</span><span class="nm">Cross Zigzag</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(120,80,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R7C8</span><span class="nm">Park All</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #ff6b6b"><span class="rc">R8C1</span><span class="nm">Strobe All</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #ff6b6b"><span class="rc">R8C2</span><span class="nm">Blinder</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(120,0,220);color:#f3f6fc;box-shadow:inset 0 0 0 2px #ff6b6b"><span class="rc">R8C3</span><span class="nm">UV Pop</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,0,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #ff6b6b"><span class="rc">R8C4</span><span class="nm">Color Burst</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #ff6b6b"><span class="rc">R8C5</span><span class="nm">Full On</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(200,200,0);color:#10131a;box-shadow:inset 0 0 0 2px #ff6b6b"><span class="rc">R8C6</span><span class="nm">Sound Active</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(40,40,40);color:#f3f6fc;box-shadow:inset 0 0 0 2px #ff6b6b"><span class="rc">R8C7</span><span class="nm">Blackout</span><span class="tp">Action</span></div><div class="pad" style="background:#222a3a;color:#cdd7ea;box-shadow:inset 0 0 0 2px #8a97ad"><span class="rc">R8C8</span><span class="nm">⇄ PAGE</span><span class="tp">cycle</span></div></div>
-      <h3>Page 2 — per‑group + presets <span style="font-weight:400">(cycle with the R8C8 pad)</span></h3>
-      <div class="legend"><span class="lg"><i style="background:#5b9cff"></i>PARS <small>Pars colour only — independent of bars/heads.</small></span><span class="lg"><i style="background:#a78bfa"></i>BARS <small>Bars colour only — independent of pars/heads.</small></span><span class="lg"><i style="background:#36d399"></i>HEADS2 <small>Heads: colour / gobo / movement. Solo.</small></span><span class="lg"><i style="background:#f472b6"></i>CHASE2 <small>More chases. Solo — one at a time.</small></span><span class="lg"><i style="background:#fbbf24"></i>PRESETS <small>Full-stage song looks. Solo — one at a time.</small></span></div>
-      <div class="grid8"><div class="pad" style="background:rgb(255,0,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R1C1</span><span class="nm">Pars Red</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,120,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R1C2</span><span class="nm">Pars Amber</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,220,0);color:#10131a;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R1C3</span><span class="nm">Pars Yellow</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,220,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R1C4</span><span class="nm">Pars Green</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,220,220);color:#10131a;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R1C5</span><span class="nm">Pars Cyan</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,60,255);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R1C6</span><span class="nm">Pars Blue</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,0,200);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R1C7</span><span class="nm">Pars Magenta</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R1C8</span><span class="nm">Pars White</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,0,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R2C1</span><span class="nm">Bars Red</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,120,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R2C2</span><span class="nm">Bars Amber</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,220,0);color:#10131a;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R2C3</span><span class="nm">Bars Yellow</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,220,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R2C4</span><span class="nm">Bars Green</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,220,220);color:#10131a;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R2C5</span><span class="nm">Bars Cyan</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,60,255);color:#f3f6fc;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R2C6</span><span class="nm">Bars Blue</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,0,200);color:#f3f6fc;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R2C7</span><span class="nm">Bars Magenta</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R2C8</span><span class="nm">Bars White</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(230,230,230);color:#10131a;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R3C1</span><span class="nm">Heads White</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,140,0);color:#10131a;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R3C2</span><span class="nm">Heads Orange</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(120,255,0);color:#10131a;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R3C3</span><span class="nm">Heads Lime</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,220,220);color:#10131a;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R3C4</span><span class="nm">Heads Cyan</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,0,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R3C5</span><span class="nm">Heads Red</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,220,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R3C6</span><span class="nm">Heads Green</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,0,200);color:#f3f6fc;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R3C7</span><span class="nm">Heads Magenta</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,220,0);color:#10131a;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R3C8</span><span class="nm">Heads Yellow</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,160,200);color:#f3f6fc;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R4C1</span><span class="nm">Gobo 1</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,160,200);color:#f3f6fc;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R4C2</span><span class="nm">Gobo 2</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,160,200);color:#f3f6fc;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R4C3</span><span class="nm">Gobo 3</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,160,200);color:#f3f6fc;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R4C4</span><span class="nm">Gobo 4</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,160,200);color:#f3f6fc;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R4C5</span><span class="nm">Gobo 5</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,160,200);color:#f3f6fc;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R4C6</span><span class="nm">Gobo 6</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,160,200);color:#f3f6fc;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R4C7</span><span class="nm">Gobo 7</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,160,200);color:#f3f6fc;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R4C8</span><span class="nm">Prism</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,120,220);color:#f3f6fc;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R5C1</span><span class="nm">Head Circle</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(0,120,220);color:#f3f6fc;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R5C2</span><span class="nm">Audience Sweep</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(0,120,220);color:#f3f6fc;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R5C3</span><span class="nm">Cross Zigzag</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(0,120,220);color:#f3f6fc;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R5C4</span><span class="nm">Head Sweep Slow</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(0,120,220);color:#f3f6fc;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R5C5</span><span class="nm">Head Sweep Fast</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(0,120,220);color:#f3f6fc;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R5C6</span><span class="nm">Figure 8</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(0,120,220);color:#f3f6fc;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R5C7</span><span class="nm">Pan Wave</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(0,120,220);color:#f3f6fc;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R5C8</span><span class="nm">Tilt Dip</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(120,40,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #f472b6"><span class="rc">R6C1</span><span class="nm">Rainbow Fast</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(120,40,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #f472b6"><span class="rc">R6C2</span><span class="nm">Strobe Rainbow</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(120,40,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #f472b6"><span class="rc">R6C3</span><span class="nm">Chase Up</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(120,40,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #f472b6"><span class="rc">R6C4</span><span class="nm">Chase Down</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(120,40,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #f472b6"><span class="rc">R6C5</span><span class="nm">Two Tone</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(120,40,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #f472b6"><span class="rc">R6C6</span><span class="nm">Par Sparkle</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(120,40,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #f472b6"><span class="rc">R6C7</span><span class="nm">Color Pop</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(120,40,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #f472b6"><span class="rc">R6C8</span><span class="nm">Mega Build</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(255,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #fbbf24"><span class="rc">R7C1</span><span class="nm">Opener</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,0,255);color:#f3f6fc;box-shadow:inset 0 0 0 2px #fbbf24"><span class="rc">R7C2</span><span class="nm">Verse Blue</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,80,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #fbbf24"><span class="rc">R7C3</span><span class="nm">Chorus Warm</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(60,0,120);color:#f3f6fc;box-shadow:inset 0 0 0 2px #fbbf24"><span class="rc">R7C4</span><span class="nm">Breakdown UV</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #fbbf24"><span class="rc">R7C5</span><span class="nm">Anthem</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,0,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #fbbf24"><span class="rc">R7C6</span><span class="nm">Half Time</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,255,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #fbbf24"><span class="rc">R7C7</span><span class="nm">Green Room</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,0,255);color:#f3f6fc;box-shadow:inset 0 0 0 2px #fbbf24"><span class="rc">R7C8</span><span class="nm">Magenta Pop</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,10,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #fbbf24"><span class="rc">R8C1</span><span class="nm">Deep Verse</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,40,30);color:#f3f6fc;box-shadow:inset 0 0 0 2px #fbbf24"><span class="rc">R8C2</span><span class="nm">Sunset Jam</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #fbbf24"><span class="rc">R8C3</span><span class="nm">Big Finish</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #fbbf24"><span class="rc">R8C4</span><span class="nm">Cyan Wash</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(120,0,200);color:#f3f6fc;box-shadow:inset 0 0 0 2px #fbbf24"><span class="rc">R8C5</span><span class="nm">Purple Haze</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,160,0);color:#10131a;box-shadow:inset 0 0 0 2px #fbbf24"><span class="rc">R8C6</span><span class="nm">Gold Ballad</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,0,255);color:#f3f6fc;box-shadow:inset 0 0 0 2px #fbbf24"><span class="rc">R8C7</span><span class="nm">Punk Slam</span><span class="tp">Scene</span></div><div class="pad" style="background:#222a3a;color:#cdd7ea;box-shadow:inset 0 0 0 2px #8a97ad"><span class="rc">R8C8</span><span class="nm">⇄ PAGE</span><span class="tp">cycle</span></div></div>
-      <div class="note">Page 2 shows five console faders: <b>Pars Dim · Bars Dim · Heads Dim</b>
-        (per‑group masters — default full, pull one down to dim that group), plus <b>Strobe Rate</b> and
-        <b>Heads Zoom</b>. <b>Master Dim</b> is the built‑in GrandMaster (top‑right — dims everything).</div>
+        the QLC+ on‑screen console, and the dashboard all use this <b>same layout</b>. All three pages
+        share <b>one positional grammar</b> — a pad keeps its song‑moment meaning on every page, just
+        redesigned hotter each level. The show <b>boots on Page 1 (Level 1)</b>; <b>press the
+        bottom‑right pad (R8C8) to ramp energy</b> — it cycles <b>Page 1 → 2 → 3 → 1</b>, so you raise a
+        song's intensity without moving your fingers. That corner pad fires no look. (The Mini MK3's top
+        →/← arrows don't transmit on the Programmer port, so a real grid pad owns the switch.)
+        <b>PgDn / PgUp</b> also switch pages. Each button's caption shows its <b>tier + R#C#</b> after the
+        name (e.g. "Band Red L1 R1C2"); idle pads glow at 50% and the <b>active</b> look at <b>100%</b>. Read
+        by <b>position</b>, not colour.</p>
+      <p style="margin:0 0 8px">Every page, same rows: <b>R1‑3 openers</b> (whole‑band hues + member
+        spotlights + texture/crowd), <b>R4‑5 verses/choruses</b>, <b>R6 strobes/hits</b>, <b>R7 chasers</b>,
+        <b>R8 utility</b> (identical on every page — the stable safety layer).</p>
+      <div class="legend"><span class="lg"><i style="background:#5b9cff"></i>BASE <small>Openers (R1-3) + verses/choruses (R4-5) — full looks. Solo: one base look at a time.</small></span><span class="lg"><i style="background:#ff6b6b"></i>STROBE <small>Strobes / hits (R6). Tap = momentary, overlays the running chaser.</small></span><span class="lg"><i style="background:#a78bfa"></i>CHASE <small>Chasers (R7). Solo: one running effect at a time, riding on the base look.</small></span><span class="lg"><i style="background:#36d399"></i>CTRL <small>Utility (R8, same on every page): Strobe All · Blinder · Sound Active · Park All · Heads Blackout · Blackout · Full On.</small></span></div>
+      <h3>Page 1 — Level 1 · chill <span style="font-weight:400">(boots here)</span></h3>
+      <div class="grid8"><div class="pad" style="background:rgb(255,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R1C1</span><span class="nm">Band White L1</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,0,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R1C2</span><span class="nm">Band Red L1</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,80,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R1C3</span><span class="nm">Band Amber L1</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,255,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R1C4</span><span class="nm">Band Green L1</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R1C5</span><span class="nm">Band Cyan L1</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,0,255);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R1C6</span><span class="nm">Band Blue L1</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,0,255);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R1C7</span><span class="nm">Band Magenta L1</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(60,0,120);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R1C8</span><span class="nm">Band UV L1</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R2C1</span><span class="nm">Singer White L1</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,0,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R2C2</span><span class="nm">Singer Red L1</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,80,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R2C3</span><span class="nm">Guitar Amber L1</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,0,255);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R2C4</span><span class="nm">Guitar Mag L1</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,0,255);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R2C5</span><span class="nm">Bass Blue L1</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,255,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R2C6</span><span class="nm">Bass Green L1</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R2C7</span><span class="nm">Cross White L1</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,0,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R2C8</span><span class="nm">Cross Split L1</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,80,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R3C1</span><span class="nm">Singer Tex L1</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,255,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R3C2</span><span class="nm">Band Grn Tex L1</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,0,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R3C3</span><span class="nm">Drums Red L1</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,0,255);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R3C4</span><span class="nm">Drums Blue L1</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,0,255);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R3C5</span><span class="nm">Cross Tex L1</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R3C6</span><span class="nm">Band Wht Tex L1</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R3C7</span><span class="nm">Crowd White L1</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,0,255);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R3C8</span><span class="nm">Crowd Mag L1</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,0,255);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R4C1</span><span class="nm">Vrs Sng Blue L1</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,10,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R4C2</span><span class="nm">Vrs Drm Deep L1</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(40,80,255);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R4C3</span><span class="nm">Vrs Wsh Cool L1</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R4C4</span><span class="nm">Vrs Sng Cyan L1</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(120,0,200);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R4C5</span><span class="nm">Vrs Purple L1</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,255,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R4C6</span><span class="nm">Vrs Green L1</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,160,0);color:#10131a;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R4C7</span><span class="nm">Vrs Gold L1</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(60,0,120);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R4C8</span><span class="nm">Vrs Wsh UV L1</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,80,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R5C1</span><span class="nm">Cho Warm L1</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,70,10);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R5C2</span><span class="nm">Cho Warm2 L1</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,40,30);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R5C3</span><span class="nm">Cho Sunset L1</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,0,255);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R5C4</span><span class="nm">Cho MagCyan L1</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,80,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R5C5</span><span class="nm">Cho Sng Amb L1</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,0,255);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R5C6</span><span class="nm">Cho Magenta L1</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R5C7</span><span class="nm">Cho White L1</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,0,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R5C8</span><span class="nm">Cho Cross L1</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #ff6b6b"><span class="rc">R6C1</span><span class="nm">Strobe L1</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(255,0,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #ff6b6b"><span class="rc">R6C2</span><span class="nm">Col Strobe L1</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(80,40,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #ff6b6b"><span class="rc">R6C3</span><span class="nm">Rnbw Hit L1</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(255,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #ff6b6b"><span class="rc">R6C4</span><span class="nm">Kill L1</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(120,0,220);color:#f3f6fc;box-shadow:inset 0 0 0 2px #ff6b6b"><span class="rc">R6C5</span><span class="nm">UV Pop L1</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,0,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #ff6b6b"><span class="rc">R6C6</span><span class="nm">Col Burst L1</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,120,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #ff6b6b"><span class="rc">R6C7</span><span class="nm">Alt Flash L1</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(255,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #ff6b6b"><span class="rc">R6C8</span><span class="nm">White Hit L1</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(80,40,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R7C1</span><span class="nm">Col Cycle L1</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(80,40,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R7C2</span><span class="nm">Police L1</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(80,40,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R7C3</span><span class="nm">Build L1</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(80,40,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R7C4</span><span class="nm">Par Dyn L1</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(80,40,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R7C5</span><span class="nm">Head Sweep L1</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(80,40,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R7C6</span><span class="nm">Cross Fig L1</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(80,40,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R7C7</span><span class="nm">Bar Dyn L1</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(80,40,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R7C8</span><span class="nm">Sparkle L1</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(255,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R8C1</span><span class="nm">Strobe All L1</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R8C2</span><span class="nm">Blinder L1</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(200,200,0);color:#10131a;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R8C3</span><span class="nm">Sound Active L1</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(120,80,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R8C4</span><span class="nm">Park All L1</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(30,30,30);color:#f3f6fc;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R8C5</span><span class="nm">Heads Black L1</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(40,40,40);color:#f3f6fc;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R8C6</span><span class="nm">Blackout L1</span><span class="tp">Action</span></div><div class="pad" style="background:rgb(255,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R8C7</span><span class="nm">Full On L1</span><span class="tp">Scene</span></div><div class="pad" style="background:#222a3a;color:#cdd7ea;box-shadow:inset 0 0 0 2px #8a97ad"><span class="rc">R8C8</span><span class="nm">⇄ PAGE</span><span class="tp">cycle</span></div></div>
+      <h3>Page 2 — Level 2 · driving <span style="font-weight:400">(tap R8C8 to ramp up)</span></h3>
+      <div class="grid8"><div class="pad" style="background:rgb(255,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R1C1</span><span class="nm">Band White L2</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,0,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R1C2</span><span class="nm">Band Red L2</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,80,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R1C3</span><span class="nm">Band Amber L2</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,255,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R1C4</span><span class="nm">Band Green L2</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R1C5</span><span class="nm">Band Cyan L2</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,0,255);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R1C6</span><span class="nm">Band Blue L2</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,0,255);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R1C7</span><span class="nm">Band Magenta L2</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(60,0,120);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R1C8</span><span class="nm">Band UV L2</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R2C1</span><span class="nm">Singer White L2</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,0,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R2C2</span><span class="nm">Singer Red L2</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,80,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R2C3</span><span class="nm">Guitar Amber L2</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,0,255);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R2C4</span><span class="nm">Guitar Mag L2</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,0,255);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R2C5</span><span class="nm">Bass Blue L2</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,255,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R2C6</span><span class="nm">Bass Green L2</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R2C7</span><span class="nm">Cross White L2</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,0,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R2C8</span><span class="nm">Cross Split L2</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,80,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R3C1</span><span class="nm">Singer Tex L2</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,255,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R3C2</span><span class="nm">Band Grn Tex L2</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,0,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R3C3</span><span class="nm">Drums Red L2</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,0,255);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R3C4</span><span class="nm">Drums Blue L2</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,0,255);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R3C5</span><span class="nm">Cross Tex L2</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R3C6</span><span class="nm">Band Wht Tex L2</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R3C7</span><span class="nm">Crowd White L2</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,0,255);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R3C8</span><span class="nm">Crowd Mag L2</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,0,255);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R4C1</span><span class="nm">Vrs Sng Blue L2</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,10,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R4C2</span><span class="nm">Vrs Drm Deep L2</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(40,80,255);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R4C3</span><span class="nm">Vrs Wsh Cool L2</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R4C4</span><span class="nm">Vrs Sng Cyan L2</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(120,0,200);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R4C5</span><span class="nm">Vrs Purple L2</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,255,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R4C6</span><span class="nm">Vrs Green L2</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,160,0);color:#10131a;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R4C7</span><span class="nm">Vrs Gold L2</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(60,0,120);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R4C8</span><span class="nm">Vrs Wsh UV L2</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,80,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R5C1</span><span class="nm">Cho Warm L2</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,70,10);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R5C2</span><span class="nm">Cho Warm2 L2</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,40,30);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R5C3</span><span class="nm">Cho Sunset L2</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,0,255);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R5C4</span><span class="nm">Cho MagCyan L2</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,80,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R5C5</span><span class="nm">Cho Sng Amb L2</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,0,255);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R5C6</span><span class="nm">Cho Magenta L2</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R5C7</span><span class="nm">Cho White L2</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,0,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R5C8</span><span class="nm">Cho Cross L2</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #ff6b6b"><span class="rc">R6C1</span><span class="nm">Strobe L2</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(255,0,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #ff6b6b"><span class="rc">R6C2</span><span class="nm">Col Strobe L2</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(80,40,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #ff6b6b"><span class="rc">R6C3</span><span class="nm">Rnbw Hit L2</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(255,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #ff6b6b"><span class="rc">R6C4</span><span class="nm">Kill L2</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(120,0,220);color:#f3f6fc;box-shadow:inset 0 0 0 2px #ff6b6b"><span class="rc">R6C5</span><span class="nm">UV Pop L2</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,0,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #ff6b6b"><span class="rc">R6C6</span><span class="nm">Col Burst L2</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,120,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #ff6b6b"><span class="rc">R6C7</span><span class="nm">Alt Flash L2</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(255,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #ff6b6b"><span class="rc">R6C8</span><span class="nm">White Hit L2</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(80,40,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R7C1</span><span class="nm">Col Cycle L2</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(80,40,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R7C2</span><span class="nm">Police L2</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(80,40,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R7C3</span><span class="nm">Build L2</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(80,40,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R7C4</span><span class="nm">Par Dyn L2</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(80,40,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R7C5</span><span class="nm">Head Sweep L2</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(80,40,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R7C6</span><span class="nm">Cross Fig L2</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(80,40,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R7C7</span><span class="nm">Bar Dyn L2</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(80,40,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R7C8</span><span class="nm">Sparkle L2</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(255,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R8C1</span><span class="nm">Strobe All L2</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R8C2</span><span class="nm">Blinder L2</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(200,200,0);color:#10131a;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R8C3</span><span class="nm">Sound Active L2</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(120,80,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R8C4</span><span class="nm">Park All L2</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(30,30,30);color:#f3f6fc;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R8C5</span><span class="nm">Heads Black L2</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(40,40,40);color:#f3f6fc;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R8C6</span><span class="nm">Blackout L2</span><span class="tp">Action</span></div><div class="pad" style="background:rgb(255,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R8C7</span><span class="nm">Full On L2</span><span class="tp">Scene</span></div><div class="pad" style="background:#222a3a;color:#cdd7ea;box-shadow:inset 0 0 0 2px #8a97ad"><span class="rc">R8C8</span><span class="nm">⇄ PAGE</span><span class="tp">cycle</span></div></div>
+      <h3>Page 3 — Level 3 · full‑send <span style="font-weight:400">(tap R8C8 again)</span></h3>
+      <div class="grid8"><div class="pad" style="background:rgb(255,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R1C1</span><span class="nm">Band White L3</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,0,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R1C2</span><span class="nm">Band Red L3</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,80,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R1C3</span><span class="nm">Band Amber L3</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,255,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R1C4</span><span class="nm">Band Green L3</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R1C5</span><span class="nm">Band Cyan L3</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,0,255);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R1C6</span><span class="nm">Band Blue L3</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,0,255);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R1C7</span><span class="nm">Band Magenta L3</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(60,0,120);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R1C8</span><span class="nm">Band UV L3</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R2C1</span><span class="nm">Singer White L3</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,0,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R2C2</span><span class="nm">Singer Red L3</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,80,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R2C3</span><span class="nm">Guitar Amber L3</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,0,255);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R2C4</span><span class="nm">Guitar Mag L3</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,0,255);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R2C5</span><span class="nm">Bass Blue L3</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,255,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R2C6</span><span class="nm">Bass Green L3</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R2C7</span><span class="nm">Cross White L3</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,0,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R2C8</span><span class="nm">Cross Split L3</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,80,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R3C1</span><span class="nm">Singer Tex L3</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,255,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R3C2</span><span class="nm">Band Grn Tex L3</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,0,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R3C3</span><span class="nm">Drums Red L3</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,0,255);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R3C4</span><span class="nm">Drums Blue L3</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,0,255);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R3C5</span><span class="nm">Cross Tex L3</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R3C6</span><span class="nm">Band Wht Tex L3</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R3C7</span><span class="nm">Crowd White L3</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,0,255);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R3C8</span><span class="nm">Crowd Mag L3</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,0,255);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R4C1</span><span class="nm">Vrs Sng Blue L3</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,10,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R4C2</span><span class="nm">Vrs Drm Deep L3</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(40,80,255);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R4C3</span><span class="nm">Vrs Wsh Cool L3</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R4C4</span><span class="nm">Vrs Sng Cyan L3</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(120,0,200);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R4C5</span><span class="nm">Vrs Purple L3</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(0,255,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R4C6</span><span class="nm">Vrs Green L3</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,160,0);color:#10131a;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R4C7</span><span class="nm">Vrs Gold L3</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(60,0,120);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R4C8</span><span class="nm">Vrs Wsh UV L3</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,80,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R5C1</span><span class="nm">Cho Warm L3</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,70,10);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R5C2</span><span class="nm">Cho Warm2 L3</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,40,30);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R5C3</span><span class="nm">Cho Sunset L3</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,0,255);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R5C4</span><span class="nm">Cho MagCyan L3</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,80,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R5C5</span><span class="nm">Cho Sng Amb L3</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,0,255);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R5C6</span><span class="nm">Cho Magenta L3</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R5C7</span><span class="nm">Cho White L3</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,0,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #5b9cff"><span class="rc">R5C8</span><span class="nm">Cho Cross L3</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #ff6b6b"><span class="rc">R6C1</span><span class="nm">Strobe L3</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,0,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #ff6b6b"><span class="rc">R6C2</span><span class="nm">Col Strobe L3</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(80,40,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #ff6b6b"><span class="rc">R6C3</span><span class="nm">Rnbw Hit L3</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(255,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #ff6b6b"><span class="rc">R6C4</span><span class="nm">Kill L3</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(120,0,220);color:#f3f6fc;box-shadow:inset 0 0 0 2px #ff6b6b"><span class="rc">R6C5</span><span class="nm">UV Pop L3</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,0,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #ff6b6b"><span class="rc">R6C6</span><span class="nm">Col Burst L3</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,120,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #ff6b6b"><span class="rc">R6C7</span><span class="nm">Alt Flash L3</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(255,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #ff6b6b"><span class="rc">R6C8</span><span class="nm">White Hit L3</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(80,40,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R7C1</span><span class="nm">Col Cycle L3</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(80,40,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R7C2</span><span class="nm">Police L3</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(80,40,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R7C3</span><span class="nm">Build L3</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(80,40,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R7C4</span><span class="nm">Par Dyn L3</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(80,40,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R7C5</span><span class="nm">Head Sweep L3</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(80,40,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R7C6</span><span class="nm">Cross Fig L3</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(80,40,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R7C7</span><span class="nm">Bar Dyn L3</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(80,40,160);color:#f3f6fc;box-shadow:inset 0 0 0 2px #a78bfa"><span class="rc">R7C8</span><span class="nm">Sparkle L3</span><span class="tp">Chaser</span></div><div class="pad" style="background:rgb(255,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R8C1</span><span class="nm">Strobe All L3</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(255,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R8C2</span><span class="nm">Blinder L3</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(200,200,0);color:#10131a;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R8C3</span><span class="nm">Sound Active L3</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(120,80,0);color:#f3f6fc;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R8C4</span><span class="nm">Park All L3</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(30,30,30);color:#f3f6fc;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R8C5</span><span class="nm">Heads Black L3</span><span class="tp">Scene</span></div><div class="pad" style="background:rgb(40,40,40);color:#f3f6fc;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R8C6</span><span class="nm">Blackout L3</span><span class="tp">Action</span></div><div class="pad" style="background:rgb(255,255,255);color:#10131a;box-shadow:inset 0 0 0 2px #36d399"><span class="rc">R8C7</span><span class="nm">Full On L3</span><span class="tp">Scene</span></div><div class="pad" style="background:#222a3a;color:#cdd7ea;box-shadow:inset 0 0 0 2px #8a97ad"><span class="rc">R8C8</span><span class="nm">⇄ PAGE</span><span class="tp">cycle</span></div></div>
+      <div class="note">Five console faders sit to the <b>right of the grid, visible on every page</b>:
+        <b>Pars Dim · Bars Dim · Heads Dim</b> (per‑group masters — default full, pull one down to dim
+        that group), plus <b>Strobe Rate</b> and <b>Heads Zoom</b>. <b>Master Dim</b> is the built‑in
+        GrandMaster (top‑right — dims everything).</div>
       <h3>Every pad — settings</h3>
       <table>
-        <thead><tr><th>Look</th><th>Frame</th><th>Type</th><th>Page · pad · LP ch</th><th>OSC path</th></tr></thead>
+        <thead><tr><th>Look</th><th>Band</th><th>Type</th><th>Page · pad · LP ch</th><th>OSC path</th></tr></thead>
         <tbody>
 <tr>
-      <td><span class="dot" style="background:rgb(255,255,255)"></span>Opener</td>
-      <td><span class="tag" style="border-color:#fbbf24;color:#fbbf24">SIMPLE-PRESETS</span></td>
-      <td>Scene</td>
-      <td class="mono">P3 R1C1 · ch 209</td>
-      <td class="mono">/opener_r1c1</td>
-    </tr>
-<tr>
-      <td><span class="dot" style="background:rgb(0,0,255)"></span>Verse Blue</td>
-      <td><span class="tag" style="border-color:#fbbf24;color:#fbbf24">SIMPLE-PRESETS</span></td>
-      <td>Scene</td>
-      <td class="mono">P3 R1C2 · ch 210</td>
-      <td class="mono">/verse_blue_r1c2</td>
-    </tr>
-<tr>
-      <td><span class="dot" style="background:rgb(255,80,0)"></span>Chorus Warm</td>
-      <td><span class="tag" style="border-color:#fbbf24;color:#fbbf24">SIMPLE-PRESETS</span></td>
-      <td>Scene</td>
-      <td class="mono">P3 R1C3 · ch 211</td>
-      <td class="mono">/chorus_warm_r1c3</td>
-    </tr>
-<tr>
-      <td><span class="dot" style="background:rgb(60,0,120)"></span>Breakdown UV</td>
-      <td><span class="tag" style="border-color:#fbbf24;color:#fbbf24">SIMPLE-PRESETS</span></td>
-      <td>Scene</td>
-      <td class="mono">P3 R1C4 · ch 212</td>
-      <td class="mono">/breakdown_uv_r1c4</td>
-    </tr>
-<tr>
-      <td><span class="dot" style="background:rgb(255,255,255)"></span>Anthem</td>
-      <td><span class="tag" style="border-color:#fbbf24;color:#fbbf24">SIMPLE-PRESETS</span></td>
-      <td>Scene</td>
-      <td class="mono">P3 R1C5 · ch 213</td>
-      <td class="mono">/anthem_r1c5</td>
-    </tr>
-<tr>
-      <td><span class="dot" style="background:rgb(255,0,0)"></span>Half Time</td>
-      <td><span class="tag" style="border-color:#fbbf24;color:#fbbf24">SIMPLE-PRESETS</span></td>
-      <td>Scene</td>
-      <td class="mono">P3 R1C6 · ch 214</td>
-      <td class="mono">/half_time_r1c6</td>
-    </tr>
-<tr>
-      <td><span class="dot" style="background:rgb(0,255,0)"></span>Green Room</td>
-      <td><span class="tag" style="border-color:#fbbf24;color:#fbbf24">SIMPLE-PRESETS</span></td>
-      <td>Scene</td>
-      <td class="mono">P3 R1C7 · ch 215</td>
-      <td class="mono">/green_room_r1c7</td>
-    </tr>
-<tr>
-      <td><span class="dot" style="background:rgb(255,0,255)"></span>Magenta Pop</td>
-      <td><span class="tag" style="border-color:#fbbf24;color:#fbbf24">SIMPLE-PRESETS</span></td>
-      <td>Scene</td>
-      <td class="mono">P3 R1C8 · ch 216</td>
-      <td class="mono">/magenta_pop_r1c8</td>
-    </tr>
-<tr>
-      <td><span class="dot" style="background:rgb(0,10,160)"></span>Deep Verse</td>
-      <td><span class="tag" style="border-color:#fbbf24;color:#fbbf24">SIMPLE-PRESETS</span></td>
-      <td>Scene</td>
-      <td class="mono">P3 R2C1 · ch 199</td>
-      <td class="mono">/deep_verse_r2c1</td>
-    </tr>
-<tr>
-      <td><span class="dot" style="background:rgb(255,40,30)"></span>Sunset Jam</td>
-      <td><span class="tag" style="border-color:#fbbf24;color:#fbbf24">SIMPLE-PRESETS</span></td>
-      <td>Scene</td>
-      <td class="mono">P3 R2C2 · ch 200</td>
-      <td class="mono">/sunset_jam_r2c2</td>
-    </tr>
-<tr>
-      <td><span class="dot" style="background:rgb(255,255,255)"></span>Big Finish</td>
-      <td><span class="tag" style="border-color:#fbbf24;color:#fbbf24">SIMPLE-PRESETS</span></td>
-      <td>Scene</td>
-      <td class="mono">P3 R2C3 · ch 201</td>
-      <td class="mono">/big_finish_r2c3</td>
-    </tr>
-<tr>
-      <td><span class="dot" style="background:rgb(0,255,255)"></span>Cyan Wash</td>
-      <td><span class="tag" style="border-color:#fbbf24;color:#fbbf24">SIMPLE-PRESETS</span></td>
-      <td>Scene</td>
-      <td class="mono">P3 R2C4 · ch 202</td>
-      <td class="mono">/cyan_wash_r2c4</td>
-    </tr>
-<tr>
-      <td><span class="dot" style="background:rgb(120,0,200)"></span>Purple Haze</td>
-      <td><span class="tag" style="border-color:#fbbf24;color:#fbbf24">SIMPLE-PRESETS</span></td>
-      <td>Scene</td>
-      <td class="mono">P3 R2C5 · ch 203</td>
-      <td class="mono">/purple_haze_r2c5</td>
-    </tr>
-<tr>
-      <td><span class="dot" style="background:rgb(255,160,0)"></span>Gold Ballad</td>
-      <td><span class="tag" style="border-color:#fbbf24;color:#fbbf24">SIMPLE-PRESETS</span></td>
-      <td>Scene</td>
-      <td class="mono">P3 R2C6 · ch 204</td>
-      <td class="mono">/gold_ballad_r2c6</td>
-    </tr>
-<tr>
-      <td><span class="dot" style="background:rgb(0,0,255)"></span>Punk Slam</td>
-      <td><span class="tag" style="border-color:#fbbf24;color:#fbbf24">SIMPLE-PRESETS</span></td>
-      <td>Scene</td>
-      <td class="mono">P3 R2C7 · ch 205</td>
-      <td class="mono">/punk_slam_r2c7</td>
-    </tr>
-<tr>
-      <td><span class="dot" style="background:rgb(255,0,0)"></span>Red</td>
-      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">SIMPLE-WASH</span></td>
-      <td>Scene</td>
-      <td class="mono">P3 R4C1 · ch 179</td>
-      <td class="mono">/red_r4c1</td>
-    </tr>
-<tr>
-      <td><span class="dot" style="background:rgb(255,120,0)"></span>Amber</td>
-      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">SIMPLE-WASH</span></td>
-      <td>Scene</td>
-      <td class="mono">P3 R4C2 · ch 180</td>
-      <td class="mono">/amber_r4c2</td>
-    </tr>
-<tr>
-      <td><span class="dot" style="background:rgb(255,220,0)"></span>Yellow</td>
-      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">SIMPLE-WASH</span></td>
-      <td>Scene</td>
-      <td class="mono">P3 R4C3 · ch 181</td>
-      <td class="mono">/yellow_r4c3</td>
-    </tr>
-<tr>
-      <td><span class="dot" style="background:rgb(0,220,0)"></span>Green</td>
-      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">SIMPLE-WASH</span></td>
-      <td>Scene</td>
-      <td class="mono">P3 R4C4 · ch 182</td>
-      <td class="mono">/green_r4c4</td>
-    </tr>
-<tr>
-      <td><span class="dot" style="background:rgb(0,220,220)"></span>Cyan</td>
-      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">SIMPLE-WASH</span></td>
-      <td>Scene</td>
-      <td class="mono">P3 R4C5 · ch 183</td>
-      <td class="mono">/cyan_r4c5</td>
-    </tr>
-<tr>
-      <td><span class="dot" style="background:rgb(0,60,255)"></span>Blue</td>
-      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">SIMPLE-WASH</span></td>
-      <td>Scene</td>
-      <td class="mono">P3 R4C6 · ch 184</td>
-      <td class="mono">/blue_r4c6</td>
-    </tr>
-<tr>
-      <td><span class="dot" style="background:rgb(255,0,200)"></span>Magenta</td>
-      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">SIMPLE-WASH</span></td>
-      <td>Scene</td>
-      <td class="mono">P3 R4C7 · ch 185</td>
-      <td class="mono">/magenta_r4c7</td>
-    </tr>
-<tr>
-      <td><span class="dot" style="background:rgb(255,255,255)"></span>White</td>
-      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">SIMPLE-WASH</span></td>
-      <td>Scene</td>
-      <td class="mono">P3 R4C8 · ch 186</td>
-      <td class="mono">/white_r4c8</td>
-    </tr>
-<tr>
-      <td><span class="dot" style="background:rgb(0,120,220)"></span>Head Circle</td>
-      <td><span class="tag" style="border-color:#36d399;color:#36d399">SIMPLE-MOVE</span></td>
-      <td>Chaser</td>
-      <td class="mono">P3 R6C1 · ch 159</td>
-      <td class="mono">/head_circle_r6c1</td>
-    </tr>
-<tr>
-      <td><span class="dot" style="background:rgb(0,120,220)"></span>Audience Sweep</td>
-      <td><span class="tag" style="border-color:#36d399;color:#36d399">SIMPLE-MOVE</span></td>
-      <td>Chaser</td>
-      <td class="mono">P3 R6C2 · ch 160</td>
-      <td class="mono">/audience_sweep_r6c2</td>
-    </tr>
-<tr>
-      <td><span class="dot" style="background:rgb(0,120,220)"></span>Cross Zigzag</td>
-      <td><span class="tag" style="border-color:#36d399;color:#36d399">SIMPLE-MOVE</span></td>
-      <td>Chaser</td>
-      <td class="mono">P3 R6C3 · ch 161</td>
-      <td class="mono">/cross_zigzag_r6c3</td>
-    </tr>
-<tr>
-      <td><span class="dot" style="background:rgb(0,120,220)"></span>Head Sweep Slow</td>
-      <td><span class="tag" style="border-color:#36d399;color:#36d399">SIMPLE-MOVE</span></td>
-      <td>Chaser</td>
-      <td class="mono">P3 R6C4 · ch 162</td>
-      <td class="mono">/head_sweep_slow_r6c4</td>
-    </tr>
-<tr>
-      <td><span class="dot" style="background:rgb(0,120,220)"></span>Head Sweep Fast</td>
-      <td><span class="tag" style="border-color:#36d399;color:#36d399">SIMPLE-MOVE</span></td>
-      <td>Chaser</td>
-      <td class="mono">P3 R6C5 · ch 163</td>
-      <td class="mono">/head_sweep_fast_r6c5</td>
-    </tr>
-<tr>
-      <td><span class="dot" style="background:rgb(0,120,220)"></span>Figure 8</td>
-      <td><span class="tag" style="border-color:#36d399;color:#36d399">SIMPLE-MOVE</span></td>
-      <td>Chaser</td>
-      <td class="mono">P3 R6C6 · ch 164</td>
-      <td class="mono">/figure_8_r6c6</td>
-    </tr>
-<tr>
-      <td><span class="dot" style="background:rgb(0,120,220)"></span>Pan Wave</td>
-      <td><span class="tag" style="border-color:#36d399;color:#36d399">SIMPLE-MOVE</span></td>
-      <td>Chaser</td>
-      <td class="mono">P3 R6C7 · ch 165</td>
-      <td class="mono">/pan_wave_r6c7</td>
-    </tr>
-<tr>
-      <td><span class="dot" style="background:rgb(0,120,220)"></span>Tilt Dip</td>
-      <td><span class="tag" style="border-color:#36d399;color:#36d399">SIMPLE-MOVE</span></td>
-      <td>Chaser</td>
-      <td class="mono">P3 R6C8 · ch 166</td>
-      <td class="mono">/tilt_dip_r6c8</td>
-    </tr>
-<tr>
-      <td><span class="dot" style="background:rgb(255,255,255)"></span>Strobe All</td>
-      <td><span class="tag" style="border-color:#ff6b6b;color:#ff6b6b">SIMPLE-CONTROL</span></td>
-      <td>Scene · hold</td>
-      <td class="mono">P3 R8C1 · ch 139</td>
-      <td class="mono">/strobe_all_r8c1</td>
-    </tr>
-<tr>
-      <td><span class="dot" style="background:rgb(255,255,255)"></span>Full On</td>
-      <td><span class="tag" style="border-color:#ff6b6b;color:#ff6b6b">SIMPLE-CONTROL</span></td>
-      <td>Scene</td>
-      <td class="mono">P3 R8C5 · ch 143</td>
-      <td class="mono">/full_on_r8c5</td>
-    </tr>
-<tr>
-      <td><span class="dot" style="background:rgb(40,40,40)"></span>Blackout</td>
-      <td><span class="tag" style="border-color:#ff6b6b;color:#ff6b6b">SIMPLE-CONTROL</span></td>
-      <td>Action</td>
-      <td class="mono">P3 R8C7 · ch 145</td>
-      <td class="mono">/blackout_r8c7</td>
-    </tr>
-<tr>
-      <td><span class="dot" style="background:rgb(255,0,0)"></span>Red</td>
-      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">WASH-STATIC</span></td>
+      <td><span class="dot" style="background:rgb(255,255,255)"></span>Band White L1</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P1 R1C1 · ch 209</td>
-      <td class="mono">/red_r1c1</td>
+      <td class="mono">/band_white_l1_r1c1</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(255,120,0)"></span>Amber</td>
-      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">WASH-STATIC</span></td>
+      <td><span class="dot" style="background:rgb(255,0,0)"></span>Band Red L1</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P1 R1C2 · ch 210</td>
-      <td class="mono">/amber_r1c2</td>
+      <td class="mono">/band_red_l1_r1c2</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(255,220,0)"></span>Yellow</td>
-      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">WASH-STATIC</span></td>
+      <td><span class="dot" style="background:rgb(255,80,0)"></span>Band Amber L1</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P1 R1C3 · ch 211</td>
-      <td class="mono">/yellow_r1c3</td>
+      <td class="mono">/band_amber_l1_r1c3</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(0,220,0)"></span>Green</td>
-      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">WASH-STATIC</span></td>
+      <td><span class="dot" style="background:rgb(0,255,0)"></span>Band Green L1</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P1 R1C4 · ch 212</td>
-      <td class="mono">/green_r1c4</td>
+      <td class="mono">/band_green_l1_r1c4</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(0,220,220)"></span>Cyan</td>
-      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">WASH-STATIC</span></td>
+      <td><span class="dot" style="background:rgb(0,255,255)"></span>Band Cyan L1</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P1 R1C5 · ch 213</td>
-      <td class="mono">/cyan_r1c5</td>
+      <td class="mono">/band_cyan_l1_r1c5</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(0,60,255)"></span>Blue</td>
-      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">WASH-STATIC</span></td>
+      <td><span class="dot" style="background:rgb(0,0,255)"></span>Band Blue L1</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P1 R1C6 · ch 214</td>
-      <td class="mono">/blue_r1c6</td>
+      <td class="mono">/band_blue_l1_r1c6</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(255,0,200)"></span>Magenta</td>
-      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">WASH-STATIC</span></td>
+      <td><span class="dot" style="background:rgb(255,0,255)"></span>Band Magenta L1</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P1 R1C7 · ch 215</td>
-      <td class="mono">/magenta_r1c7</td>
+      <td class="mono">/band_magenta_l1_r1c7</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(255,255,255)"></span>White</td>
-      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">WASH-STATIC</span></td>
+      <td><span class="dot" style="background:rgb(60,0,120)"></span>Band UV L1</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P1 R1C8 · ch 216</td>
-      <td class="mono">/white_r1c8</td>
+      <td class="mono">/band_uv_l1_r1c8</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(255,90,20)"></span>Warm Wash</td>
-      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">WASH-STATIC</span></td>
+      <td><span class="dot" style="background:rgb(255,255,255)"></span>Singer White L1</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P1 R2C1 · ch 199</td>
-      <td class="mono">/warm_wash_r2c1</td>
+      <td class="mono">/singer_white_l1_r2c1</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(40,80,255)"></span>Cool Wash</td>
-      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">WASH-STATIC</span></td>
+      <td><span class="dot" style="background:rgb(255,0,0)"></span>Singer Red L1</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P1 R2C2 · ch 200</td>
-      <td class="mono">/cool_wash_r2c2</td>
+      <td class="mono">/singer_red_l1_r2c2</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(180,0,120)"></span>Red Blue Split</td>
-      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">WASH-STATIC</span></td>
+      <td><span class="dot" style="background:rgb(255,80,0)"></span>Guitar Amber L1</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P1 R2C3 · ch 201</td>
-      <td class="mono">/red_blue_split_r2c3</td>
+      <td class="mono">/guitar_amber_l1_r2c3</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(80,0,180)"></span>UV Blacklight</td>
-      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">WASH-STATIC</span></td>
+      <td><span class="dot" style="background:rgb(255,0,255)"></span>Guitar Mag L1</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P1 R2C4 · ch 202</td>
-      <td class="mono">/uv_blacklight_r2c4</td>
+      <td class="mono">/guitar_mag_l1_r2c4</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(180,0,180)"></span>Magenta Cyan</td>
-      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">WASH-STATIC</span></td>
+      <td><span class="dot" style="background:rgb(0,0,255)"></span>Bass Blue L1</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P1 R2C5 · ch 203</td>
-      <td class="mono">/magenta_cyan_r2c5</td>
+      <td class="mono">/bass_blue_l1_r2c5</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(255,40,60)"></span>Sunset</td>
-      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">WASH-STATIC</span></td>
+      <td><span class="dot" style="background:rgb(0,255,0)"></span>Bass Green L1</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P1 R2C6 · ch 204</td>
-      <td class="mono">/sunset_r2c6</td>
+      <td class="mono">/bass_green_l1_r2c6</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(0,20,160)"></span>Deep Blue Verse</td>
-      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">WASH-STATIC</span></td>
+      <td><span class="dot" style="background:rgb(255,255,255)"></span>Cross White L1</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P1 R2C7 · ch 205</td>
-      <td class="mono">/deep_blue_verse_r2c7</td>
+      <td class="mono">/cross_white_l1_r2c7</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(255,255,255)"></span>White Static</td>
-      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">WASH-STATIC</span></td>
+      <td><span class="dot" style="background:rgb(255,0,0)"></span>Cross Split L1</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P1 R2C8 · ch 206</td>
-      <td class="mono">/white_static_r2c8</td>
+      <td class="mono">/cross_split_l1_r2c8</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(230,230,230)"></span>Singer</td>
-      <td><span class="tag" style="border-color:#36d399;color:#36d399">HEADS-STATIC</span></td>
+      <td><span class="dot" style="background:rgb(255,80,0)"></span>Singer Tex L1</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P1 R3C1 · ch 189</td>
-      <td class="mono">/singer_r3c1</td>
+      <td class="mono">/singer_tex_l1_r3c1</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(255,80,0)"></span>Guitar</td>
-      <td><span class="tag" style="border-color:#36d399;color:#36d399">HEADS-STATIC</span></td>
+      <td><span class="dot" style="background:rgb(0,255,0)"></span>Band Grn Tex L1</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P1 R3C2 · ch 190</td>
-      <td class="mono">/guitar_r3c2</td>
+      <td class="mono">/band_grn_tex_l1_r3c2</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(0,180,0)"></span>Bass</td>
-      <td><span class="tag" style="border-color:#36d399;color:#36d399">HEADS-STATIC</span></td>
+      <td><span class="dot" style="background:rgb(255,0,0)"></span>Drums Red L1</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P1 R3C3 · ch 191</td>
-      <td class="mono">/bass_r3c3</td>
+      <td class="mono">/drums_red_l1_r3c3</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(0,60,200)"></span>Drums</td>
-      <td><span class="tag" style="border-color:#36d399;color:#36d399">HEADS-STATIC</span></td>
+      <td><span class="dot" style="background:rgb(0,0,255)"></span>Drums Blue L1</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P1 R3C4 · ch 192</td>
-      <td class="mono">/drums_r3c4</td>
+      <td class="mono">/drums_blue_l1_r3c4</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(255,0,160)"></span>Crowd Near</td>
-      <td><span class="tag" style="border-color:#36d399;color:#36d399">HEADS-STATIC</span></td>
+      <td><span class="dot" style="background:rgb(255,0,255)"></span>Cross Tex L1</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P1 R3C5 · ch 193</td>
-      <td class="mono">/crowd_near_r3c5</td>
+      <td class="mono">/cross_tex_l1_r3c5</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(120,0,220)"></span>Crowd Deep</td>
-      <td><span class="tag" style="border-color:#36d399;color:#36d399">HEADS-STATIC</span></td>
+      <td><span class="dot" style="background:rgb(255,255,255)"></span>Band Wht Tex L1</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P1 R3C6 · ch 194</td>
-      <td class="mono">/crowd_deep_r3c6</td>
+      <td class="mono">/band_wht_tex_l1_r3c6</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(0,160,160)"></span>Stage Wash</td>
-      <td><span class="tag" style="border-color:#36d399;color:#36d399">HEADS-STATIC</span></td>
+      <td><span class="dot" style="background:rgb(255,255,255)"></span>Crowd White L1</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P1 R3C7 · ch 195</td>
-      <td class="mono">/stage_wash_r3c7</td>
+      <td class="mono">/crowd_white_l1_r3c7</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(40,40,40)"></span>Park</td>
-      <td><span class="tag" style="border-color:#36d399;color:#36d399">HEADS-STATIC</span></td>
+      <td><span class="dot" style="background:rgb(255,0,255)"></span>Crowd Mag L1</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P1 R3C8 · ch 196</td>
-      <td class="mono">/park_r3c8</td>
+      <td class="mono">/crowd_mag_l1_r3c8</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(200,160,0)"></span>Breakup Gobo</td>
-      <td><span class="tag" style="border-color:#36d399;color:#36d399">HEADS-STATIC</span></td>
+      <td><span class="dot" style="background:rgb(0,0,255)"></span>Vrs Sng Blue L1</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P1 R4C1 · ch 179</td>
-      <td class="mono">/breakup_gobo_r4c1</td>
+      <td class="mono">/vrs_sng_blue_l1_r4c1</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(0,180,80)"></span>Gobo Cycle</td>
-      <td><span class="tag" style="border-color:#36d399;color:#36d399">HEADS-STATIC</span></td>
+      <td><span class="dot" style="background:rgb(0,10,160)"></span>Vrs Drm Deep L1</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P1 R4C2 · ch 180</td>
-      <td class="mono">/gobo_cycle_r4c2</td>
+      <td class="mono">/vrs_drm_deep_l1_r4c2</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(0,160,200)"></span>Prism</td>
-      <td><span class="tag" style="border-color:#36d399;color:#36d399">HEADS-STATIC</span></td>
+      <td><span class="dot" style="background:rgb(40,80,255)"></span>Vrs Wsh Cool L1</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P1 R4C3 · ch 181</td>
-      <td class="mono">/prism_r4c3</td>
+      <td class="mono">/vrs_wsh_cool_l1_r4c3</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(200,0,160)"></span>Color Cycle</td>
-      <td><span class="tag" style="border-color:#36d399;color:#36d399">HEADS-STATIC</span></td>
+      <td><span class="dot" style="background:rgb(0,255,255)"></span>Vrs Sng Cyan L1</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P1 R4C4 · ch 182</td>
-      <td class="mono">/color_cycle_r4c4</td>
+      <td class="mono">/vrs_sng_cyan_l1_r4c4</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(255,0,0)"></span>Red Beam</td>
-      <td><span class="tag" style="border-color:#36d399;color:#36d399">HEADS-STATIC</span></td>
+      <td><span class="dot" style="background:rgb(120,0,200)"></span>Vrs Purple L1</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P1 R4C5 · ch 183</td>
-      <td class="mono">/red_beam_r4c5</td>
+      <td class="mono">/vrs_purple_l1_r4c5</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(0,120,220)"></span>Blue Beam</td>
-      <td><span class="tag" style="border-color:#36d399;color:#36d399">HEADS-STATIC</span></td>
+      <td><span class="dot" style="background:rgb(0,255,0)"></span>Vrs Green L1</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P1 R4C6 · ch 184</td>
-      <td class="mono">/blue_beam_r4c6</td>
+      <td class="mono">/vrs_green_l1_r4c6</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(230,230,230)"></span>Open Spot</td>
-      <td><span class="tag" style="border-color:#36d399;color:#36d399">HEADS-STATIC</span></td>
+      <td><span class="dot" style="background:rgb(255,160,0)"></span>Vrs Gold L1</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P1 R4C7 · ch 185</td>
-      <td class="mono">/open_spot_r4c7</td>
+      <td class="mono">/vrs_gold_l1_r4c7</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(30,30,30)"></span>Heads Blackout</td>
-      <td><span class="tag" style="border-color:#36d399;color:#36d399">HEADS-STATIC</span></td>
+      <td><span class="dot" style="background:rgb(60,0,120)"></span>Vrs Wsh UV L1</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P1 R4C8 · ch 186</td>
-      <td class="mono">/heads_blackout_r4c8</td>
+      <td class="mono">/vrs_wsh_uv_l1_r4c8</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(80,40,160)"></span>Rainbow</td>
-      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">DYNAMICS</span></td>
-      <td>Chaser</td>
+      <td><span class="dot" style="background:rgb(255,80,0)"></span>Cho Warm L1</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
       <td class="mono">P1 R5C1 · ch 169</td>
-      <td class="mono">/rainbow_r5c1</td>
+      <td class="mono">/cho_warm_l1_r5c1</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(80,40,160)"></span>Police</td>
-      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">DYNAMICS</span></td>
-      <td>Chaser</td>
+      <td><span class="dot" style="background:rgb(255,70,10)"></span>Cho Warm2 L1</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
       <td class="mono">P1 R5C2 · ch 170</td>
-      <td class="mono">/police_r5c2</td>
+      <td class="mono">/cho_warm2_l1_r5c2</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(80,40,160)"></span>Strobe Color</td>
-      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">DYNAMICS</span></td>
-      <td>Chaser</td>
+      <td><span class="dot" style="background:rgb(255,40,30)"></span>Cho Sunset L1</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
       <td class="mono">P1 R5C3 · ch 171</td>
-      <td class="mono">/strobe_color_r5c3</td>
+      <td class="mono">/cho_sunset_l1_r5c3</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(80,40,160)"></span>Bar Chase</td>
-      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">DYNAMICS</span></td>
-      <td>Chaser</td>
+      <td><span class="dot" style="background:rgb(255,0,255)"></span>Cho MagCyan L1</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
       <td class="mono">P1 R5C4 · ch 172</td>
-      <td class="mono">/bar_chase_r5c4</td>
+      <td class="mono">/cho_magcyan_l1_r5c4</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(80,40,160)"></span>Bounce</td>
-      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">DYNAMICS</span></td>
-      <td>Chaser</td>
+      <td><span class="dot" style="background:rgb(255,80,0)"></span>Cho Sng Amb L1</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
       <td class="mono">P1 R5C5 · ch 173</td>
-      <td class="mono">/bounce_r5c5</td>
+      <td class="mono">/cho_sng_amb_l1_r5c5</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(80,40,160)"></span>Slow Cycle</td>
-      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">DYNAMICS</span></td>
-      <td>Chaser</td>
+      <td><span class="dot" style="background:rgb(255,0,255)"></span>Cho Magenta L1</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
       <td class="mono">P1 R5C6 · ch 174</td>
-      <td class="mono">/slow_cycle_r5c6</td>
+      <td class="mono">/cho_magenta_l1_r5c6</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(0,200,200)"></span>Bar Scroll</td>
-      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">DYNAMICS</span></td>
-      <td>RGBMatrix</td>
+      <td><span class="dot" style="background:rgb(255,255,255)"></span>Cho White L1</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
       <td class="mono">P1 R5C7 · ch 175</td>
-      <td class="mono">/bar_scroll_r5c7</td>
+      <td class="mono">/cho_white_l1_r5c7</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(0,200,120)"></span>Bar Bounce</td>
-      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">DYNAMICS</span></td>
-      <td>Chaser</td>
+      <td><span class="dot" style="background:rgb(255,0,0)"></span>Cho Cross L1</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
       <td class="mono">P1 R5C8 · ch 176</td>
-      <td class="mono">/bar_bounce_r5c8</td>
+      <td class="mono">/cho_cross_l1_r5c8</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(0,200,0)"></span>Pars Auto</td>
-      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">DYNAMICS</span></td>
-      <td>Scene</td>
+      <td><span class="dot" style="background:rgb(255,255,255)"></span>Strobe L1</td>
+      <td><span class="tag" style="border-color:#ff6b6b;color:#ff6b6b">STROBE</span></td>
+      <td>Chaser · hold</td>
       <td class="mono">P1 R6C1 · ch 159</td>
-      <td class="mono">/pars_auto_r6c1</td>
+      <td class="mono">/strobe_l1_r6c1</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(220,200,0)"></span>Bars Auto</td>
-      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">DYNAMICS</span></td>
-      <td>Scene</td>
+      <td><span class="dot" style="background:rgb(255,0,160)"></span>Col Strobe L1</td>
+      <td><span class="tag" style="border-color:#ff6b6b;color:#ff6b6b">STROBE</span></td>
+      <td>Chaser · hold</td>
       <td class="mono">P1 R6C2 · ch 160</td>
-      <td class="mono">/bars_auto_r6c2</td>
+      <td class="mono">/col_strobe_l1_r6c2</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(0,160,0)"></span>Pars Morph</td>
-      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">DYNAMICS</span></td>
-      <td>Chaser</td>
+      <td><span class="dot" style="background:rgb(80,40,160)"></span>Rnbw Hit L1</td>
+      <td><span class="tag" style="border-color:#ff6b6b;color:#ff6b6b">STROBE</span></td>
+      <td>Chaser · hold</td>
       <td class="mono">P1 R6C3 · ch 161</td>
-      <td class="mono">/pars_morph_r6c3</td>
+      <td class="mono">/rnbw_hit_l1_r6c3</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(180,160,0)"></span>Bars Morph</td>
-      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">DYNAMICS</span></td>
-      <td>Chaser</td>
+      <td><span class="dot" style="background:rgb(255,255,255)"></span>Kill L1</td>
+      <td><span class="tag" style="border-color:#ff6b6b;color:#ff6b6b">STROBE</span></td>
+      <td>Chaser · hold</td>
       <td class="mono">P1 R6C4 · ch 162</td>
-      <td class="mono">/bars_morph_r6c4</td>
+      <td class="mono">/kill_l1_r6c4</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(255,0,200)"></span>Color Stab</td>
-      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">DYNAMICS</span></td>
-      <td>Chaser</td>
+      <td><span class="dot" style="background:rgb(120,0,220)"></span>UV Pop L1</td>
+      <td><span class="tag" style="border-color:#ff6b6b;color:#ff6b6b">STROBE</span></td>
+      <td>Scene · hold</td>
       <td class="mono">P1 R6C5 · ch 163</td>
-      <td class="mono">/color_stab_r6c5</td>
+      <td class="mono">/uv_pop_l1_r6c5</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(255,255,255)"></span>Kill Strobe</td>
-      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">DYNAMICS</span></td>
-      <td>Chaser</td>
+      <td><span class="dot" style="background:rgb(255,0,160)"></span>Col Burst L1</td>
+      <td><span class="tag" style="border-color:#ff6b6b;color:#ff6b6b">STROBE</span></td>
+      <td>Scene · hold</td>
       <td class="mono">P1 R6C6 · ch 164</td>
-      <td class="mono">/kill_strobe_r6c6</td>
+      <td class="mono">/col_burst_l1_r6c6</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(255,0,160)"></span>Par Run</td>
-      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">DYNAMICS</span></td>
-      <td>Chaser</td>
+      <td><span class="dot" style="background:rgb(255,120,0)"></span>Alt Flash L1</td>
+      <td><span class="tag" style="border-color:#ff6b6b;color:#ff6b6b">STROBE</span></td>
+      <td>Chaser · hold</td>
       <td class="mono">P1 R6C7 · ch 165</td>
-      <td class="mono">/par_run_r6c7</td>
+      <td class="mono">/alt_flash_l1_r6c7</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(255,0,160)"></span>Pixel Bounce</td>
-      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">DYNAMICS</span></td>
-      <td>Chaser</td>
+      <td><span class="dot" style="background:rgb(255,255,255)"></span>White Hit L1</td>
+      <td><span class="tag" style="border-color:#ff6b6b;color:#ff6b6b">STROBE</span></td>
+      <td>Scene · hold</td>
       <td class="mono">P1 R6C8 · ch 166</td>
-      <td class="mono">/pixel_bounce_r6c8</td>
+      <td class="mono">/white_hit_l1_r6c8</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(255,120,0)"></span>Alt Flash</td>
-      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">DYNAMICS</span></td>
+      <td><span class="dot" style="background:rgb(80,40,160)"></span>Col Cycle L1</td>
+      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">CHASE</span></td>
       <td>Chaser</td>
       <td class="mono">P1 R7C1 · ch 149</td>
-      <td class="mono">/alt_flash_r7c1</td>
+      <td class="mono">/col_cycle_l1_r7c1</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(255,0,0)"></span>Build Drop</td>
-      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">DYNAMICS</span></td>
+      <td><span class="dot" style="background:rgb(80,40,160)"></span>Police L1</td>
+      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">CHASE</span></td>
       <td>Chaser</td>
       <td class="mono">P1 R7C2 · ch 150</td>
-      <td class="mono">/build_drop_r7c2</td>
+      <td class="mono">/police_l1_r7c2</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(255,255,255)"></span>Opener</td>
-      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">DYNAMICS</span></td>
-      <td>Scene</td>
+      <td><span class="dot" style="background:rgb(80,40,160)"></span>Build L1</td>
+      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">CHASE</span></td>
+      <td>Chaser</td>
       <td class="mono">P1 R7C3 · ch 151</td>
-      <td class="mono">/opener_r7c3</td>
+      <td class="mono">/build_l1_r7c3</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(255,80,0)"></span>Chorus Warm</td>
-      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">DYNAMICS</span></td>
-      <td>Scene</td>
+      <td><span class="dot" style="background:rgb(80,40,160)"></span>Par Dyn L1</td>
+      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">CHASE</span></td>
+      <td>Chaser</td>
       <td class="mono">P1 R7C4 · ch 152</td>
-      <td class="mono">/chorus_warm_r7c4</td>
+      <td class="mono">/par_dyn_l1_r7c4</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(60,0,120)"></span>Breakdown UV</td>
-      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">DYNAMICS</span></td>
-      <td>Scene</td>
+      <td><span class="dot" style="background:rgb(80,40,160)"></span>Head Sweep L1</td>
+      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">CHASE</span></td>
+      <td>Chaser</td>
       <td class="mono">P1 R7C5 · ch 153</td>
-      <td class="mono">/breakdown_uv_r7c5</td>
+      <td class="mono">/head_sweep_l1_r7c5</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(0,60,200)"></span>Audience Sweep</td>
-      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">DYNAMICS</span></td>
+      <td><span class="dot" style="background:rgb(80,40,160)"></span>Cross Fig L1</td>
+      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">CHASE</span></td>
       <td>Chaser</td>
       <td class="mono">P1 R7C6 · ch 154</td>
-      <td class="mono">/audience_sweep_r7c6</td>
+      <td class="mono">/cross_fig_l1_r7c6</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(200,0,160)"></span>Cross Zigzag</td>
-      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">DYNAMICS</span></td>
+      <td><span class="dot" style="background:rgb(80,40,160)"></span>Bar Dyn L1</td>
+      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">CHASE</span></td>
       <td>Chaser</td>
       <td class="mono">P1 R7C7 · ch 155</td>
-      <td class="mono">/cross_zigzag_r7c7</td>
+      <td class="mono">/bar_dyn_l1_r7c7</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(120,80,0)"></span>Park All</td>
-      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">DYNAMICS</span></td>
-      <td>Scene</td>
+      <td><span class="dot" style="background:rgb(80,40,160)"></span>Sparkle L1</td>
+      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">CHASE</span></td>
+      <td>Chaser</td>
       <td class="mono">P1 R7C8 · ch 156</td>
-      <td class="mono">/park_all_r7c8</td>
+      <td class="mono">/sparkle_l1_r7c8</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(255,255,255)"></span>Strobe All</td>
-      <td><span class="tag" style="border-color:#ff6b6b;color:#ff6b6b">CONTROL</span></td>
+      <td><span class="dot" style="background:rgb(255,255,255)"></span>Strobe All L1</td>
+      <td><span class="tag" style="border-color:#36d399;color:#36d399">CTRL</span></td>
       <td>Scene · hold</td>
       <td class="mono">P1 R8C1 · ch 139</td>
-      <td class="mono">/strobe_all_r8c1</td>
+      <td class="mono">/strobe_all_l1_r8c1</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(255,255,255)"></span>Blinder</td>
-      <td><span class="tag" style="border-color:#ff6b6b;color:#ff6b6b">CONTROL</span></td>
+      <td><span class="dot" style="background:rgb(255,255,255)"></span>Blinder L1</td>
+      <td><span class="tag" style="border-color:#36d399;color:#36d399">CTRL</span></td>
       <td>Scene · hold</td>
       <td class="mono">P1 R8C2 · ch 140</td>
-      <td class="mono">/blinder_r8c2</td>
+      <td class="mono">/blinder_l1_r8c2</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(120,0,220)"></span>UV Pop</td>
-      <td><span class="tag" style="border-color:#ff6b6b;color:#ff6b6b">CONTROL</span></td>
-      <td>Scene · hold</td>
+      <td><span class="dot" style="background:rgb(200,200,0)"></span>Sound Active L1</td>
+      <td><span class="tag" style="border-color:#36d399;color:#36d399">CTRL</span></td>
+      <td>Scene</td>
       <td class="mono">P1 R8C3 · ch 141</td>
-      <td class="mono">/uv_pop_r8c3</td>
+      <td class="mono">/sound_active_l1_r8c3</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(255,0,160)"></span>Color Burst</td>
-      <td><span class="tag" style="border-color:#ff6b6b;color:#ff6b6b">CONTROL</span></td>
-      <td>Scene · hold</td>
+      <td><span class="dot" style="background:rgb(120,80,0)"></span>Park All L1</td>
+      <td><span class="tag" style="border-color:#36d399;color:#36d399">CTRL</span></td>
+      <td>Scene</td>
       <td class="mono">P1 R8C4 · ch 142</td>
-      <td class="mono">/color_burst_r8c4</td>
+      <td class="mono">/park_all_l1_r8c4</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(255,255,255)"></span>Full On</td>
-      <td><span class="tag" style="border-color:#ff6b6b;color:#ff6b6b">CONTROL</span></td>
+      <td><span class="dot" style="background:rgb(30,30,30)"></span>Heads Black L1</td>
+      <td><span class="tag" style="border-color:#36d399;color:#36d399">CTRL</span></td>
       <td>Scene</td>
       <td class="mono">P1 R8C5 · ch 143</td>
-      <td class="mono">/full_on_r8c5</td>
+      <td class="mono">/heads_black_l1_r8c5</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(200,200,0)"></span>Sound Active</td>
-      <td><span class="tag" style="border-color:#ff6b6b;color:#ff6b6b">CONTROL</span></td>
-      <td>Scene</td>
-      <td class="mono">P1 R8C6 · ch 144</td>
-      <td class="mono">/sound_active_r8c6</td>
-    </tr>
-<tr>
-      <td><span class="dot" style="background:rgb(40,40,40)"></span>Blackout</td>
-      <td><span class="tag" style="border-color:#ff6b6b;color:#ff6b6b">CONTROL</span></td>
+      <td><span class="dot" style="background:rgb(40,40,40)"></span>Blackout L1</td>
+      <td><span class="tag" style="border-color:#36d399;color:#36d399">CTRL</span></td>
       <td>Action</td>
-      <td class="mono">P1 R8C7 · ch 145</td>
-      <td class="mono">/blackout_r8c7</td>
+      <td class="mono">P1 R8C6 · ch 144</td>
+      <td class="mono">/blackout_l1_r8c6</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(255,0,0)"></span>Pars Red</td>
-      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">PARS</span></td>
+      <td><span class="dot" style="background:rgb(255,255,255)"></span>Full On L1</td>
+      <td><span class="tag" style="border-color:#36d399;color:#36d399">CTRL</span></td>
+      <td>Scene</td>
+      <td class="mono">P1 R8C7 · ch 145</td>
+      <td class="mono">/full_on_l1_r8c7</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(255,255,255)"></span>Band White L2</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P2 R1C1 · ch 209</td>
-      <td class="mono">/pars_red_r1c1</td>
+      <td class="mono">/band_white_l2_r1c1</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(255,120,0)"></span>Pars Amber</td>
-      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">PARS</span></td>
+      <td><span class="dot" style="background:rgb(255,0,0)"></span>Band Red L2</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P2 R1C2 · ch 210</td>
-      <td class="mono">/pars_amber_r1c2</td>
+      <td class="mono">/band_red_l2_r1c2</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(255,220,0)"></span>Pars Yellow</td>
-      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">PARS</span></td>
+      <td><span class="dot" style="background:rgb(255,80,0)"></span>Band Amber L2</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P2 R1C3 · ch 211</td>
-      <td class="mono">/pars_yellow_r1c3</td>
+      <td class="mono">/band_amber_l2_r1c3</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(0,220,0)"></span>Pars Green</td>
-      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">PARS</span></td>
+      <td><span class="dot" style="background:rgb(0,255,0)"></span>Band Green L2</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P2 R1C4 · ch 212</td>
-      <td class="mono">/pars_green_r1c4</td>
+      <td class="mono">/band_green_l2_r1c4</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(0,220,220)"></span>Pars Cyan</td>
-      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">PARS</span></td>
+      <td><span class="dot" style="background:rgb(0,255,255)"></span>Band Cyan L2</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P2 R1C5 · ch 213</td>
-      <td class="mono">/pars_cyan_r1c5</td>
+      <td class="mono">/band_cyan_l2_r1c5</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(0,60,255)"></span>Pars Blue</td>
-      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">PARS</span></td>
+      <td><span class="dot" style="background:rgb(0,0,255)"></span>Band Blue L2</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P2 R1C6 · ch 214</td>
-      <td class="mono">/pars_blue_r1c6</td>
+      <td class="mono">/band_blue_l2_r1c6</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(255,0,200)"></span>Pars Magenta</td>
-      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">PARS</span></td>
+      <td><span class="dot" style="background:rgb(255,0,255)"></span>Band Magenta L2</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P2 R1C7 · ch 215</td>
-      <td class="mono">/pars_magenta_r1c7</td>
+      <td class="mono">/band_magenta_l2_r1c7</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(255,255,255)"></span>Pars White</td>
-      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">PARS</span></td>
+      <td><span class="dot" style="background:rgb(60,0,120)"></span>Band UV L2</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P2 R1C8 · ch 216</td>
-      <td class="mono">/pars_white_r1c8</td>
+      <td class="mono">/band_uv_l2_r1c8</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(255,0,0)"></span>Bars Red</td>
-      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">BARS</span></td>
+      <td><span class="dot" style="background:rgb(255,255,255)"></span>Singer White L2</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P2 R2C1 · ch 199</td>
-      <td class="mono">/bars_red_r2c1</td>
+      <td class="mono">/singer_white_l2_r2c1</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(255,120,0)"></span>Bars Amber</td>
-      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">BARS</span></td>
+      <td><span class="dot" style="background:rgb(255,0,0)"></span>Singer Red L2</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P2 R2C2 · ch 200</td>
-      <td class="mono">/bars_amber_r2c2</td>
+      <td class="mono">/singer_red_l2_r2c2</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(255,220,0)"></span>Bars Yellow</td>
-      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">BARS</span></td>
+      <td><span class="dot" style="background:rgb(255,80,0)"></span>Guitar Amber L2</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P2 R2C3 · ch 201</td>
-      <td class="mono">/bars_yellow_r2c3</td>
+      <td class="mono">/guitar_amber_l2_r2c3</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(0,220,0)"></span>Bars Green</td>
-      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">BARS</span></td>
+      <td><span class="dot" style="background:rgb(255,0,255)"></span>Guitar Mag L2</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P2 R2C4 · ch 202</td>
-      <td class="mono">/bars_green_r2c4</td>
+      <td class="mono">/guitar_mag_l2_r2c4</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(0,220,220)"></span>Bars Cyan</td>
-      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">BARS</span></td>
+      <td><span class="dot" style="background:rgb(0,0,255)"></span>Bass Blue L2</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P2 R2C5 · ch 203</td>
-      <td class="mono">/bars_cyan_r2c5</td>
+      <td class="mono">/bass_blue_l2_r2c5</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(0,60,255)"></span>Bars Blue</td>
-      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">BARS</span></td>
+      <td><span class="dot" style="background:rgb(0,255,0)"></span>Bass Green L2</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P2 R2C6 · ch 204</td>
-      <td class="mono">/bars_blue_r2c6</td>
+      <td class="mono">/bass_green_l2_r2c6</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(255,0,200)"></span>Bars Magenta</td>
-      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">BARS</span></td>
+      <td><span class="dot" style="background:rgb(255,255,255)"></span>Cross White L2</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P2 R2C7 · ch 205</td>
-      <td class="mono">/bars_magenta_r2c7</td>
+      <td class="mono">/cross_white_l2_r2c7</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(255,255,255)"></span>Bars White</td>
-      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">BARS</span></td>
+      <td><span class="dot" style="background:rgb(255,0,0)"></span>Cross Split L2</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P2 R2C8 · ch 206</td>
-      <td class="mono">/bars_white_r2c8</td>
+      <td class="mono">/cross_split_l2_r2c8</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(230,230,230)"></span>Heads White</td>
-      <td><span class="tag" style="border-color:#36d399;color:#36d399">HEADS2</span></td>
+      <td><span class="dot" style="background:rgb(255,80,0)"></span>Singer Tex L2</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P2 R3C1 · ch 189</td>
-      <td class="mono">/heads_white_r3c1</td>
+      <td class="mono">/singer_tex_l2_r3c1</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(255,140,0)"></span>Heads Orange</td>
-      <td><span class="tag" style="border-color:#36d399;color:#36d399">HEADS2</span></td>
+      <td><span class="dot" style="background:rgb(0,255,0)"></span>Band Grn Tex L2</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P2 R3C2 · ch 190</td>
-      <td class="mono">/heads_orange_r3c2</td>
+      <td class="mono">/band_grn_tex_l2_r3c2</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(120,255,0)"></span>Heads Lime</td>
-      <td><span class="tag" style="border-color:#36d399;color:#36d399">HEADS2</span></td>
+      <td><span class="dot" style="background:rgb(255,0,0)"></span>Drums Red L2</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P2 R3C3 · ch 191</td>
-      <td class="mono">/heads_lime_r3c3</td>
+      <td class="mono">/drums_red_l2_r3c3</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(0,220,220)"></span>Heads Cyan</td>
-      <td><span class="tag" style="border-color:#36d399;color:#36d399">HEADS2</span></td>
+      <td><span class="dot" style="background:rgb(0,0,255)"></span>Drums Blue L2</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P2 R3C4 · ch 192</td>
-      <td class="mono">/heads_cyan_r3c4</td>
+      <td class="mono">/drums_blue_l2_r3c4</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(255,0,0)"></span>Heads Red</td>
-      <td><span class="tag" style="border-color:#36d399;color:#36d399">HEADS2</span></td>
+      <td><span class="dot" style="background:rgb(255,0,255)"></span>Cross Tex L2</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P2 R3C5 · ch 193</td>
-      <td class="mono">/heads_red_r3c5</td>
+      <td class="mono">/cross_tex_l2_r3c5</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(0,220,0)"></span>Heads Green</td>
-      <td><span class="tag" style="border-color:#36d399;color:#36d399">HEADS2</span></td>
+      <td><span class="dot" style="background:rgb(255,255,255)"></span>Band Wht Tex L2</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P2 R3C6 · ch 194</td>
-      <td class="mono">/heads_green_r3c6</td>
+      <td class="mono">/band_wht_tex_l2_r3c6</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(255,0,200)"></span>Heads Magenta</td>
-      <td><span class="tag" style="border-color:#36d399;color:#36d399">HEADS2</span></td>
+      <td><span class="dot" style="background:rgb(255,255,255)"></span>Crowd White L2</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P2 R3C7 · ch 195</td>
-      <td class="mono">/heads_magenta_r3c7</td>
+      <td class="mono">/crowd_white_l2_r3c7</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(255,220,0)"></span>Heads Yellow</td>
-      <td><span class="tag" style="border-color:#36d399;color:#36d399">HEADS2</span></td>
+      <td><span class="dot" style="background:rgb(255,0,255)"></span>Crowd Mag L2</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P2 R3C8 · ch 196</td>
-      <td class="mono">/heads_yellow_r3c8</td>
+      <td class="mono">/crowd_mag_l2_r3c8</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(0,160,200)"></span>Gobo 1</td>
-      <td><span class="tag" style="border-color:#36d399;color:#36d399">HEADS2</span></td>
+      <td><span class="dot" style="background:rgb(0,0,255)"></span>Vrs Sng Blue L2</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P2 R4C1 · ch 179</td>
-      <td class="mono">/gobo_1_r4c1</td>
+      <td class="mono">/vrs_sng_blue_l2_r4c1</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(0,160,200)"></span>Gobo 2</td>
-      <td><span class="tag" style="border-color:#36d399;color:#36d399">HEADS2</span></td>
+      <td><span class="dot" style="background:rgb(0,10,160)"></span>Vrs Drm Deep L2</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P2 R4C2 · ch 180</td>
-      <td class="mono">/gobo_2_r4c2</td>
+      <td class="mono">/vrs_drm_deep_l2_r4c2</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(0,160,200)"></span>Gobo 3</td>
-      <td><span class="tag" style="border-color:#36d399;color:#36d399">HEADS2</span></td>
+      <td><span class="dot" style="background:rgb(40,80,255)"></span>Vrs Wsh Cool L2</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P2 R4C3 · ch 181</td>
-      <td class="mono">/gobo_3_r4c3</td>
+      <td class="mono">/vrs_wsh_cool_l2_r4c3</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(0,160,200)"></span>Gobo 4</td>
-      <td><span class="tag" style="border-color:#36d399;color:#36d399">HEADS2</span></td>
+      <td><span class="dot" style="background:rgb(0,255,255)"></span>Vrs Sng Cyan L2</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P2 R4C4 · ch 182</td>
-      <td class="mono">/gobo_4_r4c4</td>
+      <td class="mono">/vrs_sng_cyan_l2_r4c4</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(0,160,200)"></span>Gobo 5</td>
-      <td><span class="tag" style="border-color:#36d399;color:#36d399">HEADS2</span></td>
+      <td><span class="dot" style="background:rgb(120,0,200)"></span>Vrs Purple L2</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P2 R4C5 · ch 183</td>
-      <td class="mono">/gobo_5_r4c5</td>
+      <td class="mono">/vrs_purple_l2_r4c5</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(0,160,200)"></span>Gobo 6</td>
-      <td><span class="tag" style="border-color:#36d399;color:#36d399">HEADS2</span></td>
+      <td><span class="dot" style="background:rgb(0,255,0)"></span>Vrs Green L2</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P2 R4C6 · ch 184</td>
-      <td class="mono">/gobo_6_r4c6</td>
+      <td class="mono">/vrs_green_l2_r4c6</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(0,160,200)"></span>Gobo 7</td>
-      <td><span class="tag" style="border-color:#36d399;color:#36d399">HEADS2</span></td>
+      <td><span class="dot" style="background:rgb(255,160,0)"></span>Vrs Gold L2</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P2 R4C7 · ch 185</td>
-      <td class="mono">/gobo_7_r4c7</td>
+      <td class="mono">/vrs_gold_l2_r4c7</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(0,160,200)"></span>Prism</td>
-      <td><span class="tag" style="border-color:#36d399;color:#36d399">HEADS2</span></td>
+      <td><span class="dot" style="background:rgb(60,0,120)"></span>Vrs Wsh UV L2</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
       <td>Scene</td>
       <td class="mono">P2 R4C8 · ch 186</td>
-      <td class="mono">/prism_r4c8</td>
+      <td class="mono">/vrs_wsh_uv_l2_r4c8</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(0,120,220)"></span>Head Circle</td>
-      <td><span class="tag" style="border-color:#36d399;color:#36d399">HEADS2</span></td>
-      <td>Chaser</td>
+      <td><span class="dot" style="background:rgb(255,80,0)"></span>Cho Warm L2</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
       <td class="mono">P2 R5C1 · ch 169</td>
-      <td class="mono">/head_circle_r5c1</td>
+      <td class="mono">/cho_warm_l2_r5c1</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(0,120,220)"></span>Audience Sweep</td>
-      <td><span class="tag" style="border-color:#36d399;color:#36d399">HEADS2</span></td>
-      <td>Chaser</td>
+      <td><span class="dot" style="background:rgb(255,70,10)"></span>Cho Warm2 L2</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
       <td class="mono">P2 R5C2 · ch 170</td>
-      <td class="mono">/audience_sweep_r5c2</td>
+      <td class="mono">/cho_warm2_l2_r5c2</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(0,120,220)"></span>Cross Zigzag</td>
-      <td><span class="tag" style="border-color:#36d399;color:#36d399">HEADS2</span></td>
-      <td>Chaser</td>
+      <td><span class="dot" style="background:rgb(255,40,30)"></span>Cho Sunset L2</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
       <td class="mono">P2 R5C3 · ch 171</td>
-      <td class="mono">/cross_zigzag_r5c3</td>
+      <td class="mono">/cho_sunset_l2_r5c3</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(0,120,220)"></span>Head Sweep Slow</td>
-      <td><span class="tag" style="border-color:#36d399;color:#36d399">HEADS2</span></td>
-      <td>Chaser</td>
+      <td><span class="dot" style="background:rgb(255,0,255)"></span>Cho MagCyan L2</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
       <td class="mono">P2 R5C4 · ch 172</td>
-      <td class="mono">/head_sweep_slow_r5c4</td>
+      <td class="mono">/cho_magcyan_l2_r5c4</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(0,120,220)"></span>Head Sweep Fast</td>
-      <td><span class="tag" style="border-color:#36d399;color:#36d399">HEADS2</span></td>
-      <td>Chaser</td>
+      <td><span class="dot" style="background:rgb(255,80,0)"></span>Cho Sng Amb L2</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
       <td class="mono">P2 R5C5 · ch 173</td>
-      <td class="mono">/head_sweep_fast_r5c5</td>
+      <td class="mono">/cho_sng_amb_l2_r5c5</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(0,120,220)"></span>Figure 8</td>
-      <td><span class="tag" style="border-color:#36d399;color:#36d399">HEADS2</span></td>
-      <td>Chaser</td>
+      <td><span class="dot" style="background:rgb(255,0,255)"></span>Cho Magenta L2</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
       <td class="mono">P2 R5C6 · ch 174</td>
-      <td class="mono">/figure_8_r5c6</td>
+      <td class="mono">/cho_magenta_l2_r5c6</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(0,120,220)"></span>Pan Wave</td>
-      <td><span class="tag" style="border-color:#36d399;color:#36d399">HEADS2</span></td>
-      <td>Chaser</td>
+      <td><span class="dot" style="background:rgb(255,255,255)"></span>Cho White L2</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
       <td class="mono">P2 R5C7 · ch 175</td>
-      <td class="mono">/pan_wave_r5c7</td>
+      <td class="mono">/cho_white_l2_r5c7</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(0,120,220)"></span>Tilt Dip</td>
-      <td><span class="tag" style="border-color:#36d399;color:#36d399">HEADS2</span></td>
-      <td>Chaser</td>
+      <td><span class="dot" style="background:rgb(255,0,0)"></span>Cho Cross L2</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
       <td class="mono">P2 R5C8 · ch 176</td>
-      <td class="mono">/tilt_dip_r5c8</td>
+      <td class="mono">/cho_cross_l2_r5c8</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(120,40,160)"></span>Rainbow Fast</td>
-      <td><span class="tag" style="border-color:#f472b6;color:#f472b6">CHASE2</span></td>
-      <td>Chaser</td>
+      <td><span class="dot" style="background:rgb(255,255,255)"></span>Strobe L2</td>
+      <td><span class="tag" style="border-color:#ff6b6b;color:#ff6b6b">STROBE</span></td>
+      <td>Chaser · hold</td>
       <td class="mono">P2 R6C1 · ch 159</td>
-      <td class="mono">/rainbow_fast_r6c1</td>
+      <td class="mono">/strobe_l2_r6c1</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(120,40,160)"></span>Strobe Rainbow</td>
-      <td><span class="tag" style="border-color:#f472b6;color:#f472b6">CHASE2</span></td>
-      <td>Chaser</td>
+      <td><span class="dot" style="background:rgb(255,0,160)"></span>Col Strobe L2</td>
+      <td><span class="tag" style="border-color:#ff6b6b;color:#ff6b6b">STROBE</span></td>
+      <td>Chaser · hold</td>
       <td class="mono">P2 R6C2 · ch 160</td>
-      <td class="mono">/strobe_rainbow_r6c2</td>
+      <td class="mono">/col_strobe_l2_r6c2</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(120,40,160)"></span>Chase Up</td>
-      <td><span class="tag" style="border-color:#f472b6;color:#f472b6">CHASE2</span></td>
-      <td>Chaser</td>
+      <td><span class="dot" style="background:rgb(80,40,160)"></span>Rnbw Hit L2</td>
+      <td><span class="tag" style="border-color:#ff6b6b;color:#ff6b6b">STROBE</span></td>
+      <td>Chaser · hold</td>
       <td class="mono">P2 R6C3 · ch 161</td>
-      <td class="mono">/chase_up_r6c3</td>
+      <td class="mono">/rnbw_hit_l2_r6c3</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(120,40,160)"></span>Chase Down</td>
-      <td><span class="tag" style="border-color:#f472b6;color:#f472b6">CHASE2</span></td>
-      <td>Chaser</td>
+      <td><span class="dot" style="background:rgb(255,255,255)"></span>Kill L2</td>
+      <td><span class="tag" style="border-color:#ff6b6b;color:#ff6b6b">STROBE</span></td>
+      <td>Chaser · hold</td>
       <td class="mono">P2 R6C4 · ch 162</td>
-      <td class="mono">/chase_down_r6c4</td>
+      <td class="mono">/kill_l2_r6c4</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(120,40,160)"></span>Two Tone</td>
-      <td><span class="tag" style="border-color:#f472b6;color:#f472b6">CHASE2</span></td>
-      <td>Chaser</td>
+      <td><span class="dot" style="background:rgb(120,0,220)"></span>UV Pop L2</td>
+      <td><span class="tag" style="border-color:#ff6b6b;color:#ff6b6b">STROBE</span></td>
+      <td>Scene · hold</td>
       <td class="mono">P2 R6C5 · ch 163</td>
-      <td class="mono">/two_tone_r6c5</td>
+      <td class="mono">/uv_pop_l2_r6c5</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(120,40,160)"></span>Par Sparkle</td>
-      <td><span class="tag" style="border-color:#f472b6;color:#f472b6">CHASE2</span></td>
-      <td>Chaser</td>
+      <td><span class="dot" style="background:rgb(255,0,160)"></span>Col Burst L2</td>
+      <td><span class="tag" style="border-color:#ff6b6b;color:#ff6b6b">STROBE</span></td>
+      <td>Scene · hold</td>
       <td class="mono">P2 R6C6 · ch 164</td>
-      <td class="mono">/par_sparkle_r6c6</td>
+      <td class="mono">/col_burst_l2_r6c6</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(120,40,160)"></span>Color Pop</td>
-      <td><span class="tag" style="border-color:#f472b6;color:#f472b6">CHASE2</span></td>
-      <td>Chaser</td>
+      <td><span class="dot" style="background:rgb(255,120,0)"></span>Alt Flash L2</td>
+      <td><span class="tag" style="border-color:#ff6b6b;color:#ff6b6b">STROBE</span></td>
+      <td>Chaser · hold</td>
       <td class="mono">P2 R6C7 · ch 165</td>
-      <td class="mono">/color_pop_r6c7</td>
+      <td class="mono">/alt_flash_l2_r6c7</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(120,40,160)"></span>Mega Build</td>
-      <td><span class="tag" style="border-color:#f472b6;color:#f472b6">CHASE2</span></td>
-      <td>Chaser</td>
+      <td><span class="dot" style="background:rgb(255,255,255)"></span>White Hit L2</td>
+      <td><span class="tag" style="border-color:#ff6b6b;color:#ff6b6b">STROBE</span></td>
+      <td>Scene · hold</td>
       <td class="mono">P2 R6C8 · ch 166</td>
-      <td class="mono">/mega_build_r6c8</td>
+      <td class="mono">/white_hit_l2_r6c8</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(255,255,255)"></span>Opener</td>
-      <td><span class="tag" style="border-color:#fbbf24;color:#fbbf24">PRESETS</span></td>
-      <td>Scene</td>
+      <td><span class="dot" style="background:rgb(80,40,160)"></span>Col Cycle L2</td>
+      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">CHASE</span></td>
+      <td>Chaser</td>
       <td class="mono">P2 R7C1 · ch 149</td>
-      <td class="mono">/opener_r7c1</td>
+      <td class="mono">/col_cycle_l2_r7c1</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(0,0,255)"></span>Verse Blue</td>
-      <td><span class="tag" style="border-color:#fbbf24;color:#fbbf24">PRESETS</span></td>
-      <td>Scene</td>
+      <td><span class="dot" style="background:rgb(80,40,160)"></span>Police L2</td>
+      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">CHASE</span></td>
+      <td>Chaser</td>
       <td class="mono">P2 R7C2 · ch 150</td>
-      <td class="mono">/verse_blue_r7c2</td>
+      <td class="mono">/police_l2_r7c2</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(255,80,0)"></span>Chorus Warm</td>
-      <td><span class="tag" style="border-color:#fbbf24;color:#fbbf24">PRESETS</span></td>
-      <td>Scene</td>
+      <td><span class="dot" style="background:rgb(80,40,160)"></span>Build L2</td>
+      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">CHASE</span></td>
+      <td>Chaser</td>
       <td class="mono">P2 R7C3 · ch 151</td>
-      <td class="mono">/chorus_warm_r7c3</td>
+      <td class="mono">/build_l2_r7c3</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(60,0,120)"></span>Breakdown UV</td>
-      <td><span class="tag" style="border-color:#fbbf24;color:#fbbf24">PRESETS</span></td>
-      <td>Scene</td>
+      <td><span class="dot" style="background:rgb(80,40,160)"></span>Par Dyn L2</td>
+      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">CHASE</span></td>
+      <td>Chaser</td>
       <td class="mono">P2 R7C4 · ch 152</td>
-      <td class="mono">/breakdown_uv_r7c4</td>
+      <td class="mono">/par_dyn_l2_r7c4</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(255,255,255)"></span>Anthem</td>
-      <td><span class="tag" style="border-color:#fbbf24;color:#fbbf24">PRESETS</span></td>
-      <td>Scene</td>
+      <td><span class="dot" style="background:rgb(80,40,160)"></span>Head Sweep L2</td>
+      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">CHASE</span></td>
+      <td>Chaser</td>
       <td class="mono">P2 R7C5 · ch 153</td>
-      <td class="mono">/anthem_r7c5</td>
+      <td class="mono">/head_sweep_l2_r7c5</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(255,0,0)"></span>Half Time</td>
-      <td><span class="tag" style="border-color:#fbbf24;color:#fbbf24">PRESETS</span></td>
-      <td>Scene</td>
+      <td><span class="dot" style="background:rgb(80,40,160)"></span>Cross Fig L2</td>
+      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">CHASE</span></td>
+      <td>Chaser</td>
       <td class="mono">P2 R7C6 · ch 154</td>
-      <td class="mono">/half_time_r7c6</td>
+      <td class="mono">/cross_fig_l2_r7c6</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(0,255,0)"></span>Green Room</td>
-      <td><span class="tag" style="border-color:#fbbf24;color:#fbbf24">PRESETS</span></td>
-      <td>Scene</td>
+      <td><span class="dot" style="background:rgb(80,40,160)"></span>Bar Dyn L2</td>
+      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">CHASE</span></td>
+      <td>Chaser</td>
       <td class="mono">P2 R7C7 · ch 155</td>
-      <td class="mono">/green_room_r7c7</td>
+      <td class="mono">/bar_dyn_l2_r7c7</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(255,0,255)"></span>Magenta Pop</td>
-      <td><span class="tag" style="border-color:#fbbf24;color:#fbbf24">PRESETS</span></td>
-      <td>Scene</td>
+      <td><span class="dot" style="background:rgb(80,40,160)"></span>Sparkle L2</td>
+      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">CHASE</span></td>
+      <td>Chaser</td>
       <td class="mono">P2 R7C8 · ch 156</td>
-      <td class="mono">/magenta_pop_r7c8</td>
+      <td class="mono">/sparkle_l2_r7c8</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(0,10,160)"></span>Deep Verse</td>
-      <td><span class="tag" style="border-color:#fbbf24;color:#fbbf24">PRESETS</span></td>
-      <td>Scene</td>
+      <td><span class="dot" style="background:rgb(255,255,255)"></span>Strobe All L2</td>
+      <td><span class="tag" style="border-color:#36d399;color:#36d399">CTRL</span></td>
+      <td>Scene · hold</td>
       <td class="mono">P2 R8C1 · ch 139</td>
-      <td class="mono">/deep_verse_r8c1</td>
+      <td class="mono">/strobe_all_l2_r8c1</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(255,40,30)"></span>Sunset Jam</td>
-      <td><span class="tag" style="border-color:#fbbf24;color:#fbbf24">PRESETS</span></td>
-      <td>Scene</td>
+      <td><span class="dot" style="background:rgb(255,255,255)"></span>Blinder L2</td>
+      <td><span class="tag" style="border-color:#36d399;color:#36d399">CTRL</span></td>
+      <td>Scene · hold</td>
       <td class="mono">P2 R8C2 · ch 140</td>
-      <td class="mono">/sunset_jam_r8c2</td>
+      <td class="mono">/blinder_l2_r8c2</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(255,255,255)"></span>Big Finish</td>
-      <td><span class="tag" style="border-color:#fbbf24;color:#fbbf24">PRESETS</span></td>
+      <td><span class="dot" style="background:rgb(200,200,0)"></span>Sound Active L2</td>
+      <td><span class="tag" style="border-color:#36d399;color:#36d399">CTRL</span></td>
       <td>Scene</td>
       <td class="mono">P2 R8C3 · ch 141</td>
-      <td class="mono">/big_finish_r8c3</td>
+      <td class="mono">/sound_active_l2_r8c3</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(0,255,255)"></span>Cyan Wash</td>
-      <td><span class="tag" style="border-color:#fbbf24;color:#fbbf24">PRESETS</span></td>
+      <td><span class="dot" style="background:rgb(120,80,0)"></span>Park All L2</td>
+      <td><span class="tag" style="border-color:#36d399;color:#36d399">CTRL</span></td>
       <td>Scene</td>
       <td class="mono">P2 R8C4 · ch 142</td>
-      <td class="mono">/cyan_wash_r8c4</td>
+      <td class="mono">/park_all_l2_r8c4</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(120,0,200)"></span>Purple Haze</td>
-      <td><span class="tag" style="border-color:#fbbf24;color:#fbbf24">PRESETS</span></td>
+      <td><span class="dot" style="background:rgb(30,30,30)"></span>Heads Black L2</td>
+      <td><span class="tag" style="border-color:#36d399;color:#36d399">CTRL</span></td>
       <td>Scene</td>
       <td class="mono">P2 R8C5 · ch 143</td>
-      <td class="mono">/purple_haze_r8c5</td>
+      <td class="mono">/heads_black_l2_r8c5</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(255,160,0)"></span>Gold Ballad</td>
-      <td><span class="tag" style="border-color:#fbbf24;color:#fbbf24">PRESETS</span></td>
-      <td>Scene</td>
+      <td><span class="dot" style="background:rgb(40,40,40)"></span>Blackout L2</td>
+      <td><span class="tag" style="border-color:#36d399;color:#36d399">CTRL</span></td>
+      <td>Action</td>
       <td class="mono">P2 R8C6 · ch 144</td>
-      <td class="mono">/gold_ballad_r8c6</td>
+      <td class="mono">/blackout_l2_r8c6</td>
     </tr>
 <tr>
-      <td><span class="dot" style="background:rgb(0,0,255)"></span>Punk Slam</td>
-      <td><span class="tag" style="border-color:#fbbf24;color:#fbbf24">PRESETS</span></td>
+      <td><span class="dot" style="background:rgb(255,255,255)"></span>Full On L2</td>
+      <td><span class="tag" style="border-color:#36d399;color:#36d399">CTRL</span></td>
       <td>Scene</td>
       <td class="mono">P2 R8C7 · ch 145</td>
-      <td class="mono">/punk_slam_r8c7</td>
+      <td class="mono">/full_on_l2_r8c7</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(255,255,255)"></span>Band White L3</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
+      <td class="mono">P3 R1C1 · ch 209</td>
+      <td class="mono">/band_white_l3_r1c1</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(255,0,0)"></span>Band Red L3</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
+      <td class="mono">P3 R1C2 · ch 210</td>
+      <td class="mono">/band_red_l3_r1c2</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(255,80,0)"></span>Band Amber L3</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
+      <td class="mono">P3 R1C3 · ch 211</td>
+      <td class="mono">/band_amber_l3_r1c3</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(0,255,0)"></span>Band Green L3</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
+      <td class="mono">P3 R1C4 · ch 212</td>
+      <td class="mono">/band_green_l3_r1c4</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(0,255,255)"></span>Band Cyan L3</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
+      <td class="mono">P3 R1C5 · ch 213</td>
+      <td class="mono">/band_cyan_l3_r1c5</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(0,0,255)"></span>Band Blue L3</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
+      <td class="mono">P3 R1C6 · ch 214</td>
+      <td class="mono">/band_blue_l3_r1c6</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(255,0,255)"></span>Band Magenta L3</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
+      <td class="mono">P3 R1C7 · ch 215</td>
+      <td class="mono">/band_magenta_l3_r1c7</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(60,0,120)"></span>Band UV L3</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
+      <td class="mono">P3 R1C8 · ch 216</td>
+      <td class="mono">/band_uv_l3_r1c8</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(255,255,255)"></span>Singer White L3</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
+      <td class="mono">P3 R2C1 · ch 199</td>
+      <td class="mono">/singer_white_l3_r2c1</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(255,0,0)"></span>Singer Red L3</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
+      <td class="mono">P3 R2C2 · ch 200</td>
+      <td class="mono">/singer_red_l3_r2c2</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(255,80,0)"></span>Guitar Amber L3</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
+      <td class="mono">P3 R2C3 · ch 201</td>
+      <td class="mono">/guitar_amber_l3_r2c3</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(255,0,255)"></span>Guitar Mag L3</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
+      <td class="mono">P3 R2C4 · ch 202</td>
+      <td class="mono">/guitar_mag_l3_r2c4</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(0,0,255)"></span>Bass Blue L3</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
+      <td class="mono">P3 R2C5 · ch 203</td>
+      <td class="mono">/bass_blue_l3_r2c5</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(0,255,0)"></span>Bass Green L3</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
+      <td class="mono">P3 R2C6 · ch 204</td>
+      <td class="mono">/bass_green_l3_r2c6</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(255,255,255)"></span>Cross White L3</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
+      <td class="mono">P3 R2C7 · ch 205</td>
+      <td class="mono">/cross_white_l3_r2c7</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(255,0,0)"></span>Cross Split L3</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
+      <td class="mono">P3 R2C8 · ch 206</td>
+      <td class="mono">/cross_split_l3_r2c8</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(255,80,0)"></span>Singer Tex L3</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
+      <td class="mono">P3 R3C1 · ch 189</td>
+      <td class="mono">/singer_tex_l3_r3c1</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(0,255,0)"></span>Band Grn Tex L3</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
+      <td class="mono">P3 R3C2 · ch 190</td>
+      <td class="mono">/band_grn_tex_l3_r3c2</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(255,0,0)"></span>Drums Red L3</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
+      <td class="mono">P3 R3C3 · ch 191</td>
+      <td class="mono">/drums_red_l3_r3c3</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(0,0,255)"></span>Drums Blue L3</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
+      <td class="mono">P3 R3C4 · ch 192</td>
+      <td class="mono">/drums_blue_l3_r3c4</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(255,0,255)"></span>Cross Tex L3</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
+      <td class="mono">P3 R3C5 · ch 193</td>
+      <td class="mono">/cross_tex_l3_r3c5</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(255,255,255)"></span>Band Wht Tex L3</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
+      <td class="mono">P3 R3C6 · ch 194</td>
+      <td class="mono">/band_wht_tex_l3_r3c6</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(255,255,255)"></span>Crowd White L3</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
+      <td class="mono">P3 R3C7 · ch 195</td>
+      <td class="mono">/crowd_white_l3_r3c7</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(255,0,255)"></span>Crowd Mag L3</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
+      <td class="mono">P3 R3C8 · ch 196</td>
+      <td class="mono">/crowd_mag_l3_r3c8</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(0,0,255)"></span>Vrs Sng Blue L3</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
+      <td class="mono">P3 R4C1 · ch 179</td>
+      <td class="mono">/vrs_sng_blue_l3_r4c1</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(0,10,160)"></span>Vrs Drm Deep L3</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
+      <td class="mono">P3 R4C2 · ch 180</td>
+      <td class="mono">/vrs_drm_deep_l3_r4c2</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(40,80,255)"></span>Vrs Wsh Cool L3</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
+      <td class="mono">P3 R4C3 · ch 181</td>
+      <td class="mono">/vrs_wsh_cool_l3_r4c3</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(0,255,255)"></span>Vrs Sng Cyan L3</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
+      <td class="mono">P3 R4C4 · ch 182</td>
+      <td class="mono">/vrs_sng_cyan_l3_r4c4</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(120,0,200)"></span>Vrs Purple L3</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
+      <td class="mono">P3 R4C5 · ch 183</td>
+      <td class="mono">/vrs_purple_l3_r4c5</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(0,255,0)"></span>Vrs Green L3</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
+      <td class="mono">P3 R4C6 · ch 184</td>
+      <td class="mono">/vrs_green_l3_r4c6</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(255,160,0)"></span>Vrs Gold L3</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
+      <td class="mono">P3 R4C7 · ch 185</td>
+      <td class="mono">/vrs_gold_l3_r4c7</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(60,0,120)"></span>Vrs Wsh UV L3</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
+      <td class="mono">P3 R4C8 · ch 186</td>
+      <td class="mono">/vrs_wsh_uv_l3_r4c8</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(255,80,0)"></span>Cho Warm L3</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
+      <td class="mono">P3 R5C1 · ch 169</td>
+      <td class="mono">/cho_warm_l3_r5c1</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(255,70,10)"></span>Cho Warm2 L3</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
+      <td class="mono">P3 R5C2 · ch 170</td>
+      <td class="mono">/cho_warm2_l3_r5c2</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(255,40,30)"></span>Cho Sunset L3</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
+      <td class="mono">P3 R5C3 · ch 171</td>
+      <td class="mono">/cho_sunset_l3_r5c3</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(255,0,255)"></span>Cho MagCyan L3</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
+      <td class="mono">P3 R5C4 · ch 172</td>
+      <td class="mono">/cho_magcyan_l3_r5c4</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(255,80,0)"></span>Cho Sng Amb L3</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
+      <td class="mono">P3 R5C5 · ch 173</td>
+      <td class="mono">/cho_sng_amb_l3_r5c5</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(255,0,255)"></span>Cho Magenta L3</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
+      <td class="mono">P3 R5C6 · ch 174</td>
+      <td class="mono">/cho_magenta_l3_r5c6</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(255,255,255)"></span>Cho White L3</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
+      <td class="mono">P3 R5C7 · ch 175</td>
+      <td class="mono">/cho_white_l3_r5c7</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(255,0,0)"></span>Cho Cross L3</td>
+      <td><span class="tag" style="border-color:#5b9cff;color:#5b9cff">BASE</span></td>
+      <td>Scene</td>
+      <td class="mono">P3 R5C8 · ch 176</td>
+      <td class="mono">/cho_cross_l3_r5c8</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(255,255,255)"></span>Strobe L3</td>
+      <td><span class="tag" style="border-color:#ff6b6b;color:#ff6b6b">STROBE</span></td>
+      <td>Scene · hold</td>
+      <td class="mono">P3 R6C1 · ch 159</td>
+      <td class="mono">/strobe_l3_r6c1</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(255,0,160)"></span>Col Strobe L3</td>
+      <td><span class="tag" style="border-color:#ff6b6b;color:#ff6b6b">STROBE</span></td>
+      <td>Chaser · hold</td>
+      <td class="mono">P3 R6C2 · ch 160</td>
+      <td class="mono">/col_strobe_l3_r6c2</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(80,40,160)"></span>Rnbw Hit L3</td>
+      <td><span class="tag" style="border-color:#ff6b6b;color:#ff6b6b">STROBE</span></td>
+      <td>Chaser · hold</td>
+      <td class="mono">P3 R6C3 · ch 161</td>
+      <td class="mono">/rnbw_hit_l3_r6c3</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(255,255,255)"></span>Kill L3</td>
+      <td><span class="tag" style="border-color:#ff6b6b;color:#ff6b6b">STROBE</span></td>
+      <td>Chaser · hold</td>
+      <td class="mono">P3 R6C4 · ch 162</td>
+      <td class="mono">/kill_l3_r6c4</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(120,0,220)"></span>UV Pop L3</td>
+      <td><span class="tag" style="border-color:#ff6b6b;color:#ff6b6b">STROBE</span></td>
+      <td>Scene · hold</td>
+      <td class="mono">P3 R6C5 · ch 163</td>
+      <td class="mono">/uv_pop_l3_r6c5</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(255,0,160)"></span>Col Burst L3</td>
+      <td><span class="tag" style="border-color:#ff6b6b;color:#ff6b6b">STROBE</span></td>
+      <td>Scene · hold</td>
+      <td class="mono">P3 R6C6 · ch 164</td>
+      <td class="mono">/col_burst_l3_r6c6</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(255,120,0)"></span>Alt Flash L3</td>
+      <td><span class="tag" style="border-color:#ff6b6b;color:#ff6b6b">STROBE</span></td>
+      <td>Chaser · hold</td>
+      <td class="mono">P3 R6C7 · ch 165</td>
+      <td class="mono">/alt_flash_l3_r6c7</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(255,255,255)"></span>White Hit L3</td>
+      <td><span class="tag" style="border-color:#ff6b6b;color:#ff6b6b">STROBE</span></td>
+      <td>Chaser · hold</td>
+      <td class="mono">P3 R6C8 · ch 166</td>
+      <td class="mono">/white_hit_l3_r6c8</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(80,40,160)"></span>Col Cycle L3</td>
+      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">CHASE</span></td>
+      <td>Chaser</td>
+      <td class="mono">P3 R7C1 · ch 149</td>
+      <td class="mono">/col_cycle_l3_r7c1</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(80,40,160)"></span>Police L3</td>
+      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">CHASE</span></td>
+      <td>Chaser</td>
+      <td class="mono">P3 R7C2 · ch 150</td>
+      <td class="mono">/police_l3_r7c2</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(80,40,160)"></span>Build L3</td>
+      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">CHASE</span></td>
+      <td>Chaser</td>
+      <td class="mono">P3 R7C3 · ch 151</td>
+      <td class="mono">/build_l3_r7c3</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(80,40,160)"></span>Par Dyn L3</td>
+      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">CHASE</span></td>
+      <td>Chaser</td>
+      <td class="mono">P3 R7C4 · ch 152</td>
+      <td class="mono">/par_dyn_l3_r7c4</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(80,40,160)"></span>Head Sweep L3</td>
+      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">CHASE</span></td>
+      <td>Chaser</td>
+      <td class="mono">P3 R7C5 · ch 153</td>
+      <td class="mono">/head_sweep_l3_r7c5</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(80,40,160)"></span>Cross Fig L3</td>
+      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">CHASE</span></td>
+      <td>Chaser</td>
+      <td class="mono">P3 R7C6 · ch 154</td>
+      <td class="mono">/cross_fig_l3_r7c6</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(80,40,160)"></span>Bar Dyn L3</td>
+      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">CHASE</span></td>
+      <td>Chaser</td>
+      <td class="mono">P3 R7C7 · ch 155</td>
+      <td class="mono">/bar_dyn_l3_r7c7</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(80,40,160)"></span>Sparkle L3</td>
+      <td><span class="tag" style="border-color:#a78bfa;color:#a78bfa">CHASE</span></td>
+      <td>Chaser</td>
+      <td class="mono">P3 R7C8 · ch 156</td>
+      <td class="mono">/sparkle_l3_r7c8</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(255,255,255)"></span>Strobe All L3</td>
+      <td><span class="tag" style="border-color:#36d399;color:#36d399">CTRL</span></td>
+      <td>Scene · hold</td>
+      <td class="mono">P3 R8C1 · ch 139</td>
+      <td class="mono">/strobe_all_l3_r8c1</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(255,255,255)"></span>Blinder L3</td>
+      <td><span class="tag" style="border-color:#36d399;color:#36d399">CTRL</span></td>
+      <td>Scene · hold</td>
+      <td class="mono">P3 R8C2 · ch 140</td>
+      <td class="mono">/blinder_l3_r8c2</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(200,200,0)"></span>Sound Active L3</td>
+      <td><span class="tag" style="border-color:#36d399;color:#36d399">CTRL</span></td>
+      <td>Scene</td>
+      <td class="mono">P3 R8C3 · ch 141</td>
+      <td class="mono">/sound_active_l3_r8c3</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(120,80,0)"></span>Park All L3</td>
+      <td><span class="tag" style="border-color:#36d399;color:#36d399">CTRL</span></td>
+      <td>Scene</td>
+      <td class="mono">P3 R8C4 · ch 142</td>
+      <td class="mono">/park_all_l3_r8c4</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(30,30,30)"></span>Heads Black L3</td>
+      <td><span class="tag" style="border-color:#36d399;color:#36d399">CTRL</span></td>
+      <td>Scene</td>
+      <td class="mono">P3 R8C5 · ch 143</td>
+      <td class="mono">/heads_black_l3_r8c5</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(40,40,40)"></span>Blackout L3</td>
+      <td><span class="tag" style="border-color:#36d399;color:#36d399">CTRL</span></td>
+      <td>Action</td>
+      <td class="mono">P3 R8C6 · ch 144</td>
+      <td class="mono">/blackout_l3_r8c6</td>
+    </tr>
+<tr>
+      <td><span class="dot" style="background:rgb(255,255,255)"></span>Full On L3</td>
+      <td><span class="tag" style="border-color:#36d399;color:#36d399">CTRL</span></td>
+      <td>Scene</td>
+      <td class="mono">P3 R8C7 · ch 145</td>
+      <td class="mono">/full_on_l3_r8c7</td>
     </tr>
         </tbody>
       </table>
@@ -1481,20 +1680,21 @@
         <b>two</b> buttons pointing at the <b>same function</b>: one bound to the Launchpad (MIDI,
         with LED feedback) and one bound to OSC for the MCP/dashboard. The dashboard's
         <code>widgets.json</code> only lists the OSC buttons, so each look shows once.</p>
-      <p>The grid is <b>three pages</b> of 8×8; the show <b>boots on SIMPLE</b>. Cycle with the
-        <b>bottom-right pad (R8C8)</b> or <b>PgDn / PgUp</b> (SIMPLE → Page 1 → Page 2 → SIMPLE). Each
-        page's looks sit in non-overlapping bands:</p>
+      <p>The grid is an <b>energy ladder</b>: <b>three pages</b> of 8×8 that share one positional
+        grammar, each a hotter energy tier. The show <b>boots on Page 1 (Level 1)</b>; the
+        <b>bottom-right pad (R8C8)</b> or <b>PgDn / PgUp</b> ramps energy (Page 1 → 2 → 3 → 1, wrapping).
+        Each page's looks sit in non-overlapping row bands:</p>
       <ul>
-        <li><b>SIMPLE</b> (boots here) — the minimal "get through the show" page: 15 song PRESETS (rows
-          1-2, your home base), one WASH colour row (row 4), one MOVE row (row 6), and a utility row
-          (Strobe / Full On / Blackout). Reuses the same looks as the advanced pages.</li>
-        <li><b>Page 1</b> — WASH (colours / band washes) and HEADS (positions / beams) are independent
-          Solo bands, so one wash <i>and</i> one head look run together; DYNAMICS is a single Solo band,
-          so only <b>one</b> chase / movement / auto plays at a time; CONTROL (row 8) holds the FX
-          flashes plus Full On, Sound Active and Blackout.</li>
-        <li><b>Page 2</b> — per-group colour (PARS solo, BARS solo — independent), HEADS (colour / gobo /
-          movement), a second chase bank, and 15 song PRESETS, plus <b>5 faders</b>: Pars Dim, Bars Dim,
-          Heads Dim, Strobe Rate, Heads Zoom.</li>
+        <li><b>Rows 1-5 · BASE</b> (Solo — one base look at a time): rows 1-3 openers (whole-band hues,
+          member spotlights, texture/crowd) and rows 4-5 verses/choruses. These 40 looks render at three
+          energy levels — P1 deep/cool, P2 saturated, P3 hot + white punch.</li>
+        <li><b>Row 6 · STROBES</b> (non-solo): momentary hits that overlay a running chaser. <b>Row 7 ·
+          CHASERS</b> (Solo — one running effect at a time, riding on the base look). Both escalate slow →
+          medium → fast/hard with the tier.</li>
+        <li><b>Row 8 · UTILITY</b> — <b>identical on every page</b> (the stable safety layer, does not
+          escalate): Strobe All · Blinder · Sound Active · Park All · Heads Blackout · Blackout · Full On.
+          R8C8 is the energy-up page flip. Plus <b>5 faders</b> to the right (Pars/Bars/Heads Dim, Strobe
+          Rate, Heads Zoom), visible on every page.</li>
       </ul>
       <p><b>Brightness:</b> every scene drives its own master dimmer to full, so looks light up on their
         own — including the bars. The three Dim faders on page 2 are <i>overrides</i>: leave them up for

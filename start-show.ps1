@@ -68,7 +68,7 @@ function Wait-Url($u, $tries = 40) {
 }
 
 Write-Host ''
-Write-Host "  $(Split-Path $show -LeafBase) — full launch" -ForegroundColor Cyan
+Write-Host "  $([System.IO.Path]::GetFileNameWithoutExtension($show)) — full launch" -ForegroundColor Cyan
 Write-Host "  QLC+       : $show"
 Write-Host "  MCP + dash : $dashUrl"
 Write-Host "  3D monitor : $monUrl"

@@ -1,4 +1,4 @@
-# ============================================================
+﻿# ============================================================
 #  Launchpad MIDI OUT sidecar — a DUMB, resident pipe to the Novation
 #  Launchpad Mini MK3's LEDs. The MCP server's launchpad module (src/launchpad/leds.ts)
 #  spawns this and feeds it one MIDI message per stdin line; the sidecar forwards the

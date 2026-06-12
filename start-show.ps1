@@ -1,4 +1,4 @@
-# ============================================================
+﻿# ============================================================
 #  One-shot full launcher for the QLC+ lighting stack.
 #  Brings up every connection in the rig, in order:
 #

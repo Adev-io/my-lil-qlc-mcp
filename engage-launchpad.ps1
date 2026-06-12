@@ -1,4 +1,4 @@
-# ============================================================
+﻿# ============================================================
 #  Engage the Novation Launchpad Mini MK3.
 #
 #  Puts the pad into PROGRAMMER MODE via SysEx so QLC+'s shipped

@@ -1,4 +1,4 @@
-# ============================================================
+﻿# ============================================================
 #  QLC+ 3D Monitor — standalone local web viewer.
 #  Listens to QLC+ Art-Net Universe 0 (software only, no rig,
 #  no Blender) and renders the rig live in the browser.

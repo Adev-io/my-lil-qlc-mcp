@@ -65,31 +65,65 @@ monitor / day-of head-plot workflow as the punk show. Punk show remains untouche
 ## Launchpad layout — 5 pages, chronological
 
 Same multipage-frame + LED-feedback system as punk (idle pads glow look color dim,
-active look full). Page prev/next pads walk the event in order. Every page shares
-the same bottom utility row: **blackout · all-white panic · banner on/off · page
-indicator**.
+active look full; R1C1 = top-left, R8 = bottom row). Pages ordered by event
+chronology; **R8C8 cycles pages** (punk grammar: 1→2→3→4→5→1), PgUp/PgDn on the
+keyboard too. Look pads live in solo frames — one look at a time, pressing a new
+look stops the old (this is also why blackout works: it stops the running look).
 
-| # | Page | Looks (~6–10) |
+**Rows R7–R8 are identical on every page** (muscle memory in the dark):
+
+| Pad | R8 (utility) | Pad | R7 (dim + tempo) |
+|-----|--------------|-----|-------------------|
+| R8C1 | **BLACKOUT** | R7C1 | **DIM 25%** |
+| R8C2 | PANIC (all white full) | R7C2 | **DIM 50%** |
+| R8C3 | Banner on/off | R7C3 | **DIM 75%** |
+| R8C4 | **TAP TEMPO** | R7C4 | **DIM FULL** (autostarts at boot) |
+| R8C5 | **STROBE (hold)** — momentary, full-rate, release = off | R7C5 | **SYNC STROBE** — toggle, strobe-chaser at tapped tempo |
+| R8C6 | Audio-react ON/OFF | R7C6 | reserved |
+| R8C7 | Par sound-mode (fallback) | R7C7 | reserved |
+| R8C8 | PAGE CYCLE | R7C8 | reserved |
+
+- **Dim pads (R7C1–C4):** solo group of scenes writing ONLY the dim channels
+  (pars ch0, heads ch10). Looks never write dim (punk rule kept). DIM FULL is
+  the .qxw autostart function so the show boots lit. Dim faders default 0 —
+  HTP means fader can push above the pad preset, pad can't pull below a raised
+  fader; operating rule documented: drive with pads, ride faders only on purpose.
+- **TAP TEMPO (R8C4):** external tap input of a VCSpeedDial bound to every chase
+  AND the sync-strobe chaser — tap on the beat, all movement + sync strobe
+  follow.
+- **STROBE hold (R8C5):** flash-mode button, pars ch1 + heads ch11 full-rate
+  while held. SYNC STROBE (R7C5) is the tempo-locked alternative.
+
+**Rows R1–R6 = the page's looks** (top rows first):
+
+| # | Page | Looks |
 |---|------|---------------|
-| 1 | INTRO | doors-open soft blue · slow blue/gold build chase · ENTRANCE (full bright, movers sweeping) · strobe hit (momentary) · banner blast · blackout |
-| 2 | DINNER | static only: gold wall · blue wall · gold/blue alternating · soft amber · warm white · low UV accent · banner soft · blackout |
-| 3 | SPEECHES | banner bright (floor heads gold/white) · wall low gold · speaker front-light (truss heads, aimed day-of) · off-but-banner · house bright white · blackout |
-| 4 | HORA | saturated gold+blue full · movers circling floor · fast gold/blue chase · white burst · strobe hit · blackout |
-| 5 | PARTY | gold/blue/UV theme chases · rainbow chases · UV blacklight · 2–3 mover sweep patterns · strobe momentaries · audio-react ON/OFF pad · par sound-mode fallback pad · blackout |
+| 1 | INTRO | doors-open soft blue · slow blue/gold build chase · ENTRANCE (full bright, movers sweeping) · banner blast |
+| 2 | DINNER | static only: gold wall · blue wall · gold/blue alternating · soft amber · warm white · low UV accent · banner soft |
+| 3 | SPEECHES | banner bright (floor heads gold/white) · wall low gold · speaker front-light (truss heads, aimed day-of) · banner-only · house bright white |
+| 4 | HORA | saturated gold+blue full · movers circling floor · fast gold/blue chase · white burst |
+| 5 | PARTY | gold/blue chase · blue/UV chase · gold/UV chase · rainbow chase · rainbow fast · UV blacklight · sweep wide · sweep cross · sweep punch |
 
-Target scale: ~40 looks total (punk had 160 — this show is deliberately simpler).
+Blackout/strobe/audio pads are NOT duplicated per page — the shared R7/R8 rows
+carry them. Target scale: ~30 looks + ~14 shared-control functions (punk had
+160 — this show is deliberately simpler).
 
 ## Dashboard slider panel (NX Touch replacement)
 
-Six faders, visible on all pages (outside the multipage frame, same placement
-pattern punk uses), mirrored on the web dashboard automatically via `widgets.json`:
+Faders visible on all pages (outside the multipage frame, same placement pattern
+punk uses), mirrored on the web dashboard automatically via `widgets.json`:
 
-- **Level-mode VC sliders (drive channels):** par intensity · truss-head
-  intensity · banner intensity (floor-head dimmers only) · UV level · par strobe
-  rate.
-- **Chase speed:** not a DMX channel — a VCSpeedDial bound to the chasers. If
-  the dial's OSC/dashboard mapping is awkward, fallback is slow/fast variants of
-  each chase as separate pads and the dial is dropped.
+- **Level-mode VC sliders (drive channels), default 0** so the R7 dim pads own
+  brightness at boot: Pars Dim (ch0) · Truss Dim (2 truss heads ch10) · Banner
+  Dim (2 floor heads ch10) · UV Level (pars ch7) · Strobe Rate (pars ch1 + heads
+  ch11) · Heads Zoom (ch14, day-of framing aid).
+- **Tempo:** the VCSpeedDial (tap = Launchpad R8C4) is the tempo authority for
+  all chases + sync strobe. If the dial's OSC/dashboard mirroring turns out
+  awkward, fallback is slow/fast chase variants as pads; the tap pad stays
+  either way.
+- **Implementation-verify item:** confirm in QLC+ 4.14 that dim-pad scenes +
+  faders-at-0 + DIM FULL autostart behave as designed (HTP interplay), before
+  look tables are finalized.
 
 ## Audio reactivity
 

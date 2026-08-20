@@ -103,6 +103,24 @@ const HEAD_COLOR: Record<string, number> = {
   ...(headGroup?.colorWheel ?? {}),
 };
 
+// Beam channels on the Chauvet 375Z IRC, straight from its QLC+ fixture definition.
+//   ch6 "Gobo":          0-7 open · seven gobos in 8-wide bands from 8 · 64-119 the same gobos
+//                        shaking · 128-189 CYCLE gobos slow->fast · 194-255 reverse cycle.
+//   ch7 "Gobo Rotation": 1-63 indexed (hold an angle) · 64-145 rotate slow->fast · 146-149 stop
+//                        · 150-231 reverse · 232-255 bounce.
+//   ch8 "Prism":         4-6 six-facet in · 7-65 six-facet rotating slow->fast · 132-134 five-facet.
+// Gobo slots come from rig.json when the fixture disagrees; these are the band midpoints.
+const GOBO_SLOTS: number[] = headGroup?.goboSlots ?? [11, 19, 27, 35, 43, 51, 59];
+const GOBO = {
+  open: 0,
+  slot: (i: number) => GOBO_SLOTS[i % GOBO_SLOTS.length],
+  shake: 100,        // mid of the shake bands — a gobo that vibrates on the beat
+  cycleSlow: 140,
+  cycleFast: 178,
+};
+const GROT = { off: 0, hold: 32, slow: 80, mid: 110, fast: 140, reverse: 190, bounce: 240 };
+const PRISM = { off: 0, on: 5, spinSlow: 20, spinFast: 55 };
+
 interface Fixture {
   id: number; manuf: string; model: string; mode: string; name: string;
   address: number; channels: number; kind: "par" | "bar" | "head";
@@ -282,9 +300,21 @@ function floorPos(f: Fixture): [number, number] {
 function pParVal(id: number, c: number[]): FixVal {
   return { id, pairs: [1, 0, 2, c[0], 3, c[1], 4, c[2], 5, c[3], 6, c[4], 7, c[5], 8, 0, 9, 0] };
 }
-const trussColor = (color: number): FixVal[] => trussHeads.map((f) => ({ id: f.id, pairs: [5, color, 13, 0] }));
+// Gobo, gobo-rotation and prism are LTP exactly like the sound macro, so a plain colour look has
+// to CLEAR them or the first gobo look of the night textures every look that follows it for the
+// rest of the party. Same rule, same reason as ch13 — see the LTP RECLAIM note above.
+const BEAM_CLEAR = [6, GOBO.open, 7, GROT.off, 8, PRISM.off, 13, 0];
+const trussColor = (color: number): FixVal[] =>
+  trussHeads.map((f) => ({ id: f.id, pairs: [5, color, ...BEAM_CLEAR] }));
+// A beam look: colour plus an explicit gobo / rotation / prism. Anything not passed is cleared,
+// so beams never inherit half of the previous look.
+const trussBeam = (color: number, gobo: number, rot = GROT.off, prism = PRISM.off): FixVal[] =>
+  trussHeads.map((f) => ({ id: f.id, pairs: [5, color, 6, gobo, 7, rot, 8, prism, 13, 0] }));
 const floorVal = (dim: number, color: number): FixVal[] =>
-  floorHeads.map((f) => ({ id: f.id, pairs: [5, color, 10, dim, 11, SHUTTER_OPEN] }));
+  floorHeads.map((f) => ({ id: f.id, pairs: [5, color, 10, dim, 11, SHUTTER_OPEN, ...BEAM_CLEAR] }));
+// Banner texture: the floor pair projects a gobo onto the banner instead of a flat wash.
+const floorBeam = (dim: number, color: number, gobo: number, rot = GROT.off): FixVal[] =>
+  floorHeads.map((f) => ({ id: f.id, pairs: [5, color, 6, gobo, 7, rot, 8, PRISM.off, 10, dim, 11, SHUTTER_OPEN, 13, 0] }));
 const floorOff = (): FixVal[] => floorHeads.map((f) => ({ id: f.id, pairs: [10, 0] }));
 
 // THEME palette — gold / blue / UV. [r,g,b,w,a,uv] on par ch2..7.
@@ -327,7 +357,7 @@ addScene("Panic White", [
   // The 9,0 / 13,0 are the LTP reclaim (see pParVal): Panic is the one button that must recover
   // the room from ANY state, and that includes taking the fixtures back off their own mics.
   ...pars.map((f) => ({ id: f.id, pairs: [0, 255, 1, 0, 2, 0, 3, 0, 4, 0, 5, 255, 6, 0, 7, 0, 8, 0, 9, 0] })),
-  ...trussHeads.map((f) => ({ id: f.id, pairs: [5, HEAD_COLOR.white, 10, 255, 11, SHUTTER_OPEN, 13, 0] })),
+  ...trussHeads.map((f) => ({ id: f.id, pairs: [5, HEAD_COLOR.white, 10, 255, 11, SHUTTER_OPEN, ...BEAM_CLEAR] })),
   ...floorVal(255, HEAD_COLOR.white),
 ]);
 
@@ -397,7 +427,9 @@ const dfL = { x: -DF_W / 2 + 2, y: DF_CENTER_Y }, dfR = { x: DF_W / 2 - 2, y: DF
 
 addScene("Truss Home", trussHeads.map((f, i) => {
   const [p, t] = trussPos("home", f, aim(i === 0 ? "L" : "R", dfC.x, dfC.y));
-  return { id: f.id, pairs: [0, p, 2, t, 11, SHUTTER_OPEN, 13, 0] }; // 13,0 = LTP reclaim
+  // Full LTP reclaim: Truss Home is the "put the heads back to normal" button, so it clears the
+  // beam channels too. Sweeps deliberately do NOT — a gobo sweeping across the floor is a look.
+  return { id: f.id, pairs: [0, p, 2, t, 11, SHUTTER_OPEN, ...BEAM_CLEAR] };
 }));
 // DIM-RULE EXCEPTION #3 — Speaker Light carries its own dim + white. "Get light on the person
 // talking" has to work on one press during a speech, whatever the brightness row is doing.
@@ -435,6 +467,49 @@ addChaser("Circles", [
   sweepScene("Cir C", aim("L", dfC.x + 4, dfC.y + 4), aim("R", dfC.x - 4, dfC.y + 4)),
   sweepScene("Cir D", aim("L", dfC.x + 4, dfC.y - 4), aim("R", dfC.x - 4, dfC.y - 4)),
 ], 1200, 900);
+
+// --- beam looks: gobo wheel, gobo rotation, prism -----------------------------
+// Colour looks clear these (BEAM_CLEAR); the ones below deliberately texture the beam. Gobos only
+// read as gobos where a beam lands on something — the truss pair on the dance floor and the walls,
+// the floor pair on the banner — so that is where they are used.
+addScene("Doors Gobo",   [...wallDim(BLUE, 0.5), ...trussBeam(HEAD_COLOR.cyan, GOBO.slot(0), GROT.hold)], 300, 300);
+addScene("Banner Gobo",  [...wallDim(GOLD, 0.3), ...floorBeam(220, HEAD_COLOR.orange, GOBO.slot(2), GROT.hold)], 300, 300);
+addScene("Banner Swirl", [...wallDim(UVC, 0.4), ...floorBeam(220, HEAD_COLOR.magenta, GOBO.slot(4), GROT.slow)], 300, 300);
+addScene("Gobo Spin",    [...wall(GOLD), ...trussBeam(HEAD_COLOR.orange, GOBO.slot(1), GROT.mid)]);
+addScene("Gobo Cycle",   [...wall(BLUE), ...trussBeam(HEAD_COLOR.cyan, GOBO.cycleSlow, GROT.slow)]);
+addScene("Gobo Shake",   [...wall(UVC), ...trussBeam(HEAD_COLOR.magenta, GOBO.shake, GROT.off)]);
+addScene("Prism Spin",   [...wall(GOLD), ...trussBeam(HEAD_COLOR.orange, GOBO.slot(3), GROT.slow, PRISM.spinSlow)]);
+
+// --- more static looks per part of the night ---------------------------------
+addScene("All Gold",  [...wall(GOLD), ...trussColor(HEAD_COLOR.orange), ...floorVal(255, HEAD_COLOR.orange)]);
+addScene("Half Warm", [...wallDim(WWHT, 0.5), ...trussColor(HEAD_COLOR.white)], 300, 300);
+addScene("Blue Low",  [...wallDim(BLUE, 0.35), ...trussColor(HEAD_COLOR.cyan)], 300, 300);
+
+// --- more chases --------------------------------------------------------------
+// Candle — dinner drift. Long crossfades and no head movement: it should read as the room
+// breathing, not as a light cue.
+addScene("CDL S1", [...wallDim(WWHT, 0.55), ...trussColor(HEAD_COLOR.white)], 900, 900);
+addScene("CDL S2", [...wallDim(AMBER, 0.45), ...trussColor(HEAD_COLOR.orange)], 900, 900);
+addChaser("Candle", ["CDL S1", "CDL S2"], 2200, 900);
+
+// Slow Build — the doors-open ramp: low blue up through gold to full, over about six seconds.
+addScene("SBD S1", [...wallDim(BLUE, 0.25), ...trussColor(HEAD_COLOR.cyan)], 600, 600);
+addScene("SBD S2", [...wallDim(BLUE, 0.6), ...trussColor(HEAD_COLOR.cyan)], 600, 600);
+addScene("SBD S3", [...wallDim(GOLD, 0.6), ...trussColor(HEAD_COLOR.orange)], 600, 600);
+addScene("SBD S4", [...wall(GOLD), ...trussColor(HEAD_COLOR.orange)], 600, 600);
+addChaser("Slow Build", ["SBD S1", "SBD S2", "SBD S3", "SBD S4"], 1400, 600);
+
+// Gold Pulse — hora. Full gold punching against a dark beat, gobo spinning throughout so the
+// heads keep moving while the wall blinks.
+addScene("GPL S1", [...wall(GOLD), ...trussBeam(HEAD_COLOR.orange, GOBO.slot(1), GROT.fast)], 0, 0);
+addScene("GPL S2", [...wall(OFF6), ...trussBeam(HEAD_COLOR.orange, GOBO.slot(1), GROT.fast)], 0, 0);
+addChaser("Gold Pulse", ["GPL S1", "GPL S2"], 400);
+
+// Beam Punch — party. The gobo and prism hold while colour and wheel jump on the beat.
+addScene("BPN S1", [...wall(GOLD), ...trussBeam(HEAD_COLOR.orange, GOBO.slot(5), GROT.mid, PRISM.on)], 0, 0);
+addScene("BPN S2", [...wall(BLUE), ...trussBeam(HEAD_COLOR.cyan, GOBO.slot(5), GROT.reverse, PRISM.on)], 0, 0);
+addScene("BPN S3", [...wall(UVC), ...trussBeam(HEAD_COLOR.magenta, GOBO.slot(5), GROT.mid, PRISM.on)], 0, 0);
+addChaser("Beam Punch", ["BPN S1", "BPN S2", "BPN S3"], 300);
 
 // --- audio fallback + beat pulse ---------------------------------------------
 // Par sound-active mode (R8C7): the fixture's own mic drives its own program. Values from the
@@ -507,6 +582,9 @@ const PAGES: { name: string; blurb: string; looks: PageLook[] }[] = [
     // literal "!" in "/entrance!_r1c3" — legal but a trap for anything driving the show by path.
     { cap: "Entrance",     fn: "Entrance",     row: 0, col: 2, led: LED.gold,  bg: [255, 180, 0] },
     { cap: "Banner Blast", fn: "Banner Blast", row: 0, col: 3, led: LED.uv,    bg: [150, 80, 255] },
+    { cap: "Slow Build",   fn: "Slow Build",   row: 1, col: 0, led: LED.blue,  bg: [60, 90, 200] },
+    { cap: "Doors Gobo",   fn: "Doors Gobo",   row: 1, col: 1, led: LED.cyan,  bg: [0, 160, 210] },
+    { cap: "Banner Gobo",  fn: "Banner Gobo",  row: 1, col: 2, led: LED.gold,  bg: [230, 170, 60] },
   ]},
   { name: "DINNER", blurb: "static ambient, zero motion", looks: [
     { cap: "Gold Wall",   fn: "Gold Wall",     row: 0, col: 0, led: LED.gold,  bg: [255, 170, 0] },
@@ -516,6 +594,10 @@ const PAGES: { name: string; blurb: string; looks: PageLook[] }[] = [
     { cap: "Warm White",  fn: "Warm White",    row: 0, col: 4, led: LED.white, bg: [255, 230, 200] },
     { cap: "UV Accent",   fn: "UV Accent",     row: 0, col: 5, led: LED.uv,    bg: [120, 60, 220] },
     { cap: "Banner Soft", fn: "Banner Soft",   row: 0, col: 6, led: LED.uv,    bg: [170, 120, 255] },
+    { cap: "Candle",      fn: "Candle",        row: 1, col: 0, led: LED.amber, bg: [230, 150, 70] },
+    { cap: "Blue Low",    fn: "Blue Low",      row: 1, col: 1, led: LED.blue,  bg: [30, 60, 170] },
+    { cap: "Half Warm",   fn: "Half Warm",     row: 1, col: 2, led: LED.white, bg: [230, 210, 180] },
+    { cap: "Banner Swirl", fn: "Banner Swirl", row: 1, col: 3, led: LED.uv,    bg: [190, 120, 255] },
   ]},
   { name: "SPEECHES", blurb: "calm, banner featured", looks: [
     { cap: "Banner Bright", fn: "Banner Bright", row: 0, col: 0, led: LED.gold,  bg: [255, 190, 60] },
@@ -523,12 +605,17 @@ const PAGES: { name: string; blurb: string; looks: PageLook[] }[] = [
     { cap: "Speaker",       fn: "Speaker Light", row: 0, col: 2, led: LED.white, bg: [240, 240, 240] },
     { cap: "Banner Only",   fn: "Banner Only",   row: 0, col: 3, led: LED.uv,    bg: [150, 100, 255] },
     { cap: "House Bright",  fn: "House Bright",  row: 0, col: 4, led: LED.white, bg: [255, 255, 255] },
+    { cap: "Warm Low",      fn: "Half Warm",     row: 1, col: 0, led: LED.white, bg: [220, 200, 170] },
+    { cap: "Banner Spin",   fn: "Banner Swirl",  row: 1, col: 1, led: LED.uv,    bg: [180, 110, 240] },
   ]},
   { name: "HORA", blurb: "lift the chairs", looks: [
     { cap: "Gold Blue Full", fn: "Gold Blue Full", row: 0, col: 0, led: LED.gold,  bg: [255, 170, 30] },
     { cap: "Circles",        fn: "Circles",        row: 0, col: 1, led: LED.blue,  bg: [60, 110, 255] },
     { cap: "Fast Chase",     fn: "Fast Gold Blue", row: 0, col: 2, led: LED.amber, bg: [230, 150, 50] },
     { cap: "White Burst",    fn: "White Burst",    row: 0, col: 3, led: LED.white, bg: [255, 255, 255], action: "Flash" },
+    { cap: "All Gold",       fn: "All Gold",       row: 1, col: 0, led: LED.gold,  bg: [255, 185, 40] },
+    { cap: "Gold Pulse",     fn: "Gold Pulse",     row: 1, col: 1, led: LED.amber, bg: [255, 140, 20] },
+    { cap: "Gobo Spin",      fn: "Gobo Spin",      row: 1, col: 2, led: LED.gold,  bg: [235, 165, 55] },
   ]},
   { name: "PARTY", blurb: "the dance floor", looks: [
     { cap: "GB Chase",     fn: "Chase Gold Blue", row: 0, col: 0, led: LED.gold,    bg: [255, 160, 20] },
@@ -540,6 +627,10 @@ const PAGES: { name: string; blurb: string; looks: PageLook[] }[] = [
     { cap: "Sweep Wide",   fn: "Sweep Wide",      row: 1, col: 0, led: LED.cyan,    bg: [0, 200, 230] },
     { cap: "Sweep Cross",  fn: "Sweep Cross",     row: 1, col: 1, led: LED.cyan,    bg: [0, 170, 210] },
     { cap: "Sweep Punch",  fn: "Sweep Punch",     row: 1, col: 2, led: LED.cyan,    bg: [0, 140, 190] },
+    { cap: "Gobo Cycle",   fn: "Gobo Cycle",      row: 1, col: 3, led: LED.blue,    bg: [40, 120, 255] },
+    { cap: "Gobo Shake",   fn: "Gobo Shake",      row: 1, col: 4, led: LED.uv,      bg: [170, 70, 255] },
+    { cap: "Prism Spin",   fn: "Prism Spin",      row: 1, col: 5, led: LED.gold,    bg: [255, 175, 45] },
+    { cap: "Beam Punch",   fn: "Beam Punch",      row: 1, col: 6, led: LED.magenta, bg: [255, 40, 170] },
   ]},
 ];
 
@@ -733,7 +824,10 @@ const faderDefs: { id: number; caption: string; chans: { fixture: number; ch: nu
 const TAP_PAD = padCh(7, 3);    // R8C4 — SpeedDial tap
 const PAGE_PAD = padCh(7, 7);   // R8C8 — multipage next
 const tempoFuncIds = ["Sync Strobe", "Chase Gold Blue", "Chase Blue UV", "Chase Gold UV", "Rainbow Chase",
-  "Rainbow Fast", "Fast Gold Blue", "Build Chase", "Sweep Wide", "Sweep Cross", "Sweep Punch", "Circles"]
+  "Rainbow Fast", "Fast Gold Blue", "Build Chase", "Sweep Wide", "Sweep Cross", "Sweep Punch", "Circles",
+  // Beat-driven additions. "Candle" and "Slow Build" are deliberately NOT here — they are drifts,
+  // and locking them to the tapped tempo would turn them into blinks.
+  "Gold Pulse", "Beam Punch"]
   .map((n) => funcIdByName.get(n))
   .filter((v): v is number => v !== undefined);
 

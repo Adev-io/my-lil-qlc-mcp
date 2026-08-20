@@ -31,6 +31,14 @@ const fv = (scene: string, id: number): string =>
 const sceneXml = (scene: string): string =>
   raw.match(new RegExp(`Type="Scene" Name="${scene}">[^]*?</Function>`))?.[0] || "";
 const chans = (s: string): number[] => s.split(",").map(Number).filter((_, i) => i % 2 === 0);
+// Value of one channel in a "ch,val,ch,val" string, or null if the scene does not set it.
+// Must walk channel slots only: indexOf would happily match a VALUE — colour wheel 8 is orange,
+// which is not channel 8 — and silently report the wrong thing.
+const chVal = (s: string, ch: number): number | null => {
+  const n = s.split(",").map(Number);
+  for (let i = 0; i + 1 < n.length; i += 2) if (n[i] === ch) return n[i + 1];
+  return null;
+};
 
 beforeAll(async () => {
   execSync(`npx tsx scripts/build-party.ts "${RIG}"`, {
@@ -149,15 +157,41 @@ describe("party generator — looks", () => {
     // QLC+ is HTP only on intensity channels; everything else is LTP and keeps its last value
     // when the function that set it stops. Without this, pressing R8C6/R8C7 a second time leaves
     // the fixture on its microphone forever. Verified on the rig 2026-08-20.
-    const pairOf = (s: string, ch: number): number | null => {
-      const n = s.split(",").map(Number);
-      const i = n.indexOf(ch);
-      return i < 0 || i % 2 === 1 ? null : n[i + 1];
-    };
     for (const look of ["Gold Wall", "Blue Wall", "UV Accent", "Doors Blue", "Panic White"])
-      expect(pairOf(fv(look, 0), 9), `${look} par ch9`).toBe(0);
+      expect(chVal(fv(look, 0), 9), `${look} par ch9`).toBe(0);
     for (const look of ["Gold Wall", "Blue Wall", "UV Accent", "Panic White", "Truss Home", "Speaker Light", "SwW A"])
-      expect(pairOf(fv(look, 10), 13), `${look} truss ch13`).toBe(0);
+      expect(chVal(fv(look, 10), 13), `${look} truss ch13`).toBe(0);
+  });
+
+  it("BEAM RECLAIM: colour looks clear gobo, gobo-rotation and prism so a beam look cannot stick", () => {
+    // Same LTP trap as the sound macro: ch6/ch7/ch8 keep their last value after the scene that
+    // set them stops. Without this the first gobo look of the night textures every look after it.
+    // Panic and Truss Home are the two "put it back to normal" buttons, so they clear beams too.
+    // Sweeps deliberately do not — a gobo sweeping across the floor is a look, not a leak.
+    for (const look of ["Gold Wall", "Blue Wall", "Warm White", "Doors Blue", "All Gold", "Panic White", "Truss Home"])
+      for (const ch of [6, 7, 8])
+        expect(chVal(fv(look, 10), ch), `${look} truss ch${ch}`).toBe(0);
+    // Banner washes clear them on the floor pair too.
+    for (const look of ["Banner Bright", "Banner Soft", "All Gold"])
+      for (const ch of [6, 7, 8])
+        expect(chVal(fv(look, 12), ch), `${look} floor ch${ch}`).toBe(0);
+  });
+
+  it("beam looks use real gobo/prism bands from the 375Z definition", () => {
+    // ch6: 8-63 = the seven gobos, 64-119 = the same gobos shaking, 128-189 = cycle gobos.
+    const goboOk = (v: number) => (v >= 8 && v <= 119) || (v >= 128 && v <= 189);
+    for (const look of ["Gobo Spin", "Gobo Cycle", "Gobo Shake", "Prism Spin"]) {
+      const g = chVal(fv(look, 10), 6);
+      expect(g, `${look} gobo`).not.toBeNull();
+      expect(goboOk(g!), `${look} gobo ${g} outside the fixture's usable bands`).toBe(true);
+    }
+    // ch8 prism: 4-65 is the six-facet in / rotating band.
+    const p = chVal(fv("Prism Spin", 10), 8);
+    expect(p, "Prism Spin prism").toBeGreaterThanOrEqual(4);
+    expect(p, "Prism Spin prism").toBeLessThanOrEqual(65);
+    // The floor pair textures the banner, and never gets a movement macro.
+    expect(chVal(fv("Banner Gobo", 12), 6), "Banner Gobo floor gobo").toBeGreaterThan(0);
+    expect(chVal(fv("Banner Gobo", 12), 13), "Banner Gobo floor macro").toBe(0);
   });
 
   it("Truss Sound hands the truss pair to their own mics, lit, and never touches the floor pair", () => {

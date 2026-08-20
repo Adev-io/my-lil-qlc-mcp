@@ -50,6 +50,42 @@
       "momentary": false
     },
     {
+      "note": 71,
+      "crc": 7240,
+      "path": "/slow_build_r2c1",
+      "page": 0,
+      "rgb": [
+        60,
+        90,
+        200
+      ],
+      "momentary": false
+    },
+    {
+      "note": 72,
+      "crc": 9782,
+      "path": "/doors_gobo_r2c2",
+      "page": 0,
+      "rgb": [
+        0,
+        160,
+        210
+      ],
+      "momentary": false
+    },
+    {
+      "note": 73,
+      "crc": 2092,
+      "path": "/banner_gobo_r2c3",
+      "page": 0,
+      "rgb": [
+        230,
+        170,
+        60
+      ],
+      "momentary": false
+    },
+    {
       "note": 21,
       "crc": 29966,
       "path": "/dim_25_p1_r7c1",
@@ -266,6 +302,54 @@
       "momentary": false
     },
     {
+      "note": 71,
+      "crc": 27194,
+      "path": "/candle_r2c1",
+      "page": 1,
+      "rgb": [
+        230,
+        150,
+        70
+      ],
+      "momentary": false
+    },
+    {
+      "note": 72,
+      "crc": 6305,
+      "path": "/blue_low_r2c2",
+      "page": 1,
+      "rgb": [
+        30,
+        60,
+        170
+      ],
+      "momentary": false
+    },
+    {
+      "note": 73,
+      "crc": 20444,
+      "path": "/half_warm_r2c3",
+      "page": 1,
+      "rgb": [
+        230,
+        210,
+        180
+      ],
+      "momentary": false
+    },
+    {
+      "note": 74,
+      "crc": 31220,
+      "path": "/banner_swirl_r2c4",
+      "page": 1,
+      "rgb": [
+        190,
+        120,
+        255
+      ],
+      "momentary": false
+    },
+    {
       "note": 21,
       "crc": 31091,
       "path": "/dim_25_p2_r7c1",
@@ -458,6 +542,30 @@
       "momentary": false
     },
     {
+      "note": 71,
+      "crc": 8435,
+      "path": "/warm_low_r2c1",
+      "page": 2,
+      "rgb": [
+        220,
+        200,
+        170
+      ],
+      "momentary": false
+    },
+    {
+      "note": 72,
+      "crc": 16823,
+      "path": "/banner_spin_r2c2",
+      "page": 2,
+      "rgb": [
+        180,
+        110,
+        240
+      ],
+      "momentary": false
+    },
+    {
       "note": 21,
       "crc": 32088,
       "path": "/dim_25_p3_r7c1",
@@ -636,6 +744,42 @@
         255
       ],
       "momentary": true
+    },
+    {
+      "note": 71,
+      "crc": 59431,
+      "path": "/all_gold_r2c1",
+      "page": 3,
+      "rgb": [
+        255,
+        185,
+        40
+      ],
+      "momentary": false
+    },
+    {
+      "note": 72,
+      "crc": 3610,
+      "path": "/gold_pulse_r2c2",
+      "page": 3,
+      "rgb": [
+        255,
+        140,
+        20
+      ],
+      "momentary": false
+    },
+    {
+      "note": 73,
+      "crc": 11952,
+      "path": "/gobo_spin_r2c3",
+      "page": 3,
+      "rgb": [
+        235,
+        165,
+        55
+      ],
+      "momentary": false
     },
     {
       "note": 21,
@@ -874,6 +1018,54 @@
         0,
         140,
         190
+      ],
+      "momentary": false
+    },
+    {
+      "note": 74,
+      "crc": 11571,
+      "path": "/gobo_cycle_r2c4",
+      "page": 4,
+      "rgb": [
+        40,
+        120,
+        255
+      ],
+      "momentary": false
+    },
+    {
+      "note": 75,
+      "crc": 37110,
+      "path": "/gobo_shake_r2c5",
+      "page": 4,
+      "rgb": [
+        170,
+        70,
+        255
+      ],
+      "momentary": false
+    },
+    {
+      "note": 76,
+      "crc": 42649,
+      "path": "/prism_spin_r2c6",
+      "page": 4,
+      "rgb": [
+        255,
+        175,
+        45
+      ],
+      "momentary": false
+    },
+    {
+      "note": 77,
+      "crc": 4386,
+      "path": "/beam_punch_r2c7",
+      "page": 4,
+      "rgb": [
+        255,
+        40,
+        170
       ],
       "momentary": false
     },

@@ -66,7 +66,7 @@ beat and the mics can run together.
 ```
   | Doors        | Build        | Entrance     | Banner Blast |              |              |              |              |
   ------------------------------------------------------------------------------------------------------------------------
-  |              |              |              |              |              |              |              |              |
+  | Slow Build   | Doors Gobo   | Banner Gobo  |              |              |              |              |              |
   ------------------------------------------------------------------------------------------------------------------------
   |              |              |              |              |              |              |              |              |
   ------------------------------------------------------------------------------------------------------------------------
@@ -85,7 +85,7 @@ beat and the mics can run together.
 ```
   | Gold Wall    | Blue Wall    | Gold Blue    | Soft Amber   | Warm White   | UV Accent    | Banner Soft  |              |
   ------------------------------------------------------------------------------------------------------------------------
-  |              |              |              |              |              |              |              |              |
+  | Candle       | Blue Low     | Half Warm    | Banner Swirl |              |              |              |              |
   ------------------------------------------------------------------------------------------------------------------------
   |              |              |              |              |              |              |              |              |
   ------------------------------------------------------------------------------------------------------------------------
@@ -104,7 +104,7 @@ beat and the mics can run together.
 ```
   | Banner Brigh | Wall Low     | Speaker      | Banner Only  | House Bright |              |              |              |
   ------------------------------------------------------------------------------------------------------------------------
-  |              |              |              |              |              |              |              |              |
+  | Warm Low     | Banner Spin  |              |              |              |              |              |              |
   ------------------------------------------------------------------------------------------------------------------------
   |              |              |              |              |              |              |              |              |
   ------------------------------------------------------------------------------------------------------------------------
@@ -123,7 +123,7 @@ beat and the mics can run together.
 ```
   | Gold Blue Fu | Circles      | Fast Chase   | White Burst  |              |              |              |              |
   ------------------------------------------------------------------------------------------------------------------------
-  |              |              |              |              |              |              |              |              |
+  | All Gold     | Gold Pulse   | Gobo Spin    |              |              |              |              |              |
   ------------------------------------------------------------------------------------------------------------------------
   |              |              |              |              |              |              |              |              |
   ------------------------------------------------------------------------------------------------------------------------
@@ -142,7 +142,7 @@ beat and the mics can run together.
 ```
   | GB Chase     | Blue UV      | Gold UV      | Rainbow      | Rainbow Fast | UV Black     |              |              |
   ------------------------------------------------------------------------------------------------------------------------
-  | Sweep Wide   | Sweep Cross  | Sweep Punch  |              |              |              |              |              |
+  | Sweep Wide   | Sweep Cross  | Sweep Punch  | Gobo Cycle   | Gobo Shake   | Prism Spin   | Beam Punch   |              |
   ------------------------------------------------------------------------------------------------------------------------
   |              |              |              |              |              |              |              |              |
   ------------------------------------------------------------------------------------------------------------------------
@@ -176,6 +176,9 @@ R1C1); **Pad** = the Launchpad MIDI channel; **OSC** = the dashboard path.
 | Build | 1 | R1C2 | 210 | `/build_r1c2` |
 | Entrance | 1 | R1C3 | 211 | `/entrance_r1c3` |
 | Banner Blast | 1 | R1C4 | 212 | `/banner_blast_r1c4` |
+| Slow Build | 1 | R2C1 | 199 | `/slow_build_r2c1` |
+| Doors Gobo | 1 | R2C2 | 200 | `/doors_gobo_r2c2` |
+| Banner Gobo | 1 | R2C3 | 201 | `/banner_gobo_r2c3` |
 | Dim 25 P1 | 1 | R7C1 | 149 | `/dim_25_p1_r7c1` |
 | Dim 50 P1 | 1 | R7C2 | 150 | `/dim_50_p1_r7c2` |
 | Dim 75 P1 | 1 | R7C3 | 151 | `/dim_75_p1_r7c3` |
@@ -194,6 +197,10 @@ R1C1); **Pad** = the Launchpad MIDI channel; **OSC** = the dashboard path.
 | Warm White | 2 | R1C5 | 213 | `/warm_white_r1c5` |
 | UV Accent | 2 | R1C6 | 214 | `/uv_accent_r1c6` |
 | Banner Soft | 2 | R1C7 | 215 | `/banner_soft_r1c7` |
+| Candle | 2 | R2C1 | 199 | `/candle_r2c1` |
+| Blue Low | 2 | R2C2 | 200 | `/blue_low_r2c2` |
+| Half Warm | 2 | R2C3 | 201 | `/half_warm_r2c3` |
+| Banner Swirl | 2 | R2C4 | 202 | `/banner_swirl_r2c4` |
 | Dim 25 P2 | 2 | R7C1 | 149 | `/dim_25_p2_r7c1` |
 | Dim 50 P2 | 2 | R7C2 | 150 | `/dim_50_p2_r7c2` |
 | Dim 75 P2 | 2 | R7C3 | 151 | `/dim_75_p2_r7c3` |
@@ -210,6 +217,8 @@ R1C1); **Pad** = the Launchpad MIDI channel; **OSC** = the dashboard path.
 | Speaker | 3 | R1C3 | 211 | `/speaker_r1c3` |
 | Banner Only | 3 | R1C4 | 212 | `/banner_only_r1c4` |
 | House Bright | 3 | R1C5 | 213 | `/house_bright_r1c5` |
+| Warm Low | 3 | R2C1 | 199 | `/warm_low_r2c1` |
+| Banner Spin | 3 | R2C2 | 200 | `/banner_spin_r2c2` |
 | Dim 25 P3 | 3 | R7C1 | 149 | `/dim_25_p3_r7c1` |
 | Dim 50 P3 | 3 | R7C2 | 150 | `/dim_50_p3_r7c2` |
 | Dim 75 P3 | 3 | R7C3 | 151 | `/dim_75_p3_r7c3` |
@@ -225,6 +234,9 @@ R1C1); **Pad** = the Launchpad MIDI channel; **OSC** = the dashboard path.
 | Circles | 4 | R1C2 | 210 | `/circles_r1c2` |
 | Fast Chase | 4 | R1C3 | 211 | `/fast_chase_r1c3` |
 | White Burst | 4 | R1C4 | 212 | `/white_burst_r1c4` |
+| All Gold | 4 | R2C1 | 199 | `/all_gold_r2c1` |
+| Gold Pulse | 4 | R2C2 | 200 | `/gold_pulse_r2c2` |
+| Gobo Spin | 4 | R2C3 | 201 | `/gobo_spin_r2c3` |
 | Dim 25 P4 | 4 | R7C1 | 149 | `/dim_25_p4_r7c1` |
 | Dim 50 P4 | 4 | R7C2 | 150 | `/dim_50_p4_r7c2` |
 | Dim 75 P4 | 4 | R7C3 | 151 | `/dim_75_p4_r7c3` |
@@ -245,6 +257,10 @@ R1C1); **Pad** = the Launchpad MIDI channel; **OSC** = the dashboard path.
 | Sweep Wide | 5 | R2C1 | 199 | `/sweep_wide_r2c1` |
 | Sweep Cross | 5 | R2C2 | 200 | `/sweep_cross_r2c2` |
 | Sweep Punch | 5 | R2C3 | 201 | `/sweep_punch_r2c3` |
+| Gobo Cycle | 5 | R2C4 | 202 | `/gobo_cycle_r2c4` |
+| Gobo Shake | 5 | R2C5 | 203 | `/gobo_shake_r2c5` |
+| Prism Spin | 5 | R2C6 | 204 | `/prism_spin_r2c6` |
+| Beam Punch | 5 | R2C7 | 205 | `/beam_punch_r2c7` |
 | Dim 25 P5 | 5 | R7C1 | 149 | `/dim_25_p5_r7c1` |
 | Dim 50 P5 | 5 | R7C2 | 150 | `/dim_50_p5_r7c2` |
 | Dim 75 P5 | 5 | R7C3 | 151 | `/dim_75_p5_r7c3` |

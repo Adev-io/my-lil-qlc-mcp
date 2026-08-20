@@ -16,10 +16,10 @@
     },
     {
       "id": "104",
-      "name": "Entrance! R1C3",
-      "path": "/entrance!_r1c3",
+      "name": "Entrance R1C3",
+      "path": "/entrance_r1c3",
       "type": "button",
-      "description": "Button: Entrance! R1C3 (Input Universe 0, Channel 49059)"
+      "description": "Button: Entrance R1C3 (Input Universe 0, Channel 40169)"
     },
     {
       "id": "106",
@@ -592,5 +592,5 @@
     }
   ],
   "generated": true,
-  "generatedAt": "2026-08-20T17:28:22.713Z"
+  "generatedAt": "2026-08-20T17:31:31.277Z"
 }

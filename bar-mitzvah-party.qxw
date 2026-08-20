@@ -1233,7 +1233,7 @@
       <Action>Toggle</Action>
       <Input Universe="1" Channel="210" LowerValue="30" UpperValue="26"/>
     </Button>
-    <Button Caption="Entrance! R1C3" ID="104" Icon="">
+    <Button Caption="Entrance R1C3" ID="104" Icon="">
       <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -1244,9 +1244,9 @@
       </Appearance>
       <Function ID="60"/>
       <Action>Toggle</Action>
-      <Input Universe="0" Channel="49059"/>
+      <Input Universe="0" Channel="40169"/>
     </Button>
-    <Button Caption="Entrance! R1C3" ID="105" Icon="">
+    <Button Caption="Entrance R1C3" ID="105" Icon="">
       <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>

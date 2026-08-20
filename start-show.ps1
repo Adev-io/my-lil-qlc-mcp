@@ -83,6 +83,23 @@ if (-not (Get-Command npx -ErrorAction SilentlyContinue)) {
 #    (pad notes 11..88) can read presses and light the pads via MIDI feedback.
 if ($useLaunchpad -and -not (Get-Process qlcplus -ErrorAction SilentlyContinue)) {
   & (Join-Path $here 'engage-launchpad.ps1')
+
+  # HARD WARNING (learned on the rig 2026-08-20). rig.controller.inputUid/Line are winmm device
+  # INDEXES, not names. With the Launchpad unplugged, that index resolves to whatever other MIDI
+  # device now sits there -- on this machine a virtual MIDI port -- and QLC+ reads its traffic as
+  # pad presses, firing looks continuously with nobody touching anything. The rig looks possessed.
+  # So: if the Launchpad is missing, say plainly what will happen rather than a soft "check cable".
+  $lpPresent = @(Get-PnpDevice -PresentOnly -ErrorAction SilentlyContinue |
+    Where-Object { $_.FriendlyName -like '*LPMiniMK3*' }).Count -gt 0
+  if (-not $lpPresent) {
+    Write-Host ''
+    Write-Host '  [!!] LAUNCHPAD NOT CONNECTED — and the show maps MIDI by device INDEX.' -ForegroundColor Red
+    Write-Host '       QLC+ will bind index ' -NoNewline -ForegroundColor Yellow
+    Write-Host "$($rig.controller.inputUid)" -NoNewline -ForegroundColor Yellow
+    Write-Host ' to whatever MIDI device is there instead, and stray traffic on it' -ForegroundColor Yellow
+    Write-Host '       fires looks at random. Plug the Launchpad in and re-run, or expect a haunted rig.' -ForegroundColor Yellow
+    Write-Host ''
+  }
 }
 
 # 1. QLC+ — reads Launchpad MIDI IN (pad presses), lights the pads via MIDI feedback (the show's

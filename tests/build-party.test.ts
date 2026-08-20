@@ -178,9 +178,18 @@ describe("party VC — 5 pages, shared rows, faders, tempo, audio", () => {
   });
 
   it("places each page's looks on their page", () => {
-    for (const n of ["Doors R1C1", "Entrance! R1C3", "Gold Wall R1C1", "Banner Bright R1C1",
+    for (const n of ["Doors R1C1", "Entrance R1C3", "Gold Wall R1C1", "Banner Bright R1C1",
       "Gold Blue Full R1C1", "GB Chase R1C1", "Sweep Wide R2C1"])
       expect(names).toContain(n);
+  });
+
+  // Captions become OSC paths, so punctuation leaks straight into them ("Entrance!" once shipped
+  // as "/entrance!_r1c3"). Keep every path to lowercase words, digits and underscores.
+  it("keeps every OSC path free of punctuation", () => {
+    for (const n of names) {
+      const p = `/${n.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/ /g, "_")}`;
+      expect(p, `widget "${n}"`).toMatch(/^\/[a-z0-9_]+$/);
+    }
   });
 
   it("uses solo frames for looks + brightness and a plain frame for utility", () => {

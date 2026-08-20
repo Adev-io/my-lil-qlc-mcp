@@ -472,7 +472,9 @@ const PAGES: { name: string; blurb: string; looks: PageLook[] }[] = [
   { name: "INTRO", blurb: "doors, build, grand entrance", looks: [
     { cap: "Doors",        fn: "Doors Blue",   row: 0, col: 0, led: LED.blue,  bg: [40, 80, 220] },
     { cap: "Build",        fn: "Build Chase",  row: 0, col: 1, led: LED.amber, bg: [200, 140, 40] },
-    { cap: "Entrance!",    fn: "Entrance",     row: 0, col: 2, led: LED.gold,  bg: [255, 180, 0] },
+    // No punctuation in captions: the caption becomes the OSC path, and "Entrance!" shipped a
+    // literal "!" in "/entrance!_r1c3" — legal but a trap for anything driving the show by path.
+    { cap: "Entrance",     fn: "Entrance",     row: 0, col: 2, led: LED.gold,  bg: [255, 180, 0] },
     { cap: "Banner Blast", fn: "Banner Blast", row: 0, col: 3, led: LED.uv,    bg: [150, 80, 255] },
   ]},
   { name: "DINNER", blurb: "static ambient, zero motion", looks: [

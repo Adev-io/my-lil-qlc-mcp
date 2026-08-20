@@ -49,7 +49,7 @@ and fires no look. On the keyboard, **PgDn / PgUp** also switch pages.
 
 ### Page 1 — INTRO · doors, build, grand entrance
 ```
-  | Doors        | Build        | Entrance!    | Banner Blast |              |              |              |              |
+  | Doors        | Build        | Entrance     | Banner Blast |              |              |              |              |
   ------------------------------------------------------------------------------------------------------------------------
   |              |              |              |              |              |              |              |              |
   ------------------------------------------------------------------------------------------------------------------------
@@ -159,7 +159,7 @@ R1C1); **Pad** = the Launchpad MIDI channel; **OSC** = the dashboard path.
 |------|----|-----|-----|-----|
 | Doors | 1 | R1C1 | 209 | `/doors_r1c1` |
 | Build | 1 | R1C2 | 210 | `/build_r1c2` |
-| Entrance! | 1 | R1C3 | 211 | `/entrance!_r1c3` |
+| Entrance | 1 | R1C3 | 211 | `/entrance_r1c3` |
 | Banner Blast | 1 | R1C4 | 212 | `/banner_blast_r1c4` |
 | Dim 25 P1 | 1 | R7C1 | 149 | `/dim_25_p1_r7c1` |
 | Dim 50 P1 | 1 | R7C2 | 150 | `/dim_50_p1_r7c2` |

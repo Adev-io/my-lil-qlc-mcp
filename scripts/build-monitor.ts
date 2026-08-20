@@ -77,8 +77,9 @@ for (const g of rig.fixtures) {
       });
     }
   } else if (g.kind === "bar") {
-    // Bars: UP HIGH (>10 ft), alternating sides, angled 45° down-and-inward.
-    const BAR_Z = 11;
+    // Bars: high at the BACK corners, BEHIND the band (10 ft up), angled 45° down-and-inward.
+    const BAR_Z = 10; // 10 ft up
+    const BAR_Y = D; // back of the stage, upstage of the band
     const D45 = Math.SQRT1_2; // cos/sin 45°
     // left bar throws toward audience-right + down; right bar mirrors.
     const sides = [
@@ -94,24 +95,29 @@ for (const g of rig.fixtures) {
         address: g.addresses[i],
         channels: g.channels,
         roles: pickRoles("bar", g.roles),
-        pos: [round(s.x), 0.5, BAR_Z],
+        pos: [round(s.x), BAR_Y, BAR_Z],
         point: [round(s.point[0]), 0, round(s.point[2])],
       });
     }
   } else if (g.kind === "head") {
     // Heads: front trusses, spread across headSeparationFt (the classic pair lands at ±HAP/2).
+    // A group whose namePrefix says "Floor" mounts on the DECK instead of the truss — the party
+    // rig stands two heads directly below the truss pair to cross-shoot the backdrop banner, so
+    // they share the truss X and differ only in height.
+    const prefix = g.namePrefix ?? "Head";
+    const isFloor = /floor/i.test(prefix);
     const headXs = Array.from({ length: g.count }, (_, i) =>
       g.count === 1 ? 0 : -HAP / 2 + (i * HAP) / (g.count - 1),
     );
     for (let i = 0; i < g.count; i++) {
       fixtures.push({
         id: fxId++,
-        name: `Head ${g.count === 2 ? (i === 0 ? "L" : "R") : i + 1}`,
+        name: `${prefix} ${g.count === 2 ? (i === 0 ? "L" : "R") : i + 1}`,
         kind: "head",
         address: g.addresses[i],
         channels: g.channels,
         roles: pickRoles("head", g.roles),
-        pos: [round(headXs[i]), 0, HZ],
+        pos: [round(headXs[i]), 0, isFloor ? 0.5 : HZ],
       });
     }
   }
@@ -134,6 +140,10 @@ const out = {
       panCentreUpstage: true,
     },
     shutterOpenMin: beam?.shutterOpenMin ?? 216,
+    // Backdrop banner (party rigs) — the renderer may draw it as a plain quad on the back wall so
+    // floor-head aim is judgeable. The key is OMITTED on rigs without one, so a bannerless rig's
+    // output is unchanged by this feature.
+    ...(rig.banner ? { banner: rig.banner } : {}),
     generatedFrom: "scripts/build-monitor.ts",
   },
   fixtures,

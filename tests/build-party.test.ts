@@ -272,6 +272,37 @@ describe("party generator — Launchpad LED map", () => {
   }
 });
 
+describe("party generator — 3D monitor layout", () => {
+  let mon: any;
+  beforeAll(() => {
+    execSync(`npx tsx scripts/build-monitor.ts "${RIG}"`, {
+      cwd: ROOT, stdio: "inherit", env: { ...process.env, QLC_BUILD_OUT: OUT },
+    });
+    mon = JSON.parse(readFileSync(path.join(OUT, "monitor", "fixtures.json"), "utf8"));
+  });
+
+  it("names heads by their rig group and stands the floor pair directly below the truss pair", () => {
+    const trussL = mon.fixtures.find((f: any) => f.name === "Truss L");
+    const floorL = mon.fixtures.find((f: any) => f.name === "Floor L");
+    expect(trussL).toBeTruthy();
+    expect(floorL).toBeTruthy();
+    expect(trussL.pos[2]).toBe(8);              // on the 8ft truss
+    expect(floorL.pos[2]).toBeLessThan(1);      // on the floor
+    expect(floorL.pos[0]).toBe(trussL.pos[0]);  // same X — directly below
+  });
+
+  it("passes the banner through to the renderer", () => {
+    expect(mon.meta.banner).toEqual({ widthFt: 12, heightFt: 8, centerX: 0, centerHeightFt: 8 });
+  });
+
+  it("still carries all 14 fixtures with their DMX addresses", () => {
+    expect(mon.fixtures).toHaveLength(14);
+    expect(mon.fixtures.filter((f: any) => f.kind === "par")).toHaveLength(10);
+    expect(mon.fixtures.filter((f: any) => f.kind === "head").map((f: any) => f.address))
+      .toEqual([100, 115, 130, 145]);
+  });
+});
+
 describe("party generator — patch chart", () => {
   it("documents the party rig, the five pages and the audio-device gotcha", () => {
     const chart = readFileSync(path.join(OUT, "PATCH-CHART.md"), "utf8");

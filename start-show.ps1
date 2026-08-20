@@ -126,12 +126,42 @@ public static class MIDX {
     Write-Host '       and stray traffic on it fires looks at random. Plug the Launchpad in and re-run.' -ForegroundColor Yellow
     Write-Host ''
   } elseif ("$lpIn" -ne "$($rig.controller.inputUid)" -or "$lpOut" -ne "$($rig.controller.outputUid)") {
+    # REPAIR, don't just complain. Watched live 2026-08-20: plugging in an Arturia Minilab3 (four
+    # MIDI ports, sorting before "LPMiniMK3") moved the Launchpad from index 3 to 7 between two
+    # launches. Telling the operator to edit rig.json and regenerate is not a thing anyone should
+    # be doing an hour before doors, so patch the two attributes in place. Same contract as
+    # scripts/floor-head-tilt.mjs: back up first, and never block the launch.
     Write-Host ''
-    Write-Host '  [!!] MIDI INDEXES MOVED — this show will read the WRONG device and fire looks at random.' -ForegroundColor Red
-    Write-Host "       show expects  in=$($rig.controller.inputUid) out=$($rig.controller.outputUid)" -ForegroundColor Yellow
-    Write-Host "       Launchpad is  in=$lpIn out=$lpOut" -ForegroundColor Yellow
-    Write-Host '       Fix: set controller.inputUid/inputLine and outputUid/outputLine in rig.json to those' -ForegroundColor Yellow
-    Write-Host '            numbers, run "npm run generate", then re-run this launcher.' -ForegroundColor Yellow
+    Write-Host '  [!] MIDI indexes moved — repairing.' -ForegroundColor Yellow
+    Write-Host "      show was built for in=$($rig.controller.inputUid) out=$($rig.controller.outputUid); Launchpad is now in=$lpIn out=$lpOut" -ForegroundColor Yellow
+    try {
+      $autosave = Join-Path (Split-Path $show -Parent) ([System.IO.Path]::GetFileNameWithoutExtension($show) + '.autosave.qxw')
+      $utf8 = New-Object System.Text.UTF8Encoding($false)
+      foreach ($f in @($show, $autosave)) {
+        if (-not (Test-Path $f)) { continue }
+        $t = [System.IO.File]::ReadAllText($f)
+        $n = $t -replace '<Input Plugin="MIDI" UID="\d+" Line="\d+"/>', "<Input Plugin=`"MIDI`" UID=`"$lpIn`" Line=`"$lpIn`"/>"
+        $n = $n -replace '<Feedback Plugin="MIDI" UID="\d+" Line="\d+"/>', "<Feedback Plugin=`"MIDI`" UID=`"$lpOut`" Line=`"$lpOut`"/>"
+        if ($n -eq $t) { continue }
+        Copy-Item $f "$f.midibak" -Force
+        $ro = (Get-Item $f).IsReadOnly            # the generated show ships read-only
+        if ($ro) { Set-ItemProperty $f -Name IsReadOnly -Value $false }
+        [System.IO.File]::WriteAllText($f, $n, $utf8)
+        if ($ro) { Set-ItemProperty $f -Name IsReadOnly -Value $true }
+        Write-Host "      patched $([System.IO.Path]::GetFileName($f)) [backup: $([System.IO.Path]::GetFileName($f)).midibak]" -ForegroundColor Green
+      }
+      # Keep rig.json in step by text, not ConvertTo-Json, so the file's formatting survives —
+      # otherwise the next "npm run generate" would hand the stale index straight back.
+      $rt = [System.IO.File]::ReadAllText($rigFile)
+      $rt = $rt -replace '("input(?:Uid|Line)"\s*:\s*")\d+(")', "`${1}$lpIn`${2}"
+      $rt = $rt -replace '("output(?:Uid|Line)"\s*:\s*")\d+(")', "`${1}$lpOut`${2}"
+      [System.IO.File]::WriteAllText($rigFile, $rt, $utf8)
+      Write-Host '      rig.json updated to match.' -ForegroundColor Green
+    } catch {
+      Write-Host "  [!!] repair failed: $($_.Exception.Message)" -ForegroundColor Red
+      Write-Host '       Set controller.inputUid/inputLine + outputUid/outputLine in rig.json by hand,' -ForegroundColor Yellow
+      Write-Host '       run "npm run generate", and re-run this launcher before trusting the pads.' -ForegroundColor Yellow
+    }
     Write-Host ''
   } else {
     Write-Host "  -> Launchpad MIDI index check OK (in=$lpIn out=$lpOut)" -ForegroundColor DarkGray
@@ -202,6 +232,17 @@ if ($rig -and $rig.meta.builder -eq 'party') {
     $bootPad = (Get-Content $ledMap -Raw | ConvertFrom-Json).pads |
       Where-Object { $_.path -like '/dim_full_p1*' } | Select-Object -First 1
     if ($bootPad) {
+      # Wait for QLC+ to actually be emitting before firing. This is a SOLO toggle, so it cannot
+      # simply be retried — a second press turns it back off. The monitor's lastFrameAt is the
+      # readiness signal: while QLC+ is still loading the show no Art-Net arrives and the age
+      # climbs. Seen for real: firing too early left the rig dark at boot.
+      for ($i = 0; $i -lt 30; $i++) {
+        try {
+          $st = Invoke-WebRequest "$monUrl/status" -UseBasicParsing -TimeoutSec 1 | ForEach-Object { $_.Content } | ConvertFrom-Json
+          if ($st.ageMs -lt 1500) { break }
+        } catch { }
+        Start-Sleep -Milliseconds 500
+      }
       Write-Host "  -> boot lit: firing $($bootPad.path)" -ForegroundColor Green
       try { & node $oscScript $bootPad.path 1 | Out-Null }
       catch { Write-Host "  [!] boot-lit OSC failed (press R7C4 instead): $($_.Exception.Message)" -ForegroundColor Yellow }

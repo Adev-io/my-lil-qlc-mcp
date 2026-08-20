@@ -149,16 +149,26 @@ const funcs: FuncDef[] = [];
 const funcIdByName = new Map<string, number>();
 let funcId = 0;
 
-// SAFETY GUARD. Firmware movement macros (head ch13) are banned outright: their auto pan/tilt
-// ignores every limit here and could rake the dance floor at face height. Once day-of capture
-// writes rig.headSafety (per-head fence by DMX address), pan/tilt are bounds-checked too.
+// SAFETY GUARD. Firmware movement macros (head ch13) are banned: their auto pan/tilt ignores every
+// limit here and could rake the dance floor at face height. Once day-of capture writes
+// rig.headSafety (per-head fence by DMX address), pan/tilt are bounds-checked too.
+//
+// ONE exception, by name: SOUND_SCENE puts the TRUSS pair into a sound-active program on purpose
+// (the show's audio reactivity comes from the fixtures' own mics, not a feed into QLC+). It is
+// truss-only — those heads are 8ft up over the dance floor where sweeping is the point — and the
+// guard still refuses it on any other head, so the floor pair aimed at the banner can never
+// inherit it. scripts/floor-head-tilt.mjs carries the matching exemption at launch time.
+const SOUND_SCENE = "Truss Sound";
 function coverGuard(scene: string, v: FixVal): void {
   if (!heads.some((h) => h.id === v.id)) return;
+  const soundOk = scene === SOUND_SCENE && trussHeads.some((h) => h.id === v.id);
   const fence = fenceFor(v.id);
   for (let k = 0; k + 1 < v.pairs.length; k += 2) {
     const ch = v.pairs[k], val = v.pairs[k + 1];
-    if (ch === 13 && val !== 0)
+    if (ch === 13 && val !== 0 && !soundOk)
       throw new Error(`Scene "${scene}" head ${v.id}: movement macro ${val} banned (firmware pan/tilt ignores eye-safe limits)`);
+    if (ch === 13 && soundOk && val < 136)
+      throw new Error(`Scene "${scene}" head ${v.id}: macro ${val} is an AUTO program — only sound-active (136-255) is allowed here`);
     if (!fence) continue;
     if (ch === 0 && (val < fence.panMin || val > fence.panMax))
       throw new Error(`Scene "${scene}" head ${v.id}: pan ${val} outside eye-safe fence [${fence.panMin}..${fence.panMax}]`);
@@ -262,10 +272,17 @@ function floorPos(f: Fixture): [number, number] {
 // and the faders. Floor heads are the exception by role: banner scenes are their own layer and
 // carry their own dim (the Banner Dim fader rides them).
 // ----------------------------------------------------------------------------
+//
+// LTP RECLAIM (verified on the rig 2026-08-20). QLC+ is HTP only for Intensity-group channels;
+// EVERY other channel is LTP and KEEPS ITS LAST VALUE after the function that set it stops. So a
+// sound-active mode cannot be switched off by re-pressing its own pad — nothing writes the
+// channel back. A look therefore has to zero the sound channels itself: par ch9 "Sound active"
+// and head ch13 "Movement Macros". With these in place the operator rule is one sentence:
+// **any look press takes the fixtures back from their microphones.**
 function pParVal(id: number, c: number[]): FixVal {
-  return { id, pairs: [1, 0, 2, c[0], 3, c[1], 4, c[2], 5, c[3], 6, c[4], 7, c[5], 8, 0] };
+  return { id, pairs: [1, 0, 2, c[0], 3, c[1], 4, c[2], 5, c[3], 6, c[4], 7, c[5], 8, 0, 9, 0] };
 }
-const trussColor = (color: number): FixVal[] => trussHeads.map((f) => ({ id: f.id, pairs: [5, color] }));
+const trussColor = (color: number): FixVal[] => trussHeads.map((f) => ({ id: f.id, pairs: [5, color, 13, 0] }));
 const floorVal = (dim: number, color: number): FixVal[] =>
   floorHeads.map((f) => ({ id: f.id, pairs: [5, color, 10, dim, 11, SHUTTER_OPEN] }));
 const floorOff = (): FixVal[] => floorHeads.map((f) => ({ id: f.id, pairs: [10, 0] }));
@@ -307,8 +324,10 @@ addScene("Banner Blast",  floorVal(255, HEAD_COLOR.orange), 60, 60);
 // DIM-RULE EXCEPTION #1 — Panic writes every dimmer itself. It is the break-glass "light the
 // room NOW" pad; it must work with the dim row at 25% or a fader pulled to zero.
 addScene("Panic White", [
-  ...pars.map((f) => ({ id: f.id, pairs: [0, 255, 1, 0, 2, 0, 3, 0, 4, 0, 5, 255, 6, 0, 7, 0, 8, 0] })),
-  ...trussHeads.map((f) => ({ id: f.id, pairs: [5, HEAD_COLOR.white, 10, 255, 11, SHUTTER_OPEN] })),
+  // The 9,0 / 13,0 are the LTP reclaim (see pParVal): Panic is the one button that must recover
+  // the room from ANY state, and that includes taking the fixtures back off their own mics.
+  ...pars.map((f) => ({ id: f.id, pairs: [0, 255, 1, 0, 2, 0, 3, 0, 4, 0, 5, 255, 6, 0, 7, 0, 8, 0, 9, 0] })),
+  ...trussHeads.map((f) => ({ id: f.id, pairs: [5, HEAD_COLOR.white, 10, 255, 11, SHUTTER_OPEN, 13, 0] })),
   ...floorVal(255, HEAD_COLOR.white),
 ]);
 
@@ -378,13 +397,13 @@ const dfL = { x: -DF_W / 2 + 2, y: DF_CENTER_Y }, dfR = { x: DF_W / 2 - 2, y: DF
 
 addScene("Truss Home", trussHeads.map((f, i) => {
   const [p, t] = trussPos("home", f, aim(i === 0 ? "L" : "R", dfC.x, dfC.y));
-  return { id: f.id, pairs: [0, p, 2, t, 11, SHUTTER_OPEN] };
+  return { id: f.id, pairs: [0, p, 2, t, 11, SHUTTER_OPEN, 13, 0] }; // 13,0 = LTP reclaim
 }));
 // DIM-RULE EXCEPTION #3 — Speaker Light carries its own dim + white. "Get light on the person
 // talking" has to work on one press during a speech, whatever the brightness row is doing.
 addScene("Speaker Light", trussHeads.map((f, i) => {
   const [p, t] = trussPos("speaker", f, aim(i === 0 ? "L" : "R", 0, 2, STAGE_DECK + 5));
-  return { id: f.id, pairs: [0, p, 2, t, 5, HEAD_COLOR.white, 10, 255, 11, SHUTTER_OPEN] };
+  return { id: f.id, pairs: [0, p, 2, t, 5, HEAD_COLOR.white, 10, 255, 11, SHUTTER_OPEN, 13, 0] };
 }));
 addScene("Banner Home", floorHeads.map((f) => {
   const [p, t] = floorPos(f);
@@ -393,8 +412,8 @@ addScene("Banner Home", floorHeads.map((f) => {
 
 function sweepScene(n: string, l: [number, number], r: [number, number]): string {
   addScene(n, [
-    { id: trussHeads[0].id, pairs: [0, l[0], 2, l[1], 11, SHUTTER_OPEN] },
-    { id: trussHeads[1].id, pairs: [0, r[0], 2, r[1], 11, SHUTTER_OPEN] },
+    { id: trussHeads[0].id, pairs: [0, l[0], 2, l[1], 11, SHUTTER_OPEN, 13, 0] }, // 13,0 = LTP reclaim
+    { id: trussHeads[1].id, pairs: [0, r[0], 2, r[1], 11, SHUTTER_OPEN, 13, 0] },
   ], 800, 800);
   return n;
 }
@@ -420,8 +439,20 @@ addChaser("Circles", [
 // --- audio fallback + beat pulse ---------------------------------------------
 // Par sound-active mode (R8C7): the fixture's own mic drives its own program. Values from the
 // Rainbow Smart 2 Pro definition — ch8 220-255 "Sound active color", ch9 251-255 "Sound active".
-// Pars ONLY: a head in firmware sound mode would pan/tilt past every fence.
 addScene("Par Sound Mode", pars.map((f) => ({ id: f.id, pairs: [0, 255, 8, 240, 9, 253] })), 0, 0);
+
+// Truss sound-active mode (R8C6): the heads' own mics drive their firmware program. Chauvet
+// Intimidator Spot 375Z IRC, 15-channel mode, ch13 "Movement Macros": 136-255 is eight
+// Sound-Active programs in 16-wide bands (136 p1, 152 p2, 168 p3, 184 p4, 200 p5, 216 p6,
+// 232 p7, 248 p8). 144 sits mid-band on program 1 — change this one number to try another.
+//
+// TRUSS ONLY, and that is a safety decision, not a stylistic one. A head running a firmware
+// program IGNORES DMX pan/tilt, so scripts/floor-head-tilt.mjs cannot fence where the beam goes.
+// The truss pair is 8ft up over the dance floor, where sweeping is the whole point. The FLOOR
+// pair sits at ankle height pointed at the banner — turning those loose would rake the beam
+// across guests' eyes at close range, so they stay under DMX aim on the banner.
+const SOUND_PROGRAM = 144;
+addScene(SOUND_SCENE, trussHeads.map((f) => ({ id: f.id, pairs: [10, 255, 11, SHUTTER_OPEN, 13, SOUND_PROGRAM] })), 0, 0);
 // Beat Pulse — what the audio-trigger bass bar fires. Dimmer-only bump: HTP lifts the pars above
 // whatever the brightness row holds, then releases back. The look's colours are untouched.
 addScene("Beat Pulse", pars.map((f) => ({ id: f.id, pairs: [0, 255] })), 0, 180);
@@ -520,14 +551,16 @@ const DIM_ROW: { cap: string; fn: string; col: number; led: number; bg: number[]
   { cap: "Dim Full",    fn: "Dim Full",    col: 3, led: LED.gold,  bg: [255, 180, 40] },
   { cap: "Sync Strobe", fn: "Sync Strobe", col: 4, led: LED.white, bg: [230, 230, 230] },
 ];
-// R8 — utility, overlays whatever runs. C4 = SpeedDial tap, C6 = audio-trigger toggle,
-// C8 = page cycle: all three are INPUTS on other widgets, so they place no button here.
+// R8 — utility, overlays whatever runs. C4 = SpeedDial tap and C8 = page cycle are INPUTS on
+// other widgets, so they place no button here. C6 used to arm the QLC+ audio-trigger widget;
+// with the reactivity now coming from the fixtures' own mics (no AudioBox), it drives the heads.
 const UTIL_ROW: { cap: string; fn?: string; action: string; col: number; led: number; bg: number[] }[] = [
   { cap: "Blackout",  action: "Blackout", col: 0, led: LED.red,   bg: [40, 40, 40] },
-  { cap: "Panic",     fn: "Panic White",    action: "Toggle", col: 1, led: LED.white, bg: [255, 255, 255] },
-  { cap: "Banner",    fn: "Banner On",      action: "Toggle", col: 2, led: LED.uv,    bg: [160, 100, 255] },
-  { cap: "Strobe",    fn: "Strobe Burst",   action: "Flash",  col: 4, led: LED.white, bg: [220, 220, 220] },
-  { cap: "Par Sound", fn: "Par Sound Mode", action: "Toggle", col: 6, led: LED.amber, bg: [255, 140, 60] },
+  { cap: "Panic",     fn: "Panic White",    action: "Toggle", col: 1, led: LED.white,   bg: [255, 255, 255] },
+  { cap: "Banner",    fn: "Banner On",      action: "Toggle", col: 2, led: LED.uv,      bg: [160, 100, 255] },
+  { cap: "Strobe",    fn: "Strobe Burst",   action: "Flash",  col: 4, led: LED.white,   bg: [220, 220, 220] },
+  { cap: "Truss Sound", fn: "Truss Sound",  action: "Toggle", col: 5, led: LED.magenta, bg: [255, 80, 200] },
+  { cap: "Par Sound", fn: "Par Sound Mode", action: "Toggle", col: 6, led: LED.amber,   bg: [255, 140, 60] },
 ];
 
 PAGES.forEach((pg, pi) => {
@@ -664,7 +697,7 @@ ${fns}
 // (docs/qlc-xml-notes.md). Bar Type 2 = FunctionBar; thresholds are the QLC+ defaults (51/204),
 // tuned at soundcheck in the QLC+ UI. The AUDIO INPUT DEVICE is a per-machine QLC+ preference,
 // NOT part of this file — selecting the AudioBox is a SHOW-SETUP step.
-function audioTriggersXml(id: number, caption: string, x: number, y: number, togglePad: number, pulseFuncId: number, bars = 16): string {
+function audioTriggersXml(id: number, caption: string, x: number, y: number, togglePad: number | null, pulseFuncId: number, bars = 16): string {
   return `    <AudioTriggers Caption="${esc(caption)}" ID="${id}" BarsNumber="${bars}">
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -674,8 +707,7 @@ function audioTriggersXml(id: number, caption: string, x: number, y: number, tog
       <Font>Default</Font>
      </Appearance>
      <WindowState Visible="True" X="${x}" Y="${y}" Width="180" Height="160"/>
-     <Input Universe="1" Channel="${togglePad}"/>
-     <SpectrumBar Name="Bass" Type="2" MinThreshold="51" MaxThreshold="204" Divisor="1" Index="0" FunctionID="${pulseFuncId}"/>
+${togglePad === null ? "" : `     <Input Universe="1" Channel="${togglePad}"/>\n`}     <SpectrumBar Name="Bass" Type="2" MinThreshold="51" MaxThreshold="204" Divisor="1" Index="0" FunctionID="${pulseFuncId}"/>
     </AudioTriggers>`;
 }
 
@@ -699,23 +731,26 @@ const faderDefs: { id: number; caption: string; chans: { fixture: number; ch: nu
   { id: 905, caption: "Heads Zoom", chans: heads.map((f) => ({ fixture: f.id, ch: 14 })), value: 128, osc: "/heads_zoom" },
 ];
 const TAP_PAD = padCh(7, 3);    // R8C4 — SpeedDial tap
-const AUDIO_PAD = padCh(7, 5);  // R8C6 — audio-trigger enable
 const PAGE_PAD = padCh(7, 7);   // R8C8 — multipage next
 const tempoFuncIds = ["Sync Strobe", "Chase Gold Blue", "Chase Blue UV", "Chase Gold UV", "Rainbow Chase",
   "Rainbow Fast", "Fast Gold Blue", "Build Chase", "Sweep Wide", "Sweep Cross", "Sweep Punch", "Circles"]
   .map((n) => funcIdByName.get(n))
   .filter((v): v is number => v !== undefined);
 
-// Audio triggers are the one feature with a pre-agreed kill switch (spec: audio go/no-go).
-// PARTY_AUDIO=0 builds the show without the widget; tap tempo and the par sound-mode pad then
-// carry reactivity. Worth knowing: QLC+ stores the capture device as an APPLICATION preference,
-// so with none chosen it listens to the machine's default input — a laptop mic will drive the
-// beat pulse off room noise, which looks like the show flickering on its own.
-const AUDIO_TRIGGERS = process.env.PARTY_AUDIO !== "0";
+// Audio triggers are the one feature with a pre-agreed kill switch (spec: audio go/no-go), and the
+// switch is now OFF: the AudioBox is out for this show and reactivity comes from the fixtures' own
+// microphones (R8C6 Truss Sound, R8C7 Par Sound) plus tap tempo. That is not just a preference —
+// QLC+ stores the capture device as an APPLICATION preference, so a widget with no device chosen
+// listens to the machine's DEFAULT input. On this laptop that is the built-in mic, which would
+// drive the beat pulse off room noise and read as the show flickering on its own.
+//
+// PARTY_AUDIO=1 builds the widget back in, for the day an AudioBox is plugged in. It carries no
+// Launchpad input then — R8C6 belongs to the heads now — so arm it in the Virtual Console.
+const AUDIO_TRIGGERS = process.env.PARTY_AUDIO === "1";
 const fadersInner = [
   ...faderDefs.map((d, i) => sliderXml(d.id, d.caption, 12 + i * 72, d.chans, d.value, d.osc)),
   speedDialXml(920, "Tempo", 12, 348, TAP_PAD, tempoFuncIds, 500),
-  ...(AUDIO_TRIGGERS ? [audioTriggersXml(930, "Audio", 204, 348, AUDIO_PAD, funcIdByName.get("Beat Pulse")!)] : []),
+  ...(AUDIO_TRIGGERS ? [audioTriggersXml(930, "Audio", 204, 348, null, funcIdByName.get("Beat Pulse")!)] : []),
 ];
 const fadersFrame = frame("Frame", "FADERS", 9, 805, 8, 12 + faderDefs.length * 72, 520, fadersInner);
 
@@ -992,13 +1027,28 @@ and fires no look. On the keyboard, **PgDn / PgUp** also switch pages.
   These are the only functions that touch dimmers; looks set colour only. One at a time.
 - **R8 = utility.** Blackout · Panic (all white, full, ignores the dim row) · Banner on/off ·
   **R8C4 TAP TEMPO** (sets every chaser + Sync Strobe) · Strobe (HOLD, releases off) ·
-  **R8C6 audio-react on/off** · Par Sound Mode (fixtures' own mics — the break-glass fallback) ·
-  **R8C8 page**. C4, C6 and C8 fire no look: they are inputs on the tempo dial, the audio-trigger
-  widget and the page frame.
+  **R8C6 Truss Sound** · **R8C7 Par Sound** · **R8C8 page**. C4 and C8 fire no look: they are
+  inputs on the tempo dial and the page frame.
+
+**Audio reactivity is the fixtures' own microphones**, not a feed into QLC+. **R8C7 Par Sound**
+hands the pars to their internal mic; **R8C6 Truss Sound** puts the two truss heads into
+Sound-Active program 1 (ch13 = ${SOUND_PROGRAM}). Tap tempo still drives every chase, so a tapped
+beat and the mics can run together.
+
+> **To take a fixture back, press a look — not the sound pad again.** QLC+ is HTP only on
+> intensity channels; every other channel is LTP and keeps its last value after the function that
+> set it stops, so re-pressing R8C6 or R8C7 leaves the fixture on its microphone. Every look
+> writes the sound channels back to zero (par ch9, head ch13), and so do **Panic**, **Truss Home**
+> and every sweep. One rule: **any look press takes the fixtures back.**
+
+> **Truss heads only, and that is deliberate.** A head running a firmware program ignores DMX
+> pan/tilt, so nothing can fence where its beam lands. The truss pair is 8ft up over the dance
+> floor where sweeping is the point. The floor pair is at ankle height aimed at the banner —
+> loose, it would rake guests' eyes at close range — so it stays under DMX aim.
 
 ${pageSections}
 Pads glow at ~30% in their look colour when idle and jump to 100% while running. To the right of the
-grid: the **Heads Zoom** fader, the **Tempo** dial, and the **Audio** trigger widget.
+grid: the **Heads Zoom** fader and the **Tempo** dial.
 
 > **Why only one fader.** A QLC+ Level slider does not blend with scenes — it owns its channels and
 > forces its value out. Dim / UV / strobe faders therefore fought the pads and won, pinning the rig
@@ -1017,8 +1067,12 @@ ${lookIndex()}
 - **Launchpad** (MIDI): the 8x8 grid above. Requires Programmer Mode — see SHOW-SETUP.md.
 - **MCP / dashboard** (OSC): every look has an OSC path = \`/\` + lowercase name, spaces -> \`_\`.
   Bindings are pre-baked (CRC-16 of the path); no Auto-Detect needed.
-- **Audio input device is a QLC+ preference, not part of this file** — select the AudioBox USB96
-  in QLC+ once on the show machine or the audio triggers do nothing.
+- **No audio feed into QLC+ for this show.** Reactivity comes from the fixtures' built-in mics
+  (R8C6 / R8C7). The QLC+ audio-trigger widget is deliberately not built: its capture device is a
+  **QLC+ preference, not part of this file**, so with none chosen it listens to the machine's
+  default input — the laptop mic — and pulses the pars off room noise. To bring it back the day an
+  AudioBox USB96 is patched in: \`PARTY_AUDIO=1 npm run generate\`, then select the AudioBox in
+  QLC+ and arm the widget in the Virtual Console (it has no Launchpad pad; R8C6 is the heads).
 `;
 
 writeFileSync(path.join(OUT, "PATCH-CHART.md"), chart, "utf8");

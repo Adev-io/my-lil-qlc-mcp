@@ -43,9 +43,24 @@ and fires no look. On the keyboard, **PgDn / PgUp** also switch pages.
   These are the only functions that touch dimmers; looks set colour only. One at a time.
 - **R8 = utility.** Blackout · Panic (all white, full, ignores the dim row) · Banner on/off ·
   **R8C4 TAP TEMPO** (sets every chaser + Sync Strobe) · Strobe (HOLD, releases off) ·
-  **R8C6 audio-react on/off** · Par Sound Mode (fixtures' own mics — the break-glass fallback) ·
-  **R8C8 page**. C4, C6 and C8 fire no look: they are inputs on the tempo dial, the audio-trigger
-  widget and the page frame.
+  **R8C6 Truss Sound** · **R8C7 Par Sound** · **R8C8 page**. C4 and C8 fire no look: they are
+  inputs on the tempo dial and the page frame.
+
+**Audio reactivity is the fixtures' own microphones**, not a feed into QLC+. **R8C7 Par Sound**
+hands the pars to their internal mic; **R8C6 Truss Sound** puts the two truss heads into
+Sound-Active program 1 (ch13 = 144). Tap tempo still drives every chase, so a tapped
+beat and the mics can run together.
+
+> **To take a fixture back, press a look — not the sound pad again.** QLC+ is HTP only on
+> intensity channels; every other channel is LTP and keeps its last value after the function that
+> set it stops, so re-pressing R8C6 or R8C7 leaves the fixture on its microphone. Every look
+> writes the sound channels back to zero (par ch9, head ch13), and so do **Panic**, **Truss Home**
+> and every sweep. One rule: **any look press takes the fixtures back.**
+
+> **Truss heads only, and that is deliberate.** A head running a firmware program ignores DMX
+> pan/tilt, so nothing can fence where its beam lands. The truss pair is 8ft up over the dance
+> floor where sweeping is the point. The floor pair is at ankle height aimed at the banner —
+> loose, it would rake guests' eyes at close range — so it stays under DMX aim.
 
 ### Page 1 — INTRO · doors, build, grand entrance
 ```
@@ -63,7 +78,7 @@ and fires no look. On the keyboard, **PgDn / PgUp** also switch pages.
   ------------------------------------------------------------------------------------------------------------------------
   | Dim 25 P1    | Dim 50 P1    | Dim 75 P1    | Dim Full P1  | Sync Strobe  |              |              |              |
   ------------------------------------------------------------------------------------------------------------------------
-  | Blackout P1  | Panic P1     | Banner P1    |              | Strobe P1    |              | Par Sound P1 |              |
+  | Blackout P1  | Panic P1     | Banner P1    |              | Strobe P1    | Truss Sound  | Par Sound P1 |              |
 ```
 
 ### Page 2 — DINNER · static ambient, zero motion
@@ -82,7 +97,7 @@ and fires no look. On the keyboard, **PgDn / PgUp** also switch pages.
   ------------------------------------------------------------------------------------------------------------------------
   | Dim 25 P2    | Dim 50 P2    | Dim 75 P2    | Dim Full P2  | Sync Strobe  |              |              |              |
   ------------------------------------------------------------------------------------------------------------------------
-  | Blackout P2  | Panic P2     | Banner P2    |              | Strobe P2    |              | Par Sound P2 |              |
+  | Blackout P2  | Panic P2     | Banner P2    |              | Strobe P2    | Truss Sound  | Par Sound P2 |              |
 ```
 
 ### Page 3 — SPEECHES · calm, banner featured
@@ -101,7 +116,7 @@ and fires no look. On the keyboard, **PgDn / PgUp** also switch pages.
   ------------------------------------------------------------------------------------------------------------------------
   | Dim 25 P3    | Dim 50 P3    | Dim 75 P3    | Dim Full P3  | Sync Strobe  |              |              |              |
   ------------------------------------------------------------------------------------------------------------------------
-  | Blackout P3  | Panic P3     | Banner P3    |              | Strobe P3    |              | Par Sound P3 |              |
+  | Blackout P3  | Panic P3     | Banner P3    |              | Strobe P3    | Truss Sound  | Par Sound P3 |              |
 ```
 
 ### Page 4 — HORA · lift the chairs
@@ -120,7 +135,7 @@ and fires no look. On the keyboard, **PgDn / PgUp** also switch pages.
   ------------------------------------------------------------------------------------------------------------------------
   | Dim 25 P4    | Dim 50 P4    | Dim 75 P4    | Dim Full P4  | Sync Strobe  |              |              |              |
   ------------------------------------------------------------------------------------------------------------------------
-  | Blackout P4  | Panic P4     | Banner P4    |              | Strobe P4    |              | Par Sound P4 |              |
+  | Blackout P4  | Panic P4     | Banner P4    |              | Strobe P4    | Truss Sound  | Par Sound P4 |              |
 ```
 
 ### Page 5 — PARTY · the dance floor
@@ -139,11 +154,11 @@ and fires no look. On the keyboard, **PgDn / PgUp** also switch pages.
   ------------------------------------------------------------------------------------------------------------------------
   | Dim 25 P5    | Dim 50 P5    | Dim 75 P5    | Dim Full P5  | Sync Strobe  |              |              |              |
   ------------------------------------------------------------------------------------------------------------------------
-  | Blackout P5  | Panic P5     | Banner P5    |              | Strobe P5    |              | Par Sound P5 |              |
+  | Blackout P5  | Panic P5     | Banner P5    |              | Strobe P5    | Truss Sound  | Par Sound P5 |              |
 ```
 
 Pads glow at ~30% in their look colour when idle and jump to 100% while running. To the right of the
-grid: the **Heads Zoom** fader, the **Tempo** dial, and the **Audio** trigger widget.
+grid: the **Heads Zoom** fader and the **Tempo** dial.
 
 > **Why only one fader.** A QLC+ Level slider does not blend with scenes — it owns its channels and
 > forces its value out. Dim / UV / strobe faders therefore fought the pads and won, pinning the rig
@@ -170,6 +185,7 @@ R1C1); **Pad** = the Launchpad MIDI channel; **OSC** = the dashboard path.
 | Panic P1 | 1 | R8C2 | 140 | `/panic_p1_r8c2` |
 | Banner P1 | 1 | R8C3 | 141 | `/banner_p1_r8c3` |
 | Strobe P1 | 1 | R8C5 | 143 | `/strobe_p1_r8c5` |
+| Truss Sound P1 | 1 | R8C6 | 144 | `/truss_sound_p1_r8c6` |
 | Par Sound P1 | 1 | R8C7 | 145 | `/par_sound_p1_r8c7` |
 | Gold Wall | 2 | R1C1 | 209 | `/gold_wall_r1c1` |
 | Blue Wall | 2 | R1C2 | 210 | `/blue_wall_r1c2` |
@@ -187,6 +203,7 @@ R1C1); **Pad** = the Launchpad MIDI channel; **OSC** = the dashboard path.
 | Panic P2 | 2 | R8C2 | 140 | `/panic_p2_r8c2` |
 | Banner P2 | 2 | R8C3 | 141 | `/banner_p2_r8c3` |
 | Strobe P2 | 2 | R8C5 | 143 | `/strobe_p2_r8c5` |
+| Truss Sound P2 | 2 | R8C6 | 144 | `/truss_sound_p2_r8c6` |
 | Par Sound P2 | 2 | R8C7 | 145 | `/par_sound_p2_r8c7` |
 | Banner Bright | 3 | R1C1 | 209 | `/banner_bright_r1c1` |
 | Wall Low | 3 | R1C2 | 210 | `/wall_low_r1c2` |
@@ -202,6 +219,7 @@ R1C1); **Pad** = the Launchpad MIDI channel; **OSC** = the dashboard path.
 | Panic P3 | 3 | R8C2 | 140 | `/panic_p3_r8c2` |
 | Banner P3 | 3 | R8C3 | 141 | `/banner_p3_r8c3` |
 | Strobe P3 | 3 | R8C5 | 143 | `/strobe_p3_r8c5` |
+| Truss Sound P3 | 3 | R8C6 | 144 | `/truss_sound_p3_r8c6` |
 | Par Sound P3 | 3 | R8C7 | 145 | `/par_sound_p3_r8c7` |
 | Gold Blue Full | 4 | R1C1 | 209 | `/gold_blue_full_r1c1` |
 | Circles | 4 | R1C2 | 210 | `/circles_r1c2` |
@@ -216,6 +234,7 @@ R1C1); **Pad** = the Launchpad MIDI channel; **OSC** = the dashboard path.
 | Panic P4 | 4 | R8C2 | 140 | `/panic_p4_r8c2` |
 | Banner P4 | 4 | R8C3 | 141 | `/banner_p4_r8c3` |
 | Strobe P4 | 4 | R8C5 | 143 | `/strobe_p4_r8c5` |
+| Truss Sound P4 | 4 | R8C6 | 144 | `/truss_sound_p4_r8c6` |
 | Par Sound P4 | 4 | R8C7 | 145 | `/par_sound_p4_r8c7` |
 | GB Chase | 5 | R1C1 | 209 | `/gb_chase_r1c1` |
 | Blue UV | 5 | R1C2 | 210 | `/blue_uv_r1c2` |
@@ -235,6 +254,7 @@ R1C1); **Pad** = the Launchpad MIDI channel; **OSC** = the dashboard path.
 | Panic P5 | 5 | R8C2 | 140 | `/panic_p5_r8c2` |
 | Banner P5 | 5 | R8C3 | 141 | `/banner_p5_r8c3` |
 | Strobe P5 | 5 | R8C5 | 143 | `/strobe_p5_r8c5` |
+| Truss Sound P5 | 5 | R8C6 | 144 | `/truss_sound_p5_r8c6` |
 | Par Sound P5 | 5 | R8C7 | 145 | `/par_sound_p5_r8c7` |
 
 ## Control surfaces
@@ -242,5 +262,9 @@ R1C1); **Pad** = the Launchpad MIDI channel; **OSC** = the dashboard path.
 - **Launchpad** (MIDI): the 8x8 grid above. Requires Programmer Mode — see SHOW-SETUP.md.
 - **MCP / dashboard** (OSC): every look has an OSC path = `/` + lowercase name, spaces -> `_`.
   Bindings are pre-baked (CRC-16 of the path); no Auto-Detect needed.
-- **Audio input device is a QLC+ preference, not part of this file** — select the AudioBox USB96
-  in QLC+ once on the show machine or the audio triggers do nothing.
+- **No audio feed into QLC+ for this show.** Reactivity comes from the fixtures' built-in mics
+  (R8C6 / R8C7). The QLC+ audio-trigger widget is deliberately not built: its capture device is a
+  **QLC+ preference, not part of this file**, so with none chosen it listens to the machine's
+  default input — the laptop mic — and pulses the pars off room noise. To bring it back the day an
+  AudioBox USB96 is patched in: `PARTY_AUDIO=1 npm run generate`, then select the AudioBox in
+  QLC+ and arm the widget in the Virtual Console (it has no Launchpad pad; R8C6 is the heads).

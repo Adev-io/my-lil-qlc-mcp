@@ -158,6 +158,18 @@
       "momentary": true
     },
     {
+      "note": 16,
+      "crc": 16245,
+      "path": "/truss_sound_p1_r8c6",
+      "page": 0,
+      "rgb": [
+        255,
+        80,
+        200
+      ],
+      "momentary": false
+    },
+    {
       "note": 17,
       "crc": 22275,
       "path": "/par_sound_p1_r8c7",
@@ -362,6 +374,18 @@
       "momentary": true
     },
     {
+      "note": 16,
+      "crc": 13064,
+      "path": "/truss_sound_p2_r8c6",
+      "page": 1,
+      "rgb": [
+        255,
+        80,
+        200
+      ],
+      "momentary": false
+    },
+    {
       "note": 17,
       "crc": 23422,
       "path": "/par_sound_p2_r8c7",
@@ -542,6 +566,18 @@
       "momentary": true
     },
     {
+      "note": 16,
+      "crc": 14115,
+      "path": "/truss_sound_p3_r8c6",
+      "page": 2,
+      "rgb": [
+        255,
+        80,
+        200
+      ],
+      "momentary": false
+    },
+    {
       "note": 17,
       "crc": 24405,
       "path": "/par_sound_p3_r8c7",
@@ -708,6 +744,18 @@
         220
       ],
       "momentary": true
+    },
+    {
+      "note": 16,
+      "crc": 11250,
+      "path": "/truss_sound_p4_r8c6",
+      "page": 3,
+      "rgb": [
+        255,
+        80,
+        200
+      ],
+      "momentary": false
     },
     {
       "note": 17,
@@ -936,6 +984,18 @@
         220
       ],
       "momentary": true
+    },
+    {
+      "note": 16,
+      "crc": 12249,
+      "path": "/truss_sound_p5_r8c6",
+      "page": 4,
+      "rgb": [
+        255,
+        80,
+        200
+      ],
+      "momentary": false
     },
     {
       "note": 17,

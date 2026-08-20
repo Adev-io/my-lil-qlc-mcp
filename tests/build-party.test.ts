@@ -75,7 +75,7 @@ describe("party generator — looks", () => {
   it("builds the dynamics: dim presets, strobes, chases, sweeps, positions, sound fallback", () => {
     for (const fn of ["Dim 25", "Dim 50", "Dim 75", "Dim Full", "Strobe Burst", "Sync Strobe",
       "Chase Gold Blue", "Chase Blue UV", "Chase Gold UV", "Rainbow Chase", "Rainbow Fast",
-      "UV Blacklight", "Sweep Wide", "Sweep Cross", "Sweep Punch", "Par Sound Mode", "Beat Pulse",
+      "UV Blacklight", "Sweep Wide", "Sweep Cross", "Sweep Punch", "Par Sound Mode", "Truss Sound", "Beat Pulse",
       "Circles", "Fast Gold Blue", "White Burst", "Gold Blue Full", "Entrance", "Build Chase",
       "Truss Home", "Speaker Light", "Banner Home"])
       expect(raw).toContain(`Name="${fn}"`);
@@ -126,13 +126,50 @@ describe("party generator — looks", () => {
     for (const id of [10, 11, 12, 13]) expect(sceneXml("Par Sound Mode")).not.toContain(`<FixtureVal ID="${id}">`);
   });
 
-  it("SAFETY: no scene ever sets a head movement macro (ch13)", () => {
+  it("SAFETY: 'Truss Sound' is the ONLY scene allowed to set a head movement macro (ch13)", () => {
+    // A head running a firmware program ignores DMX pan/tilt, so the fence in
+    // scripts/floor-head-tilt.mjs cannot constrain where its beam lands. Exactly one scene gets
+    // that licence, and only on the truss pair (fx 10/11) — never the floor pair aimed at the
+    // banner at ankle height (fx 12/13).
     for (const sc of raw.matchAll(/Type="Scene" Name="([^"]*)"[^]*?<\/Function>/g))
       for (const f of sc[0].matchAll(/<FixtureVal ID="(1[0-3])">([^<]*)</g)) {
         const nums = f[2].split(",").map(Number);
-        for (let k = 0; k + 1 < nums.length; k += 2)
-          if (nums[k] === 13) expect(nums[k + 1], `${sc[1]} fx${f[1]}`).toBe(0);
+        for (let k = 0; k + 1 < nums.length; k += 2) {
+          if (nums[k] !== 13) continue;
+          if (sc[1] === "Truss Sound" && (f[1] === "10" || f[1] === "11")) {
+            expect(nums[k + 1], `${sc[1]} fx${f[1]}`).toBeGreaterThanOrEqual(136); // sound-active band
+          } else {
+            expect(nums[k + 1], `${sc[1]} fx${f[1]}`).toBe(0);
+          }
+        }
       }
+  });
+
+  it("LTP RECLAIM: looks zero the sound channels, so a look press takes fixtures off their mics", () => {
+    // QLC+ is HTP only on intensity channels; everything else is LTP and keeps its last value
+    // when the function that set it stops. Without this, pressing R8C6/R8C7 a second time leaves
+    // the fixture on its microphone forever. Verified on the rig 2026-08-20.
+    const pairOf = (s: string, ch: number): number | null => {
+      const n = s.split(",").map(Number);
+      const i = n.indexOf(ch);
+      return i < 0 || i % 2 === 1 ? null : n[i + 1];
+    };
+    for (const look of ["Gold Wall", "Blue Wall", "UV Accent", "Doors Blue", "Panic White"])
+      expect(pairOf(fv(look, 0), 9), `${look} par ch9`).toBe(0);
+    for (const look of ["Gold Wall", "Blue Wall", "UV Accent", "Panic White", "Truss Home", "Speaker Light", "SwW A"])
+      expect(pairOf(fv(look, 10), 13), `${look} truss ch13`).toBe(0);
+  });
+
+  it("Truss Sound hands the truss pair to their own mics, lit, and never touches the floor pair", () => {
+    // Chauvet 375Z IRC 15ch: ch13 136-255 = Sound-Active programs 1-8 in 16-wide bands.
+    for (const id of [10, 11]) {
+      const s = fv("Truss Sound", id).split(",").map(Number);
+      const macro = s[s.indexOf(13) + 1];
+      expect(macro, `truss fx${id} macro`).toBeGreaterThanOrEqual(136);
+      expect(s[s.indexOf(10) + 1], `truss fx${id} dimmer`).toBe(255); // lit if the head honours it
+      expect(s.indexOf(11), `truss fx${id} shutter`).toBeGreaterThanOrEqual(0);
+    }
+    for (const id of [12, 13]) expect(sceneXml("Truss Sound")).not.toContain(`<FixtureVal ID="${id}">`);
   });
 
   it("SAFETY: floor heads only ever aim upstage at the banner (tilt above horizontal)", () => {
@@ -159,7 +196,7 @@ describe("party VC — 5 pages, shared rows, faders, tempo, audio", () => {
     for (const pg of [1, 2, 3, 4, 5]) {
       for (const cap of ["Dim 25", "Dim 50", "Dim 75", "Dim Full", "Sync Strobe"])
         expect(baseNames, `R7 page ${pg}`).toContain(`${cap} P${pg}`);
-      for (const cap of ["Blackout", "Panic", "Banner", "Strobe", "Par Sound"])
+      for (const cap of ["Blackout", "Panic", "Banner", "Strobe", "Truss Sound", "Par Sound"])
         expect(baseNames, `R8 page ${pg}`).toContain(`${cap} P${pg}`);
     }
   });
@@ -172,8 +209,9 @@ describe("party VC — 5 pages, shared rows, faders, tempo, audio", () => {
     }
   });
 
-  it("leaves R8C4 (tap), R8C6 (audio) and R8C8 (page) free of look buttons", () => {
-    const utilPads = names.filter((n) => / R8C[468]$/.test(n));
+  it("leaves R8C4 (tap) and R8C8 (page) free of look buttons", () => {
+    // R8C6 used to be the audio-trigger arm pad; it is the Truss Sound toggle now.
+    const utilPads = names.filter((n) => / R8C[48]$/.test(n));
     expect(utilPads).toEqual([]);
   });
 
@@ -263,15 +301,13 @@ describe("party VC — 5 pages, shared rows, faders, tempo, audio", () => {
     }
   });
 
-  it("emits the AudioTriggers widget: bass bar -> Beat Pulse, enable on R8C6 (pad 144)", () => {
-    const at = raw.match(/<AudioTriggers[^]*?<\/AudioTriggers>/)?.[0] || "";
-    expect(at).toContain('BarsNumber="16"');
-    expect(at).toContain('<Input Universe="1" Channel="144"/>');
-    const pulseId = raw.match(/<Function ID="(\d+)" Type="Scene" Name="Beat Pulse">/)?.[1];
-    expect(pulseId).toBeTruthy();
-    expect(at).toContain(`Type="2"`);                    // FunctionBar
-    expect(at).toContain(`FunctionID="${pulseId}"`);
-    expect(at).toContain('Index="0"');                   // lowest band = bass
+  it("builds NO AudioTriggers widget by default — reactivity is the fixtures' own mics", () => {
+    // QLC+ stores the capture device as an application preference, so a widget with none chosen
+    // listens to the machine's default input (the laptop mic) and pulses the pars off room noise.
+    // No AudioBox for this show => no widget. PARTY_AUDIO=1 builds it back in, without a pad.
+    expect(raw).not.toContain("<AudioTriggers");
+    // R8C6 (pad 144) is the Truss Sound toggle now, on every page.
+    for (const pg of [1, 2, 3, 4, 5]) expect(padChOf(`Truss Sound P${pg}`)).toBe(144);
   });
 
   it("Beat Pulse bumps only par dimmers, so audio reactivity never overrides look colours", () => {
@@ -297,8 +333,11 @@ describe("party generator — Launchpad LED map", () => {
     }
   });
 
-  it("never lights the three input-only pads (notes 14, 16, 18 on the bottom row)", () => {
-    for (const n of [14, 16, 18]) expect(pads.map((p) => p.note)).not.toContain(n);
+  it("never lights the two input-only pads (notes 14 tap, 18 page, on the bottom row)", () => {
+    // Note 16 (R8C6) was the third one while it armed the audio-trigger widget; it is the
+    // Truss Sound toggle now, so it lights like any other button.
+    for (const n of [14, 18]) expect(pads.map((p) => p.note)).not.toContain(n);
+    expect(pads.map((p) => p.note)).toContain(16);
   });
 
   it("flags the hold-strobe pads momentary and toggles not", () => {

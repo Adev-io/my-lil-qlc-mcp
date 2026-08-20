@@ -13,12 +13,12 @@
     <Input Plugin="OSC" UID="None" Line="0"/>
     <Output Plugin="ArtNet" UID="None" Line="0">
      <PluginParameters outputUni="0" transmitMode="Standard"/>
-    </Output><!-- no outputIP -&gt; broadcast. Pknight CR011R node at 10.201.6.100/24 via USB GbE NIC (static 10.201.6.1/24). Controller UIDs VERIFIED 2026-08-20 against live winmm enumeration: MIDI IN [3] and MIDI OUT [4] are both named 'LPMiniMK3 MIDI'. Old 2/3 pointed at FLStudioMCP virtual ports - that was the haunted-rig bug. start-show.ps1 now re-checks name-&gt;index every launch. -->
+    </Output><!-- no outputIP -&gt; broadcast. Pknight CR011R node at 10.201.6.100/24 via USB GbE NIC (static 10.201.6.1/24). Controller UIDs are winmm device INDEXES and they MOVE - seen twice on 2026-08-20 (old 2/3 pointed at FLStudioMCP virtual ports, the haunted-rig bug; then plugging in a Minilab3 pushed the Launchpad 3-&gt;7). DO NOT hand-tune these: start-show.ps1 resolves 'LPMiniMK3 MIDI' by name every launch and rewrites both this file and the .qxw to match. -->
     <Feedback Plugin="OSC" UID="None" Line="0"/>
    </Universe>
    <Universe Name="Launchpad" ID="1" Profile="Novation Launchpad Mini MK3">
-    <Input Plugin="MIDI" UID="3" Line="3"/>
-    <Feedback Plugin="MIDI" UID="4" Line="4"/>
+    <Input Plugin="MIDI" UID="7" Line="7"/>
+    <Feedback Plugin="MIDI" UID="8" Line="8"/>
    </Universe>
   </InputOutputMap>
   <Fixture>
@@ -163,151 +163,151 @@
   </Fixture>
   <Function ID="0" Type="Scene" Name="Gold Wall">
    <Speed FadeIn="300" FadeOut="300" Duration="0"/>
-   <FixtureVal ID="0">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="1">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="2">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="3">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="4">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="5">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="6">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="7">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="8">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="9">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="10">5,8</FixtureVal>
-   <FixtureVal ID="11">5,8</FixtureVal>
+   <FixtureVal ID="0">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="1">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="2">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="3">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="4">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="5">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="6">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="7">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="8">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="9">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="10">5,8,13,0</FixtureVal>
+   <FixtureVal ID="11">5,8,13,0</FixtureVal>
   </Function>
   <Function ID="1" Type="Scene" Name="Blue Wall">
    <Speed FadeIn="300" FadeOut="300" Duration="0"/>
-   <FixtureVal ID="0">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="1">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="2">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="3">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="4">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="5">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="6">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="7">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="8">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="9">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="10">5,24</FixtureVal>
-   <FixtureVal ID="11">5,24</FixtureVal>
+   <FixtureVal ID="0">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="1">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="2">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="3">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="4">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="5">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="6">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="7">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="8">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="9">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="10">5,24,13,0</FixtureVal>
+   <FixtureVal ID="11">5,24,13,0</FixtureVal>
   </Function>
   <Function ID="2" Type="Scene" Name="Gold Blue Alt">
    <Speed FadeIn="300" FadeOut="300" Duration="0"/>
-   <FixtureVal ID="0">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="1">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="2">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="3">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="4">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="5">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="6">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="7">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="8">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="9">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="10">5,8</FixtureVal>
-   <FixtureVal ID="11">5,8</FixtureVal>
+   <FixtureVal ID="0">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="1">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="2">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="3">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="4">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="5">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="6">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="7">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="8">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="9">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="10">5,8,13,0</FixtureVal>
+   <FixtureVal ID="11">5,8,13,0</FixtureVal>
   </Function>
   <Function ID="3" Type="Scene" Name="Soft Amber">
    <Speed FadeIn="300" FadeOut="300" Duration="0"/>
-   <FixtureVal ID="0">1,0,2,179,3,42,4,0,5,0,6,154,7,0,8,0</FixtureVal>
-   <FixtureVal ID="1">1,0,2,179,3,42,4,0,5,0,6,154,7,0,8,0</FixtureVal>
-   <FixtureVal ID="2">1,0,2,179,3,42,4,0,5,0,6,154,7,0,8,0</FixtureVal>
-   <FixtureVal ID="3">1,0,2,179,3,42,4,0,5,0,6,154,7,0,8,0</FixtureVal>
-   <FixtureVal ID="4">1,0,2,179,3,42,4,0,5,0,6,154,7,0,8,0</FixtureVal>
-   <FixtureVal ID="5">1,0,2,179,3,42,4,0,5,0,6,154,7,0,8,0</FixtureVal>
-   <FixtureVal ID="6">1,0,2,179,3,42,4,0,5,0,6,154,7,0,8,0</FixtureVal>
-   <FixtureVal ID="7">1,0,2,179,3,42,4,0,5,0,6,154,7,0,8,0</FixtureVal>
-   <FixtureVal ID="8">1,0,2,179,3,42,4,0,5,0,6,154,7,0,8,0</FixtureVal>
-   <FixtureVal ID="9">1,0,2,179,3,42,4,0,5,0,6,154,7,0,8,0</FixtureVal>
-   <FixtureVal ID="10">5,8</FixtureVal>
-   <FixtureVal ID="11">5,8</FixtureVal>
+   <FixtureVal ID="0">1,0,2,179,3,42,4,0,5,0,6,154,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="1">1,0,2,179,3,42,4,0,5,0,6,154,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="2">1,0,2,179,3,42,4,0,5,0,6,154,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="3">1,0,2,179,3,42,4,0,5,0,6,154,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="4">1,0,2,179,3,42,4,0,5,0,6,154,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="5">1,0,2,179,3,42,4,0,5,0,6,154,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="6">1,0,2,179,3,42,4,0,5,0,6,154,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="7">1,0,2,179,3,42,4,0,5,0,6,154,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="8">1,0,2,179,3,42,4,0,5,0,6,154,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="9">1,0,2,179,3,42,4,0,5,0,6,154,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="10">5,8,13,0</FixtureVal>
+   <FixtureVal ID="11">5,8,13,0</FixtureVal>
   </Function>
   <Function ID="4" Type="Scene" Name="Warm White">
    <Speed FadeIn="300" FadeOut="300" Duration="0"/>
-   <FixtureVal ID="0">1,0,2,255,3,140,4,40,5,200,6,120,7,0,8,0</FixtureVal>
-   <FixtureVal ID="1">1,0,2,255,3,140,4,40,5,200,6,120,7,0,8,0</FixtureVal>
-   <FixtureVal ID="2">1,0,2,255,3,140,4,40,5,200,6,120,7,0,8,0</FixtureVal>
-   <FixtureVal ID="3">1,0,2,255,3,140,4,40,5,200,6,120,7,0,8,0</FixtureVal>
-   <FixtureVal ID="4">1,0,2,255,3,140,4,40,5,200,6,120,7,0,8,0</FixtureVal>
-   <FixtureVal ID="5">1,0,2,255,3,140,4,40,5,200,6,120,7,0,8,0</FixtureVal>
-   <FixtureVal ID="6">1,0,2,255,3,140,4,40,5,200,6,120,7,0,8,0</FixtureVal>
-   <FixtureVal ID="7">1,0,2,255,3,140,4,40,5,200,6,120,7,0,8,0</FixtureVal>
-   <FixtureVal ID="8">1,0,2,255,3,140,4,40,5,200,6,120,7,0,8,0</FixtureVal>
-   <FixtureVal ID="9">1,0,2,255,3,140,4,40,5,200,6,120,7,0,8,0</FixtureVal>
-   <FixtureVal ID="10">5,0</FixtureVal>
-   <FixtureVal ID="11">5,0</FixtureVal>
+   <FixtureVal ID="0">1,0,2,255,3,140,4,40,5,200,6,120,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="1">1,0,2,255,3,140,4,40,5,200,6,120,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="2">1,0,2,255,3,140,4,40,5,200,6,120,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="3">1,0,2,255,3,140,4,40,5,200,6,120,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="4">1,0,2,255,3,140,4,40,5,200,6,120,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="5">1,0,2,255,3,140,4,40,5,200,6,120,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="6">1,0,2,255,3,140,4,40,5,200,6,120,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="7">1,0,2,255,3,140,4,40,5,200,6,120,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="8">1,0,2,255,3,140,4,40,5,200,6,120,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="9">1,0,2,255,3,140,4,40,5,200,6,120,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="10">5,0,13,0</FixtureVal>
+   <FixtureVal ID="11">5,0,13,0</FixtureVal>
   </Function>
   <Function ID="5" Type="Scene" Name="UV Accent">
    <Speed FadeIn="300" FadeOut="300" Duration="0"/>
-   <FixtureVal ID="0">1,0,2,0,3,0,4,20,5,0,6,0,7,128,8,0</FixtureVal>
-   <FixtureVal ID="1">1,0,2,0,3,0,4,20,5,0,6,0,7,128,8,0</FixtureVal>
-   <FixtureVal ID="2">1,0,2,0,3,0,4,20,5,0,6,0,7,128,8,0</FixtureVal>
-   <FixtureVal ID="3">1,0,2,0,3,0,4,20,5,0,6,0,7,128,8,0</FixtureVal>
-   <FixtureVal ID="4">1,0,2,0,3,0,4,20,5,0,6,0,7,128,8,0</FixtureVal>
-   <FixtureVal ID="5">1,0,2,0,3,0,4,20,5,0,6,0,7,128,8,0</FixtureVal>
-   <FixtureVal ID="6">1,0,2,0,3,0,4,20,5,0,6,0,7,128,8,0</FixtureVal>
-   <FixtureVal ID="7">1,0,2,0,3,0,4,20,5,0,6,0,7,128,8,0</FixtureVal>
-   <FixtureVal ID="8">1,0,2,0,3,0,4,20,5,0,6,0,7,128,8,0</FixtureVal>
-   <FixtureVal ID="9">1,0,2,0,3,0,4,20,5,0,6,0,7,128,8,0</FixtureVal>
-   <FixtureVal ID="10">5,50</FixtureVal>
-   <FixtureVal ID="11">5,50</FixtureVal>
+   <FixtureVal ID="0">1,0,2,0,3,0,4,20,5,0,6,0,7,128,8,0,9,0</FixtureVal>
+   <FixtureVal ID="1">1,0,2,0,3,0,4,20,5,0,6,0,7,128,8,0,9,0</FixtureVal>
+   <FixtureVal ID="2">1,0,2,0,3,0,4,20,5,0,6,0,7,128,8,0,9,0</FixtureVal>
+   <FixtureVal ID="3">1,0,2,0,3,0,4,20,5,0,6,0,7,128,8,0,9,0</FixtureVal>
+   <FixtureVal ID="4">1,0,2,0,3,0,4,20,5,0,6,0,7,128,8,0,9,0</FixtureVal>
+   <FixtureVal ID="5">1,0,2,0,3,0,4,20,5,0,6,0,7,128,8,0,9,0</FixtureVal>
+   <FixtureVal ID="6">1,0,2,0,3,0,4,20,5,0,6,0,7,128,8,0,9,0</FixtureVal>
+   <FixtureVal ID="7">1,0,2,0,3,0,4,20,5,0,6,0,7,128,8,0,9,0</FixtureVal>
+   <FixtureVal ID="8">1,0,2,0,3,0,4,20,5,0,6,0,7,128,8,0,9,0</FixtureVal>
+   <FixtureVal ID="9">1,0,2,0,3,0,4,20,5,0,6,0,7,128,8,0,9,0</FixtureVal>
+   <FixtureVal ID="10">5,50,13,0</FixtureVal>
+   <FixtureVal ID="11">5,50,13,0</FixtureVal>
   </Function>
   <Function ID="6" Type="Scene" Name="Doors Blue">
    <Speed FadeIn="300" FadeOut="300" Duration="0"/>
-   <FixtureVal ID="0">1,0,2,0,3,24,4,153,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="1">1,0,2,0,3,24,4,153,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="2">1,0,2,0,3,24,4,153,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="3">1,0,2,0,3,24,4,153,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="4">1,0,2,0,3,24,4,153,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="5">1,0,2,0,3,24,4,153,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="6">1,0,2,0,3,24,4,153,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="7">1,0,2,0,3,24,4,153,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="8">1,0,2,0,3,24,4,153,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="9">1,0,2,0,3,24,4,153,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="10">5,24</FixtureVal>
-   <FixtureVal ID="11">5,24</FixtureVal>
+   <FixtureVal ID="0">1,0,2,0,3,24,4,153,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="1">1,0,2,0,3,24,4,153,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="2">1,0,2,0,3,24,4,153,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="3">1,0,2,0,3,24,4,153,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="4">1,0,2,0,3,24,4,153,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="5">1,0,2,0,3,24,4,153,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="6">1,0,2,0,3,24,4,153,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="7">1,0,2,0,3,24,4,153,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="8">1,0,2,0,3,24,4,153,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="9">1,0,2,0,3,24,4,153,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="10">5,24,13,0</FixtureVal>
+   <FixtureVal ID="11">5,24,13,0</FixtureVal>
   </Function>
   <Function ID="7" Type="Scene" Name="Wall Low Gold">
    <Speed FadeIn="300" FadeOut="300" Duration="0"/>
-   <FixtureVal ID="0">1,0,2,89,3,42,4,0,5,0,6,63,7,0,8,0</FixtureVal>
-   <FixtureVal ID="1">1,0,2,89,3,42,4,0,5,0,6,63,7,0,8,0</FixtureVal>
-   <FixtureVal ID="2">1,0,2,89,3,42,4,0,5,0,6,63,7,0,8,0</FixtureVal>
-   <FixtureVal ID="3">1,0,2,89,3,42,4,0,5,0,6,63,7,0,8,0</FixtureVal>
-   <FixtureVal ID="4">1,0,2,89,3,42,4,0,5,0,6,63,7,0,8,0</FixtureVal>
-   <FixtureVal ID="5">1,0,2,89,3,42,4,0,5,0,6,63,7,0,8,0</FixtureVal>
-   <FixtureVal ID="6">1,0,2,89,3,42,4,0,5,0,6,63,7,0,8,0</FixtureVal>
-   <FixtureVal ID="7">1,0,2,89,3,42,4,0,5,0,6,63,7,0,8,0</FixtureVal>
-   <FixtureVal ID="8">1,0,2,89,3,42,4,0,5,0,6,63,7,0,8,0</FixtureVal>
-   <FixtureVal ID="9">1,0,2,89,3,42,4,0,5,0,6,63,7,0,8,0</FixtureVal>
-   <FixtureVal ID="10">5,8</FixtureVal>
-   <FixtureVal ID="11">5,8</FixtureVal>
+   <FixtureVal ID="0">1,0,2,89,3,42,4,0,5,0,6,63,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="1">1,0,2,89,3,42,4,0,5,0,6,63,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="2">1,0,2,89,3,42,4,0,5,0,6,63,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="3">1,0,2,89,3,42,4,0,5,0,6,63,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="4">1,0,2,89,3,42,4,0,5,0,6,63,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="5">1,0,2,89,3,42,4,0,5,0,6,63,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="6">1,0,2,89,3,42,4,0,5,0,6,63,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="7">1,0,2,89,3,42,4,0,5,0,6,63,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="8">1,0,2,89,3,42,4,0,5,0,6,63,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="9">1,0,2,89,3,42,4,0,5,0,6,63,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="10">5,8,13,0</FixtureVal>
+   <FixtureVal ID="11">5,8,13,0</FixtureVal>
   </Function>
   <Function ID="8" Type="Scene" Name="House Bright">
    <Speed FadeIn="300" FadeOut="300" Duration="0"/>
-   <FixtureVal ID="0">1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="1">1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="2">1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="3">1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="4">1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="5">1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="6">1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="7">1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="8">1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="9">1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="10">5,0</FixtureVal>
-   <FixtureVal ID="11">5,0</FixtureVal>
+   <FixtureVal ID="0">1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="1">1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="2">1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="3">1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="4">1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="5">1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="6">1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="7">1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="8">1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="9">1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="10">5,0,13,0</FixtureVal>
+   <FixtureVal ID="11">5,0,13,0</FixtureVal>
   </Function>
   <Function ID="9" Type="Scene" Name="Banner Only">
    <Speed FadeIn="300" FadeOut="300" Duration="0"/>
-   <FixtureVal ID="0">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="1">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="2">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="3">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="4">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="5">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="6">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="7">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="8">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="9">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0</FixtureVal>
+   <FixtureVal ID="0">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="1">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="2">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="3">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="4">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="5">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="6">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="7">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="8">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="9">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
    <FixtureVal ID="12">5,8,10,255,11,255</FixtureVal>
    <FixtureVal ID="13">5,8,10,255,11,255</FixtureVal>
   </Function>
@@ -338,18 +338,18 @@
   </Function>
   <Function ID="15" Type="Scene" Name="Panic White">
    <Speed FadeIn="120" FadeOut="120" Duration="0"/>
-   <FixtureVal ID="0">0,255,1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="1">0,255,1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="2">0,255,1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="3">0,255,1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="4">0,255,1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="5">0,255,1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="6">0,255,1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="7">0,255,1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="8">0,255,1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="9">0,255,1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="10">5,0,10,255,11,255</FixtureVal>
-   <FixtureVal ID="11">5,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="0">0,255,1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="1">0,255,1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="2">0,255,1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="3">0,255,1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="4">0,255,1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="5">0,255,1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="6">0,255,1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="7">0,255,1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="8">0,255,1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="9">0,255,1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="10">5,0,10,255,11,255,13,0</FixtureVal>
+   <FixtureVal ID="11">5,0,10,255,11,255,13,0</FixtureVal>
    <FixtureVal ID="12">5,0,10,255,11,255</FixtureVal>
    <FixtureVal ID="13">5,0,10,255,11,255</FixtureVal>
   </Function>
@@ -468,33 +468,33 @@
   </Function>
   <Function ID="24" Type="Scene" Name="CGB S1">
    <Speed FadeIn="80" FadeOut="80" Duration="0"/>
-   <FixtureVal ID="0">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="1">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="2">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="3">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="4">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="5">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="6">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="7">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="8">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="9">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="10">5,8</FixtureVal>
-   <FixtureVal ID="11">5,8</FixtureVal>
+   <FixtureVal ID="0">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="1">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="2">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="3">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="4">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="5">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="6">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="7">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="8">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="9">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="10">5,8,13,0</FixtureVal>
+   <FixtureVal ID="11">5,8,13,0</FixtureVal>
   </Function>
   <Function ID="25" Type="Scene" Name="CGB S2">
    <Speed FadeIn="80" FadeOut="80" Duration="0"/>
-   <FixtureVal ID="0">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="1">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="2">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="3">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="4">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="5">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="6">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="7">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="8">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="9">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="10">5,24</FixtureVal>
-   <FixtureVal ID="11">5,24</FixtureVal>
+   <FixtureVal ID="0">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="1">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="2">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="3">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="4">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="5">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="6">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="7">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="8">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="9">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="10">5,24,13,0</FixtureVal>
+   <FixtureVal ID="11">5,24,13,0</FixtureVal>
   </Function>
   <Function ID="26" Type="Chaser" Name="Chase Gold Blue">
    <Speed FadeIn="0" FadeOut="0" Duration="500"/>
@@ -506,33 +506,33 @@
   </Function>
   <Function ID="27" Type="Scene" Name="CBU S1">
    <Speed FadeIn="80" FadeOut="80" Duration="0"/>
-   <FixtureVal ID="0">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="1">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="2">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="3">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="4">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="5">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="6">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="7">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="8">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="9">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="10">5,24</FixtureVal>
-   <FixtureVal ID="11">5,24</FixtureVal>
+   <FixtureVal ID="0">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="1">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="2">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="3">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="4">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="5">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="6">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="7">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="8">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="9">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="10">5,24,13,0</FixtureVal>
+   <FixtureVal ID="11">5,24,13,0</FixtureVal>
   </Function>
   <Function ID="28" Type="Scene" Name="CBU S2">
    <Speed FadeIn="80" FadeOut="80" Duration="0"/>
-   <FixtureVal ID="0">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0</FixtureVal>
-   <FixtureVal ID="1">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0</FixtureVal>
-   <FixtureVal ID="2">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0</FixtureVal>
-   <FixtureVal ID="3">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0</FixtureVal>
-   <FixtureVal ID="4">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0</FixtureVal>
-   <FixtureVal ID="5">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0</FixtureVal>
-   <FixtureVal ID="6">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0</FixtureVal>
-   <FixtureVal ID="7">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0</FixtureVal>
-   <FixtureVal ID="8">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0</FixtureVal>
-   <FixtureVal ID="9">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0</FixtureVal>
-   <FixtureVal ID="10">5,50</FixtureVal>
-   <FixtureVal ID="11">5,50</FixtureVal>
+   <FixtureVal ID="0">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0,9,0</FixtureVal>
+   <FixtureVal ID="1">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0,9,0</FixtureVal>
+   <FixtureVal ID="2">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0,9,0</FixtureVal>
+   <FixtureVal ID="3">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0,9,0</FixtureVal>
+   <FixtureVal ID="4">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0,9,0</FixtureVal>
+   <FixtureVal ID="5">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0,9,0</FixtureVal>
+   <FixtureVal ID="6">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0,9,0</FixtureVal>
+   <FixtureVal ID="7">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0,9,0</FixtureVal>
+   <FixtureVal ID="8">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0,9,0</FixtureVal>
+   <FixtureVal ID="9">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0,9,0</FixtureVal>
+   <FixtureVal ID="10">5,50,13,0</FixtureVal>
+   <FixtureVal ID="11">5,50,13,0</FixtureVal>
   </Function>
   <Function ID="29" Type="Chaser" Name="Chase Blue UV">
    <Speed FadeIn="0" FadeOut="0" Duration="500"/>
@@ -544,33 +544,33 @@
   </Function>
   <Function ID="30" Type="Scene" Name="CGU S1">
    <Speed FadeIn="80" FadeOut="80" Duration="0"/>
-   <FixtureVal ID="0">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="1">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="2">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="3">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="4">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="5">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="6">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="7">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="8">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="9">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="10">5,8</FixtureVal>
-   <FixtureVal ID="11">5,8</FixtureVal>
+   <FixtureVal ID="0">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="1">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="2">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="3">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="4">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="5">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="6">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="7">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="8">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="9">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="10">5,8,13,0</FixtureVal>
+   <FixtureVal ID="11">5,8,13,0</FixtureVal>
   </Function>
   <Function ID="31" Type="Scene" Name="CGU S2">
    <Speed FadeIn="80" FadeOut="80" Duration="0"/>
-   <FixtureVal ID="0">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0</FixtureVal>
-   <FixtureVal ID="1">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0</FixtureVal>
-   <FixtureVal ID="2">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0</FixtureVal>
-   <FixtureVal ID="3">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0</FixtureVal>
-   <FixtureVal ID="4">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0</FixtureVal>
-   <FixtureVal ID="5">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0</FixtureVal>
-   <FixtureVal ID="6">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0</FixtureVal>
-   <FixtureVal ID="7">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0</FixtureVal>
-   <FixtureVal ID="8">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0</FixtureVal>
-   <FixtureVal ID="9">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0</FixtureVal>
-   <FixtureVal ID="10">5,50</FixtureVal>
-   <FixtureVal ID="11">5,50</FixtureVal>
+   <FixtureVal ID="0">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0,9,0</FixtureVal>
+   <FixtureVal ID="1">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0,9,0</FixtureVal>
+   <FixtureVal ID="2">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0,9,0</FixtureVal>
+   <FixtureVal ID="3">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0,9,0</FixtureVal>
+   <FixtureVal ID="4">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0,9,0</FixtureVal>
+   <FixtureVal ID="5">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0,9,0</FixtureVal>
+   <FixtureVal ID="6">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0,9,0</FixtureVal>
+   <FixtureVal ID="7">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0,9,0</FixtureVal>
+   <FixtureVal ID="8">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0,9,0</FixtureVal>
+   <FixtureVal ID="9">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0,9,0</FixtureVal>
+   <FixtureVal ID="10">5,50,13,0</FixtureVal>
+   <FixtureVal ID="11">5,50,13,0</FixtureVal>
   </Function>
   <Function ID="32" Type="Chaser" Name="Chase Gold UV">
    <Speed FadeIn="0" FadeOut="0" Duration="500"/>
@@ -582,93 +582,93 @@
   </Function>
   <Function ID="33" Type="Scene" Name="RBW S1">
    <Speed FadeIn="80" FadeOut="80" Duration="0"/>
-   <FixtureVal ID="0">1,0,2,255,3,0,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="1">1,0,2,255,3,0,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="2">1,0,2,255,3,0,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="3">1,0,2,255,3,0,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="4">1,0,2,255,3,0,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="5">1,0,2,255,3,0,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="6">1,0,2,255,3,0,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="7">1,0,2,255,3,0,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="8">1,0,2,255,3,0,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="9">1,0,2,255,3,0,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="10">5,36</FixtureVal>
-   <FixtureVal ID="11">5,36</FixtureVal>
+   <FixtureVal ID="0">1,0,2,255,3,0,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="1">1,0,2,255,3,0,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="2">1,0,2,255,3,0,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="3">1,0,2,255,3,0,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="4">1,0,2,255,3,0,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="5">1,0,2,255,3,0,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="6">1,0,2,255,3,0,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="7">1,0,2,255,3,0,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="8">1,0,2,255,3,0,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="9">1,0,2,255,3,0,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="10">5,36,13,0</FixtureVal>
+   <FixtureVal ID="11">5,36,13,0</FixtureVal>
   </Function>
   <Function ID="34" Type="Scene" Name="RBW S2">
    <Speed FadeIn="80" FadeOut="80" Duration="0"/>
-   <FixtureVal ID="0">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="1">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="2">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="3">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="4">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="5">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="6">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="7">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="8">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="9">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="10">5,8</FixtureVal>
-   <FixtureVal ID="11">5,8</FixtureVal>
+   <FixtureVal ID="0">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="1">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="2">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="3">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="4">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="5">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="6">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="7">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="8">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="9">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="10">5,8,13,0</FixtureVal>
+   <FixtureVal ID="11">5,8,13,0</FixtureVal>
   </Function>
   <Function ID="35" Type="Scene" Name="RBW S3">
    <Speed FadeIn="80" FadeOut="80" Duration="0"/>
-   <FixtureVal ID="0">1,0,2,0,3,255,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="1">1,0,2,0,3,255,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="2">1,0,2,0,3,255,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="3">1,0,2,0,3,255,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="4">1,0,2,0,3,255,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="5">1,0,2,0,3,255,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="6">1,0,2,0,3,255,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="7">1,0,2,0,3,255,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="8">1,0,2,0,3,255,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="9">1,0,2,0,3,255,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="10">5,44</FixtureVal>
-   <FixtureVal ID="11">5,44</FixtureVal>
+   <FixtureVal ID="0">1,0,2,0,3,255,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="1">1,0,2,0,3,255,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="2">1,0,2,0,3,255,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="3">1,0,2,0,3,255,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="4">1,0,2,0,3,255,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="5">1,0,2,0,3,255,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="6">1,0,2,0,3,255,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="7">1,0,2,0,3,255,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="8">1,0,2,0,3,255,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="9">1,0,2,0,3,255,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="10">5,44,13,0</FixtureVal>
+   <FixtureVal ID="11">5,44,13,0</FixtureVal>
   </Function>
   <Function ID="36" Type="Scene" Name="RBW S4">
    <Speed FadeIn="80" FadeOut="80" Duration="0"/>
-   <FixtureVal ID="0">1,0,2,0,3,200,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="1">1,0,2,0,3,200,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="2">1,0,2,0,3,200,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="3">1,0,2,0,3,200,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="4">1,0,2,0,3,200,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="5">1,0,2,0,3,200,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="6">1,0,2,0,3,200,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="7">1,0,2,0,3,200,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="8">1,0,2,0,3,200,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="9">1,0,2,0,3,200,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="10">5,24</FixtureVal>
-   <FixtureVal ID="11">5,24</FixtureVal>
+   <FixtureVal ID="0">1,0,2,0,3,200,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="1">1,0,2,0,3,200,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="2">1,0,2,0,3,200,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="3">1,0,2,0,3,200,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="4">1,0,2,0,3,200,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="5">1,0,2,0,3,200,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="6">1,0,2,0,3,200,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="7">1,0,2,0,3,200,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="8">1,0,2,0,3,200,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="9">1,0,2,0,3,200,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="10">5,24,13,0</FixtureVal>
+   <FixtureVal ID="11">5,24,13,0</FixtureVal>
   </Function>
   <Function ID="37" Type="Scene" Name="RBW S5">
    <Speed FadeIn="80" FadeOut="80" Duration="0"/>
-   <FixtureVal ID="0">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="1">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="2">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="3">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="4">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="5">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="6">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="7">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="8">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="9">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="10">5,50</FixtureVal>
-   <FixtureVal ID="11">5,50</FixtureVal>
+   <FixtureVal ID="0">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="1">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="2">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="3">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="4">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="5">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="6">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="7">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="8">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="9">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="10">5,50,13,0</FixtureVal>
+   <FixtureVal ID="11">5,50,13,0</FixtureVal>
   </Function>
   <Function ID="38" Type="Scene" Name="RBW S6">
    <Speed FadeIn="80" FadeOut="80" Duration="0"/>
-   <FixtureVal ID="0">1,0,2,255,3,0,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="1">1,0,2,255,3,0,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="2">1,0,2,255,3,0,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="3">1,0,2,255,3,0,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="4">1,0,2,255,3,0,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="5">1,0,2,255,3,0,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="6">1,0,2,255,3,0,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="7">1,0,2,255,3,0,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="8">1,0,2,255,3,0,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="9">1,0,2,255,3,0,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="10">5,60</FixtureVal>
-   <FixtureVal ID="11">5,60</FixtureVal>
+   <FixtureVal ID="0">1,0,2,255,3,0,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="1">1,0,2,255,3,0,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="2">1,0,2,255,3,0,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="3">1,0,2,255,3,0,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="4">1,0,2,255,3,0,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="5">1,0,2,255,3,0,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="6">1,0,2,255,3,0,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="7">1,0,2,255,3,0,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="8">1,0,2,255,3,0,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="9">1,0,2,255,3,0,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="10">5,60,13,0</FixtureVal>
+   <FixtureVal ID="11">5,60,13,0</FixtureVal>
   </Function>
   <Function ID="39" Type="Chaser" Name="Rainbow Chase">
    <Speed FadeIn="0" FadeOut="0" Duration="500"/>
@@ -684,93 +684,93 @@
   </Function>
   <Function ID="40" Type="Scene" Name="RBF S1">
    <Speed FadeIn="80" FadeOut="80" Duration="0"/>
-   <FixtureVal ID="0">1,0,2,255,3,0,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="1">1,0,2,255,3,0,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="2">1,0,2,255,3,0,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="3">1,0,2,255,3,0,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="4">1,0,2,255,3,0,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="5">1,0,2,255,3,0,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="6">1,0,2,255,3,0,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="7">1,0,2,255,3,0,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="8">1,0,2,255,3,0,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="9">1,0,2,255,3,0,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="10">5,36</FixtureVal>
-   <FixtureVal ID="11">5,36</FixtureVal>
+   <FixtureVal ID="0">1,0,2,255,3,0,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="1">1,0,2,255,3,0,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="2">1,0,2,255,3,0,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="3">1,0,2,255,3,0,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="4">1,0,2,255,3,0,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="5">1,0,2,255,3,0,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="6">1,0,2,255,3,0,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="7">1,0,2,255,3,0,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="8">1,0,2,255,3,0,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="9">1,0,2,255,3,0,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="10">5,36,13,0</FixtureVal>
+   <FixtureVal ID="11">5,36,13,0</FixtureVal>
   </Function>
   <Function ID="41" Type="Scene" Name="RBF S2">
    <Speed FadeIn="80" FadeOut="80" Duration="0"/>
-   <FixtureVal ID="0">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="1">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="2">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="3">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="4">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="5">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="6">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="7">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="8">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="9">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="10">5,8</FixtureVal>
-   <FixtureVal ID="11">5,8</FixtureVal>
+   <FixtureVal ID="0">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="1">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="2">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="3">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="4">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="5">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="6">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="7">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="8">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="9">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="10">5,8,13,0</FixtureVal>
+   <FixtureVal ID="11">5,8,13,0</FixtureVal>
   </Function>
   <Function ID="42" Type="Scene" Name="RBF S3">
    <Speed FadeIn="80" FadeOut="80" Duration="0"/>
-   <FixtureVal ID="0">1,0,2,0,3,255,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="1">1,0,2,0,3,255,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="2">1,0,2,0,3,255,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="3">1,0,2,0,3,255,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="4">1,0,2,0,3,255,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="5">1,0,2,0,3,255,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="6">1,0,2,0,3,255,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="7">1,0,2,0,3,255,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="8">1,0,2,0,3,255,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="9">1,0,2,0,3,255,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="10">5,44</FixtureVal>
-   <FixtureVal ID="11">5,44</FixtureVal>
+   <FixtureVal ID="0">1,0,2,0,3,255,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="1">1,0,2,0,3,255,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="2">1,0,2,0,3,255,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="3">1,0,2,0,3,255,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="4">1,0,2,0,3,255,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="5">1,0,2,0,3,255,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="6">1,0,2,0,3,255,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="7">1,0,2,0,3,255,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="8">1,0,2,0,3,255,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="9">1,0,2,0,3,255,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="10">5,44,13,0</FixtureVal>
+   <FixtureVal ID="11">5,44,13,0</FixtureVal>
   </Function>
   <Function ID="43" Type="Scene" Name="RBF S4">
    <Speed FadeIn="80" FadeOut="80" Duration="0"/>
-   <FixtureVal ID="0">1,0,2,0,3,200,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="1">1,0,2,0,3,200,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="2">1,0,2,0,3,200,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="3">1,0,2,0,3,200,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="4">1,0,2,0,3,200,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="5">1,0,2,0,3,200,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="6">1,0,2,0,3,200,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="7">1,0,2,0,3,200,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="8">1,0,2,0,3,200,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="9">1,0,2,0,3,200,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="10">5,24</FixtureVal>
-   <FixtureVal ID="11">5,24</FixtureVal>
+   <FixtureVal ID="0">1,0,2,0,3,200,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="1">1,0,2,0,3,200,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="2">1,0,2,0,3,200,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="3">1,0,2,0,3,200,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="4">1,0,2,0,3,200,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="5">1,0,2,0,3,200,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="6">1,0,2,0,3,200,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="7">1,0,2,0,3,200,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="8">1,0,2,0,3,200,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="9">1,0,2,0,3,200,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="10">5,24,13,0</FixtureVal>
+   <FixtureVal ID="11">5,24,13,0</FixtureVal>
   </Function>
   <Function ID="44" Type="Scene" Name="RBF S5">
    <Speed FadeIn="80" FadeOut="80" Duration="0"/>
-   <FixtureVal ID="0">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="1">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="2">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="3">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="4">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="5">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="6">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="7">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="8">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="9">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="10">5,50</FixtureVal>
-   <FixtureVal ID="11">5,50</FixtureVal>
+   <FixtureVal ID="0">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="1">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="2">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="3">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="4">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="5">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="6">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="7">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="8">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="9">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="10">5,50,13,0</FixtureVal>
+   <FixtureVal ID="11">5,50,13,0</FixtureVal>
   </Function>
   <Function ID="45" Type="Scene" Name="RBF S6">
    <Speed FadeIn="80" FadeOut="80" Duration="0"/>
-   <FixtureVal ID="0">1,0,2,255,3,0,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="1">1,0,2,255,3,0,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="2">1,0,2,255,3,0,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="3">1,0,2,255,3,0,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="4">1,0,2,255,3,0,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="5">1,0,2,255,3,0,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="6">1,0,2,255,3,0,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="7">1,0,2,255,3,0,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="8">1,0,2,255,3,0,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="9">1,0,2,255,3,0,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="10">5,60</FixtureVal>
-   <FixtureVal ID="11">5,60</FixtureVal>
+   <FixtureVal ID="0">1,0,2,255,3,0,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="1">1,0,2,255,3,0,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="2">1,0,2,255,3,0,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="3">1,0,2,255,3,0,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="4">1,0,2,255,3,0,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="5">1,0,2,255,3,0,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="6">1,0,2,255,3,0,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="7">1,0,2,255,3,0,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="8">1,0,2,255,3,0,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="9">1,0,2,255,3,0,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="10">5,60,13,0</FixtureVal>
+   <FixtureVal ID="11">5,60,13,0</FixtureVal>
   </Function>
   <Function ID="46" Type="Chaser" Name="Rainbow Fast">
    <Speed FadeIn="0" FadeOut="0" Duration="180"/>
@@ -786,63 +786,63 @@
   </Function>
   <Function ID="47" Type="Scene" Name="FGB S1">
    <Speed FadeIn="80" FadeOut="80" Duration="0"/>
-   <FixtureVal ID="0">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="1">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="2">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="3">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="4">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="5">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="6">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="7">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="8">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="9">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="10">5,8</FixtureVal>
-   <FixtureVal ID="11">5,8</FixtureVal>
+   <FixtureVal ID="0">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="1">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="2">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="3">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="4">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="5">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="6">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="7">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="8">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="9">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="10">5,8,13,0</FixtureVal>
+   <FixtureVal ID="11">5,8,13,0</FixtureVal>
   </Function>
   <Function ID="48" Type="Scene" Name="FGB S2">
    <Speed FadeIn="80" FadeOut="80" Duration="0"/>
-   <FixtureVal ID="0">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="1">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="2">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="3">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="4">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="5">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="6">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="7">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="8">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="9">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="10">5,24</FixtureVal>
-   <FixtureVal ID="11">5,24</FixtureVal>
+   <FixtureVal ID="0">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="1">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="2">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="3">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="4">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="5">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="6">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="7">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="8">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="9">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="10">5,24,13,0</FixtureVal>
+   <FixtureVal ID="11">5,24,13,0</FixtureVal>
   </Function>
   <Function ID="49" Type="Scene" Name="FGB S3">
    <Speed FadeIn="80" FadeOut="80" Duration="0"/>
-   <FixtureVal ID="0">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="1">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="2">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="3">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="4">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="5">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="6">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="7">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="8">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="9">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="10">5,8</FixtureVal>
-   <FixtureVal ID="11">5,8</FixtureVal>
+   <FixtureVal ID="0">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="1">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="2">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="3">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="4">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="5">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="6">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="7">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="8">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="9">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="10">5,8,13,0</FixtureVal>
+   <FixtureVal ID="11">5,8,13,0</FixtureVal>
   </Function>
   <Function ID="50" Type="Scene" Name="FGB S4">
    <Speed FadeIn="80" FadeOut="80" Duration="0"/>
-   <FixtureVal ID="0">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="1">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="2">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="3">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="4">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="5">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="6">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="7">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="8">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="9">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="10">5,24</FixtureVal>
-   <FixtureVal ID="11">5,24</FixtureVal>
+   <FixtureVal ID="0">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="1">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="2">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="3">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="4">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="5">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="6">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="7">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="8">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="9">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="10">5,24,13,0</FixtureVal>
+   <FixtureVal ID="11">5,24,13,0</FixtureVal>
   </Function>
   <Function ID="51" Type="Chaser" Name="Fast Gold Blue">
    <Speed FadeIn="0" FadeOut="0" Duration="200"/>
@@ -856,63 +856,63 @@
   </Function>
   <Function ID="52" Type="Scene" Name="BLD S1">
    <Speed FadeIn="80" FadeOut="80" Duration="0"/>
-   <FixtureVal ID="0">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="1">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="2">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="3">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="4">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="5">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="6">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="7">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="8">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="9">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="10">5,24</FixtureVal>
-   <FixtureVal ID="11">5,24</FixtureVal>
+   <FixtureVal ID="0">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="1">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="2">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="3">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="4">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="5">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="6">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="7">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="8">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="9">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="10">5,24,13,0</FixtureVal>
+   <FixtureVal ID="11">5,24,13,0</FixtureVal>
   </Function>
   <Function ID="53" Type="Scene" Name="BLD S2">
    <Speed FadeIn="80" FadeOut="80" Duration="0"/>
-   <FixtureVal ID="0">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="1">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="2">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="3">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="4">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="5">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="6">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="7">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="8">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="9">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="10">5,8</FixtureVal>
-   <FixtureVal ID="11">5,8</FixtureVal>
+   <FixtureVal ID="0">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="1">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="2">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="3">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="4">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="5">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="6">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="7">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="8">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="9">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="10">5,8,13,0</FixtureVal>
+   <FixtureVal ID="11">5,8,13,0</FixtureVal>
   </Function>
   <Function ID="54" Type="Scene" Name="BLD S3">
    <Speed FadeIn="80" FadeOut="80" Duration="0"/>
-   <FixtureVal ID="0">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="1">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="2">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="3">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="4">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="5">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="6">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="7">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="8">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="9">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="10">5,24</FixtureVal>
-   <FixtureVal ID="11">5,24</FixtureVal>
+   <FixtureVal ID="0">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="1">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="2">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="3">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="4">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="5">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="6">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="7">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="8">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="9">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="10">5,24,13,0</FixtureVal>
+   <FixtureVal ID="11">5,24,13,0</FixtureVal>
   </Function>
   <Function ID="55" Type="Scene" Name="BLD S4">
    <Speed FadeIn="80" FadeOut="80" Duration="0"/>
-   <FixtureVal ID="0">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="1">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="2">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="3">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="4">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="5">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="6">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="7">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="8">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="9">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="10">5,8</FixtureVal>
-   <FixtureVal ID="11">5,8</FixtureVal>
+   <FixtureVal ID="0">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="1">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="2">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="3">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="4">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="5">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="6">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="7">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="8">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="9">1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="10">5,8,13,0</FixtureVal>
+   <FixtureVal ID="11">5,8,13,0</FixtureVal>
   </Function>
   <Function ID="56" Type="Chaser" Name="Build Chase">
    <Speed FadeIn="0" FadeOut="0" Duration="700"/>
@@ -926,79 +926,79 @@
   </Function>
   <Function ID="57" Type="Scene" Name="UV Blacklight">
    <Speed FadeIn="120" FadeOut="120" Duration="0"/>
-   <FixtureVal ID="0">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0</FixtureVal>
-   <FixtureVal ID="1">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0</FixtureVal>
-   <FixtureVal ID="2">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0</FixtureVal>
-   <FixtureVal ID="3">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0</FixtureVal>
-   <FixtureVal ID="4">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0</FixtureVal>
-   <FixtureVal ID="5">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0</FixtureVal>
-   <FixtureVal ID="6">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0</FixtureVal>
-   <FixtureVal ID="7">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0</FixtureVal>
-   <FixtureVal ID="8">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0</FixtureVal>
-   <FixtureVal ID="9">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0</FixtureVal>
-   <FixtureVal ID="10">5,50</FixtureVal>
-   <FixtureVal ID="11">5,50</FixtureVal>
+   <FixtureVal ID="0">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0,9,0</FixtureVal>
+   <FixtureVal ID="1">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0,9,0</FixtureVal>
+   <FixtureVal ID="2">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0,9,0</FixtureVal>
+   <FixtureVal ID="3">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0,9,0</FixtureVal>
+   <FixtureVal ID="4">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0,9,0</FixtureVal>
+   <FixtureVal ID="5">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0,9,0</FixtureVal>
+   <FixtureVal ID="6">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0,9,0</FixtureVal>
+   <FixtureVal ID="7">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0,9,0</FixtureVal>
+   <FixtureVal ID="8">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0,9,0</FixtureVal>
+   <FixtureVal ID="9">1,0,2,0,3,0,4,40,5,0,6,0,7,255,8,0,9,0</FixtureVal>
+   <FixtureVal ID="10">5,50,13,0</FixtureVal>
+   <FixtureVal ID="11">5,50,13,0</FixtureVal>
    <FixtureVal ID="12">5,50,10,140,11,255</FixtureVal>
    <FixtureVal ID="13">5,50,10,140,11,255</FixtureVal>
   </Function>
   <Function ID="58" Type="Scene" Name="Gold Blue Full">
    <Speed FadeIn="120" FadeOut="120" Duration="0"/>
-   <FixtureVal ID="0">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="1">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="2">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="3">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="4">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="5">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="6">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="7">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="8">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="9">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="10">5,8</FixtureVal>
-   <FixtureVal ID="11">5,8</FixtureVal>
+   <FixtureVal ID="0">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="1">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="2">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="3">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="4">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="5">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="6">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="7">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="8">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="9">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="10">5,8,13,0</FixtureVal>
+   <FixtureVal ID="11">5,8,13,0</FixtureVal>
    <FixtureVal ID="12">5,8,10,255,11,255</FixtureVal>
    <FixtureVal ID="13">5,8,10,255,11,255</FixtureVal>
   </Function>
   <Function ID="59" Type="Scene" Name="White Burst">
    <Speed FadeIn="60" FadeOut="400" Duration="0"/>
-   <FixtureVal ID="0">1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="1">1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="2">1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="3">1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="4">1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="5">1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="6">1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="7">1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="8">1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="9">1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="10">5,0</FixtureVal>
-   <FixtureVal ID="11">5,0</FixtureVal>
+   <FixtureVal ID="0">1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="1">1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="2">1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="3">1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="4">1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="5">1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="6">1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="7">1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="8">1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="9">1,0,2,0,3,0,4,0,5,255,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="10">5,0,13,0</FixtureVal>
+   <FixtureVal ID="11">5,0,13,0</FixtureVal>
   </Function>
   <Function ID="60" Type="Scene" Name="Entrance">
    <Speed FadeIn="60" FadeOut="120" Duration="0"/>
-   <FixtureVal ID="0">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="1">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="2">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="3">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="4">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="5">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="6">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="7">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="8">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0</FixtureVal>
-   <FixtureVal ID="9">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0</FixtureVal>
-   <FixtureVal ID="10">5,8</FixtureVal>
-   <FixtureVal ID="11">5,8</FixtureVal>
+   <FixtureVal ID="0">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="1">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="2">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="3">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="4">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="5">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="6">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="7">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="8">1,0,2,255,3,120,4,0,5,0,6,180,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="9">1,0,2,0,3,40,4,255,5,0,6,0,7,0,8,0,9,0</FixtureVal>
+   <FixtureVal ID="10">5,8,13,0</FixtureVal>
+   <FixtureVal ID="11">5,8,13,0</FixtureVal>
    <FixtureVal ID="12">5,8,10,255,11,255</FixtureVal>
    <FixtureVal ID="13">5,8,10,255,11,255</FixtureVal>
   </Function>
   <Function ID="61" Type="Scene" Name="Truss Home">
    <Speed FadeIn="120" FadeOut="120" Duration="0"/>
-   <FixtureVal ID="10">0,189,2,114,11,255</FixtureVal>
-   <FixtureVal ID="11">0,67,2,114,11,255</FixtureVal>
+   <FixtureVal ID="10">0,189,2,114,11,255,13,0</FixtureVal>
+   <FixtureVal ID="11">0,67,2,114,11,255,13,0</FixtureVal>
   </Function>
   <Function ID="62" Type="Scene" Name="Speaker Light">
    <Speed FadeIn="120" FadeOut="120" Duration="0"/>
-   <FixtureVal ID="10">0,167,2,98,5,0,10,255,11,255</FixtureVal>
-   <FixtureVal ID="11">0,89,2,98,5,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="10">0,167,2,98,5,0,10,255,11,255,13,0</FixtureVal>
+   <FixtureVal ID="11">0,89,2,98,5,0,10,255,11,255,13,0</FixtureVal>
   </Function>
   <Function ID="63" Type="Scene" Name="Banner Home">
    <Speed FadeIn="120" FadeOut="120" Duration="0"/>
@@ -1007,13 +1007,13 @@
   </Function>
   <Function ID="64" Type="Scene" Name="SwW A">
    <Speed FadeIn="800" FadeOut="800" Duration="0"/>
-   <FixtureVal ID="10">0,199,2,121,11,255</FixtureVal>
-   <FixtureVal ID="11">0,57,2,121,11,255</FixtureVal>
+   <FixtureVal ID="10">0,199,2,121,11,255,13,0</FixtureVal>
+   <FixtureVal ID="11">0,57,2,121,11,255,13,0</FixtureVal>
   </Function>
   <Function ID="65" Type="Scene" Name="SwW B">
    <Speed FadeIn="800" FadeOut="800" Duration="0"/>
-   <FixtureVal ID="10">0,184,2,109,11,255</FixtureVal>
-   <FixtureVal ID="11">0,72,2,109,11,255</FixtureVal>
+   <FixtureVal ID="10">0,184,2,109,11,255,13,0</FixtureVal>
+   <FixtureVal ID="11">0,72,2,109,11,255,13,0</FixtureVal>
   </Function>
   <Function ID="66" Type="Chaser" Name="Sweep Wide">
    <Speed FadeIn="800" FadeOut="800" Duration="1600"/>
@@ -1025,13 +1025,13 @@
   </Function>
   <Function ID="67" Type="Scene" Name="SwX A">
    <Speed FadeIn="800" FadeOut="800" Duration="0"/>
-   <FixtureVal ID="10">0,181,2,110,11,255</FixtureVal>
-   <FixtureVal ID="11">0,75,2,110,11,255</FixtureVal>
+   <FixtureVal ID="10">0,181,2,110,11,255,13,0</FixtureVal>
+   <FixtureVal ID="11">0,75,2,110,11,255,13,0</FixtureVal>
   </Function>
   <Function ID="68" Type="Scene" Name="SwX B">
    <Speed FadeIn="800" FadeOut="800" Duration="0"/>
-   <FixtureVal ID="10">0,201,2,117,11,255</FixtureVal>
-   <FixtureVal ID="11">0,55,2,117,11,255</FixtureVal>
+   <FixtureVal ID="10">0,201,2,117,11,255,13,0</FixtureVal>
+   <FixtureVal ID="11">0,55,2,117,11,255,13,0</FixtureVal>
   </Function>
   <Function ID="69" Type="Chaser" Name="Sweep Cross">
    <Speed FadeIn="800" FadeOut="800" Duration="1600"/>
@@ -1043,13 +1043,13 @@
   </Function>
   <Function ID="70" Type="Scene" Name="SwP A">
    <Speed FadeIn="800" FadeOut="800" Duration="0"/>
-   <FixtureVal ID="10">0,189,2,114,11,255</FixtureVal>
-   <FixtureVal ID="11">0,67,2,114,11,255</FixtureVal>
+   <FixtureVal ID="10">0,189,2,114,11,255,13,0</FixtureVal>
+   <FixtureVal ID="11">0,67,2,114,11,255,13,0</FixtureVal>
   </Function>
   <Function ID="71" Type="Scene" Name="SwP B">
    <Speed FadeIn="800" FadeOut="800" Duration="0"/>
-   <FixtureVal ID="10">0,182,2,117,11,255</FixtureVal>
-   <FixtureVal ID="11">0,74,2,117,11,255</FixtureVal>
+   <FixtureVal ID="10">0,182,2,117,11,255,13,0</FixtureVal>
+   <FixtureVal ID="11">0,74,2,117,11,255,13,0</FixtureVal>
   </Function>
   <Function ID="72" Type="Chaser" Name="Sweep Punch">
    <Speed FadeIn="300" FadeOut="300" Duration="900"/>
@@ -1061,23 +1061,23 @@
   </Function>
   <Function ID="73" Type="Scene" Name="Cir A">
    <Speed FadeIn="800" FadeOut="800" Duration="0"/>
-   <FixtureVal ID="10">0,197,2,114,11,255</FixtureVal>
-   <FixtureVal ID="11">0,59,2,114,11,255</FixtureVal>
+   <FixtureVal ID="10">0,197,2,114,11,255,13,0</FixtureVal>
+   <FixtureVal ID="11">0,59,2,114,11,255,13,0</FixtureVal>
   </Function>
   <Function ID="74" Type="Scene" Name="Cir B">
    <Speed FadeIn="800" FadeOut="800" Duration="0"/>
-   <FixtureVal ID="10">0,188,2,121,11,255</FixtureVal>
-   <FixtureVal ID="11">0,68,2,121,11,255</FixtureVal>
+   <FixtureVal ID="10">0,188,2,121,11,255,13,0</FixtureVal>
+   <FixtureVal ID="11">0,68,2,121,11,255,13,0</FixtureVal>
   </Function>
   <Function ID="75" Type="Scene" Name="Cir C">
    <Speed FadeIn="800" FadeOut="800" Duration="0"/>
-   <FixtureVal ID="10">0,181,2,113,11,255</FixtureVal>
-   <FixtureVal ID="11">0,75,2,113,11,255</FixtureVal>
+   <FixtureVal ID="10">0,181,2,113,11,255,13,0</FixtureVal>
+   <FixtureVal ID="11">0,75,2,113,11,255,13,0</FixtureVal>
   </Function>
   <Function ID="76" Type="Scene" Name="Cir D">
    <Speed FadeIn="800" FadeOut="800" Duration="0"/>
-   <FixtureVal ID="10">0,189,2,109,11,255</FixtureVal>
-   <FixtureVal ID="11">0,67,2,109,11,255</FixtureVal>
+   <FixtureVal ID="10">0,189,2,109,11,255,13,0</FixtureVal>
+   <FixtureVal ID="11">0,67,2,109,11,255,13,0</FixtureVal>
   </Function>
   <Function ID="77" Type="Chaser" Name="Circles">
    <Speed FadeIn="900" FadeOut="900" Duration="1200"/>
@@ -1102,7 +1102,12 @@
    <FixtureVal ID="8">0,255,8,240,9,253</FixtureVal>
    <FixtureVal ID="9">0,255,8,240,9,253</FixtureVal>
   </Function>
-  <Function ID="79" Type="Scene" Name="Beat Pulse">
+  <Function ID="79" Type="Scene" Name="Truss Sound">
+   <Speed FadeIn="0" FadeOut="0" Duration="0"/>
+   <FixtureVal ID="10">10,255,11,255,13,144</FixtureVal>
+   <FixtureVal ID="11">10,255,11,255,13,144</FixtureVal>
+  </Function>
+  <Function ID="80" Type="Scene" Name="Beat Pulse">
    <Speed FadeIn="0" FadeOut="180" Duration="0"/>
    <FixtureVal ID="0">0,255</FixtureVal>
    <FixtureVal ID="1">0,255</FixtureVal>
@@ -1549,7 +1554,33 @@
       <Action>Flash</Action>
       <Input Universe="1" Channel="143" LowerValue="2" UpperValue="6"/>
     </Button>
-    <Button Caption="Par Sound P1 R8C7" ID="126" Icon="">
+    <Button Caption="Truss Sound P1 R8C6" ID="126" Icon="">
+      <WindowState Visible="True" X="484" Y="4" Width="90" Height="44"/>
+      <Appearance>
+       <FrameStyle>None</FrameStyle>
+       <ForegroundColor>4278190080</ForegroundColor>
+       <BackgroundColor>4294922440</BackgroundColor>
+       <BackgroundImage>None</BackgroundImage>
+       <Font>Default</Font>
+      </Appearance>
+      <Function ID="79"/>
+      <Action>Toggle</Action>
+      <Input Universe="0" Channel="16245"/>
+    </Button>
+    <Button Caption="Truss Sound P1 R8C6" ID="127" Icon="">
+      <WindowState Visible="True" X="484" Y="4" Width="90" Height="44"/>
+      <Appearance>
+       <FrameStyle>None</FrameStyle>
+       <ForegroundColor>4278190080</ForegroundColor>
+       <BackgroundColor>4294922440</BackgroundColor>
+       <BackgroundImage>None</BackgroundImage>
+       <Font>Default</Font>
+      </Appearance>
+      <Function ID="79"/>
+      <Action>Toggle</Action>
+      <Input Universe="1" Channel="144" LowerValue="110" UpperValue="106"/>
+    </Button>
+    <Button Caption="Par Sound P1 R8C7" ID="128" Icon="">
       <WindowState Visible="True" X="580" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -1562,7 +1593,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="22275"/>
     </Button>
-    <Button Caption="Par Sound P1 R8C7" ID="127" Icon="">
+    <Button Caption="Par Sound P1 R8C7" ID="129" Icon="">
       <WindowState Visible="True" X="580" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -1591,7 +1622,7 @@
     <ShowEnableButton>False</ShowEnableButton>
     <Collapsed>False</Collapsed>
     <Disabled>False</Disabled>
-    <Button Caption="Gold Wall R1C1" ID="128" Icon="">
+    <Button Caption="Gold Wall R1C1" ID="130" Icon="">
       <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -1604,7 +1635,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="45097"/>
     </Button>
-    <Button Caption="Gold Wall R1C1" ID="129" Icon="">
+    <Button Caption="Gold Wall R1C1" ID="131" Icon="">
       <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -1617,7 +1648,7 @@
       <Action>Toggle</Action>
       <Input Universe="1" Channel="209" LowerValue="22" UpperValue="18"/>
     </Button>
-    <Button Caption="Blue Wall R1C2" ID="130" Icon="">
+    <Button Caption="Blue Wall R1C2" ID="132" Icon="">
       <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -1630,7 +1661,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="52966"/>
     </Button>
-    <Button Caption="Blue Wall R1C2" ID="131" Icon="">
+    <Button Caption="Blue Wall R1C2" ID="133" Icon="">
       <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -1643,7 +1674,7 @@
       <Action>Toggle</Action>
       <Input Universe="1" Channel="210" LowerValue="86" UpperValue="82"/>
     </Button>
-    <Button Caption="Gold Blue R1C3" ID="132" Icon="">
+    <Button Caption="Gold Blue R1C3" ID="134" Icon="">
       <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -1656,7 +1687,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="30185"/>
     </Button>
-    <Button Caption="Gold Blue R1C3" ID="133" Icon="">
+    <Button Caption="Gold Blue R1C3" ID="135" Icon="">
       <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -1669,7 +1700,7 @@
       <Action>Toggle</Action>
       <Input Universe="1" Channel="211" LowerValue="30" UpperValue="26"/>
     </Button>
-    <Button Caption="Soft Amber R1C4" ID="134" Icon="">
+    <Button Caption="Soft Amber R1C4" ID="136" Icon="">
       <WindowState Visible="True" X="292" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -1682,7 +1713,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="49340"/>
     </Button>
-    <Button Caption="Soft Amber R1C4" ID="135" Icon="">
+    <Button Caption="Soft Amber R1C4" ID="137" Icon="">
       <WindowState Visible="True" X="292" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -1695,7 +1726,7 @@
       <Action>Toggle</Action>
       <Input Universe="1" Channel="212" LowerValue="30" UpperValue="26"/>
     </Button>
-    <Button Caption="Warm White R1C5" ID="136" Icon="">
+    <Button Caption="Warm White R1C5" ID="138" Icon="">
       <WindowState Visible="True" X="388" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -1708,7 +1739,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="21774"/>
     </Button>
-    <Button Caption="Warm White R1C5" ID="137" Icon="">
+    <Button Caption="Warm White R1C5" ID="139" Icon="">
       <WindowState Visible="True" X="388" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -1721,7 +1752,7 @@
       <Action>Toggle</Action>
       <Input Universe="1" Channel="213" LowerValue="2" UpperValue="6"/>
     </Button>
-    <Button Caption="UV Accent R1C6" ID="138" Icon="">
+    <Button Caption="UV Accent R1C6" ID="140" Icon="">
       <WindowState Visible="True" X="484" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -1734,7 +1765,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="2668"/>
     </Button>
-    <Button Caption="UV Accent R1C6" ID="139" Icon="">
+    <Button Caption="UV Accent R1C6" ID="141" Icon="">
       <WindowState Visible="True" X="484" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -1747,7 +1778,7 @@
       <Action>Toggle</Action>
       <Input Universe="1" Channel="214" LowerValue="94" UpperValue="90"/>
     </Button>
-    <Button Caption="Banner Soft R1C7" ID="140" Icon="">
+    <Button Caption="Banner Soft R1C7" ID="142" Icon="">
       <WindowState Visible="True" X="580" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -1760,7 +1791,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="25086"/>
     </Button>
-    <Button Caption="Banner Soft R1C7" ID="141" Icon="">
+    <Button Caption="Banner Soft R1C7" ID="143" Icon="">
       <WindowState Visible="True" X="580" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -1789,7 +1820,7 @@
     <ShowEnableButton>False</ShowEnableButton>
     <Collapsed>False</Collapsed>
     <Disabled>False</Disabled>
-    <Button Caption="Dim 25 P2 R7C1" ID="142" Icon="">
+    <Button Caption="Dim 25 P2 R7C1" ID="144" Icon="">
       <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -1802,7 +1833,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="31091"/>
     </Button>
-    <Button Caption="Dim 25 P2 R7C1" ID="143" Icon="">
+    <Button Caption="Dim 25 P2 R7C1" ID="145" Icon="">
       <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -1815,7 +1846,7 @@
       <Action>Toggle</Action>
       <Input Universe="1" Channel="149" LowerValue="30" UpperValue="26"/>
     </Button>
-    <Button Caption="Dim 50 P2 R7C2" ID="144" Icon="">
+    <Button Caption="Dim 50 P2 R7C2" ID="146" Icon="">
       <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -1828,7 +1859,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="64773"/>
     </Button>
-    <Button Caption="Dim 50 P2 R7C2" ID="145" Icon="">
+    <Button Caption="Dim 50 P2 R7C2" ID="147" Icon="">
       <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -1841,7 +1872,7 @@
       <Action>Toggle</Action>
       <Input Universe="1" Channel="150" LowerValue="30" UpperValue="26"/>
     </Button>
-    <Button Caption="Dim 75 P2 R7C3" ID="146" Icon="">
+    <Button Caption="Dim 75 P2 R7C3" ID="148" Icon="">
       <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -1854,7 +1885,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="50906"/>
     </Button>
-    <Button Caption="Dim 75 P2 R7C3" ID="147" Icon="">
+    <Button Caption="Dim 75 P2 R7C3" ID="149" Icon="">
       <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -1867,7 +1898,7 @@
       <Action>Toggle</Action>
       <Input Universe="1" Channel="151" LowerValue="30" UpperValue="26"/>
     </Button>
-    <Button Caption="Dim Full P2 R7C4" ID="148" Icon="">
+    <Button Caption="Dim Full P2 R7C4" ID="150" Icon="">
       <WindowState Visible="True" X="292" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -1880,7 +1911,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="57315"/>
     </Button>
-    <Button Caption="Dim Full P2 R7C4" ID="149" Icon="">
+    <Button Caption="Dim Full P2 R7C4" ID="151" Icon="">
       <WindowState Visible="True" X="292" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -1893,7 +1924,7 @@
       <Action>Toggle</Action>
       <Input Universe="1" Channel="152" LowerValue="22" UpperValue="18"/>
     </Button>
-    <Button Caption="Sync Strobe P2 R7C5" ID="150" Icon="">
+    <Button Caption="Sync Strobe P2 R7C5" ID="152" Icon="">
       <WindowState Visible="True" X="388" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -1906,7 +1937,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="46153"/>
     </Button>
-    <Button Caption="Sync Strobe P2 R7C5" ID="151" Icon="">
+    <Button Caption="Sync Strobe P2 R7C5" ID="153" Icon="">
       <WindowState Visible="True" X="388" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -1935,7 +1966,7 @@
     <ShowEnableButton>False</ShowEnableButton>
     <Collapsed>False</Collapsed>
     <Disabled>False</Disabled>
-    <Button Caption="Blackout P2 R8C1" ID="152" Icon="">
+    <Button Caption="Blackout P2 R8C1" ID="154" Icon="">
       <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -1947,7 +1978,7 @@
       <Action>Blackout</Action>
       <Input Universe="0" Channel="44351"/>
     </Button>
-    <Button Caption="Blackout P2 R8C1" ID="153" Icon="">
+    <Button Caption="Blackout P2 R8C1" ID="155" Icon="">
       <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -1959,7 +1990,7 @@
       <Action>Blackout</Action>
       <Input Universe="1" Channel="139" LowerValue="14" UpperValue="10"/>
     </Button>
-    <Button Caption="Panic P2 R8C2" ID="154" Icon="">
+    <Button Caption="Panic P2 R8C2" ID="156" Icon="">
       <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -1972,7 +2003,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="53190"/>
     </Button>
-    <Button Caption="Panic P2 R8C2" ID="155" Icon="">
+    <Button Caption="Panic P2 R8C2" ID="157" Icon="">
       <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -1985,7 +2016,7 @@
       <Action>Toggle</Action>
       <Input Universe="1" Channel="140" LowerValue="2" UpperValue="6"/>
     </Button>
-    <Button Caption="Banner P2 R8C3" ID="156" Icon="">
+    <Button Caption="Banner P2 R8C3" ID="158" Icon="">
       <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -1998,7 +2029,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="14926"/>
     </Button>
-    <Button Caption="Banner P2 R8C3" ID="157" Icon="">
+    <Button Caption="Banner P2 R8C3" ID="159" Icon="">
       <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2011,7 +2042,7 @@
       <Action>Toggle</Action>
       <Input Universe="1" Channel="141" LowerValue="94" UpperValue="90"/>
     </Button>
-    <Button Caption="Strobe P2 R8C5" ID="158" Icon="">
+    <Button Caption="Strobe P2 R8C5" ID="160" Icon="">
       <WindowState Visible="True" X="388" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2024,7 +2055,7 @@
       <Action>Flash</Action>
       <Input Universe="0" Channel="9180"/>
     </Button>
-    <Button Caption="Strobe P2 R8C5" ID="159" Icon="">
+    <Button Caption="Strobe P2 R8C5" ID="161" Icon="">
       <WindowState Visible="True" X="388" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2037,7 +2068,33 @@
       <Action>Flash</Action>
       <Input Universe="1" Channel="143" LowerValue="2" UpperValue="6"/>
     </Button>
-    <Button Caption="Par Sound P2 R8C7" ID="160" Icon="">
+    <Button Caption="Truss Sound P2 R8C6" ID="162" Icon="">
+      <WindowState Visible="True" X="484" Y="4" Width="90" Height="44"/>
+      <Appearance>
+       <FrameStyle>None</FrameStyle>
+       <ForegroundColor>4278190080</ForegroundColor>
+       <BackgroundColor>4294922440</BackgroundColor>
+       <BackgroundImage>None</BackgroundImage>
+       <Font>Default</Font>
+      </Appearance>
+      <Function ID="79"/>
+      <Action>Toggle</Action>
+      <Input Universe="0" Channel="13064"/>
+    </Button>
+    <Button Caption="Truss Sound P2 R8C6" ID="163" Icon="">
+      <WindowState Visible="True" X="484" Y="4" Width="90" Height="44"/>
+      <Appearance>
+       <FrameStyle>None</FrameStyle>
+       <ForegroundColor>4278190080</ForegroundColor>
+       <BackgroundColor>4294922440</BackgroundColor>
+       <BackgroundImage>None</BackgroundImage>
+       <Font>Default</Font>
+      </Appearance>
+      <Function ID="79"/>
+      <Action>Toggle</Action>
+      <Input Universe="1" Channel="144" LowerValue="110" UpperValue="106"/>
+    </Button>
+    <Button Caption="Par Sound P2 R8C7" ID="164" Icon="">
       <WindowState Visible="True" X="580" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2050,7 +2107,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="23422"/>
     </Button>
-    <Button Caption="Par Sound P2 R8C7" ID="161" Icon="">
+    <Button Caption="Par Sound P2 R8C7" ID="165" Icon="">
       <WindowState Visible="True" X="580" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2079,7 +2136,7 @@
     <ShowEnableButton>False</ShowEnableButton>
     <Collapsed>False</Collapsed>
     <Disabled>False</Disabled>
-    <Button Caption="Banner Bright R1C1" ID="162" Icon="">
+    <Button Caption="Banner Bright R1C1" ID="166" Icon="">
       <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2092,7 +2149,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="28691"/>
     </Button>
-    <Button Caption="Banner Bright R1C1" ID="163" Icon="">
+    <Button Caption="Banner Bright R1C1" ID="167" Icon="">
       <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2105,7 +2162,7 @@
       <Action>Toggle</Action>
       <Input Universe="1" Channel="209" LowerValue="22" UpperValue="18"/>
     </Button>
-    <Button Caption="Wall Low R1C2" ID="164" Icon="">
+    <Button Caption="Wall Low R1C2" ID="168" Icon="">
       <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2118,7 +2175,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="59827"/>
     </Button>
-    <Button Caption="Wall Low R1C2" ID="165" Icon="">
+    <Button Caption="Wall Low R1C2" ID="169" Icon="">
       <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2131,7 +2188,7 @@
       <Action>Toggle</Action>
       <Input Universe="1" Channel="210" LowerValue="30" UpperValue="26"/>
     </Button>
-    <Button Caption="Speaker R1C3" ID="166" Icon="">
+    <Button Caption="Speaker R1C3" ID="170" Icon="">
       <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2144,7 +2201,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="50040"/>
     </Button>
-    <Button Caption="Speaker R1C3" ID="167" Icon="">
+    <Button Caption="Speaker R1C3" ID="171" Icon="">
       <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2157,7 +2214,7 @@
       <Action>Toggle</Action>
       <Input Universe="1" Channel="211" LowerValue="2" UpperValue="6"/>
     </Button>
-    <Button Caption="Banner Only R1C4" ID="168" Icon="">
+    <Button Caption="Banner Only R1C4" ID="172" Icon="">
       <WindowState Visible="True" X="292" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2170,7 +2227,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="45545"/>
     </Button>
-    <Button Caption="Banner Only R1C4" ID="169" Icon="">
+    <Button Caption="Banner Only R1C4" ID="173" Icon="">
       <WindowState Visible="True" X="292" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2183,7 +2240,7 @@
       <Action>Toggle</Action>
       <Input Universe="1" Channel="212" LowerValue="94" UpperValue="90"/>
     </Button>
-    <Button Caption="House Bright R1C5" ID="170" Icon="">
+    <Button Caption="House Bright R1C5" ID="174" Icon="">
       <WindowState Visible="True" X="388" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2196,7 +2253,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="22052"/>
     </Button>
-    <Button Caption="House Bright R1C5" ID="171" Icon="">
+    <Button Caption="House Bright R1C5" ID="175" Icon="">
       <WindowState Visible="True" X="388" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2225,7 +2282,7 @@
     <ShowEnableButton>False</ShowEnableButton>
     <Collapsed>False</Collapsed>
     <Disabled>False</Disabled>
-    <Button Caption="Dim 25 P3 R7C1" ID="172" Icon="">
+    <Button Caption="Dim 25 P3 R7C1" ID="176" Icon="">
       <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2238,7 +2295,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="32088"/>
     </Button>
-    <Button Caption="Dim 25 P3 R7C1" ID="173" Icon="">
+    <Button Caption="Dim 25 P3 R7C1" ID="177" Icon="">
       <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2251,7 +2308,7 @@
       <Action>Toggle</Action>
       <Input Universe="1" Channel="149" LowerValue="30" UpperValue="26"/>
     </Button>
-    <Button Caption="Dim 50 P3 R7C2" ID="174" Icon="">
+    <Button Caption="Dim 50 P3 R7C2" ID="178" Icon="">
       <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2264,7 +2321,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="63790"/>
     </Button>
-    <Button Caption="Dim 50 P3 R7C2" ID="175" Icon="">
+    <Button Caption="Dim 50 P3 R7C2" ID="179" Icon="">
       <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2277,7 +2334,7 @@
       <Action>Toggle</Action>
       <Input Universe="1" Channel="150" LowerValue="30" UpperValue="26"/>
     </Button>
-    <Button Caption="Dim 75 P3 R7C3" ID="176" Icon="">
+    <Button Caption="Dim 75 P3 R7C3" ID="180" Icon="">
       <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2290,7 +2347,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="49905"/>
     </Button>
-    <Button Caption="Dim 75 P3 R7C3" ID="177" Icon="">
+    <Button Caption="Dim 75 P3 R7C3" ID="181" Icon="">
       <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2303,7 +2360,7 @@
       <Action>Toggle</Action>
       <Input Universe="1" Channel="151" LowerValue="30" UpperValue="26"/>
     </Button>
-    <Button Caption="Dim Full P3 R7C4" ID="178" Icon="">
+    <Button Caption="Dim Full P3 R7C4" ID="182" Icon="">
       <WindowState Visible="True" X="292" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2316,7 +2373,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="56264"/>
     </Button>
-    <Button Caption="Dim Full P3 R7C4" ID="179" Icon="">
+    <Button Caption="Dim Full P3 R7C4" ID="183" Icon="">
       <WindowState Visible="True" X="292" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2329,7 +2386,7 @@
       <Action>Toggle</Action>
       <Input Universe="1" Channel="152" LowerValue="22" UpperValue="18"/>
     </Button>
-    <Button Caption="Sync Strobe P3 R7C5" ID="180" Icon="">
+    <Button Caption="Sync Strobe P3 R7C5" ID="184" Icon="">
       <WindowState Visible="True" X="388" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2342,7 +2399,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="45154"/>
     </Button>
-    <Button Caption="Sync Strobe P3 R7C5" ID="181" Icon="">
+    <Button Caption="Sync Strobe P3 R7C5" ID="185" Icon="">
       <WindowState Visible="True" X="388" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2371,7 +2428,7 @@
     <ShowEnableButton>False</ShowEnableButton>
     <Collapsed>False</Collapsed>
     <Disabled>False</Disabled>
-    <Button Caption="Blackout P3 R8C1" ID="182" Icon="">
+    <Button Caption="Blackout P3 R8C1" ID="186" Icon="">
       <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2383,7 +2440,7 @@
       <Action>Blackout</Action>
       <Input Universe="0" Channel="43284"/>
     </Button>
-    <Button Caption="Blackout P3 R8C1" ID="183" Icon="">
+    <Button Caption="Blackout P3 R8C1" ID="187" Icon="">
       <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2395,7 +2452,7 @@
       <Action>Blackout</Action>
       <Input Universe="1" Channel="139" LowerValue="14" UpperValue="10"/>
     </Button>
-    <Button Caption="Panic P3 R8C2" ID="184" Icon="">
+    <Button Caption="Panic P3 R8C2" ID="188" Icon="">
       <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2408,7 +2465,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="52205"/>
     </Button>
-    <Button Caption="Panic P3 R8C2" ID="185" Icon="">
+    <Button Caption="Panic P3 R8C2" ID="189" Icon="">
       <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2421,7 +2478,7 @@
       <Action>Toggle</Action>
       <Input Universe="1" Channel="140" LowerValue="2" UpperValue="6"/>
     </Button>
-    <Button Caption="Banner P3 R8C3" ID="186" Icon="">
+    <Button Caption="Banner P3 R8C3" ID="190" Icon="">
       <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2434,7 +2491,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="15973"/>
     </Button>
-    <Button Caption="Banner P3 R8C3" ID="187" Icon="">
+    <Button Caption="Banner P3 R8C3" ID="191" Icon="">
       <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2447,7 +2504,7 @@
       <Action>Toggle</Action>
       <Input Universe="1" Channel="141" LowerValue="94" UpperValue="90"/>
     </Button>
-    <Button Caption="Strobe P3 R8C5" ID="188" Icon="">
+    <Button Caption="Strobe P3 R8C5" ID="192" Icon="">
       <WindowState Visible="True" X="388" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2460,7 +2517,7 @@
       <Action>Flash</Action>
       <Input Universe="0" Channel="10231"/>
     </Button>
-    <Button Caption="Strobe P3 R8C5" ID="189" Icon="">
+    <Button Caption="Strobe P3 R8C5" ID="193" Icon="">
       <WindowState Visible="True" X="388" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2473,7 +2530,33 @@
       <Action>Flash</Action>
       <Input Universe="1" Channel="143" LowerValue="2" UpperValue="6"/>
     </Button>
-    <Button Caption="Par Sound P3 R8C7" ID="190" Icon="">
+    <Button Caption="Truss Sound P3 R8C6" ID="194" Icon="">
+      <WindowState Visible="True" X="484" Y="4" Width="90" Height="44"/>
+      <Appearance>
+       <FrameStyle>None</FrameStyle>
+       <ForegroundColor>4278190080</ForegroundColor>
+       <BackgroundColor>4294922440</BackgroundColor>
+       <BackgroundImage>None</BackgroundImage>
+       <Font>Default</Font>
+      </Appearance>
+      <Function ID="79"/>
+      <Action>Toggle</Action>
+      <Input Universe="0" Channel="14115"/>
+    </Button>
+    <Button Caption="Truss Sound P3 R8C6" ID="195" Icon="">
+      <WindowState Visible="True" X="484" Y="4" Width="90" Height="44"/>
+      <Appearance>
+       <FrameStyle>None</FrameStyle>
+       <ForegroundColor>4278190080</ForegroundColor>
+       <BackgroundColor>4294922440</BackgroundColor>
+       <BackgroundImage>None</BackgroundImage>
+       <Font>Default</Font>
+      </Appearance>
+      <Function ID="79"/>
+      <Action>Toggle</Action>
+      <Input Universe="1" Channel="144" LowerValue="110" UpperValue="106"/>
+    </Button>
+    <Button Caption="Par Sound P3 R8C7" ID="196" Icon="">
       <WindowState Visible="True" X="580" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2486,7 +2569,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="24405"/>
     </Button>
-    <Button Caption="Par Sound P3 R8C7" ID="191" Icon="">
+    <Button Caption="Par Sound P3 R8C7" ID="197" Icon="">
       <WindowState Visible="True" X="580" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2515,7 +2598,7 @@
     <ShowEnableButton>False</ShowEnableButton>
     <Collapsed>False</Collapsed>
     <Disabled>False</Disabled>
-    <Button Caption="Gold Blue Full R1C1" ID="192" Icon="">
+    <Button Caption="Gold Blue Full R1C1" ID="198" Icon="">
       <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2528,7 +2611,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="39245"/>
     </Button>
-    <Button Caption="Gold Blue Full R1C1" ID="193" Icon="">
+    <Button Caption="Gold Blue Full R1C1" ID="199" Icon="">
       <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2541,7 +2624,7 @@
       <Action>Toggle</Action>
       <Input Universe="1" Channel="209" LowerValue="22" UpperValue="18"/>
     </Button>
-    <Button Caption="Circles R1C2" ID="194" Icon="">
+    <Button Caption="Circles R1C2" ID="200" Icon="">
       <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2554,7 +2637,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="18991"/>
     </Button>
-    <Button Caption="Circles R1C2" ID="195" Icon="">
+    <Button Caption="Circles R1C2" ID="201" Icon="">
       <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2567,7 +2650,7 @@
       <Action>Toggle</Action>
       <Input Universe="1" Channel="210" LowerValue="86" UpperValue="82"/>
     </Button>
-    <Button Caption="Fast Chase R1C3" ID="196" Icon="">
+    <Button Caption="Fast Chase R1C3" ID="202" Icon="">
       <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2580,7 +2663,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="52560"/>
     </Button>
-    <Button Caption="Fast Chase R1C3" ID="197" Icon="">
+    <Button Caption="Fast Chase R1C3" ID="203" Icon="">
       <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2593,7 +2676,7 @@
       <Action>Toggle</Action>
       <Input Universe="1" Channel="211" LowerValue="30" UpperValue="26"/>
     </Button>
-    <Button Caption="White Burst R1C4" ID="198" Icon="">
+    <Button Caption="White Burst R1C4" ID="204" Icon="">
       <WindowState Visible="True" X="292" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2606,7 +2689,7 @@
       <Action>Flash</Action>
       <Input Universe="0" Channel="40931"/>
     </Button>
-    <Button Caption="White Burst R1C4" ID="199" Icon="">
+    <Button Caption="White Burst R1C4" ID="205" Icon="">
       <WindowState Visible="True" X="292" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2635,7 +2718,7 @@
     <ShowEnableButton>False</ShowEnableButton>
     <Collapsed>False</Collapsed>
     <Disabled>False</Disabled>
-    <Button Caption="Dim 25 P4 R7C1" ID="200" Icon="">
+    <Button Caption="Dim 25 P4 R7C1" ID="206" Icon="">
       <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2648,7 +2731,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="24969"/>
     </Button>
-    <Button Caption="Dim 25 P4 R7C1" ID="201" Icon="">
+    <Button Caption="Dim 25 P4 R7C1" ID="207" Icon="">
       <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2661,7 +2744,7 @@
       <Action>Toggle</Action>
       <Input Universe="1" Channel="149" LowerValue="30" UpperValue="26"/>
     </Button>
-    <Button Caption="Dim 50 P4 R7C2" ID="202" Icon="">
+    <Button Caption="Dim 50 P4 R7C2" ID="208" Icon="">
       <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2674,7 +2757,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="58879"/>
     </Button>
-    <Button Caption="Dim 50 P4 R7C2" ID="203" Icon="">
+    <Button Caption="Dim 50 P4 R7C2" ID="209" Icon="">
       <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2687,7 +2770,7 @@
       <Action>Toggle</Action>
       <Input Universe="1" Channel="150" LowerValue="30" UpperValue="26"/>
     </Button>
-    <Button Caption="Dim 75 P4 R7C3" ID="204" Icon="">
+    <Button Caption="Dim 75 P4 R7C3" ID="210" Icon="">
       <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2700,7 +2783,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="56864"/>
     </Button>
-    <Button Caption="Dim 75 P4 R7C3" ID="205" Icon="">
+    <Button Caption="Dim 75 P4 R7C3" ID="211" Icon="">
       <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2713,7 +2796,7 @@
       <Action>Toggle</Action>
       <Input Universe="1" Channel="151" LowerValue="30" UpperValue="26"/>
     </Button>
-    <Button Caption="Dim Full P4 R7C4" ID="206" Icon="">
+    <Button Caption="Dim Full P4 R7C4" ID="212" Icon="">
       <WindowState Visible="True" X="292" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2726,7 +2809,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="50969"/>
     </Button>
-    <Button Caption="Dim Full P4 R7C4" ID="207" Icon="">
+    <Button Caption="Dim Full P4 R7C4" ID="213" Icon="">
       <WindowState Visible="True" X="292" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2739,7 +2822,7 @@
       <Action>Toggle</Action>
       <Input Universe="1" Channel="152" LowerValue="22" UpperValue="18"/>
     </Button>
-    <Button Caption="Sync Strobe P4 R7C5" ID="208" Icon="">
+    <Button Caption="Sync Strobe P4 R7C5" ID="214" Icon="">
       <WindowState Visible="True" X="388" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2752,7 +2835,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="44211"/>
     </Button>
-    <Button Caption="Sync Strobe P4 R7C5" ID="209" Icon="">
+    <Button Caption="Sync Strobe P4 R7C5" ID="215" Icon="">
       <WindowState Visible="True" X="388" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2781,7 +2864,7 @@
     <ShowEnableButton>False</ShowEnableButton>
     <Collapsed>False</Collapsed>
     <Disabled>False</Disabled>
-    <Button Caption="Blackout P4 R8C1" ID="210" Icon="">
+    <Button Caption="Blackout P4 R8C1" ID="216" Icon="">
       <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2793,7 +2876,7 @@
       <Action>Blackout</Action>
       <Input Universe="0" Channel="46533"/>
     </Button>
-    <Button Caption="Blackout P4 R8C1" ID="211" Icon="">
+    <Button Caption="Blackout P4 R8C1" ID="217" Icon="">
       <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2805,7 +2888,7 @@
       <Action>Blackout</Action>
       <Input Universe="1" Channel="139" LowerValue="14" UpperValue="10"/>
     </Button>
-    <Button Caption="Panic P4 R8C2" ID="212" Icon="">
+    <Button Caption="Panic P4 R8C2" ID="218" Icon="">
       <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2818,7 +2901,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="55100"/>
     </Button>
-    <Button Caption="Panic P4 R8C2" ID="213" Icon="">
+    <Button Caption="Panic P4 R8C2" ID="219" Icon="">
       <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2831,7 +2914,7 @@
       <Action>Toggle</Action>
       <Input Universe="1" Channel="140" LowerValue="2" UpperValue="6"/>
     </Button>
-    <Button Caption="Banner P4 R8C3" ID="214" Icon="">
+    <Button Caption="Banner P4 R8C3" ID="220" Icon="">
       <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2844,7 +2927,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="8884"/>
     </Button>
-    <Button Caption="Banner P4 R8C3" ID="215" Icon="">
+    <Button Caption="Banner P4 R8C3" ID="221" Icon="">
       <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2857,7 +2940,7 @@
       <Action>Toggle</Action>
       <Input Universe="1" Channel="141" LowerValue="94" UpperValue="90"/>
     </Button>
-    <Button Caption="Strobe P4 R8C5" ID="216" Icon="">
+    <Button Caption="Strobe P4 R8C5" ID="222" Icon="">
       <WindowState Visible="True" X="388" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2870,7 +2953,7 @@
       <Action>Flash</Action>
       <Input Universe="0" Channel="15142"/>
     </Button>
-    <Button Caption="Strobe P4 R8C5" ID="217" Icon="">
+    <Button Caption="Strobe P4 R8C5" ID="223" Icon="">
       <WindowState Visible="True" X="388" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2883,7 +2966,33 @@
       <Action>Flash</Action>
       <Input Universe="1" Channel="143" LowerValue="2" UpperValue="6"/>
     </Button>
-    <Button Caption="Par Sound P4 R8C7" ID="218" Icon="">
+    <Button Caption="Truss Sound P4 R8C6" ID="224" Icon="">
+      <WindowState Visible="True" X="484" Y="4" Width="90" Height="44"/>
+      <Appearance>
+       <FrameStyle>None</FrameStyle>
+       <ForegroundColor>4278190080</ForegroundColor>
+       <BackgroundColor>4294922440</BackgroundColor>
+       <BackgroundImage>None</BackgroundImage>
+       <Font>Default</Font>
+      </Appearance>
+      <Function ID="79"/>
+      <Action>Toggle</Action>
+      <Input Universe="0" Channel="11250"/>
+    </Button>
+    <Button Caption="Truss Sound P4 R8C6" ID="225" Icon="">
+      <WindowState Visible="True" X="484" Y="4" Width="90" Height="44"/>
+      <Appearance>
+       <FrameStyle>None</FrameStyle>
+       <ForegroundColor>4278190080</ForegroundColor>
+       <BackgroundColor>4294922440</BackgroundColor>
+       <BackgroundImage>None</BackgroundImage>
+       <Font>Default</Font>
+      </Appearance>
+      <Function ID="79"/>
+      <Action>Toggle</Action>
+      <Input Universe="1" Channel="144" LowerValue="110" UpperValue="106"/>
+    </Button>
+    <Button Caption="Par Sound P4 R8C7" ID="226" Icon="">
       <WindowState Visible="True" X="580" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2896,7 +3005,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="17284"/>
     </Button>
-    <Button Caption="Par Sound P4 R8C7" ID="219" Icon="">
+    <Button Caption="Par Sound P4 R8C7" ID="227" Icon="">
       <WindowState Visible="True" X="580" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2925,7 +3034,7 @@
     <ShowEnableButton>False</ShowEnableButton>
     <Collapsed>False</Collapsed>
     <Disabled>False</Disabled>
-    <Button Caption="GB Chase R1C1" ID="220" Icon="">
+    <Button Caption="GB Chase R1C1" ID="228" Icon="">
       <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2938,7 +3047,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="54161"/>
     </Button>
-    <Button Caption="GB Chase R1C1" ID="221" Icon="">
+    <Button Caption="GB Chase R1C1" ID="229" Icon="">
       <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2951,7 +3060,7 @@
       <Action>Toggle</Action>
       <Input Universe="1" Channel="209" LowerValue="22" UpperValue="18"/>
     </Button>
-    <Button Caption="Blue UV R1C2" ID="222" Icon="">
+    <Button Caption="Blue UV R1C2" ID="230" Icon="">
       <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2964,7 +3073,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="25154"/>
     </Button>
-    <Button Caption="Blue UV R1C2" ID="223" Icon="">
+    <Button Caption="Blue UV R1C2" ID="231" Icon="">
       <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2977,7 +3086,7 @@
       <Action>Toggle</Action>
       <Input Universe="1" Channel="210" LowerValue="86" UpperValue="82"/>
     </Button>
-    <Button Caption="Gold UV R1C3" ID="224" Icon="">
+    <Button Caption="Gold UV R1C3" ID="232" Icon="">
       <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -2990,7 +3099,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="55290"/>
     </Button>
-    <Button Caption="Gold UV R1C3" ID="225" Icon="">
+    <Button Caption="Gold UV R1C3" ID="233" Icon="">
       <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -3003,7 +3112,7 @@
       <Action>Toggle</Action>
       <Input Universe="1" Channel="211" LowerValue="94" UpperValue="90"/>
     </Button>
-    <Button Caption="Rainbow R1C4" ID="226" Icon="">
+    <Button Caption="Rainbow R1C4" ID="234" Icon="">
       <WindowState Visible="True" X="292" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -3016,7 +3125,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="2056"/>
     </Button>
-    <Button Caption="Rainbow R1C4" ID="227" Icon="">
+    <Button Caption="Rainbow R1C4" ID="235" Icon="">
       <WindowState Visible="True" X="292" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -3029,7 +3138,7 @@
       <Action>Toggle</Action>
       <Input Universe="1" Channel="212" LowerValue="46" UpperValue="42"/>
     </Button>
-    <Button Caption="Rainbow Fast R1C5" ID="228" Icon="">
+    <Button Caption="Rainbow Fast R1C5" ID="236" Icon="">
       <WindowState Visible="True" X="388" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -3042,7 +3151,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="45219"/>
     </Button>
-    <Button Caption="Rainbow Fast R1C5" ID="229" Icon="">
+    <Button Caption="Rainbow Fast R1C5" ID="237" Icon="">
       <WindowState Visible="True" X="388" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -3055,7 +3164,7 @@
       <Action>Toggle</Action>
       <Input Universe="1" Channel="213" LowerValue="110" UpperValue="106"/>
     </Button>
-    <Button Caption="UV Black R1C6" ID="230" Icon="">
+    <Button Caption="UV Black R1C6" ID="238" Icon="">
       <WindowState Visible="True" X="484" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -3068,7 +3177,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="31139"/>
     </Button>
-    <Button Caption="UV Black R1C6" ID="231" Icon="">
+    <Button Caption="UV Black R1C6" ID="239" Icon="">
       <WindowState Visible="True" X="484" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -3081,7 +3190,7 @@
       <Action>Toggle</Action>
       <Input Universe="1" Channel="214" LowerValue="94" UpperValue="90"/>
     </Button>
-    <Button Caption="Sweep Wide R2C1" ID="232" Icon="">
+    <Button Caption="Sweep Wide R2C1" ID="240" Icon="">
       <WindowState Visible="True" X="4" Y="54" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -3094,7 +3203,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="41757"/>
     </Button>
-    <Button Caption="Sweep Wide R2C1" ID="233" Icon="">
+    <Button Caption="Sweep Wide R2C1" ID="241" Icon="">
       <WindowState Visible="True" X="4" Y="54" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -3107,7 +3216,7 @@
       <Action>Toggle</Action>
       <Input Universe="1" Channel="199" LowerValue="78" UpperValue="74"/>
     </Button>
-    <Button Caption="Sweep Cross R2C2" ID="234" Icon="">
+    <Button Caption="Sweep Cross R2C2" ID="242" Icon="">
       <WindowState Visible="True" X="100" Y="54" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -3120,7 +3229,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="53359"/>
     </Button>
-    <Button Caption="Sweep Cross R2C2" ID="235" Icon="">
+    <Button Caption="Sweep Cross R2C2" ID="243" Icon="">
       <WindowState Visible="True" X="100" Y="54" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -3133,7 +3242,7 @@
       <Action>Toggle</Action>
       <Input Universe="1" Channel="200" LowerValue="78" UpperValue="74"/>
     </Button>
-    <Button Caption="Sweep Punch R2C3" ID="236" Icon="">
+    <Button Caption="Sweep Punch R2C3" ID="244" Icon="">
       <WindowState Visible="True" X="196" Y="54" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -3146,7 +3255,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="54748"/>
     </Button>
-    <Button Caption="Sweep Punch R2C3" ID="237" Icon="">
+    <Button Caption="Sweep Punch R2C3" ID="245" Icon="">
       <WindowState Visible="True" X="196" Y="54" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -3175,7 +3284,7 @@
     <ShowEnableButton>False</ShowEnableButton>
     <Collapsed>False</Collapsed>
     <Disabled>False</Disabled>
-    <Button Caption="Dim 25 P5 R7C1" ID="238" Icon="">
+    <Button Caption="Dim 25 P5 R7C1" ID="246" Icon="">
       <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -3188,7 +3297,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="26018"/>
     </Button>
-    <Button Caption="Dim 25 P5 R7C1" ID="239" Icon="">
+    <Button Caption="Dim 25 P5 R7C1" ID="247" Icon="">
       <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -3201,7 +3310,7 @@
       <Action>Toggle</Action>
       <Input Universe="1" Channel="149" LowerValue="30" UpperValue="26"/>
     </Button>
-    <Button Caption="Dim 50 P5 R7C2" ID="240" Icon="">
+    <Button Caption="Dim 50 P5 R7C2" ID="248" Icon="">
       <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -3214,7 +3323,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="57812"/>
     </Button>
-    <Button Caption="Dim 50 P5 R7C2" ID="241" Icon="">
+    <Button Caption="Dim 50 P5 R7C2" ID="249" Icon="">
       <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -3227,7 +3336,7 @@
       <Action>Toggle</Action>
       <Input Universe="1" Channel="150" LowerValue="30" UpperValue="26"/>
     </Button>
-    <Button Caption="Dim 75 P5 R7C3" ID="242" Icon="">
+    <Button Caption="Dim 75 P5 R7C3" ID="250" Icon="">
       <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -3240,7 +3349,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="55819"/>
     </Button>
-    <Button Caption="Dim 75 P5 R7C3" ID="243" Icon="">
+    <Button Caption="Dim 75 P5 R7C3" ID="251" Icon="">
       <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -3253,7 +3362,7 @@
       <Action>Toggle</Action>
       <Input Universe="1" Channel="151" LowerValue="30" UpperValue="26"/>
     </Button>
-    <Button Caption="Dim Full P5 R7C4" ID="244" Icon="">
+    <Button Caption="Dim Full P5 R7C4" ID="252" Icon="">
       <WindowState Visible="True" X="292" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -3266,7 +3375,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="49970"/>
     </Button>
-    <Button Caption="Dim Full P5 R7C4" ID="245" Icon="">
+    <Button Caption="Dim Full P5 R7C4" ID="253" Icon="">
       <WindowState Visible="True" X="292" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -3279,7 +3388,7 @@
       <Action>Toggle</Action>
       <Input Universe="1" Channel="152" LowerValue="22" UpperValue="18"/>
     </Button>
-    <Button Caption="Sync Strobe P5 R7C5" ID="246" Icon="">
+    <Button Caption="Sync Strobe P5 R7C5" ID="254" Icon="">
       <WindowState Visible="True" X="388" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -3292,7 +3401,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="43160"/>
     </Button>
-    <Button Caption="Sync Strobe P5 R7C5" ID="247" Icon="">
+    <Button Caption="Sync Strobe P5 R7C5" ID="255" Icon="">
       <WindowState Visible="True" X="388" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -3321,7 +3430,7 @@
     <ShowEnableButton>False</ShowEnableButton>
     <Collapsed>False</Collapsed>
     <Disabled>False</Disabled>
-    <Button Caption="Blackout P5 R8C1" ID="248" Icon="">
+    <Button Caption="Blackout P5 R8C1" ID="256" Icon="">
       <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -3333,7 +3442,7 @@
       <Action>Blackout</Action>
       <Input Universe="0" Channel="45550"/>
     </Button>
-    <Button Caption="Blackout P5 R8C1" ID="249" Icon="">
+    <Button Caption="Blackout P5 R8C1" ID="257" Icon="">
       <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -3345,7 +3454,7 @@
       <Action>Blackout</Action>
       <Input Universe="1" Channel="139" LowerValue="14" UpperValue="10"/>
     </Button>
-    <Button Caption="Panic P5 R8C2" ID="250" Icon="">
+    <Button Caption="Panic P5 R8C2" ID="258" Icon="">
       <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -3358,7 +3467,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="54039"/>
     </Button>
-    <Button Caption="Panic P5 R8C2" ID="251" Icon="">
+    <Button Caption="Panic P5 R8C2" ID="259" Icon="">
       <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -3371,7 +3480,7 @@
       <Action>Toggle</Action>
       <Input Universe="1" Channel="140" LowerValue="2" UpperValue="6"/>
     </Button>
-    <Button Caption="Banner P5 R8C3" ID="252" Icon="">
+    <Button Caption="Banner P5 R8C3" ID="260" Icon="">
       <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -3384,7 +3493,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="9887"/>
     </Button>
-    <Button Caption="Banner P5 R8C3" ID="253" Icon="">
+    <Button Caption="Banner P5 R8C3" ID="261" Icon="">
       <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -3397,7 +3506,7 @@
       <Action>Toggle</Action>
       <Input Universe="1" Channel="141" LowerValue="94" UpperValue="90"/>
     </Button>
-    <Button Caption="Strobe P5 R8C5" ID="254" Icon="">
+    <Button Caption="Strobe P5 R8C5" ID="262" Icon="">
       <WindowState Visible="True" X="388" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -3410,7 +3519,7 @@
       <Action>Flash</Action>
       <Input Universe="0" Channel="16141"/>
     </Button>
-    <Button Caption="Strobe P5 R8C5" ID="255" Icon="">
+    <Button Caption="Strobe P5 R8C5" ID="263" Icon="">
       <WindowState Visible="True" X="388" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -3423,7 +3532,33 @@
       <Action>Flash</Action>
       <Input Universe="1" Channel="143" LowerValue="2" UpperValue="6"/>
     </Button>
-    <Button Caption="Par Sound P5 R8C7" ID="256" Icon="">
+    <Button Caption="Truss Sound P5 R8C6" ID="264" Icon="">
+      <WindowState Visible="True" X="484" Y="4" Width="90" Height="44"/>
+      <Appearance>
+       <FrameStyle>None</FrameStyle>
+       <ForegroundColor>4278190080</ForegroundColor>
+       <BackgroundColor>4294922440</BackgroundColor>
+       <BackgroundImage>None</BackgroundImage>
+       <Font>Default</Font>
+      </Appearance>
+      <Function ID="79"/>
+      <Action>Toggle</Action>
+      <Input Universe="0" Channel="12249"/>
+    </Button>
+    <Button Caption="Truss Sound P5 R8C6" ID="265" Icon="">
+      <WindowState Visible="True" X="484" Y="4" Width="90" Height="44"/>
+      <Appearance>
+       <FrameStyle>None</FrameStyle>
+       <ForegroundColor>4278190080</ForegroundColor>
+       <BackgroundColor>4294922440</BackgroundColor>
+       <BackgroundImage>None</BackgroundImage>
+       <Font>Default</Font>
+      </Appearance>
+      <Function ID="79"/>
+      <Action>Toggle</Action>
+      <Input Universe="1" Channel="144" LowerValue="110" UpperValue="106"/>
+    </Button>
+    <Button Caption="Par Sound P5 R8C7" ID="266" Icon="">
       <WindowState Visible="True" X="580" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -3436,7 +3571,7 @@
       <Action>Toggle</Action>
       <Input Universe="0" Channel="18351"/>
     </Button>
-    <Button Caption="Par Sound P5 R8C7" ID="257" Icon="">
+    <Button Caption="Par Sound P5 R8C7" ID="267" Icon="">
       <WindowState Visible="True" X="580" Y="4" Width="90" Height="44"/>
       <Appearance>
        <FrameStyle>None</FrameStyle>
@@ -3514,18 +3649,6 @@
      <Function FadeIn="0" FadeOut="0" Duration="6">72</Function>
      <Function FadeIn="0" FadeOut="0" Duration="6">77</Function>
     </SpeedDial>
-    <AudioTriggers Caption="Audio" ID="930" BarsNumber="16">
-     <Appearance>
-      <FrameStyle>None</FrameStyle>
-      <ForegroundColor>Default</ForegroundColor>
-      <BackgroundColor>Default</BackgroundColor>
-      <BackgroundImage>None</BackgroundImage>
-      <Font>Default</Font>
-     </Appearance>
-     <WindowState Visible="True" X="204" Y="348" Width="180" Height="160"/>
-     <Input Universe="1" Channel="144"/>
-     <SpectrumBar Name="Bass" Type="2" MinThreshold="51" MaxThreshold="204" Divisor="1" Index="0" FunctionID="79"/>
-    </AudioTriggers>
    </Frame>
    <SoloFrame Caption="TRUSS POSITION" ID="8">
     <Appearance>

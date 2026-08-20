@@ -196,19 +196,51 @@ describe("party VC — 5 pages, shared rows, faders, tempo, audio", () => {
     expect(raw.match(/Caption="Blackout P1 R8C1"[^]*?<Action>(\w+)<\/Action>/)?.[1]).toBe("Blackout");
   });
 
-  it("ships six faders, all dim faders defaulting to 0 so the R7 pads own brightness", () => {
-    expect((raw.match(/<Slider Caption=/g) || []).length).toBe(6);
-    expect(names).toEqual(expect.arrayContaining(
-      ["Pars Dim", "Truss Dim", "Banner Dim", "UV Level", "Strobe Rate", "Heads Zoom"]));
-    for (const cap of ["Pars Dim", "Truss Dim", "Banner Dim", "UV Level", "Strobe Rate"]) {
-      const s = raw.match(new RegExp(`<Slider Caption="${cap}"[^]*?</Slider>`))?.[0] || "";
-      expect(s, cap).toContain('Value="0"');
-      expect(s, cap).toContain(">Level</SliderMode>");
+  // REGRESSION GUARD — verified on the real rig 2026-08-20. A QLC+ Level slider does not take part
+  // in HTP: it owns its channels and forces its value out. Dim/UV/strobe faders therefore pinned
+  // those channels and the rig stayed dark with "Dim Full" apparently running. Any channel a look
+  // or a pad drives must never appear on a Level fader again.
+  it("puts NO look-driven channel on a Level fader (dimmers, UV, strobe stay pad/scene territory)", () => {
+    const forbidden: Record<string, number[]> = {
+      par: [0, 1, 2, 3, 4, 5, 6, 7],   // dimmer, strobe, and all colour channels
+      head: [0, 2, 5, 10, 11],          // pan, tilt, colour wheel, dimmer, shutter
+    };
+    for (const s of raw.matchAll(/<Slider Caption="([^"]*)"[^]*?<\/Slider>/g)) {
+      for (const c of s[0].matchAll(/<Channel Fixture="(\d+)">(\d+)<\/Channel>/g)) {
+        const fixtureId = Number(c[1]), ch = Number(c[2]);
+        const kind = fixtureId < 10 ? "par" : "head";
+        expect(forbidden[kind], `slider "${s[1]}" claims ${kind} ch${ch}`).not.toContain(ch);
+      }
     }
-    // Banner Dim drives the floor heads' dimmer, Truss Dim the truss heads' — never crossed.
-    const banner = raw.match(/<Slider Caption="Banner Dim"[^]*?<\/Slider>/)?.[0] || "";
-    expect(banner).toContain('<Channel Fixture="12">10</Channel>');
-    expect(banner).not.toContain('<Channel Fixture="10">');
+  });
+
+  it("ships only the Heads Zoom fader — the one channel no function touches", () => {
+    expect((raw.match(/<Slider Caption=/g) || []).length).toBe(1);
+    expect(names).toContain("Heads Zoom");
+    for (const gone of ["Pars Dim", "Truss Dim", "Banner Dim", "UV Level", "Strobe Rate"])
+      expect(names, `${gone} must not be a Level fader`).not.toContain(gone);
+    const zoom = raw.match(/<Slider Caption="Heads Zoom"[^]*?<\/Slider>/)?.[0] || "";
+    expect(zoom).toContain('Value="128"');
+    expect(zoom).toContain(">Level</SliderMode>");
+  });
+
+  it("binds the fader's OSC input to its own path, not a double-slashed one", () => {
+    // crc16("/heads_zoom"); the earlier emitter ran the path through oscPath() a second time and
+    // bound crc16("//heads_zoom"), so the slider never answered OSC at all.
+    const zoom = raw.match(/<Slider Caption="Heads Zoom"[^]*?<\/Slider>/)?.[0] || "";
+    const crcOf = (s: string) => {
+      const T = [0x0000,0x1081,0x2102,0x3183,0x4204,0x5285,0x6306,0x7387,0x8408,0x9489,0xa50a,0xb58b,0xc60c,0xd68d,0xe70e,0xf78f];
+      let crc = 0xffff;
+      for (const b of Buffer.from(s, "utf8")) {
+        let c = b;
+        crc = ((crc >> 4) & 0x0fff) ^ T[(crc ^ c) & 15];
+        c = c >> 4;
+        crc = ((crc >> 4) & 0x0fff) ^ T[(crc ^ c) & 15];
+      }
+      return ~crc & 0xffff;
+    };
+    expect(zoom).toContain(`<Input Universe="0" Channel="${crcOf("/heads_zoom")}"/>`);
+    expect(zoom).not.toContain(`Channel="${crcOf("//heads_zoom")}"`);
   });
 
   it("emits a tap-tempo SpeedDial on R8C4 (pad 142) driving every chaser incl. Sync Strobe", () => {

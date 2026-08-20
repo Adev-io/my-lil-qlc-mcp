@@ -626,7 +626,7 @@ ${channels}
      <Playback>
       <Function>4294967295</Function>
      </Playback>
-     <Input Universe="0" Channel="${crc16(oscPath(oscName))}"/>
+     <Input Universe="0" Channel="${crc16(oscName)}"/>
     </Slider>`;
 }
 
@@ -677,15 +677,24 @@ function audioTriggersXml(id: number, caption: string, x: number, y: number, tog
     </AudioTriggers>`;
 }
 
-// FADERS — all default 0 except zoom: the R7 dim pads own brightness at boot, and a fader that
-// booted at full would sit above every pad preset under HTP and make the row look broken.
+// FADERS — deliberately minimal, and this is load-bearing.
+//
+// VERIFIED ON THE RIG 2026-08-20: a QLC+ VCSlider in Level mode does NOT contribute to HTP — it
+// OWNS every channel it lists and forces its own value out, always. The first cut of this show
+// shipped Pars/Truss/Banner Dim faders defaulting to 0 on the theory that the R7 dim pads would
+// win on HTP; instead those faders pinned every dimmer to 0 and the whole rig stayed dark while
+// "Dim Full" showed as running. Head colour wheel and shutter still passed through, which is what
+// gave the game away: only fader-covered channels were dead.
+//
+// So: any channel a look or a pad needs to drive must NOT appear on a Level fader. That rules out
+// dimmers (R7 pads), par UV (UV looks), and strobe (the R8C5 hold pad). Zoom is the one channel no
+// function touches, so it is the one fader that can safely exist.
+//
+// Continuous master dimming is the built-in GRAND MASTER (top-left of the console, Intensity /
+// Reduce) — it scales intensity channels without owning them, which is exactly the semantic the
+// dim faders were reaching for.
 const faderDefs: { id: number; caption: string; chans: { fixture: number; ch: number }[]; value: number; osc: string }[] = [
-  { id: 900, caption: "Pars Dim",    chans: pars.map((f) => ({ fixture: f.id, ch: 0 })),        value: 0,   osc: "/pars_dim" },
-  { id: 901, caption: "Truss Dim",   chans: trussHeads.map((f) => ({ fixture: f.id, ch: 10 })), value: 0,   osc: "/truss_dim" },
-  { id: 902, caption: "Banner Dim",  chans: floorHeads.map((f) => ({ fixture: f.id, ch: 10 })), value: 0,   osc: "/banner_dim" },
-  { id: 903, caption: "UV Level",    chans: pars.map((f) => ({ fixture: f.id, ch: 7 })),        value: 0,   osc: "/uv_level" },
-  { id: 904, caption: "Strobe Rate", chans: [...pars.map((f) => ({ fixture: f.id, ch: 1 })), ...heads.map((f) => ({ fixture: f.id, ch: 11 }))], value: 0, osc: "/strobe_rate" },
-  { id: 905, caption: "Heads Zoom",  chans: heads.map((f) => ({ fixture: f.id, ch: 14 })),      value: 128, osc: "/heads_zoom" },
+  { id: 905, caption: "Heads Zoom", chans: heads.map((f) => ({ fixture: f.id, ch: 14 })), value: 128, osc: "/heads_zoom" },
 ];
 const TAP_PAD = padCh(7, 3);    // R8C4 — SpeedDial tap
 const AUDIO_PAD = padCh(7, 5);  // R8C6 — audio-trigger enable
@@ -695,10 +704,16 @@ const tempoFuncIds = ["Sync Strobe", "Chase Gold Blue", "Chase Blue UV", "Chase 
   .map((n) => funcIdByName.get(n))
   .filter((v): v is number => v !== undefined);
 
+// Audio triggers are the one feature with a pre-agreed kill switch (spec: audio go/no-go).
+// PARTY_AUDIO=0 builds the show without the widget; tap tempo and the par sound-mode pad then
+// carry reactivity. Worth knowing: QLC+ stores the capture device as an APPLICATION preference,
+// so with none chosen it listens to the machine's default input — a laptop mic will drive the
+// beat pulse off room noise, which looks like the show flickering on its own.
+const AUDIO_TRIGGERS = process.env.PARTY_AUDIO !== "0";
 const fadersInner = [
   ...faderDefs.map((d, i) => sliderXml(d.id, d.caption, 12 + i * 72, d.chans, d.value, d.osc)),
   speedDialXml(920, "Tempo", 12, 348, TAP_PAD, tempoFuncIds, 500),
-  audioTriggersXml(930, "Audio", 204, 348, AUDIO_PAD, funcIdByName.get("Beat Pulse")!),
+  ...(AUDIO_TRIGGERS ? [audioTriggersXml(930, "Audio", 204, 348, AUDIO_PAD, funcIdByName.get("Beat Pulse")!)] : []),
 ];
 const fadersFrame = frame("Frame", "FADERS", 9, 805, 8, 12 + faderDefs.length * 72, 520, fadersInner);
 
@@ -981,8 +996,12 @@ and fires no look. On the keyboard, **PgDn / PgUp** also switch pages.
 
 ${pageSections}
 Pads glow at ~30% in their look colour when idle and jump to 100% while running. To the right of the
-grid: **Pars Dim · Truss Dim · Banner Dim · UV Level · Strobe Rate · Heads Zoom** (all default 0
-except zoom — the R7 pads own brightness), the **Tempo** dial, and the **Audio** trigger widget.
+grid: the **Heads Zoom** fader, the **Tempo** dial, and the **Audio** trigger widget.
+
+> **Why only one fader.** A QLC+ Level slider does not blend with scenes — it owns its channels and
+> forces its value out. Dim / UV / strobe faders therefore fought the pads and won, pinning the rig
+> dark. Brightness is the R7 pad row; **continuous master dimming is the Grand Master** (top-left of
+> the console). Zoom is the only channel no look touches, so it is the only safe fader.
 
 ## Look index — every pad (locate / update)
 

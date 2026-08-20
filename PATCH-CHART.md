@@ -143,8 +143,12 @@ and fires no look. On the keyboard, **PgDn / PgUp** also switch pages.
 ```
 
 Pads glow at ~30% in their look colour when idle and jump to 100% while running. To the right of the
-grid: **Pars Dim · Truss Dim · Banner Dim · UV Level · Strobe Rate · Heads Zoom** (all default 0
-except zoom — the R7 pads own brightness), the **Tempo** dial, and the **Audio** trigger widget.
+grid: the **Heads Zoom** fader, the **Tempo** dial, and the **Audio** trigger widget.
+
+> **Why only one fader.** A QLC+ Level slider does not blend with scenes — it owns its channels and
+> forces its value out. Dim / UV / strobe faders therefore fought the pads and won, pinning the rig
+> dark. Brightness is the R7 pad row; **continuous master dimming is the Grand Master** (top-left of
+> the console). Zoom is the only channel no look touches, so it is the only safe fader.
 
 ## Look index — every pad (locate / update)
 

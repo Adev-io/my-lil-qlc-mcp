@@ -582,60 +582,15 @@
       "description": "Button: Speaker Light (Input Universe 0, Channel 35807)"
     },
     {
-      "id": "900",
-      "name": "Pars Dim",
-      "path": "/pars_dim",
-      "type": "slider",
-      "description": "Slider: Pars Dim (Input Universe 0, Channel 32300)",
-      "minValue": 0,
-      "maxValue": 255
-    },
-    {
-      "id": "901",
-      "name": "Truss Dim",
-      "path": "/truss_dim",
-      "type": "slider",
-      "description": "Slider: Truss Dim (Input Universe 0, Channel 35207)",
-      "minValue": 0,
-      "maxValue": 255
-    },
-    {
-      "id": "902",
-      "name": "Banner Dim",
-      "path": "/banner_dim",
-      "type": "slider",
-      "description": "Slider: Banner Dim (Input Universe 0, Channel 40563)",
-      "minValue": 0,
-      "maxValue": 255
-    },
-    {
-      "id": "903",
-      "name": "UV Level",
-      "path": "/uv_level",
-      "type": "slider",
-      "description": "Slider: UV Level (Input Universe 0, Channel 60871)",
-      "minValue": 0,
-      "maxValue": 255
-    },
-    {
-      "id": "904",
-      "name": "Strobe Rate",
-      "path": "/strobe_rate",
-      "type": "slider",
-      "description": "Slider: Strobe Rate (Input Universe 0, Channel 17505)",
-      "minValue": 0,
-      "maxValue": 255
-    },
-    {
       "id": "905",
       "name": "Heads Zoom",
       "path": "/heads_zoom",
       "type": "slider",
-      "description": "Slider: Heads Zoom (Input Universe 0, Channel 4809)",
+      "description": "Slider: Heads Zoom (Input Universe 0, Channel 56839)",
       "minValue": 0,
       "maxValue": 255
     }
   ],
   "generated": true,
-  "generatedAt": "2026-08-20T16:59:05.039Z"
+  "generatedAt": "2026-08-20T17:28:22.713Z"
 }

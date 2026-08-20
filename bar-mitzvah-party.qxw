@@ -13,12 +13,12 @@
     <Input Plugin="OSC" UID="None" Line="0"/>
     <Output Plugin="ArtNet" UID="None" Line="0">
      <PluginParameters outputUni="0" transmitMode="Standard"/>
-    </Output><!-- no outputIP -&gt; broadcast. Pknight CR011R node at 10.201.6.100/24 via USB GbE NIC (static 10.201.6.1/24). Controller UIDs copied from punk - RE-VERIFY Saturday (winmm index shifts on replug). -->
+    </Output><!-- no outputIP -&gt; broadcast. Pknight CR011R node at 10.201.6.100/24 via USB GbE NIC (static 10.201.6.1/24). Controller UIDs VERIFIED 2026-08-20 against live winmm enumeration: MIDI IN [3] and MIDI OUT [4] are both named 'LPMiniMK3 MIDI'. Old 2/3 pointed at FLStudioMCP virtual ports - that was the haunted-rig bug. start-show.ps1 now re-checks name-&gt;index every launch. -->
     <Feedback Plugin="OSC" UID="None" Line="0"/>
    </Universe>
    <Universe Name="Launchpad" ID="1" Profile="Novation Launchpad Mini MK3">
-    <Input Plugin="MIDI" UID="2" Line="2"/>
-    <Feedback Plugin="MIDI" UID="3" Line="3"/>
+    <Input Plugin="MIDI" UID="3" Line="3"/>
+    <Feedback Plugin="MIDI" UID="4" Line="4"/>
    </Universe>
   </InputOutputMap>
   <Fixture>

@@ -84,21 +84,57 @@ if (-not (Get-Command npx -ErrorAction SilentlyContinue)) {
 if ($useLaunchpad -and -not (Get-Process qlcplus -ErrorAction SilentlyContinue)) {
   & (Join-Path $here 'engage-launchpad.ps1')
 
-  # HARD WARNING (learned on the rig 2026-08-20). rig.controller.inputUid/Line are winmm device
-  # INDEXES, not names. With the Launchpad unplugged, that index resolves to whatever other MIDI
-  # device now sits there -- on this machine a virtual MIDI port -- and QLC+ reads its traffic as
-  # pad presses, firing looks continuously with nobody touching anything. The rig looks possessed.
-  # So: if the Launchpad is missing, say plainly what will happen rather than a soft "check cable".
-  $lpPresent = @(Get-PnpDevice -PresentOnly -ErrorAction SilentlyContinue |
-    Where-Object { $_.FriendlyName -like '*LPMiniMK3*' }).Count -gt 0
-  if (-not $lpPresent) {
+  # HARD PREFLIGHT (learned on the rig 2026-08-20). rig.controller.inputUid/Line are winmm device
+  # INDEXES, not names, and those indexes MOVE when any MIDI device is added, removed or replugged
+  # (this machine also has loopMIDI + FLStudioMCP virtual ports). Point the show at the wrong index
+  # and QLC+ reads that device's traffic as pad presses: looks fire continuously with nobody
+  # touching anything, and the rig looks possessed. So resolve 'LPMiniMK3 MIDI' by NAME every
+  # launch and compare with what the show was generated against.
+  if (-not ('MIDX' -as [type])) {
+    Add-Type -TypeDefinition @"
+using System;
+using System.Runtime.InteropServices;
+public static class MIDX {
+  [StructLayout(LayoutKind.Sequential, CharSet=CharSet.Unicode)]
+  struct INCAPS { public ushort wMid, wPid; public uint v;
+    [MarshalAs(UnmanagedType.ByValTStr, SizeConst=32)] public string szPname; public uint dwSupport; }
+  [StructLayout(LayoutKind.Sequential, CharSet=CharSet.Unicode)]
+  struct OUTCAPS { public ushort wMid, wPid; public uint v;
+    [MarshalAs(UnmanagedType.ByValTStr, SizeConst=32)] public string szPname;
+    public ushort wTechnology, wVoices, wNotes, wChannelMask; public uint dwSupport; }
+  [DllImport("winmm.dll")] static extern uint midiInGetNumDevs();
+  [DllImport("winmm.dll", CharSet=CharSet.Unicode)] static extern uint midiInGetDevCaps(UIntPtr id, ref INCAPS c, uint cb);
+  [DllImport("winmm.dll")] static extern uint midiOutGetNumDevs();
+  [DllImport("winmm.dll", CharSet=CharSet.Unicode)] static extern uint midiOutGetDevCaps(UIntPtr id, ref OUTCAPS c, uint cb);
+  public static int In(string name) {
+    for (uint i = 0; i < midiInGetNumDevs(); i++) { var c = new INCAPS();
+      midiInGetDevCaps((UIntPtr)i, ref c, (uint)Marshal.SizeOf(c)); if (c.szPname == name) return (int)i; }
+    return -1; }
+  public static int Out(string name) {
+    for (uint i = 0; i < midiOutGetNumDevs(); i++) { var c = new OUTCAPS();
+      midiOutGetDevCaps((UIntPtr)i, ref c, (uint)Marshal.SizeOf(c)); if (c.szPname == name) return (int)i; }
+    return -1; }
+}
+"@
+  }
+  $lpIn  = [MIDX]::In('LPMiniMK3 MIDI')
+  $lpOut = [MIDX]::Out('LPMiniMK3 MIDI')
+  if ($lpIn -lt 0 -or $lpOut -lt 0) {
     Write-Host ''
     Write-Host '  [!!] LAUNCHPAD NOT CONNECTED — and the show maps MIDI by device INDEX.' -ForegroundColor Red
-    Write-Host '       QLC+ will bind index ' -NoNewline -ForegroundColor Yellow
-    Write-Host "$($rig.controller.inputUid)" -NoNewline -ForegroundColor Yellow
-    Write-Host ' to whatever MIDI device is there instead, and stray traffic on it' -ForegroundColor Yellow
-    Write-Host '       fires looks at random. Plug the Launchpad in and re-run, or expect a haunted rig.' -ForegroundColor Yellow
+    Write-Host "       QLC+ will bind index $($rig.controller.inputUid) to whatever MIDI device sits there instead," -ForegroundColor Yellow
+    Write-Host '       and stray traffic on it fires looks at random. Plug the Launchpad in and re-run.' -ForegroundColor Yellow
     Write-Host ''
+  } elseif ("$lpIn" -ne "$($rig.controller.inputUid)" -or "$lpOut" -ne "$($rig.controller.outputUid)") {
+    Write-Host ''
+    Write-Host '  [!!] MIDI INDEXES MOVED — this show will read the WRONG device and fire looks at random.' -ForegroundColor Red
+    Write-Host "       show expects  in=$($rig.controller.inputUid) out=$($rig.controller.outputUid)" -ForegroundColor Yellow
+    Write-Host "       Launchpad is  in=$lpIn out=$lpOut" -ForegroundColor Yellow
+    Write-Host '       Fix: set controller.inputUid/inputLine and outputUid/outputLine in rig.json to those' -ForegroundColor Yellow
+    Write-Host '            numbers, run "npm run generate", then re-run this launcher.' -ForegroundColor Yellow
+    Write-Host ''
+  } else {
+    Write-Host "  -> Launchpad MIDI index check OK (in=$lpIn out=$lpOut)" -ForegroundColor DarkGray
   }
 }
 

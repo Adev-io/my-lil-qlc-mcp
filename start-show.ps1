@@ -246,6 +246,24 @@ if ($rig -and $rig.meta.builder -eq 'party') {
       Write-Host "  -> boot lit: firing $($bootPad.path)" -ForegroundColor Green
       try { & node $oscScript $bootPad.path 1 | Out-Null }
       catch { Write-Host "  [!] boot-lit OSC failed (press R7C4 instead): $($_.Exception.Message)" -ForegroundColor Yellow }
+
+      # BOOT AIM. Looks set colour, never position, so until a position scene runs the heads sit
+      # at pan 0 / tilt 0 -- a hard mechanical extreme, and not a direction anyone chose. Send them
+      # to their home aim at startup: truss on the dance floor, floor pair on the banner. Resolved
+      # by widget NAME from the generated map so renaming a pad cannot silently break it.
+      $wjson = Join-Path $here 'config/widgets.json'
+      if (Test-Path $wjson) {
+        $ws = (Get-Content $wjson -Raw | ConvertFrom-Json).widgets
+        foreach ($n in @('Truss Home', 'Banner Home')) {
+          $w = $ws | Where-Object { $_.name -eq $n } | Select-Object -First 1
+          if ($w) {
+            try { & node $oscScript $w.path 1 | Out-Null; Write-Host "  -> boot aim: $($w.path)" -ForegroundColor Green }
+            catch { Write-Host "  [!] boot-aim OSC failed for $n (press it on the dashboard): $($_.Exception.Message)" -ForegroundColor Yellow }
+          } else {
+            Write-Host "  [!] boot-aim skipped: no '$n' widget in config/widgets.json" -ForegroundColor DarkGray
+          }
+        }
+      }
     } else {
       Write-Host '  [!] boot-lit skipped: no /dim_full_p1 pad in config/launchpad-leds.json' -ForegroundColor DarkGray
     }

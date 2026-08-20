@@ -23,7 +23,7 @@ monitor / day-of head-plot workflow as the punk show. Punk show remains untouche
 | Fixtures | Def | Addresses | Placement |
 |---|---|---|---|
 | 10x Rainbow Smart 2 Pro RGBWA+UV, 10ch | reused verbatim from punk rig | 0–90 (step 10) | Floor along back wall behind 28ft stage, uplighting the wall: 5 left group + 5 right group, ~2ft spacing |
-| 4x Chauvet Intimidator Spot 375Z IRC, 15ch | reused verbatim (roles, beam, color wheel, gobo slots) | 100 / 115 / 130 / 145 | 2 on 8ft truss flanking stage (`trussL`/`trussR`); 2 on floor aimed up at the banner (`floorL`/`floorR`) |
+| 4x Chauvet Intimidator Spot 375Z IRC, 15ch | reused verbatim (roles, beam, color wheel, gobo slots) | 100 / 115 / 130 / 145 | 2 on 8ft truss flanking stage (`trussL`/`trussR`); 2 on floor **directly below the truss positions**, aimed up+inward at the banner (`floorL`/`floorR`) — cross-shot X beams |
 
 - New per-head `mount` field: `trussL | trussR | floorL | floorR`.
 - New `banner` block: `{ widthFt: 12, heightFt: 8, centerX: 0 }` — upstage center
@@ -50,9 +50,10 @@ monitor / day-of head-plot workflow as the punk show. Punk show remains untouche
 
 - **Truss heads (8ft):** above targets again — punk `aim()` math applies for
   dance-floor and speaker targets in front of the stage. Roof guard stays.
-- **Floor heads:** aim UP at the banner — beams travel upstage, away from people.
-  New `aimBanner()` helper (inverted-elevation case); targets clamped to the
-  banner rectangle.
+- **Floor heads:** sit directly below the truss positions (stage sides), aim UP
+  and INWARD at the banner — cross-shot X beams, still traveling upstage away
+  from people. New `aimBanner()` helper (inverted-elevation case); targets
+  clamped to the banner rectangle; per-side pan mirroring.
 - **Movement-macro ban stays (ch13 ≠ 0 throws):** firmware auto pan/tilt ignores
   every fence and could rake the dance floor at face height.
 - **Sound-active mode is pars-only.** Heads are never audio- or sound-driven.

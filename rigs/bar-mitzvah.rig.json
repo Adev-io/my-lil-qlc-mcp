@@ -1,0 +1,76 @@
+{
+  "$schema": "./rig.schema.json",
+  "meta": {
+    "name": "Bar Mitzvah Party",
+    "description": "Dance-party rig: 10x Rainbow pars uplighting the back wall behind a 30ft x 4ft stage, 2x 375Z on 8ft truss flanking the stage, 2x 375Z on the floor below the truss cross-shooting a 12x8 banner. Gold/blue/UV theme.",
+    "author": "A_Development",
+    "builder": "party"
+  },
+  "stage": {
+    "widthFt": 30,
+    "depthFt": 4,
+    "deckHeightFt": 1.5,
+    "headHeightFt": 8,
+    "headSeparationFt": 30,
+    "notes": "MEASURED 2026-08-20: stage 30w x 4d x 1.5h ft; dance-floor CENTER is 14ft from stage center = 12ft downstage of the front edge (danceFloorCenterY = -12 in builder coords). Dance floor size + banner.centerHeightFt still come from the day-of plot sheet Saturday 2026-08-22; head positions from movingHeadSettings captured on site."
+  },
+  "banner": { "widthFt": 12, "heightFt": 8, "centerX": 0, "centerHeightFt": 8 },
+  "fixtures": [
+    {
+      "kind": "par",
+      "namePrefix": "Rainbow Par",
+      "manufacturer": "Rainbow Lights",
+      "model": "Smart 2 Pro RGBWA+UV",
+      "mode": "10 Channel",
+      "channels": 10,
+      "count": 10,
+      "addresses": [0, 10, 20, 30, 40, 50, 60, 70, 80, 90],
+      "qxfFile": "fixtures/Rainbow-Lights-Smart-2-Pro-RGBWAUV.qxf",
+      "roles": { "dim": 0, "strobe": 1, "r": 2, "g": 3, "b": 4, "w": 5, "a": 6, "uv": 7, "macro": 8, "speed": 9 }
+    },
+    {
+      "kind": "head",
+      "namePrefix": "Truss",
+      "manufacturer": "Chauvet",
+      "model": "Intimidator Spot 375Z IRC",
+      "mode": "15 channel",
+      "channels": 15,
+      "count": 2,
+      "addresses": [100, 115],
+      "roles": { "pan": 0, "panFine": 1, "tilt": 2, "tiltFine": 3, "ptSpeed": 4, "color": 5, "gobo": 6, "goboRot": 7, "prism": 8, "focus": 9, "dim": 10, "shutter": 11, "ctrl": 12, "mov": 13, "zoom": 14 },
+      "beam": { "panRangeDeg": 540, "tiltRangeDeg": 270, "tiltCentreDeprDeg": 37.5, "shutterOpen": 255, "shutterOpenMin": 216 },
+      "colorWheel": { "white": 0, "orange": 8, "lime": 16, "cyan": 24, "red": 36, "green": 44, "magenta": 50, "yellow": 60 },
+      "goboSlots": [11, 19, 27, 35, 43, 51, 59]
+    },
+    {
+      "kind": "head",
+      "namePrefix": "Floor",
+      "manufacturer": "Chauvet",
+      "model": "Intimidator Spot 375Z IRC",
+      "mode": "15 channel",
+      "channels": 15,
+      "count": 2,
+      "addresses": [130, 145],
+      "roles": { "pan": 0, "panFine": 1, "tilt": 2, "tiltFine": 3, "ptSpeed": 4, "color": 5, "gobo": 6, "goboRot": 7, "prism": 8, "focus": 9, "dim": 10, "shutter": 11, "ctrl": 12, "mov": 13, "zoom": 14 },
+      "beam": { "panRangeDeg": 540, "tiltRangeDeg": 270, "tiltCentreDeprDeg": 37.5, "shutterOpen": 255, "shutterOpenMin": 216 },
+      "colorWheel": { "white": 0, "orange": 8, "lime": 16, "cyan": 24, "red": 36, "green": 44, "magenta": 50, "yellow": 60 },
+      "goboSlots": [11, 19, 27, 35, 43, 51, 59]
+    }
+  ],
+  "controller": {
+    "launchpad": true,
+    "model": "Novation Launchpad Mini MK3",
+    "profile": "Novation Launchpad Mini MK3",
+    "inputUid": "2",
+    "inputLine": "2",
+    "outputUid": "3",
+    "outputLine": "3"
+  },
+  "dmxOutput": {
+    "plugin": "ArtNet",
+    "universe": 0,
+    "transmitMode": "Standard",
+    "outputIp": null,
+    "notes": "no outputIP -> broadcast. Pknight CR011R node at 10.201.6.100/24 via USB GbE NIC (static 10.201.6.1/24). Controller UIDs copied from punk - RE-VERIFY Saturday (winmm index shifts on replug)."
+  }
+}

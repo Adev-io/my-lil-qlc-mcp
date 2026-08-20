@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { RigSchema } from "../scripts/rig.js";
+import { RigSchema, loadRig } from "../scripts/rig.js";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -31,5 +31,18 @@ describe("rig schema — party additions", () => {
   it("rejects an unknown builder", () => {
     const r = RigSchema.safeParse({ ...punk, meta: { ...punk.meta, builder: "techno" } });
     expect(r.success).toBe(false);
+  });
+});
+
+describe("bar-mitzvah rig file", () => {
+  it("loads, validates, and has the party shape", () => {
+    const { rig } = loadRig(path.join(ROOT, "rigs", "bar-mitzvah.rig.json"));
+    expect(rig.meta.builder).toBe("party");
+    expect(rig.banner?.widthFt).toBe(12);
+    const heads = rig.fixtures.filter((g) => g.kind === "head");
+    expect(heads.map((g) => g.namePrefix)).toEqual(["Truss", "Floor"]);
+    expect(heads.flatMap((g) => g.addresses)).toEqual([100, 115, 130, 145]);
+    expect(rig.fixtures.find((g) => g.kind === "par")?.count).toBe(10);
+    expect(rig.fixtures.some((g) => g.kind === "bar")).toBe(false);
   });
 });

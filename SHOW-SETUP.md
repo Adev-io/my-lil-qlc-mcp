@@ -1,17 +1,30 @@
-# Show Setup — Punk/Alt-Rock Rig
+# Show Setup — QLC+ side
 
 Everything gear-independent is already built. When the equipment is in hand, this is the
 whole job: **dial addresses → map Art-Net → map the Launchpad → load test.**
+
+> **Two shows live in this repo.** The active one is whichever `rig.json` points at, and the
+> generated docs always describe THAT show. **Take DMX addresses and the pad map from
+> `PATCH-CHART.md`, never from the examples below** — the addresses printed in step 2 are the
+> punk rig's and are wrong for any other show.
+>
+> | Show | rig file | project file | operator manual |
+> |---|---|---|---|
+> | Punk / alt-rock band | `rigs/punk-rock-show.rig.json` | `punk-rock-show.qxw` | `SETUP-MANUAL.html` |
+> | Bar mitzvah party | `rigs/bar-mitzvah.rig.json` | `bar-mitzvah-party.qxw` | `SETUP-MANUAL.html` |
+>
+> Switch shows with `Copy-Item rigs/<show>.rig.json rig.json -Force` then `npm run generate`.
+> Both shows share the Rainbow pars and the 375Z heads, so step 0 below applies to either.
 
 Files in this folder:
 
 | File | What it is |
 |---|---|
-| `punk-rock-show.qxw` | The QLC+ project — open this in QLC+. |
+| `<show>.qxw` | The QLC+ project — open the active show's file in QLC+. |
 | `fixtures/Rainbow-Lights-Smart-2-Pro-RGBWAUV.qxf` | Custom fixture def for the Rainbow pars. |
-| `PATCH-CHART.md` | DMX addresses + Launchpad grid map (also in the dashboard Docs tab). |
+| `PATCH-CHART.md` | **Authoritative** DMX addresses + Launchpad grid map for the active show. |
 | `config/widgets.json` | OSC look list driving the MCP + dashboard (auto-generated). |
-| `scripts/build-show.ts` | Regenerates the project + chart from data tables. |
+| `scripts/build-show.ts` / `scripts/build-party.ts` | Regenerate the project + chart from the rig. |
 
 ---
 
@@ -29,12 +42,17 @@ QLC+ won't know the Rainbow pars until its definition is in your user fixtures f
 
 ## 1. Open the project
 
-QLC+ → File → Open → `punk-rock-show.qxw`. Switch to the **Virtual Console** tab — you'll see
-four frames: **WASH**, **HEADS**, **FX**, **MASTER**.
+QLC+ → File → Open → the active show's `.qxw` (`punk-rock-show.qxw` or
+`bar-mitzvah-party.qxw`), or just run `./start-show.ps1`, which opens it in Operate mode
+along with the MCP server and the 3D monitor.
 
-## 2. Address the lights (from PATCH-CHART.md)
+## 2. Address the lights — **use PATCH-CHART.md, not this page**
 
-Set each fixture's physical DMX start address on its own display/dip-switches:
+Set each fixture's physical DMX start address on its own display/dip-switches, reading the
+addresses out of the freshly generated `PATCH-CHART.md`. Its numbers are 1-based, exactly as
+the fixture menus want them.
+
+The punk rig's addresses, as an example of the shape (the party show uses different ones):
 
 ```
 Rainbow Par 1..10  ->  1, 11, 21, 31, 41, 51, 61, 71, 81, 91
@@ -43,6 +61,10 @@ COLORband Bar 1..4 ->  101, 114, 127, 140
 ```
 
 All one universe. Spacing leaves room if you ever change a fixture's channel mode.
+
+**Party show only — audio reactivity.** QLC+ stores the audio input device as an application
+preference, not in the show file, so the AudioBox has to be picked once on the show machine or
+the audio triggers do nothing. See `docs/qlc-xml-notes.md`.
 
 ## 3. Art-Net output → the CR011R node
 
@@ -56,17 +78,18 @@ QLC+ → **Inputs/Outputs** tab → universe **Stage**:
    node's IP as the destination for universe 0. This is the *single field* to fill when you
    have the node's IP. Broadcast is fine if you skip it.
 
-## 4. Launchpad Mini MK3 → MIDI in + LED feedback
+## 4. Launchpad Mini MK3 → MIDI IN only (the MCP server drives the LEDs)
 
 Same **Inputs/Outputs** tab → universe **Launchpad** (profile *Novation Launchpad Mini MK3* is
 already assigned):
 
 1. **Input** column → select the Launchpad's MIDI input (e.g. *Launchpad Mini MK3 MIDI*).
-2. **Feedback** column → select the Launchpad's MIDI output (drives the pad LEDs).
-3. **Put the Launchpad in Programmer Mode** — the shipped profile (pad notes 11–88 / QLC+
-   channels 139–216) expects it. Use Novation's method from the Launchpad Mini MK3 user guide
-   (hold **Session** to open settings, then choose **Programmer** on the bottom row). In
-   Programmer Mode the pads will light in each look's color as you arm them.
+2. **Leave the Feedback column EMPTY.** QLC+ no longer drives the pad LEDs — the MCP server's
+   launchpad module owns the Launchpad MIDI output and lights the pads itself over RGB SysEx (idle
+   at 50%, the active look at 100%). Binding Feedback here would fight it for the port.
+3. **Programmer Mode is automatic** — the MCP module sets it (and paints the pads) when the server
+   starts via `start-show.ps1`. The shipped profile maps pad notes 11–88 / QLC+ channels 139–216.
+   (By hand, if ever needed: hold **Session** and pick **Programmer** on the bottom row.)
 
 ## 5. Load test (5 min, do this before doors)
 
@@ -99,13 +122,14 @@ QLC+ blackout actions.
 
 ## Changing the show later
 
-Edit the data tables at the top of `scripts/build-show.ts` (colors, positions, chases, pad
-layout), then:
+Edit the data tables in the builder for the active show — `scripts/build-show.ts` (punk) or
+`scripts/build-party.ts` (party): colors, positions, chases, pad layout. Then rebuild
+everything with one command, which picks the right builder off `rig.meta.builder`:
 
 ```
-npx tsx scripts/build-show.ts
-npx tsx src/qlc/generateWidgets.ts ./punk-rock-show.qxw config/widgets.json
+npm run generate
 ```
 
 Reload the project in QLC+. The CRC-16 OSC bindings and Launchpad pads are recomputed
-automatically.
+automatically. Never hand-edit a `.qxw` or save over it inside QLC+ — the generated file is
+written read-only for exactly that reason.

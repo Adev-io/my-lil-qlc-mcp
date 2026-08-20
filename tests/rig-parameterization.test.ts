@@ -16,6 +16,21 @@ import { RigSchema, loadRig } from "../scripts/rig.js";
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const EXAMPLE_RIG = path.join(REPO, "rigs", "punk-rock-show.rig.json");
 
+// Some generated artifacts have SHOW-NEUTRAL filenames (monitor/fixtures.json, PATCH-CHART.md,
+// config/widgets.json), so whichever rig is active at the repo root owns them. Comparing the punk
+// build against those files is only meaningful while punk IS the active rig — with a second show
+// installed (rig.json -> rigs/bar-mitzvah.rig.json) they legitimately hold that show's data.
+// punk-rock-show.qxw is exempt: its filename is the show slug, so no other show ever writes it.
+function punkIsActiveRig(): boolean {
+  const rootRig = path.join(REPO, "rig.json");
+  if (!existsSync(rootRig)) return false;
+  try {
+    return JSON.parse(readFileSync(rootRig, "utf8"))?.meta?.name === "Punk Rock Show";
+  } catch {
+    return false;
+  }
+}
+
 function runBuildShow(rigPath: string, outDir: string): void {
   execFileSync("npx", ["tsx", "scripts/build-show.ts", rigPath], {
     cwd: REPO,
@@ -50,12 +65,26 @@ describe("regression — example rig reproduces the committed show", () => {
     expect(generated).toBe(committed);
   }, 60_000);
 
-  it("build-monitor output matches monitor/fixtures.json byte-for-byte", () => {
-    const dir = path.join(outDir, "regress-mon");
-    runBuildMonitor(EXAMPLE_RIG, dir);
-    const generated = readFileSync(path.join(dir, "monitor", "fixtures.json"), "utf8");
-    const committed = readFileSync(path.join(REPO, "monitor", "fixtures.json"), "utf8");
-    expect(generated).toBe(committed);
+  it.skipIf(!punkIsActiveRig())(
+    "build-monitor output matches monitor/fixtures.json byte-for-byte (punk must be the active rig)",
+    () => {
+      const dir = path.join(outDir, "regress-mon");
+      runBuildMonitor(EXAMPLE_RIG, dir);
+      const generated = readFileSync(path.join(dir, "monitor", "fixtures.json"), "utf8");
+      const committed = readFileSync(path.join(REPO, "monitor", "fixtures.json"), "utf8");
+      expect(generated).toBe(committed);
+    },
+    60_000,
+  );
+
+  // Runs on every rig: proves build-monitor is still deterministic for punk even when another
+  // show owns the checked-in fixtures.json.
+  it("build-monitor is deterministic for the example rig", () => {
+    const a = path.join(outDir, "regress-mon-a"), b = path.join(outDir, "regress-mon-b");
+    runBuildMonitor(EXAMPLE_RIG, a);
+    runBuildMonitor(EXAMPLE_RIG, b);
+    expect(readFileSync(path.join(a, "monitor", "fixtures.json"), "utf8"))
+      .toBe(readFileSync(path.join(b, "monitor", "fixtures.json"), "utf8"));
   }, 60_000);
 });
 

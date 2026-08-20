@@ -22,7 +22,7 @@ monitor / day-of head-plot workflow as the punk show. Punk show remains untouche
 
 | Fixtures | Def | Addresses | Placement |
 |---|---|---|---|
-| 10x Rainbow Smart 2 Pro RGBWA+UV, 10ch | reused verbatim from punk rig | 0–90 (step 10) | Floor along back wall behind 28ft stage, uplighting the wall: 5 left group + 5 right group, ~2ft spacing |
+| 10x Rainbow Smart 2 Pro RGBWA+UV, 10ch | reused verbatim from punk rig | 0–90 (step 10) | Floor along back wall behind the 30ft x 4ft stage (1.5ft deck, measured 2026-08-20; dance-floor centre 12ft off the front edge), uplighting the wall: 5 left group + 5 right group, ~2ft spacing |
 | 4x Chauvet Intimidator Spot 375Z IRC, 15ch | reused verbatim (roles, beam, color wheel, gobo slots) | 100 / 115 / 130 / 145 | 2 on 8ft truss flanking stage (`trussL`/`trussR`); 2 on floor **directly below the truss positions**, aimed up+inward at the banner (`floorL`/`floorR`) — cross-shot X beams |
 
 - New per-head `mount` field: `trussL | trussR | floorL | floorR`.

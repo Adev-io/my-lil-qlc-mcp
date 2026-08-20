@@ -1,0 +1,953 @@
+{
+  "note": "note = QLC+ universe-1 pad channel - 128 (Mini MK3 programmer-mode note); rgb 0-255",
+  "pads": [
+    {
+      "note": 81,
+      "crc": 31202,
+      "path": "/doors_r1c1",
+      "page": 0,
+      "rgb": [
+        40,
+        80,
+        220
+      ],
+      "momentary": false
+    },
+    {
+      "note": 82,
+      "crc": 51255,
+      "path": "/build_r1c2",
+      "page": 0,
+      "rgb": [
+        200,
+        140,
+        40
+      ],
+      "momentary": false
+    },
+    {
+      "note": 83,
+      "crc": 49059,
+      "path": "/entrance!_r1c3",
+      "page": 0,
+      "rgb": [
+        255,
+        180,
+        0
+      ],
+      "momentary": false
+    },
+    {
+      "note": 84,
+      "crc": 61245,
+      "path": "/banner_blast_r1c4",
+      "page": 0,
+      "rgb": [
+        150,
+        80,
+        255
+      ],
+      "momentary": false
+    },
+    {
+      "note": 21,
+      "crc": 29966,
+      "path": "/dim_25_p1_r7c1",
+      "page": 0,
+      "rgb": [
+        120,
+        70,
+        20
+      ],
+      "momentary": false
+    },
+    {
+      "note": 22,
+      "crc": 61816,
+      "path": "/dim_50_p1_r7c2",
+      "page": 0,
+      "rgb": [
+        170,
+        100,
+        30
+      ],
+      "momentary": false
+    },
+    {
+      "note": 23,
+      "crc": 51879,
+      "path": "/dim_75_p1_r7c3",
+      "page": 0,
+      "rgb": [
+        220,
+        140,
+        40
+      ],
+      "momentary": false
+    },
+    {
+      "note": 24,
+      "crc": 54174,
+      "path": "/dim_full_p1_r7c4",
+      "page": 0,
+      "rgb": [
+        255,
+        180,
+        40
+      ],
+      "momentary": false
+    },
+    {
+      "note": 25,
+      "crc": 47156,
+      "path": "/sync_strobe_p1_r7c5",
+      "page": 0,
+      "rgb": [
+        230,
+        230,
+        230
+      ],
+      "momentary": false
+    },
+    {
+      "note": 11,
+      "crc": 41282,
+      "path": "/blackout_p1_r8c1",
+      "page": 0,
+      "rgb": [
+        40,
+        40,
+        40
+      ],
+      "momentary": false
+    },
+    {
+      "note": 12,
+      "crc": 50107,
+      "path": "/panic_p1_r8c2",
+      "page": 0,
+      "rgb": [
+        255,
+        255,
+        255
+      ],
+      "momentary": false
+    },
+    {
+      "note": 13,
+      "crc": 13875,
+      "path": "/banner_p1_r8c3",
+      "page": 0,
+      "rgb": [
+        160,
+        100,
+        255
+      ],
+      "momentary": false
+    },
+    {
+      "note": 15,
+      "crc": 12193,
+      "path": "/strobe_p1_r8c5",
+      "page": 0,
+      "rgb": [
+        220,
+        220,
+        220
+      ],
+      "momentary": true
+    },
+    {
+      "note": 17,
+      "crc": 22275,
+      "path": "/par_sound_p1_r8c7",
+      "page": 0,
+      "rgb": [
+        255,
+        140,
+        60
+      ],
+      "momentary": false
+    },
+    {
+      "note": 81,
+      "crc": 45097,
+      "path": "/gold_wall_r1c1",
+      "page": 1,
+      "rgb": [
+        255,
+        170,
+        0
+      ],
+      "momentary": false
+    },
+    {
+      "note": 82,
+      "crc": 52966,
+      "path": "/blue_wall_r1c2",
+      "page": 1,
+      "rgb": [
+        0,
+        60,
+        255
+      ],
+      "momentary": false
+    },
+    {
+      "note": 83,
+      "crc": 30185,
+      "path": "/gold_blue_r1c3",
+      "page": 1,
+      "rgb": [
+        220,
+        130,
+        60
+      ],
+      "momentary": false
+    },
+    {
+      "note": 84,
+      "crc": 49340,
+      "path": "/soft_amber_r1c4",
+      "page": 1,
+      "rgb": [
+        255,
+        120,
+        30
+      ],
+      "momentary": false
+    },
+    {
+      "note": 85,
+      "crc": 21774,
+      "path": "/warm_white_r1c5",
+      "page": 1,
+      "rgb": [
+        255,
+        230,
+        200
+      ],
+      "momentary": false
+    },
+    {
+      "note": 86,
+      "crc": 2668,
+      "path": "/uv_accent_r1c6",
+      "page": 1,
+      "rgb": [
+        120,
+        60,
+        220
+      ],
+      "momentary": false
+    },
+    {
+      "note": 87,
+      "crc": 25086,
+      "path": "/banner_soft_r1c7",
+      "page": 1,
+      "rgb": [
+        170,
+        120,
+        255
+      ],
+      "momentary": false
+    },
+    {
+      "note": 21,
+      "crc": 31091,
+      "path": "/dim_25_p2_r7c1",
+      "page": 1,
+      "rgb": [
+        120,
+        70,
+        20
+      ],
+      "momentary": false
+    },
+    {
+      "note": 22,
+      "crc": 64773,
+      "path": "/dim_50_p2_r7c2",
+      "page": 1,
+      "rgb": [
+        170,
+        100,
+        30
+      ],
+      "momentary": false
+    },
+    {
+      "note": 23,
+      "crc": 50906,
+      "path": "/dim_75_p2_r7c3",
+      "page": 1,
+      "rgb": [
+        220,
+        140,
+        40
+      ],
+      "momentary": false
+    },
+    {
+      "note": 24,
+      "crc": 57315,
+      "path": "/dim_full_p2_r7c4",
+      "page": 1,
+      "rgb": [
+        255,
+        180,
+        40
+      ],
+      "momentary": false
+    },
+    {
+      "note": 25,
+      "crc": 46153,
+      "path": "/sync_strobe_p2_r7c5",
+      "page": 1,
+      "rgb": [
+        230,
+        230,
+        230
+      ],
+      "momentary": false
+    },
+    {
+      "note": 11,
+      "crc": 44351,
+      "path": "/blackout_p2_r8c1",
+      "page": 1,
+      "rgb": [
+        40,
+        40,
+        40
+      ],
+      "momentary": false
+    },
+    {
+      "note": 12,
+      "crc": 53190,
+      "path": "/panic_p2_r8c2",
+      "page": 1,
+      "rgb": [
+        255,
+        255,
+        255
+      ],
+      "momentary": false
+    },
+    {
+      "note": 13,
+      "crc": 14926,
+      "path": "/banner_p2_r8c3",
+      "page": 1,
+      "rgb": [
+        160,
+        100,
+        255
+      ],
+      "momentary": false
+    },
+    {
+      "note": 15,
+      "crc": 9180,
+      "path": "/strobe_p2_r8c5",
+      "page": 1,
+      "rgb": [
+        220,
+        220,
+        220
+      ],
+      "momentary": true
+    },
+    {
+      "note": 17,
+      "crc": 23422,
+      "path": "/par_sound_p2_r8c7",
+      "page": 1,
+      "rgb": [
+        255,
+        140,
+        60
+      ],
+      "momentary": false
+    },
+    {
+      "note": 81,
+      "crc": 28691,
+      "path": "/banner_bright_r1c1",
+      "page": 2,
+      "rgb": [
+        255,
+        190,
+        60
+      ],
+      "momentary": false
+    },
+    {
+      "note": 82,
+      "crc": 59827,
+      "path": "/wall_low_r1c2",
+      "page": 2,
+      "rgb": [
+        180,
+        120,
+        40
+      ],
+      "momentary": false
+    },
+    {
+      "note": 83,
+      "crc": 50040,
+      "path": "/speaker_r1c3",
+      "page": 2,
+      "rgb": [
+        240,
+        240,
+        240
+      ],
+      "momentary": false
+    },
+    {
+      "note": 84,
+      "crc": 45545,
+      "path": "/banner_only_r1c4",
+      "page": 2,
+      "rgb": [
+        150,
+        100,
+        255
+      ],
+      "momentary": false
+    },
+    {
+      "note": 85,
+      "crc": 22052,
+      "path": "/house_bright_r1c5",
+      "page": 2,
+      "rgb": [
+        255,
+        255,
+        255
+      ],
+      "momentary": false
+    },
+    {
+      "note": 21,
+      "crc": 32088,
+      "path": "/dim_25_p3_r7c1",
+      "page": 2,
+      "rgb": [
+        120,
+        70,
+        20
+      ],
+      "momentary": false
+    },
+    {
+      "note": 22,
+      "crc": 63790,
+      "path": "/dim_50_p3_r7c2",
+      "page": 2,
+      "rgb": [
+        170,
+        100,
+        30
+      ],
+      "momentary": false
+    },
+    {
+      "note": 23,
+      "crc": 49905,
+      "path": "/dim_75_p3_r7c3",
+      "page": 2,
+      "rgb": [
+        220,
+        140,
+        40
+      ],
+      "momentary": false
+    },
+    {
+      "note": 24,
+      "crc": 56264,
+      "path": "/dim_full_p3_r7c4",
+      "page": 2,
+      "rgb": [
+        255,
+        180,
+        40
+      ],
+      "momentary": false
+    },
+    {
+      "note": 25,
+      "crc": 45154,
+      "path": "/sync_strobe_p3_r7c5",
+      "page": 2,
+      "rgb": [
+        230,
+        230,
+        230
+      ],
+      "momentary": false
+    },
+    {
+      "note": 11,
+      "crc": 43284,
+      "path": "/blackout_p3_r8c1",
+      "page": 2,
+      "rgb": [
+        40,
+        40,
+        40
+      ],
+      "momentary": false
+    },
+    {
+      "note": 12,
+      "crc": 52205,
+      "path": "/panic_p3_r8c2",
+      "page": 2,
+      "rgb": [
+        255,
+        255,
+        255
+      ],
+      "momentary": false
+    },
+    {
+      "note": 13,
+      "crc": 15973,
+      "path": "/banner_p3_r8c3",
+      "page": 2,
+      "rgb": [
+        160,
+        100,
+        255
+      ],
+      "momentary": false
+    },
+    {
+      "note": 15,
+      "crc": 10231,
+      "path": "/strobe_p3_r8c5",
+      "page": 2,
+      "rgb": [
+        220,
+        220,
+        220
+      ],
+      "momentary": true
+    },
+    {
+      "note": 17,
+      "crc": 24405,
+      "path": "/par_sound_p3_r8c7",
+      "page": 2,
+      "rgb": [
+        255,
+        140,
+        60
+      ],
+      "momentary": false
+    },
+    {
+      "note": 81,
+      "crc": 39245,
+      "path": "/gold_blue_full_r1c1",
+      "page": 3,
+      "rgb": [
+        255,
+        170,
+        30
+      ],
+      "momentary": false
+    },
+    {
+      "note": 82,
+      "crc": 18991,
+      "path": "/circles_r1c2",
+      "page": 3,
+      "rgb": [
+        60,
+        110,
+        255
+      ],
+      "momentary": false
+    },
+    {
+      "note": 83,
+      "crc": 52560,
+      "path": "/fast_chase_r1c3",
+      "page": 3,
+      "rgb": [
+        230,
+        150,
+        50
+      ],
+      "momentary": false
+    },
+    {
+      "note": 84,
+      "crc": 40931,
+      "path": "/white_burst_r1c4",
+      "page": 3,
+      "rgb": [
+        255,
+        255,
+        255
+      ],
+      "momentary": true
+    },
+    {
+      "note": 21,
+      "crc": 24969,
+      "path": "/dim_25_p4_r7c1",
+      "page": 3,
+      "rgb": [
+        120,
+        70,
+        20
+      ],
+      "momentary": false
+    },
+    {
+      "note": 22,
+      "crc": 58879,
+      "path": "/dim_50_p4_r7c2",
+      "page": 3,
+      "rgb": [
+        170,
+        100,
+        30
+      ],
+      "momentary": false
+    },
+    {
+      "note": 23,
+      "crc": 56864,
+      "path": "/dim_75_p4_r7c3",
+      "page": 3,
+      "rgb": [
+        220,
+        140,
+        40
+      ],
+      "momentary": false
+    },
+    {
+      "note": 24,
+      "crc": 50969,
+      "path": "/dim_full_p4_r7c4",
+      "page": 3,
+      "rgb": [
+        255,
+        180,
+        40
+      ],
+      "momentary": false
+    },
+    {
+      "note": 25,
+      "crc": 44211,
+      "path": "/sync_strobe_p4_r7c5",
+      "page": 3,
+      "rgb": [
+        230,
+        230,
+        230
+      ],
+      "momentary": false
+    },
+    {
+      "note": 11,
+      "crc": 46533,
+      "path": "/blackout_p4_r8c1",
+      "page": 3,
+      "rgb": [
+        40,
+        40,
+        40
+      ],
+      "momentary": false
+    },
+    {
+      "note": 12,
+      "crc": 55100,
+      "path": "/panic_p4_r8c2",
+      "page": 3,
+      "rgb": [
+        255,
+        255,
+        255
+      ],
+      "momentary": false
+    },
+    {
+      "note": 13,
+      "crc": 8884,
+      "path": "/banner_p4_r8c3",
+      "page": 3,
+      "rgb": [
+        160,
+        100,
+        255
+      ],
+      "momentary": false
+    },
+    {
+      "note": 15,
+      "crc": 15142,
+      "path": "/strobe_p4_r8c5",
+      "page": 3,
+      "rgb": [
+        220,
+        220,
+        220
+      ],
+      "momentary": true
+    },
+    {
+      "note": 17,
+      "crc": 17284,
+      "path": "/par_sound_p4_r8c7",
+      "page": 3,
+      "rgb": [
+        255,
+        140,
+        60
+      ],
+      "momentary": false
+    },
+    {
+      "note": 81,
+      "crc": 54161,
+      "path": "/gb_chase_r1c1",
+      "page": 4,
+      "rgb": [
+        255,
+        160,
+        20
+      ],
+      "momentary": false
+    },
+    {
+      "note": 82,
+      "crc": 25154,
+      "path": "/blue_uv_r1c2",
+      "page": 4,
+      "rgb": [
+        70,
+        60,
+        255
+      ],
+      "momentary": false
+    },
+    {
+      "note": 83,
+      "crc": 55290,
+      "path": "/gold_uv_r1c3",
+      "page": 4,
+      "rgb": [
+        200,
+        120,
+        255
+      ],
+      "momentary": false
+    },
+    {
+      "note": 84,
+      "crc": 2056,
+      "path": "/rainbow_r1c4",
+      "page": 4,
+      "rgb": [
+        0,
+        220,
+        100
+      ],
+      "momentary": false
+    },
+    {
+      "note": 85,
+      "crc": 45219,
+      "path": "/rainbow_fast_r1c5",
+      "page": 4,
+      "rgb": [
+        255,
+        0,
+        180
+      ],
+      "momentary": false
+    },
+    {
+      "note": 86,
+      "crc": 31139,
+      "path": "/uv_black_r1c6",
+      "page": 4,
+      "rgb": [
+        110,
+        40,
+        255
+      ],
+      "momentary": false
+    },
+    {
+      "note": 71,
+      "crc": 41757,
+      "path": "/sweep_wide_r2c1",
+      "page": 4,
+      "rgb": [
+        0,
+        200,
+        230
+      ],
+      "momentary": false
+    },
+    {
+      "note": 72,
+      "crc": 53359,
+      "path": "/sweep_cross_r2c2",
+      "page": 4,
+      "rgb": [
+        0,
+        170,
+        210
+      ],
+      "momentary": false
+    },
+    {
+      "note": 73,
+      "crc": 54748,
+      "path": "/sweep_punch_r2c3",
+      "page": 4,
+      "rgb": [
+        0,
+        140,
+        190
+      ],
+      "momentary": false
+    },
+    {
+      "note": 21,
+      "crc": 26018,
+      "path": "/dim_25_p5_r7c1",
+      "page": 4,
+      "rgb": [
+        120,
+        70,
+        20
+      ],
+      "momentary": false
+    },
+    {
+      "note": 22,
+      "crc": 57812,
+      "path": "/dim_50_p5_r7c2",
+      "page": 4,
+      "rgb": [
+        170,
+        100,
+        30
+      ],
+      "momentary": false
+    },
+    {
+      "note": 23,
+      "crc": 55819,
+      "path": "/dim_75_p5_r7c3",
+      "page": 4,
+      "rgb": [
+        220,
+        140,
+        40
+      ],
+      "momentary": false
+    },
+    {
+      "note": 24,
+      "crc": 49970,
+      "path": "/dim_full_p5_r7c4",
+      "page": 4,
+      "rgb": [
+        255,
+        180,
+        40
+      ],
+      "momentary": false
+    },
+    {
+      "note": 25,
+      "crc": 43160,
+      "path": "/sync_strobe_p5_r7c5",
+      "page": 4,
+      "rgb": [
+        230,
+        230,
+        230
+      ],
+      "momentary": false
+    },
+    {
+      "note": 11,
+      "crc": 45550,
+      "path": "/blackout_p5_r8c1",
+      "page": 4,
+      "rgb": [
+        40,
+        40,
+        40
+      ],
+      "momentary": false
+    },
+    {
+      "note": 12,
+      "crc": 54039,
+      "path": "/panic_p5_r8c2",
+      "page": 4,
+      "rgb": [
+        255,
+        255,
+        255
+      ],
+      "momentary": false
+    },
+    {
+      "note": 13,
+      "crc": 9887,
+      "path": "/banner_p5_r8c3",
+      "page": 4,
+      "rgb": [
+        160,
+        100,
+        255
+      ],
+      "momentary": false
+    },
+    {
+      "note": 15,
+      "crc": 16141,
+      "path": "/strobe_p5_r8c5",
+      "page": 4,
+      "rgb": [
+        220,
+        220,
+        220
+      ],
+      "momentary": true
+    },
+    {
+      "note": 17,
+      "crc": 18351,
+      "path": "/par_sound_p5_r8c7",
+      "page": 4,
+      "rgb": [
+        255,
+        140,
+        60
+      ],
+      "momentary": false
+    }
+  ]
+}

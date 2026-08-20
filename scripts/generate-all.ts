@@ -9,6 +9,7 @@ import { execFileSync } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { loadRig, slugify } from "./rig.js";
+import { builderScript } from "./generate-all-helpers.js";
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const rigArg = process.argv[2];
@@ -18,7 +19,7 @@ const qxw = `${slugify(rig.meta.name)}.qxw`;
 const run = (args: string[]) =>
   execFileSync("npx", ["tsx", ...args], { cwd: REPO, stdio: "inherit", shell: true });
 
-run(["scripts/build-show.ts", rigPath]);
+run([builderScript(rig.meta.builder), rigPath]);
 run(["scripts/build-monitor.ts", rigPath]);
 run(["src/qlc/generateWidgets.ts", `./${qxw}`, "config/widgets.json"]);
 

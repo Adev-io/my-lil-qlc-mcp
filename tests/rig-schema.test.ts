@@ -34,6 +34,15 @@ describe("rig schema — party additions", () => {
   });
 });
 
+describe("builder dispatch", () => {
+  it("routes party rigs to build-party.ts and everything else to build-show.ts", async () => {
+    const { builderScript } = await import("../scripts/generate-all-helpers.js");
+    expect(builderScript("party")).toBe("scripts/build-party.ts");
+    expect(builderScript("punk")).toBe("scripts/build-show.ts");
+    expect(builderScript(undefined)).toBe("scripts/build-show.ts");
+  });
+});
+
 describe("bar-mitzvah rig file", () => {
   it("loads, validates, and has the party shape", () => {
     const { rig } = loadRig(path.join(ROOT, "rigs", "bar-mitzvah.rig.json"));

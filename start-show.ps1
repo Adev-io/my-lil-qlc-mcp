@@ -90,6 +90,19 @@ if ($useLaunchpad -and -not (Get-Process qlcplus -ErrorAction SilentlyContinue))
 if (Get-Process qlcplus -ErrorAction SilentlyContinue) {
   Write-Host '  -> QLC+ already running' -ForegroundColor DarkGray
 } elseif ($qlc) {
+  # COVER FLOOR (2026-06-12): before QLC+ opens the show, clamp every moving-head tilt to >=
+  # horizontal so no cue or stray edit can aim a beam up into the canopy (and zero any banned
+  # firmware movement-macro). Idempotent — no-op when already safe — and fail-safe: a clamp
+  # error is logged but never blocks the show. See scripts/floor-head-tilt.mjs.
+  $floorScript = Join-Path $here 'scripts/floor-head-tilt.mjs'
+  if ((Test-Path $floorScript) -and (Get-Command node -ErrorAction SilentlyContinue)) {
+    $floorTargets = @($show)
+    $autoFile = Join-Path (Split-Path $show -Parent) ([System.IO.Path]::GetFileNameWithoutExtension($show) + '.autosave.qxw')
+    if (Test-Path $autoFile) { $floorTargets += $autoFile }
+    try { & node $floorScript @floorTargets } catch { Write-Host "  [!] cover-floor step error (continuing): $($_.Exception.Message)" -ForegroundColor Yellow }
+  } else {
+    Write-Host '  [!] cover-floor step skipped (node or floor script missing)' -ForegroundColor DarkGray
+  }
   Write-Host '  -> launching QLC+ (Operate) ...' -ForegroundColor Green
   Start-Process $qlc -ArgumentList '--open', $show, '--operate'
 } else {
@@ -123,6 +136,27 @@ $monOk = Wait-Url "$monUrl/status"
 
 if ($monOk) { Start-Process $monUrl }  else { Write-Host '  [!] 3D monitor did not answer'  -ForegroundColor Yellow }
 if ($mcpOk) { Start-Process $dashUrl } else { Write-Host '  [!] MCP/dashboard did not answer' -ForegroundColor Yellow }
+
+# 5. BOOT LIT (party shows only). Party looks set colour, never brightness -- the R7 dim row owns
+#    that -- so a freshly opened show sits dark until a dim pad is pressed. Fire "Dim Full" once so
+#    the rig comes up lit. The path is read from the generated LED map rather than hard-coded, so
+#    a pad move does not silently break this. UDP OSC has no ACK and QLC+ may still be loading:
+#    if nothing lights, press R7C4 on the Launchpad -- that is the same function.
+if ($rig -and $rig.meta.builder -eq 'party') {
+  $ledMap = Join-Path $here 'config/launchpad-leds.json'
+  $oscScript = Join-Path $here 'scripts/send-osc.mjs'
+  if ((Test-Path $ledMap) -and (Test-Path $oscScript) -and (Get-Command node -ErrorAction SilentlyContinue)) {
+    $bootPad = (Get-Content $ledMap -Raw | ConvertFrom-Json).pads |
+      Where-Object { $_.path -like '/dim_full_p1*' } | Select-Object -First 1
+    if ($bootPad) {
+      Write-Host "  -> boot lit: firing $($bootPad.path)" -ForegroundColor Green
+      try { & node $oscScript $bootPad.path 1 | Out-Null }
+      catch { Write-Host "  [!] boot-lit OSC failed (press R7C4 instead): $($_.Exception.Message)" -ForegroundColor Yellow }
+    } else {
+      Write-Host '  [!] boot-lit skipped: no /dim_full_p1 pad in config/launchpad-leds.json' -ForegroundColor DarkGray
+    }
+  }
+}
 
 Write-Host ''
 Write-Host '  Up. QLC+ in Operate; the MCP server drives the Launchpad LEDs. If pads are dark, check the MCP window or reseat the Launchpad USB, then re-run.' -ForegroundColor Cyan

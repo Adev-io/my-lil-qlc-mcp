@@ -58,6 +58,7 @@ export const RigSchema = z.object({
     name: z.string().min(1),
     description: z.string().optional(),
     author: z.string().optional(),
+    builder: z.enum(["punk", "party"]).optional(), // generate-all.ts dispatch key; absent -> build-show.ts
   }),
   stage: z.object({
     widthFt: z.number().positive(),
@@ -87,6 +88,19 @@ export const RigSchema = z.object({
       transmitMode: z.string().default("Standard"),
       outputIp: z.string().nullable().default(null),
       notes: z.string().optional(),
+    })
+    .optional(),
+  // 2026-06-13 moving-head reconfig (heads @4ft): measured eye-safe fences (by DMX addr) +
+  // the 3 measured settings. Kept permissive (passthrough) — build-show.ts reads them as data.
+  headSafety: z.any().optional(),
+  movingHeadSettings: z.any().optional(),
+  // Party-show backdrop banner (floor heads aim at it); consumed by build-party.ts + the 3D monitor.
+  banner: z
+    .object({
+      widthFt: z.number().positive(),
+      heightFt: z.number().positive(),
+      centerX: z.number().default(0), // ft from stage centre
+      centerHeightFt: z.number().positive().default(8), // banner centre above the floor
     })
     .optional(),
 });

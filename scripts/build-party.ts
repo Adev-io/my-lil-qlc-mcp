@@ -440,8 +440,12 @@ const DOORS: { x: number; y: number } | null = (rig as any).doors
   ? { x: (rig as any).doors.xFt, y: -Math.abs((rig as any).doors.downstageFt) }
   : null;
 
+// Helper for aiming each head at its home position: the ceiling 5 ft in front of its tower.
+// Both Truss Home and unreachable doors use this home aim, so both can reuse it data-driven.
+const homeAim = (i: number) => aim(i === 0 ? "L" : "R", i === 0 ? -HEAD_SEP / 2 : HEAD_SEP / 2, -5, ZONES.ceilingZ);
+
 addScene("Truss Home", trussHeads.map((f, i) => {
-  const [p, t] = trussPos("home", f, aim(i === 0 ? "L" : "R", i === 0 ? -15 : 15, -5, ZONES.ceilingZ));
+  const [p, t] = trussPos("home", f, homeAim(i));
   // Home = the ceiling 5 ft in front of each tower: lit, moving nothing, on nobody.
   // Full LTP reclaim: Truss Home is the "put the heads back to normal" button, so it clears the
   // beam channels too.
@@ -449,9 +453,8 @@ addScene("Truss Home", trussHeads.map((f, i) => {
 }));
 // DIM-RULE EXCEPTION #3 — Speaker Light carries its own dim + white. "Get light on the person
 // talking" has to work on one press during a speech, whatever the brightness row is doing.
-// Aim at stage center at ceiling height to keep the beam above table/floor clearance as it travels.
 addScene("Speaker Light", trussHeads.map((f, i) => {
-  const [p, t] = trussPos("speaker", f, aim(i === 0 ? "L" : "R", 0, 2, ZONES.ceilingZ));
+  const [p, t] = trussPos("speaker", f, aim(i === 0 ? "L" : "R", 0, 2, STAGE_DECK + 5));
   return { id: f.id, pairs: [0, p, 2, t, 5, HEAD_COLOR.white, 10, 255, 11, SHUTTER_OPEN, 13, 0] };
 }));
 addScene("Banner Home", floorHeads.map((f) => {
@@ -460,10 +463,15 @@ addScene("Banner Home", floorHeads.map((f) => {
 }));
 
 // --- the doorway ---------------------------------------------------------------
-// Aim ABOVE the door at the wall, not at the door itself: the beam runs the length of the side
-// tables. Both heads put a beam on the back wall at the door's x-coordinate and height 11 ft,
-// which keeps the beam above the floor and table clearance requirements as it travels.
-const DOOR_Z = 11;
+// Only the head whose beam can reach the doorway within the rule lights it (the far tower's
+// line would cross the dance floor at ~8 ft); the other keeps its ceiling home, same colour.
+const DOOR_Z = 9;
+const doorAim = (i: number): [number, number] => {
+  const side = i === 0 ? "L" : "R";
+  return beamSafe(HEAD_XYZ[side], { x: DOORS.x, y: DOORS.y, z: DOOR_Z }) === null
+    ? aim(side, DOORS.x, DOORS.y, DOOR_Z)
+    : homeAim(i);
+};
 // Both truss heads put a beam on the doors for arrivals and the grand entrance. Only built when
 // rig.doors exists, so a rig without a measured doorway simply has no door look rather than a
 // pad that aims somewhere invented. The floor pair stays on the banner throughout.
@@ -471,14 +479,14 @@ if (DOORS) {
   addScene("Door Spot", [
     ...wallDim(BLUE, 0.35),
     ...trussHeads.map((f, i) => {
-      const [p, t] = aim(i === 0 ? "L" : "R", DOORS.x, WALL_Y, DOOR_Z);
+      const [p, t] = doorAim(i);
       return { id: f.id, pairs: [0, p, 2, t, 5, HEAD_COLOR.white, 10, 255, 11, SHUTTER_OPEN, ...BEAM_CLEAR] };
     }),
   ], 400, 400);
   addScene("Door Gobo", [
     ...wallDim(GOLD, 0.3),
     ...trussHeads.map((f, i) => {
-      const [p, t] = aim(i === 0 ? "L" : "R", DOORS.x, WALL_Y, DOOR_Z);
+      const [p, t] = doorAim(i);
       return { id: f.id, pairs: [0, p, 2, t, 5, HEAD_COLOR.orange, 6, GOBO.slot(2), 10, 255, 11, SHUTTER_OPEN, 13, 0] };
     }),
   ], 400, 400);

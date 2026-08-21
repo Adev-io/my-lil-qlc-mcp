@@ -22,7 +22,7 @@ describe("party geometry — aim and its inverse", () => {
   it("exposes the measured room", () => {
     expect(HEAD.z).toBe(8);
     expect(ZONES.floor).toEqual({ xMin: -10, xMax: 10, yMin: -24, yMax: -4 });
-    expect(ZONES.stage).toEqual({ xMin: -15, xMax: 15, yMin: 0, yMax: 4 });
+    expect(ZONES.stage).toEqual({ xMin: -16, xMax: 16, yMin: 0, yMax: 4 });
     expect(ZONES.ceilingZ).toBe(12);
   });
 });

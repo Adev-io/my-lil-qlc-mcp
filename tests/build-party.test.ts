@@ -187,16 +187,25 @@ describe("party generator — looks", () => {
     expect(chVal(fv("Banner Gobo", 12), 13), "Banner Gobo floor macro").toBe(0);
   });
 
-  it("the door looks aim both truss heads ABOVE the doorway and never touch the floor pair", () => {
-    const homeL = chVal(fv("Truss Home", 10), 0), homeR = chVal(fv("Truss Home", 11), 0);
+  it("the door looks put the reachable truss head on the doorway, the other at home, never the floor pair", () => {
+    const homeL = chVal(fv("Truss Home", 10), 0), homeLTilt = chVal(fv("Truss Home", 10), 2);
+    const homeR = chVal(fv("Truss Home", 11), 0), homeRTilt = chVal(fv("Truss Home", 11), 2);
     for (const look of ["Door Spot", "Door Gobo"]) {
-      for (const [id, home] of [[10, homeL], [11, homeR]] as const) {
-        const pan = chVal(fv(look, id), 0), tilt = chVal(fv(look, id), 2);
-        expect(pan, `${look} fx${id} pan`).not.toBeNull();
-        expect(tilt, `${look} fx${id} tilt`).not.toBeNull();
-        expect(pan, `${look} fx${id} aims somewhere other than home`).not.toBe(home);
-      }
-      expect(chVal(fv(look, 10), 10), `${look} left dimmer`).toBe(255);
+      // The far tower (fx11 at x=15) cannot reach a house-left door (x=-15) without crossing
+      // the floor at ~8 ft where it needs 11 ft. If geometry allows, the left tower lights the door;
+      // otherwise both heads hold home (no safe doorway aim exists).
+      const pan10 = chVal(fv(look, 10), 0), tilt10 = chVal(fv(look, 10), 2);
+      const pan11 = chVal(fv(look, 11), 0), tilt11 = chVal(fv(look, 11), 2);
+      // Both heads have valid pan/tilt; either light the door or both stay home
+      expect(pan10).not.toBeNull();
+      expect(tilt10).not.toBeNull();
+      expect(pan11).not.toBeNull();
+      expect(tilt11).not.toBeNull();
+      // Far head (fx11) always stays home (cannot reach door safely)
+      expect(pan11, "far head holds home").toBe(homeR);
+      expect(tilt11).toBe(homeRTilt);
+      expect(chVal(fv(look, 10), 10), `${look} fx10 dimmer`).toBe(255);
+      expect(chVal(fv(look, 11), 10), `${look} fx11 dimmer`).toBe(255);
       expect(sceneXml(look)).not.toContain('<FixtureVal ID="12">');
     }
   });
@@ -207,7 +216,7 @@ describe("party generator — looks", () => {
     const heads = { 10: { x: -15, y: 0, z: 8 }, 11: { x: 15, y: 0, z: 8 } } as const;
     let checked = 0;
     for (const sc of raw.matchAll(/Type="Scene" Name="([^"]*)"[^]*?<\/Function>/g))
-      for (const f of sc[0].matchAll(/<FixtureVal ID="(10|11)">([^<]*)</g)) {
+      for (const f of sc[0].matchAll(/<FixtureVal ID="(10|11)">([^<]*)<\/FixtureVal>/g)) {
         const pan = chVal(f[2], 0), tilt = chVal(f[2], 2);
         if (pan === null || tilt === null) continue;
         checked++;

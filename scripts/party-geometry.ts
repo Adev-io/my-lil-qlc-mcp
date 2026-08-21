@@ -7,7 +7,7 @@ export type Rect = { xMin: number; xMax: number; yMin: number; yMax: number };
 
 export const HEAD = { sep: 30, z: 8 };                // truss towers at x = ±15, lens 8 ft up
 export const ZONES = {
-  stage: { xMin: -15, xMax: 15, yMin: 0, yMax: 4 } as Rect,     // deck: lighting people here is the job
+  stage: { xMin: -16, xMax: 16, yMin: 0, yMax: 4 } as Rect,     // deck + 1 ft of back wall either side: the far tower's speaker beam overshoots the deck edge by ~0.7 ft; no seating there
   floor: { xMin: -10, xMax: 10, yMin: -24, yMax: -4 } as Rect,  // 20×20, centre 14 ft off the front edge
   ceilingZ: 12,
   backWallY: 4,

@@ -6,6 +6,7 @@ import fs from "node:fs/promises";
 import { readFileSync } from "node:fs";
 import { beforeAll, describe, expect, it } from "vitest";
 import { parseQxwFile } from "../src/qlc/qxwParser";
+import { panTiltSafe } from "../scripts/party-geometry";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 // Generate into a temp dir so running tests never clobbers the user's generated show.
@@ -80,11 +81,11 @@ describe("party generator — looks", () => {
       expect(raw).toContain(`Name="${fn}"`);
   });
 
-  it("builds the dynamics: dim presets, strobes, chases, sweeps, positions, sound fallback", () => {
+  it("builds the dynamics: dim presets, strobes, chases, positions, sound fallback (floor sweeps + Truss Sound removed)", () => {
     for (const fn of ["Dim 25", "Dim 50", "Dim 75", "Dim Full", "Strobe Burst", "Sync Strobe",
       "Chase Gold Blue", "Chase Blue UV", "Chase Gold UV", "Rainbow Chase", "Rainbow Fast",
-      "UV Blacklight", "Sweep Wide", "Sweep Cross", "Sweep Punch", "Par Sound Mode", "Truss Sound", "Beat Pulse",
-      "Circles", "Fast Gold Blue", "White Burst", "Gold Blue Full", "Entrance", "Build Chase",
+      "UV Blacklight", "Par Sound Mode", "Beat Pulse",
+      "Fast Gold Blue", "White Burst", "Gold Blue Full", "Entrance", "Build Chase",
       "Truss Home", "Speaker Light", "Banner Home"])
       expect(raw).toContain(`Name="${fn}"`);
   });
@@ -134,23 +135,15 @@ describe("party generator — looks", () => {
     for (const id of [10, 11, 12, 13]) expect(sceneXml("Par Sound Mode")).not.toContain(`<FixtureVal ID="${id}">`);
   });
 
-  it("SAFETY: 'Truss Sound' is the ONLY scene allowed to set a head movement macro (ch13)", () => {
-    // A head running a firmware program ignores DMX pan/tilt, so the fence in
-    // scripts/floor-head-tilt.mjs cannot constrain where its beam lands. Exactly one scene gets
-    // that licence, and only on the truss pair (fx 10/11) — never the floor pair aimed at the
-    // banner at ankle height (fx 12/13).
+  it("SAFETY: no scene sets a head movement macro (ch13) — firmware programs ignore DMX aim", () => {
     for (const sc of raw.matchAll(/Type="Scene" Name="([^"]*)"[^]*?<\/Function>/g))
-      for (const f of sc[0].matchAll(/<FixtureVal ID="(1[0-3])">([^<]*)</g)) {
+      for (const f of sc[0].matchAll(/<FixtureVal ID="(1[0-3])">([^<]*)<\/FixtureVal>/g)) {
         const nums = f[2].split(",").map(Number);
-        for (let k = 0; k + 1 < nums.length; k += 2) {
-          if (nums[k] !== 13) continue;
-          if (sc[1] === "Truss Sound" && (f[1] === "10" || f[1] === "11")) {
-            expect(nums[k + 1], `${sc[1]} fx${f[1]}`).toBeGreaterThanOrEqual(136); // sound-active band
-          } else {
-            expect(nums[k + 1], `${sc[1]} fx${f[1]}`).toBe(0);
-          }
-        }
+        for (let k = 0; k + 1 < nums.length; k += 2)
+          if (nums[k] === 13) expect(nums[k + 1], `${sc[1]} fx${f[1]}`).toBe(0);
       }
+    expect(raw).not.toContain('Name="Truss Sound"');
+    expect(baseNames.some((n) => n.startsWith("Truss Sound"))).toBe(false);
   });
 
   it("LTP RECLAIM: looks zero the sound channels, so a look press takes fixtures off their mics", () => {
@@ -159,7 +152,7 @@ describe("party generator — looks", () => {
     // the fixture on its microphone forever. Verified on the rig 2026-08-20.
     for (const look of ["Gold Wall", "Blue Wall", "UV Accent", "Doors Blue", "Panic White"])
       expect(chVal(fv(look, 0), 9), `${look} par ch9`).toBe(0);
-    for (const look of ["Gold Wall", "Blue Wall", "UV Accent", "Panic White", "Truss Home", "Speaker Light", "SwW A"])
+    for (const look of ["Gold Wall", "Blue Wall", "UV Accent", "Panic White", "Truss Home", "Speaker Light"])
       expect(chVal(fv(look, 10), 13), `${look} truss ch13`).toBe(0);
   });
 
@@ -167,7 +160,6 @@ describe("party generator — looks", () => {
     // Same LTP trap as the sound macro: ch6/ch7/ch8 keep their last value after the scene that
     // set them stops. Without this the first gobo look of the night textures every look after it.
     // Panic and Truss Home are the two "put it back to normal" buttons, so they clear beams too.
-    // Sweeps deliberately do not — a gobo sweeping across the floor is a look, not a leak.
     for (const look of ["Gold Wall", "Blue Wall", "Warm White", "Doors Blue", "All Gold", "Panic White", "Truss Home"])
       expect(chVal(fv(look, 10), 6), `${look} truss gobo`).toBe(0);
     for (const look of ["Banner Bright", "Banner Soft", "All Gold"])
@@ -195,35 +187,38 @@ describe("party generator — looks", () => {
     expect(chVal(fv("Banner Gobo", 12), 13), "Banner Gobo floor macro").toBe(0);
   });
 
-  it("the door looks aim both truss heads at the measured doorway", () => {
-    // Do NOT assert the two pans sit on the same side of centre: this fixture pans 540 degrees,
-    // so two heads aiming at one point legitimately land either side of 128 (measured: 213 and
-    // 69 for a house-left doorway). What must be true is that the doorway is a DIFFERENT aim
-    // from the dance floor, on both heads, with the beam actually on.
+  it("the door looks aim both truss heads ABOVE the doorway and never touch the floor pair", () => {
     const homeL = chVal(fv("Truss Home", 10), 0), homeR = chVal(fv("Truss Home", 11), 0);
     for (const look of ["Door Spot", "Door Gobo"]) {
       for (const [id, home] of [[10, homeL], [11, homeR]] as const) {
         const pan = chVal(fv(look, id), 0), tilt = chVal(fv(look, id), 2);
         expect(pan, `${look} fx${id} pan`).not.toBeNull();
         expect(tilt, `${look} fx${id} tilt`).not.toBeNull();
-        expect(pan, `${look} fx${id} aims somewhere other than the dance floor`).not.toBe(home);
+        expect(pan, `${look} fx${id} aims somewhere other than home`).not.toBe(home);
       }
       expect(chVal(fv(look, 10), 10), `${look} left dimmer`).toBe(255);
-      // The floor pair stays on the banner — a door look never moves it.
       expect(sceneXml(look)).not.toContain('<FixtureVal ID="12">');
     }
   });
 
-  it("Truss Sound hands the truss pair to their own mics, lit, and never touches the floor pair", () => {
-    // Chauvet 375Z IRC 15ch: ch13 136-255 = Sound-Active programs 1-8 in 16-wide bands.
-    for (const id of [10, 11]) {
-      const s = fv("Truss Sound", id).split(",").map(Number);
-      const macro = s[s.indexOf(13) + 1];
-      expect(macro, `truss fx${id} macro`).toBeGreaterThanOrEqual(136);
-      expect(s[s.indexOf(10) + 1], `truss fx${id} dimmer`).toBe(255); // lit if the head honours it
-      expect(s.indexOf(11), `truss fx${id} shutter`).toBeGreaterThanOrEqual(0);
-    }
-    for (const id of [12, 13]) expect(sceneXml("Truss Sound")).not.toContain(`<FixtureVal ID="${id}">`);
+  it("THE RULE: every truss pan/tilt in every scene passes the beam guard", () => {
+    // fx10 = Truss L at (-15,0,8), fx11 = Truss R at (15,0,8). Anything a scene writes to
+    // ch0/ch2 on those two must land on ceiling, banner, stage or above the doorway.
+    const heads = { 10: { x: -15, y: 0, z: 8 }, 11: { x: 15, y: 0, z: 8 } } as const;
+    let checked = 0;
+    for (const sc of raw.matchAll(/Type="Scene" Name="([^"]*)"[^]*?<\/Function>/g))
+      for (const f of sc[0].matchAll(/<FixtureVal ID="(10|11)">([^<]*)</g)) {
+        const pan = chVal(f[2], 0), tilt = chVal(f[2], 2);
+        if (pan === null || tilt === null) continue;
+        checked++;
+        expect(panTiltSafe(heads[Number(f[1]) as 10 | 11], pan, tilt), `${sc[1]} fx${f[1]} pan ${pan} tilt ${tilt}`).toBeNull();
+      }
+    expect(checked).toBeGreaterThan(4); // Truss Home ×2, Speaker ×2, doors ×4 at least
+  });
+
+  it("no function moves a truss head onto the dance floor: the floor sweeps are gone", () => {
+    for (const gone of ["Sweep Wide", "Sweep Cross", "Sweep Punch", "Circles"])
+      expect(raw, gone).not.toContain(`Name="${gone}"`);
   });
 
   it("SAFETY: floor heads only ever aim upstage at the banner (tilt above horizontal)", () => {
@@ -250,7 +245,7 @@ describe("party VC — 5 pages, shared rows, faders, tempo, audio", () => {
     for (const pg of [1, 2, 3, 4, 5]) {
       for (const cap of ["Dim 25", "Dim 50", "Dim 75", "Dim Full", "Sync Strobe"])
         expect(baseNames, `R7 page ${pg}`).toContain(`${cap} P${pg}`);
-      for (const cap of ["Blackout", "Panic", "Banner", "Strobe", "Truss Sound", "Par Sound"])
+      for (const cap of ["Blackout", "Panic", "Banner", "Strobe", "Par Sound"])
         expect(baseNames, `R8 page ${pg}`).toContain(`${cap} P${pg}`);
     }
   });
@@ -271,7 +266,7 @@ describe("party VC — 5 pages, shared rows, faders, tempo, audio", () => {
 
   it("places each page's looks on their page", () => {
     for (const n of ["Doors R1C1", "Entrance R1C3", "Gold Wall R1C1", "Banner Bright R1C1",
-      "Gold Blue Full R1C1", "GB Chase R1C1", "Sweep Wide R2C1"])
+      "Gold Blue Full R1C1", "GB Chase R1C1"])
       expect(names).toContain(n);
   });
 
@@ -396,7 +391,7 @@ describe("party VC — 5 pages, shared rows, faders, tempo, audio", () => {
     const dial = raw.match(/<SpeedDial[^]*?<\/SpeedDial>/)?.[0] || "";
     expect(dial).toContain('<Input Universe="1" Channel="142"/>');
     expect(dial).toContain("<Tap>");
-    for (const fn of ["Sync Strobe", "Chase Gold Blue", "Rainbow Chase", "Sweep Wide", "Circles"]) {
+    for (const fn of ["Sync Strobe", "Chase Gold Blue", "Rainbow Chase"]) {
       const id = raw.match(new RegExp(`<Function ID="(\\d+)" Type="Chaser" Name="${fn}">`))?.[1];
       expect(id, `${fn} chaser id`).toBeTruthy();
       expect(dial, fn).toContain(`Duration="6">${id}</Function>`); // multiplier 6 = "1" (as tapped)
@@ -408,8 +403,6 @@ describe("party VC — 5 pages, shared rows, faders, tempo, audio", () => {
     // listens to the machine's default input (the laptop mic) and pulses the pars off room noise.
     // No AudioBox for this show => no widget. PARTY_AUDIO=1 builds it back in, without a pad.
     expect(raw).not.toContain("<AudioTriggers");
-    // R8C6 (pad 144) is the Truss Sound toggle now, on every page.
-    for (const pg of [1, 2, 3, 4, 5]) expect(padChOf(`Truss Sound P${pg}`)).toBe(144);
   });
 
   it("Beat Pulse bumps only par dimmers, so audio reactivity never overrides look colours", () => {
@@ -436,10 +429,8 @@ describe("party generator — Launchpad LED map", () => {
   });
 
   it("never lights the two input-only pads (notes 14 tap, 18 page, on the bottom row)", () => {
-    // Note 16 (R8C6) was the third one while it armed the audio-trigger widget; it is the
-    // Truss Sound toggle now, so it lights like any other button.
-    for (const n of [14, 18]) expect(pads.map((p) => p.note)).not.toContain(n);
-    expect(pads.map((p) => p.note)).toContain(16);
+    // Note 16 (R8C6) is now empty — the Truss Sound pad was removed (unfenceable).
+    for (const n of [14, 16, 18]) expect(pads.map((p) => p.note)).not.toContain(n);
   });
 
   it("flags the hold-strobe pads momentary and toggles not", () => {

@@ -12,7 +12,7 @@
     "deckHeightFt": 1.5,
     "headHeightFt": 8,
     "headSeparationFt": 30,
-    "notes": "MEASURED 2026-08-20: stage 30w x 4d x 1.5h ft; dance-floor CENTER is 14ft from stage center = 12ft downstage of the front edge (danceFloorCenterY = -12 in builder coords). Dance floor size + banner.centerHeightFt still come from the day-of plot sheet Saturday 2026-08-22; head positions from movingHeadSettings captured on site."
+    "notes": "MEASURED 2026-08-20: stage 30w x 4d x 1.5h ft; dance-floor CENTER is 14ft downstage of the FRONT EDGE (corrected 2026-08-20; DF_CENTER_Y = -14). Tables on three sides of the 20x20 floor: truss beams never go to the floor (scripts/party-geometry.ts). Dance floor size + banner.centerHeightFt still come from the day-of plot sheet Saturday 2026-08-22; head positions from movingHeadSettings captured on site."
   },
   "banner": { "widthFt": 12, "heightFt": 8, "centerX": 0, "centerHeightFt": 8 },
   "fixtures": [

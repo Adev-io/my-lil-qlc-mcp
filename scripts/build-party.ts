@@ -29,6 +29,7 @@ import { fileURLToPath } from "url";
 import path from "path";
 import { renderManual } from "./manual.js";
 import { loadRig, slugify } from "./rig.js";
+import { aimAt, beamSafe, panTiltSafe, ZONES, type Vec3 } from "./party-geometry.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO = path.resolve(__dirname, "..");
@@ -154,6 +155,10 @@ const HEAD_SAFETY: Record<string, { panMin: number; panMax: number; tiltMin: num
 const headAddr = new Map<number, number>(heads.map((f) => [f.id, f.address]));
 const fenceFor = (id: number) => HEAD_SAFETY[String(headAddr.get(id))];
 const clampDmx = (v: number) => Math.max(0, Math.min(255, Math.round(v)));
+const chanOf = (v: FixVal, ch: number): number | null => {
+  for (let k = 0; k + 1 < v.pairs.length; k += 2) if (v.pairs[k] === ch) return v.pairs[k + 1];
+  return null;
+};
 
 // ----------------------------------------------------------------------------
 // Function model
@@ -167,26 +172,17 @@ const funcs: FuncDef[] = [];
 const funcIdByName = new Map<string, number>();
 let funcId = 0;
 
-// SAFETY GUARD. Firmware movement macros (head ch13) are banned: their auto pan/tilt ignores every
-// limit here and could rake the dance floor at face height. Once day-of capture writes
+// SAFETY GUARD. Firmware movement macros (head ch13) are banned: their auto pan/tilt ignores the
+// beam guard and could rake the dance floor or guests' eyes. Once day-of capture writes
 // rig.headSafety (per-head fence by DMX address), pan/tilt are bounds-checked too.
-//
-// ONE exception, by name: SOUND_SCENE puts the TRUSS pair into a sound-active program on purpose
-// (the show's audio reactivity comes from the fixtures' own mics, not a feed into QLC+). It is
-// truss-only — those heads are 8ft up over the dance floor where sweeping is the point — and the
-// guard still refuses it on any other head, so the floor pair aimed at the banner can never
-// inherit it. scripts/floor-head-tilt.mjs carries the matching exemption at launch time.
-const SOUND_SCENE = "Truss Sound";
+const SOUND_SCENE = "Truss Sound"; // kept only so the guard's error can name what was removed
 function coverGuard(scene: string, v: FixVal): void {
   if (!heads.some((h) => h.id === v.id)) return;
-  const soundOk = scene === SOUND_SCENE && trussHeads.some((h) => h.id === v.id);
   const fence = fenceFor(v.id);
   for (let k = 0; k + 1 < v.pairs.length; k += 2) {
     const ch = v.pairs[k], val = v.pairs[k + 1];
-    if (ch === 13 && val !== 0 && !soundOk)
-      throw new Error(`Scene "${scene}" head ${v.id}: movement macro ${val} banned (firmware pan/tilt ignores eye-safe limits)`);
-    if (ch === 13 && soundOk && val < 136)
-      throw new Error(`Scene "${scene}" head ${v.id}: macro ${val} is an AUTO program — only sound-active (136-255) is allowed here`);
+    if (ch === 13 && val !== 0)
+      throw new Error(`Scene "${scene}" head ${v.id}: movement macro ${val} banned (firmware pan/tilt ignores the beam guard; ${SOUND_SCENE} was removed for this reason)`);
     if (!fence) continue;
     if (ch === 0 && (val < fence.panMin || val > fence.panMax))
       throw new Error(`Scene "${scene}" head ${v.id}: pan ${val} outside eye-safe fence [${fence.panMin}..${fence.panMax}]`);
@@ -210,6 +206,23 @@ function addChaser(name: string, stepNames: string[], hold: number, fade = 0, di
     if (sid === undefined) throw new Error(`Chaser "${name}" references unknown scene "${n}"`);
     return sid;
   });
+  // QLC+ crossfades pan/tilt between steps, so the beam travels the straight DMX line between
+  // them. Sample that line for every truss head whose aim changes between consecutive steps.
+  for (let i = 1; i < steps.length; i++) {
+    const a = funcs.find((f) => f.id === steps[i - 1]), b = funcs.find((f) => f.id === steps[i]);
+    if (!a || !b || a.type !== "Scene" || b.type !== "Scene") continue;
+    for (const hd of trussHeads) {
+      const va = a.vals.find((v) => v.id === hd.id), vb = b.vals.find((v) => v.id === hd.id);
+      const pa = va ? chanOf(va, 0) : null, ta = va ? chanOf(va, 2) : null;
+      const pb = vb ? chanOf(vb, 0) : null, tb = vb ? chanOf(vb, 2) : null;
+      if (pa === null || ta === null || pb === null || tb === null) continue;
+      const h = HEAD_XYZ[hd.id === trussHeads[0].id ? "L" : "R"];
+      for (let k = 0; k <= 8; k++) {
+        const why = panTiltSafe(h, pa + ((pb - pa) * k) / 8, ta + ((tb - ta) * k) / 8);
+        if (why) throw new Error(`Chaser "${name}" ${a.name} -> ${b.name} head ${hd.name}: ${why}`);
+      }
+    }
+  }
   funcs.push({ type: "Chaser", id, name, steps, hold, fade, direction, runOrder });
   funcIdByName.set(name, id);
   return id;
@@ -229,28 +242,24 @@ const STAGE_D = rig.stage.depthFt;
 const HEAD_SEP = rig.stage.headSeparationFt ?? STAGE_W;
 const HEAD_Z = rig.stage.headHeightFt;
 const STAGE_DECK = rig.stage.deckHeightFt;
-const HEAD_XYZ = { L: { x: -HEAD_SEP / 2, y: 0, z: HEAD_Z }, R: { x: HEAD_SEP / 2, y: 0, z: HEAD_Z } };
+const HEAD_XYZ: Record<"L" | "R", Vec3> = { L: { x: -HEAD_SEP / 2, y: 0, z: HEAD_Z }, R: { x: HEAD_SEP / 2, y: 0, z: HEAD_Z } };
 const PAN_DMX_PER_DEG = 255 / (headGroup?.beam?.panRangeDeg ?? 540);
 const TILT_DMX_PER_DEG = 255 / (headGroup?.beam?.tiltRangeDeg ?? 270);
 const TILT_CENTRE_DEPR = headGroup?.beam?.tiltCentreDeprDeg ?? 37.5;
 const BANNER = rig.banner ?? { widthFt: 12, heightFt: 8, centerX: 0, centerHeightFt: 8 };
 const WALL_Y = STAGE_D;      // the banner hangs on the back wall, just upstage of the deck
 const FLOOR_HEAD_Z = 1;      // floor heads sit on their bases, lens ~1ft up
-const DF_CENTER_Y = -12;     // dance-floor centre: 14ft from stage centre, stage is 4ft deep
-const DF_W = 20;             // dance-floor width — PLACEHOLDER, day-of plot sheet refines
+const DF_CENTER_Y = -14;     // MEASURED 2026-08-20: 14 ft from the stage FRONT EDGE to floor centre
 
-// Truss head aim: target a point, get [pan, tilt]. No front-obstruction guard here (unlike the
-// band builder) — the dance floor is legitimately downstage. The roof guard stays: a beam at or
-// above horizontal would fire into the room at head height instead of down onto the floor.
+// Truss head aim: target a point, get [pan, tilt] — and REFUSE anything whose centre line would
+// pass below 8 ft over a table or 11 ft over the dance floor (scripts/party-geometry.ts). Towers
+// stand at the stage ends with tables directly beneath them, so no floor target can ever pass:
+// truss beams go to the ceiling, the banner, the deck and the wall above the doors.
 function aim(side: "L" | "R", tx: number, ty: number, tz = 0): [number, number] {
-  const h = HEAD_XYZ[side];
-  const dx = tx - h.x, dy = ty - h.y;
-  const panDeg = (Math.atan2(dx, dy) * 180) / Math.PI;                          // 0 = upstage, + = aud-right
-  const deprDeg = (Math.atan2(h.z - tz, Math.hypot(dx, dy)) * 180) / Math.PI;   // ° below horizontal
-  if (deprDeg <= 0)
-    throw new Error(`aim(${side}, ${tx}, ${ty}, ${tz}): beam at/above horizontal — roof violation`);
-  return [clampDmx(128 + panDeg * PAN_DMX_PER_DEG),
-          clampDmx(128 + (deprDeg - TILT_CENTRE_DEPR) * TILT_DMX_PER_DEG)];
+  const h: Vec3 = HEAD_XYZ[side];
+  const why = beamSafe(h, { x: tx, y: ty, z: tz });
+  if (why) throw new Error(`aim(${side}, ${tx}, ${ty}, ${tz}): ${why}`);
+  return aimAt(h, { x: tx, y: ty, z: tz });
 }
 
 // Floor head aim: the inverted case — the head sits BELOW its target, so elevation is above
@@ -424,25 +433,25 @@ addScene("Gold Blue Full", [...wallAlt(GOLD, BLUE), ...trussColor(HEAD_COLOR.ora
 addScene("White Burst",    [...wall(PWHT), ...trussColor(HEAD_COLOR.white)], 60, 400);
 addScene("Entrance",       [...wallAlt(GOLD, BLUE), ...trussColor(HEAD_COLOR.orange), ...floorVal(255, HEAD_COLOR.orange)], 60);
 
-// --- truss head positions + sweeps -------------------------------------------
+// --- truss head positions -----
 // Doors: where the guests come in. Optional in rig.json — without it there is no door look.
 // downstageFt is measured from the FRONT edge of the stage, so it is negative on the y axis.
 const DOORS: { x: number; y: number } | null = (rig as any).doors
   ? { x: (rig as any).doors.xFt, y: -Math.abs((rig as any).doors.downstageFt) }
   : null;
-const dfC = { x: 0, y: DF_CENTER_Y };
-const dfL = { x: -DF_W / 2 + 2, y: DF_CENTER_Y }, dfR = { x: DF_W / 2 - 2, y: DF_CENTER_Y };
 
 addScene("Truss Home", trussHeads.map((f, i) => {
-  const [p, t] = trussPos("home", f, aim(i === 0 ? "L" : "R", dfC.x, dfC.y));
+  const [p, t] = trussPos("home", f, aim(i === 0 ? "L" : "R", i === 0 ? -15 : 15, -5, ZONES.ceilingZ));
+  // Home = the ceiling 5 ft in front of each tower: lit, moving nothing, on nobody.
   // Full LTP reclaim: Truss Home is the "put the heads back to normal" button, so it clears the
-  // beam channels too. Sweeps deliberately do NOT — a gobo sweeping across the floor is a look.
+  // beam channels too.
   return { id: f.id, pairs: [0, p, 2, t, 11, SHUTTER_OPEN, ...BEAM_CLEAR] };
 }));
 // DIM-RULE EXCEPTION #3 — Speaker Light carries its own dim + white. "Get light on the person
 // talking" has to work on one press during a speech, whatever the brightness row is doing.
+// Aim at stage center at ceiling height to keep the beam above table/floor clearance as it travels.
 addScene("Speaker Light", trussHeads.map((f, i) => {
-  const [p, t] = trussPos("speaker", f, aim(i === 0 ? "L" : "R", 0, 2, STAGE_DECK + 5));
+  const [p, t] = trussPos("speaker", f, aim(i === 0 ? "L" : "R", 0, 2, ZONES.ceilingZ));
   return { id: f.id, pairs: [0, p, 2, t, 5, HEAD_COLOR.white, 10, 255, 11, SHUTTER_OPEN, 13, 0] };
 }));
 addScene("Banner Home", floorHeads.map((f) => {
@@ -450,33 +459,11 @@ addScene("Banner Home", floorHeads.map((f) => {
   return { id: f.id, pairs: [0, p, 2, t, 11, SHUTTER_OPEN] };
 }));
 
-function sweepScene(n: string, l: [number, number], r: [number, number]): string {
-  addScene(n, [
-    { id: trussHeads[0].id, pairs: [0, l[0], 2, l[1], 11, SHUTTER_OPEN, 13, 0] }, // 13,0 = LTP reclaim
-    { id: trussHeads[1].id, pairs: [0, r[0], 2, r[1], 11, SHUTTER_OPEN, 13, 0] },
-  ], 800, 800);
-  return n;
-}
-addChaser("Sweep Wide", [
-  sweepScene("SwW A", aim("L", dfL.x, dfL.y), aim("R", dfR.x, dfR.y)),
-  sweepScene("SwW B", aim("L", dfR.x, dfR.y), aim("R", dfL.x, dfL.y)),
-], 1600, 800);
-addChaser("Sweep Cross", [
-  sweepScene("SwX A", aim("L", dfR.x, dfC.y + 3), aim("R", dfL.x, dfC.y + 3)),
-  sweepScene("SwX B", aim("L", dfL.x, dfC.y - 3), aim("R", dfR.x, dfC.y - 3)),
-], 1600, 800);
-addChaser("Sweep Punch", [
-  sweepScene("SwP A", aim("L", dfC.x, dfC.y), aim("R", dfC.x, dfC.y)),
-  sweepScene("SwP B", aim("L", dfC.x, dfC.y + 5), aim("R", dfC.x, dfC.y + 5)),
-], 900, 300);
-addChaser("Circles", [
-  sweepScene("Cir A", aim("L", dfC.x - 4, dfC.y - 4), aim("R", dfC.x + 4, dfC.y - 4)),
-  sweepScene("Cir B", aim("L", dfC.x - 4, dfC.y + 4), aim("R", dfC.x + 4, dfC.y + 4)),
-  sweepScene("Cir C", aim("L", dfC.x + 4, dfC.y + 4), aim("R", dfC.x - 4, dfC.y + 4)),
-  sweepScene("Cir D", aim("L", dfC.x + 4, dfC.y - 4), aim("R", dfC.x - 4, dfC.y - 4)),
-], 1200, 900);
-
 // --- the doorway ---------------------------------------------------------------
+// Aim ABOVE the door at the wall, not at the door itself: the beam runs the length of the side
+// tables. Both heads put a beam on the back wall at the door's x-coordinate and height 11 ft,
+// which keeps the beam above the floor and table clearance requirements as it travels.
+const DOOR_Z = 11;
 // Both truss heads put a beam on the doors for arrivals and the grand entrance. Only built when
 // rig.doors exists, so a rig without a measured doorway simply has no door look rather than a
 // pad that aims somewhere invented. The floor pair stays on the banner throughout.
@@ -484,14 +471,14 @@ if (DOORS) {
   addScene("Door Spot", [
     ...wallDim(BLUE, 0.35),
     ...trussHeads.map((f, i) => {
-      const [p, t] = aim(i === 0 ? "L" : "R", DOORS.x, DOORS.y);
+      const [p, t] = aim(i === 0 ? "L" : "R", DOORS.x, WALL_Y, DOOR_Z);
       return { id: f.id, pairs: [0, p, 2, t, 5, HEAD_COLOR.white, 10, 255, 11, SHUTTER_OPEN, ...BEAM_CLEAR] };
     }),
   ], 400, 400);
   addScene("Door Gobo", [
     ...wallDim(GOLD, 0.3),
     ...trussHeads.map((f, i) => {
-      const [p, t] = aim(i === 0 ? "L" : "R", DOORS.x, DOORS.y);
+      const [p, t] = aim(i === 0 ? "L" : "R", DOORS.x, WALL_Y, DOOR_Z);
       return { id: f.id, pairs: [0, p, 2, t, 5, HEAD_COLOR.orange, 6, GOBO.slot(2), 10, 255, 11, SHUTTER_OPEN, 13, 0] };
     }),
   ], 400, 400);
@@ -545,18 +532,6 @@ addChaser("Beam Punch", ["BPN S1", "BPN S2", "BPN S3"], 300);
 // Rainbow Smart 2 Pro definition — ch8 220-255 "Sound active color", ch9 251-255 "Sound active".
 addScene("Par Sound Mode", pars.map((f) => ({ id: f.id, pairs: [0, 255, 8, 240, 9, 253] })), 0, 0);
 
-// Truss sound-active mode (R8C6): the heads' own mics drive their firmware program. Chauvet
-// Intimidator Spot 375Z IRC, 15-channel mode, ch13 "Movement Macros": 136-255 is eight
-// Sound-Active programs in 16-wide bands (136 p1, 152 p2, 168 p3, 184 p4, 200 p5, 216 p6,
-// 232 p7, 248 p8). 144 sits mid-band on program 1 — change this one number to try another.
-//
-// TRUSS ONLY, and that is a safety decision, not a stylistic one. A head running a firmware
-// program IGNORES DMX pan/tilt, so scripts/floor-head-tilt.mjs cannot fence where the beam goes.
-// The truss pair is 8ft up over the dance floor, where sweeping is the whole point. The FLOOR
-// pair sits at ankle height pointed at the banner — turning those loose would rake the beam
-// across guests' eyes at close range, so they stay under DMX aim on the banner.
-const SOUND_PROGRAM = 144;
-addScene(SOUND_SCENE, trussHeads.map((f) => ({ id: f.id, pairs: [10, 255, 11, SHUTTER_OPEN, 13, SOUND_PROGRAM] })), 0, 0);
 // Beat Pulse — what the audio-trigger bass bar fires. Dimmer-only bump: HTP lifts the pars above
 // whatever the brightness row holds, then releases back. The look's colours are untouched.
 addScene("Beat Pulse", pars.map((f) => ({ id: f.id, pairs: [0, 255] })), 0, 180);
@@ -644,7 +619,6 @@ const PAGES: { name: string; blurb: string; looks: PageLook[] }[] = [
   ]},
   { name: "HORA", blurb: "lift the chairs", looks: [
     { cap: "Gold Blue Full", fn: "Gold Blue Full", row: 0, col: 0, led: LED.gold,  bg: [255, 170, 30] },
-    { cap: "Circles",        fn: "Circles",        row: 0, col: 1, led: LED.blue,  bg: [60, 110, 255] },
     { cap: "Fast Chase",     fn: "Fast Gold Blue", row: 0, col: 2, led: LED.amber, bg: [230, 150, 50] },
     { cap: "White Burst",    fn: "White Burst",    row: 0, col: 3, led: LED.white, bg: [255, 255, 255], action: "Flash" },
     { cap: "All Gold",       fn: "All Gold",       row: 1, col: 0, led: LED.gold,  bg: [255, 185, 40] },
@@ -658,9 +632,6 @@ const PAGES: { name: string; blurb: string; looks: PageLook[] }[] = [
     { cap: "Rainbow",      fn: "Rainbow Chase",   row: 0, col: 3, led: LED.green,   bg: [0, 220, 100] },
     { cap: "Rainbow Fast", fn: "Rainbow Fast",    row: 0, col: 4, led: LED.magenta, bg: [255, 0, 180] },
     { cap: "UV Black",     fn: "UV Blacklight",   row: 0, col: 5, led: LED.uv,      bg: [110, 40, 255] },
-    { cap: "Sweep Wide",   fn: "Sweep Wide",      row: 1, col: 0, led: LED.cyan,    bg: [0, 200, 230] },
-    { cap: "Sweep Cross",  fn: "Sweep Cross",     row: 1, col: 1, led: LED.cyan,    bg: [0, 170, 210] },
-    { cap: "Sweep Punch",  fn: "Sweep Punch",     row: 1, col: 2, led: LED.cyan,    bg: [0, 140, 190] },
     { cap: "Gobo Cycle",   fn: "Gobo Cycle",      row: 1, col: 3, led: LED.blue,    bg: [40, 120, 255] },
     { cap: "Gobo Shake",   fn: "Gobo Shake",      row: 1, col: 4, led: LED.uv,      bg: [170, 70, 255] },
     { cap: "Gobo Wide",    fn: "Gobo Wide",       row: 1, col: 5, led: LED.gold,    bg: [255, 175, 45] },
@@ -677,14 +648,13 @@ const DIM_ROW: { cap: string; fn: string; col: number; led: number; bg: number[]
   { cap: "Sync Strobe", fn: "Sync Strobe", col: 4, led: LED.white, bg: [230, 230, 230] },
 ];
 // R8 — utility, overlays whatever runs. C4 = SpeedDial tap and C8 = page cycle are INPUTS on
-// other widgets, so they place no button here. C6 used to arm the QLC+ audio-trigger widget;
-// with the reactivity now coming from the fixtures' own mics (no AudioBox), it drives the heads.
+// other widgets, so they place no button here. C6 is now empty (the heads' firmware sound program
+// could not be fenced with tables on three sides).
 const UTIL_ROW: { cap: string; fn?: string; action: string; col: number; led: number; bg: number[] }[] = [
   { cap: "Blackout",  action: "Blackout", col: 0, led: LED.red,   bg: [40, 40, 40] },
   { cap: "Panic",     fn: "Panic White",    action: "Toggle", col: 1, led: LED.white,   bg: [255, 255, 255] },
   { cap: "Banner",    fn: "Banner On",      action: "Toggle", col: 2, led: LED.uv,      bg: [160, 100, 255] },
   { cap: "Strobe",    fn: "Strobe Burst",   action: "Flash",  col: 4, led: LED.white,   bg: [220, 220, 220] },
-  { cap: "Truss Sound", fn: "Truss Sound",  action: "Toggle", col: 5, led: LED.magenta, bg: [255, 80, 200] },
   { cap: "Par Sound", fn: "Par Sound Mode", action: "Toggle", col: 6, led: LED.amber,   bg: [255, 140, 60] },
 ];
 
@@ -916,7 +886,7 @@ const groupFaderDefs = [
 const TAP_PAD = padCh(7, 3);    // R8C4 — SpeedDial tap
 const PAGE_PAD = padCh(7, 7);   // R8C8 — multipage next
 const tempoFuncIds = ["Sync Strobe", "Chase Gold Blue", "Chase Blue UV", "Chase Gold UV", "Rainbow Chase",
-  "Rainbow Fast", "Fast Gold Blue", "Build Chase", "Sweep Wide", "Sweep Cross", "Sweep Punch", "Circles",
+  "Rainbow Fast", "Fast Gold Blue", "Build Chase",
   // Beat-driven additions. "Candle" and "Slow Build" are deliberately NOT here — they are drifts,
   // and locking them to the tapped tempo would turn them into blinks.
   "Gold Pulse", "Beam Punch"]
@@ -1215,19 +1185,17 @@ and fires no look. On the keyboard, **PgDn / PgUp** also switch pages.
   These are the only functions that touch dimmers; looks set colour only. One at a time.
 - **R8 = utility.** Blackout · Panic (all white, full, ignores the dim row) · Banner on/off ·
   **R8C4 TAP TEMPO** (sets every chaser + Sync Strobe) · Strobe (HOLD, releases off) ·
-  **R8C6 Truss Sound** · **R8C7 Par Sound** · **R8C8 page**. C4 and C8 fire no look: they are
-  inputs on the tempo dial and the page frame.
+  **R8C7 Par Sound** · **R8C8 page**. C4 and C8 fire no look: they are inputs on the tempo dial
+  and the page frame. C6 is empty (the heads' firmware sound program could not be fenced).
 
 **Audio reactivity is the fixtures' own microphones**, not a feed into QLC+. **R8C7 Par Sound**
-hands the pars to their internal mic; **R8C6 Truss Sound** puts the two truss heads into
-Sound-Active program 1 (ch13 = ${SOUND_PROGRAM}). Tap tempo still drives every chase, so a tapped
-beat and the mics can run together.
+hands the pars to their internal mic. Tap tempo still drives every chase.
 
 > **To take a fixture back, press a look — not the sound pad again.** QLC+ is HTP only on
 > intensity channels; every other channel is LTP and keeps its last value after the function that
-> set it stops, so re-pressing R8C6 or R8C7 leaves the fixture on its microphone. Every look
-> writes the sound channels back to zero (par ch9, head ch13), and so do **Panic**, **Truss Home**
-> and every sweep. One rule: **any look press takes the fixtures back.**
+> set it stops, so re-pressing R8C7 leaves the fixture on its microphone. Every look writes the
+> sound channels back to zero (par ch9, head ch13), and so do **Panic** and **Truss Home**. One
+> rule: **any look press takes the fixtures back.**
 
 > **Truss heads only, and that is deliberate.** A head running a firmware program ignores DMX
 > pan/tilt, so nothing can fence where its beam lands. The truss pair is 8ft up over the dance

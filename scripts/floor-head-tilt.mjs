@@ -55,13 +55,10 @@ for (const file of process.argv.slice(2)) {
     if (fenceById.size === 0) { console.log(`  fence: ${file} — no head fences in rig.json (or no heads) — nothing to enforce`); }
 
     let panFixed = 0, tiltFixed = 0, macroFixed = 0;
-    // Walk Function blocks rather than the whole file, so a scene can declare itself exempt from
-    // macro-zeroing by NAME. A firmware sound-active program is the one movement macro that IS
-    // intentional (bar mitzvah show, R8C6 "Truss Sound"); without this the fence would silently
-    // strip it at every launch and the pad would look broken. Pan/tilt clamping still applies —
-    // it costs nothing, since a head in a firmware program ignores those channels anyway.
+    // Walk Function blocks, zeroing any firmware movement macro (ch13) — all of them, with no exemptions.
+    // Pan/tilt clamping still applies — it costs nothing, since a head in a firmware program ignores
+    // those channels anyway.
     const out = xml.replace(/<Function\b[^>]*>[\s\S]*?<\/Function>/g, (block) => {
-      const soundMode = /sound/i.test(block.match(/\sName="([^"]*)"/)?.[1] ?? "");
       return block.replace(/<FixtureVal ID="(\d+)">([^<]*)<\/FixtureVal>/g, (full, id, body) => {
         const fence = fenceById.get(id);
         if (!fence) return full; // only head fixtures (those with a rig.headSafety fence) are touched
@@ -76,7 +73,7 @@ for (const file of process.argv.slice(2)) {
           } else if (n[k] === tiltCh) {
             const c = clampN(n[k + 1], fence.tiltMin, fence.tiltMax);
             if (c !== n[k + 1]) { n[k + 1] = c; tiltFixed++; changed = true; }
-          } else if (n[k] === movCh && n[k + 1] !== 0 && !soundMode) { n[k + 1] = 0; macroFixed++; changed = true; }
+          } else if (n[k] === movCh && n[k + 1] !== 0) { n[k + 1] = 0; macroFixed++; changed = true; }
         }
         return changed ? `<FixtureVal ID="${id}">${n.join(",")}</FixtureVal>` : full;
       });

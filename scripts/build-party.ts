@@ -371,17 +371,17 @@ function pParVal(id: number, c: number[]): FixVal {
 // Gobo, gobo-rotation and prism are LTP exactly like the sound macro, so a plain colour look has
 // to CLEAR them or the first gobo look of the night textures every look that follows it for the
 // rest of the party. Same rule, same reason as ch13 — see the LTP RECLAIM note above.
-// The split with the MiniLab knobs: colour looks clear ch6 (gobo position) + ch13 (movement macro).
-// Beam looks that set a specific gobo (Banner Gobo, Banner Swirl) skip the gobo clear (they set
-// it explicitly). The knobs own ch7 (gobo rotation), ch8 (prism), ch14 (zoom): scenes never write them.
-const BEAM_CLEAR = [6, GOBO.open, 13, 0];
+// The split with the MiniLab knobs: on the TRUSS pair the Gobo knob (K3) owns ch6 outright, so
+// truss scenes never write it — not even a clear (a Level knob owns its channel; see the fader
+// rule below). The FLOOR pair has no gobo knob, so floor colour looks still clear ch6 and the
+// banner beam looks (Banner Gobo, Banner Swirl) set it. Knobs own ch7 (rotation), ch8 (prism),
+// ch14 (zoom) on every head: scenes never write those.
+const BEAM_CLEAR = [13, 0];                 // truss: movement macro only
+const FLOOR_CLEAR = [6, GOBO.open, 13, 0];  // floor: gobo wheel + movement macro
 const trussColor = (color: number): FixVal[] =>
   trussHeads.map((f) => ({ id: f.id, pairs: [5, color, ...BEAM_CLEAR] }));
-// A beam look: colour plus a gobo. Rotation and prism come from the knobs.
-const trussBeam = (color: number, gobo: number): FixVal[] =>
-  trussHeads.map((f) => ({ id: f.id, pairs: [5, color, 6, gobo, 13, 0] }));
 const floorVal = (dim: number, color: number): FixVal[] =>
-  floorHeads.map((f) => ({ id: f.id, pairs: [5, color, 10, dim, 11, SHUTTER_OPEN, ...BEAM_CLEAR] }));
+  floorHeads.map((f) => ({ id: f.id, pairs: [5, color, 10, dim, 11, SHUTTER_OPEN, ...FLOOR_CLEAR] }));
 // Banner texture: the floor pair projects a gobo onto the banner instead of a flat wash.
 const floorBeam = (dim: number, color: number, gobo: number): FixVal[] =>
   floorHeads.map((f) => ({ id: f.id, pairs: [5, color, 6, gobo, 10, dim, 11, SHUTTER_OPEN, 13, 0] }));
@@ -638,6 +638,12 @@ function place(spec: BtnSpec) {
     throw new Error(`Button "${spec.caption}" references unknown function "${spec.funcName}"`);
   const display = `${spec.caption} R${spec.padRow + 1}C${spec.padCol + 1}`;
   const osc = oscPath(display);
+  // Pages share a coordinate grammar, so the same caption can sit at the same pad on two pages and
+  // both buttons answer ONE OSC path. Harmless only while they drive the same function (QLC+ gives
+  // input to the visible page alone); a different function behind a shared path would misfire.
+  const prior = placed.find((p) => p.osc === osc);
+  if (prior && prior.funcName !== spec.funcName)
+    throw new Error(`OSC path ${osc} is shared by "${prior.funcName}" (page ${prior.page + 1}) and "${spec.funcName}" (page ${(spec.page ?? 0) + 1})`);
   const ftype = spec.funcName === undefined
     ? "Action"
     : funcs.find((f) => f.name === spec.funcName)?.type ?? "Scene";
@@ -1061,22 +1067,11 @@ const AUDIO_TRIGGERS = process.env.PARTY_AUDIO === "1";
 // pan/tilt speed were never used by anything. Fade and Speed dials get AbsoluteValue inputs instead.
 const ML = (rig as any).controller2 as { inputUid: string; inputLine: string; cc: Record<string, number> } | undefined;
 
-// Fade dial: applies to every look scene that isn't a utility, preset, or fader-backing scene.
-const fadeFuncIds = [
-  "Gold Wall", "Blue Wall", "Gold Blue Alt", "Soft Amber", "Warm White", "UV Accent", "Doors Blue",
-  "Wall Low Gold", "House Bright", "Banner Only",
-  "Banner Soft", "Banner Bright",
-  "Entrance", "UV Blacklight", "Gold Blue Full", "White Burst",
-  "Ceiling Gold", "Ceiling Blue", "Banner Beams", "Banner Gobo", "Banner Swirl", "All Gold", "Half Warm", "Blue Low",
-  "CDL S1", "CDL S2", "SBD S1", "SBD S2", "SBD S3", "SBD S4",
-  "GPL S1", "GPL S2", "GPL S3", "GPL S4", "GPL S5",
-  "Ceiling Circle", "Ceiling Circle Fast", "Figure 8", "Ceiling Line", "Diamond", "Banner Wave",
-  "Sync Strobe", "Chase Gold Blue", "Chase Blue UV", "Chase Gold UV", "Rainbow Chase",
-  "Rainbow Fast", "Fast Gold Blue", "Build Chase", "Gold Pulse", "Beam Punch",
-  "Truss Home", "Speaker Light", "Door Spot",
-]
-  .map((n) => funcIdByName.get(n))
-  .filter((v): v is number => v !== undefined);
+// Fade dial (MiniLab K1): fade in/out of every LOOK scene. Derived from the function list, not a
+// hand-kept name list, so a new look is covered the day it is added. Excluded: chase steps (their
+// fade is the chaser's), the brightness presets, the break-glass pads and the fader-backing scenes.
+const NOT_FADED = /^([A-Z]{3} S\d+|Blink O(n|ff)|Beat Pulse|.* Full|Dim \d+|Strobe Burst|Panic White|Banner O(n|ff)|Par Sound Mode)$/;
+const fadeFuncIds = funcs.filter((f) => f.type === "Scene" && !NOT_FADED.test(f.name)).map((f) => f.id);
 
 const allFaders = groupFaderDefs.length + faderDefs.length;
 const fadersInner = [
@@ -1124,15 +1119,17 @@ const miniInner = ML ? [
     const fid = funcIdByName.get(`${cap} Full`)!;
     return playbackSliderXml(930 + i, cap, 12 + i * 72, fid, midiInput(ML.cc[`f${i + 1}` as keyof typeof ML.cc]));
   }),
-  // Level knobs: gobo spin, prism, zoom. (Gobo position is scene-driven via BEAM_CLEAR/beam looks; no knob.)
-  sliderXml(934, "Gobo Spin", 12, heads.map((f) => ({ fixture: f.id, ch: 7 })), GROT.off, midiInput(ML.cc.k3)),
-  sliderXml(935, "Prism", 84, heads.map((f) => ({ fixture: f.id, ch: 8 })), PRISM.off, midiInput(ML.cc.k4)),
-  sliderXml(936, "Zoom", 156, heads.map((f) => ({ fixture: f.id, ch: 14 })), 128, midiInput(ML.cc.k5)),
-  // Playback washes: UV and Warm on HTP, nothing at 0.
-  playbackSliderXml(937, "UV Wash", 228, funcIdByName.get("UV Full")!, midiInput(ML.cc.k7)),
-  playbackSliderXml(938, "Warm Wash", 300, funcIdByName.get("Warm Full")!, midiInput(ML.cc.k8)),
+  // Level knobs own beam channels no scene writes: truss gobo wheel (the looks gave it up, see
+  // BEAM_CLEAR), gobo rotation, prism and zoom on every head.
+  sliderXml(934, "Gobo",      12 + 4 * 72, trussHeads.map((f) => ({ fixture: f.id, ch: 6 })), GOBO.open, midiInput(ML.cc.k3)),
+  sliderXml(935, "Gobo Spin", 12 + 5 * 72, heads.map((f) => ({ fixture: f.id, ch: 7 })), GROT.off, midiInput(ML.cc.k4)),
+  sliderXml(936, "Prism",     12 + 6 * 72, heads.map((f) => ({ fixture: f.id, ch: 8 })), PRISM.off, midiInput(ML.cc.k5)),
+  sliderXml(937, "Zoom",      12 + 7 * 72, heads.map((f) => ({ fixture: f.id, ch: 14 })), 128, midiInput(ML.cc.k6)),
+  // Playback washes: UV and Warm blend in on HTP over whatever look is lit; nothing at 0.
+  playbackSliderXml(938, "UV Wash",   12 + 8 * 72, funcIdByName.get("UV Full")!, midiInput(ML.cc.k7)),
+  playbackSliderXml(939, "Warm Wash", 12 + 9 * 72, funcIdByName.get("Warm Full")!, midiInput(ML.cc.k8)),
 ] : [];
-const miniFrame = ML ? frame("Frame", "MINILAB", 11, 805, 680, 444, 360, miniInner) : "";
+const miniFrame = ML ? frame("Frame", "MINILAB", 11, 805, 680, 12 + 10 * 72, 360, miniInner) : "";
 
 // Frames are sized to the tight bounding box of their buttons. Per page the three frames are
 // non-overlapping row bands (rows 0-1 / 6 / 7) — QLC+ frames are opaque, so overlap hides pads.

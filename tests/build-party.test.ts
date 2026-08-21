@@ -171,8 +171,10 @@ describe("party generator — looks", () => {
     // Same LTP trap as the sound macro: ch6/ch7/ch8 keep their last value after the scene that
     // set them stops. Without this the first gobo look of the night textures every look after it.
     // Panic and Truss Home are the two "put it back to normal" buttons, so they clear beams too.
+    // Truss: the Gobo knob (MiniLab K3) OWNS ch6, so no truss scene writes it at all — not even 0.
     for (const look of ["Gold Wall", "Blue Wall", "Warm White", "Doors Blue", "All Gold", "Panic White", "Truss Home"])
-      expect(chVal(fv(look, 10), 6), `${look} truss gobo`).toBe(0);
+      expect(chVal(fv(look, 10), 6), `${look} truss gobo`).toBeNull();
+    // Floor: no knob, so colour looks still clear the wheel.
     for (const look of ["Banner Bright", "Banner Soft", "All Gold"])
       expect(chVal(fv(look, 12), 6), `${look} floor gobo`).toBe(0);
     // ch7 rotation and ch8 prism belong to the MiniLab knobs, so NO scene may write them —
@@ -439,9 +441,10 @@ describe("party generator — MiniLab 3", () => {
 
   it("knobs 3-8: Level knobs own beam channels no scene writes; washes are Playback", () => {
     const want: Record<string, { cap: string; ch?: number; fx?: number[]; fn?: string }> = {
-      k3: { cap: "Gobo Spin", ch: 7, fx: [10, 11, 12, 13] },
-      k4: { cap: "Prism", ch: 8, fx: [10, 11, 12, 13] },
-      k5: { cap: "Zoom", ch: 14, fx: [10, 11, 12, 13] },
+      k3: { cap: "Gobo", ch: 6, fx: [10, 11] },
+      k4: { cap: "Gobo Spin", ch: 7, fx: [10, 11, 12, 13] },
+      k5: { cap: "Prism", ch: 8, fx: [10, 11, 12, 13] },
+      k6: { cap: "Zoom", ch: 14, fx: [10, 11, 12, 13] },
       k7: { cap: "UV Wash", fn: "UV Full" },
       k8: { cap: "Warm Wash", fn: "Warm Full" },
     };
@@ -469,16 +472,34 @@ describe("party generator — MiniLab 3", () => {
     expect(tempo).toMatch(new RegExp(`<AbsoluteValue[^>]*>\\s*<Input Universe="2" Channel="${cc.k2}"/>`));
     expect(tempo).toMatch(/<Tap>\s*<Input Universe="1" Channel="\d+"\/>/);
     // Fade: FadeIn/FadeOut multiplier index 6 ("1"), Duration index 0 ("(Not Sent)"); covers every look scene.
-    const fadeFns = [...fade.matchAll(/<Function ID="(\d+)" FadeIn="(\d+)" FadeOut="(\d+)" Duration="(\d+)"\/>/g)];
+    // QLC+ speed-dial function entries carry the id as text: <Function FadeIn FadeOut Duration>id</Function>
+    const fadeFns = [...fade.matchAll(/<Function FadeIn="(\d+)" FadeOut="(\d+)" Duration="(\d+)">(\d+)<\/Function>/g)]
+      .map((m) => ({ id: m[4], fadeIn: m[1], fadeOut: m[2], duration: m[3] }));
     expect(fadeFns.length).toBeGreaterThan(20);
-    for (const f of fadeFns) { expect(f[2]).toBe("6"); expect(f[3]).toBe("6"); expect(f[4]).toBe("0"); }
-    const looks = ["Gold Wall", "Doors Blue", "All Gold", "Ceiling Gold", "House Bright"].map((n) => raw.match(new RegExp(`<Function ID="(\\d+)" Type="Scene" Name="${n}">`))![1]);
-    for (const id of looks) expect(fadeFns.some((f) => f[1] === id), `Fade covers function ${id}`).toBe(true);
+    for (const f of fadeFns) { expect(f.fadeIn).toBe("6"); expect(f.fadeOut).toBe("6"); expect(f.duration).toBe("0"); }
+    const idOf = (n: string) => raw.match(new RegExp(`<Function ID="(\\d+)" Type="Scene" Name="${n}">`))![1];
+    for (const n of ["Gold Wall", "Doors Blue", "All Gold", "Ceiling Gold", "House Bright"])
+      expect(fadeFns.some((f) => f.id === idOf(n)), `Fade covers ${n}`).toBe(true);
+    for (const n of ["Dim Full", "Panic White", "Strobe Burst", "UV Full", "CGB S1"])
+      expect(fadeFns.some((f) => f.id === idOf(n)), `Fade must NOT touch ${n}`).toBe(false);
   });
 
-  it("no two MiniLab controls share an input channel", () => {
+  it("no two MiniLab controls share an input channel, and there are exactly twelve", () => {
     const chans = [...raw.matchAll(/<Input Universe="2" Channel="(\d+)"\/>/g)].map((m) => m[1]);
     expect(new Set(chans).size).toBe(chans.length);
+    expect(chans.length).toBe(12);
+  });
+
+  it("a shared OSC path always means the same function (pages share a coordinate grammar)", () => {
+    const byPath = new Map<string, string>();
+    for (const btn of raw.matchAll(/<Button Caption="[^"]*" ID="\d+"[^]*?<\/Button>/g)) {
+      const fn = btn[0].match(/<Function ID="(\d+)"\/>/)?.[1], ch = btn[0].match(/<Input Universe="0" Channel="(\d+)"\/>/)?.[1];
+      if (!fn || !ch) continue; // MIDI twins and action-only buttons
+      const seen = byPath.get(ch);
+      if (seen !== undefined) expect(seen, `OSC channel ${ch} drives two functions`).toBe(fn);
+      byPath.set(ch, fn);
+    }
+    expect(byPath.size).toBeGreaterThan(40);
   });
 });
 

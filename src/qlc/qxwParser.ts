@@ -290,11 +290,14 @@ function extractInputMapping(
   if (
     !Number.isInteger(universe) ||
     !Number.isInteger(channel) ||
-    universe !== 0 ||
     channel < 0
   ) {
     return null;
   }
+
+  // Only universe 0 is the OSC input in every generated show; a widget bound to a MIDI universe
+  // has no OSC path, and listing one made the dashboard advertise controls QLC+ never heard.
+  if (universe !== 0) return null;
 
   return {
     universe,

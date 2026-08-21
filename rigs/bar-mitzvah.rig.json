@@ -57,6 +57,11 @@
       "goboSlots": [11, 19, 27, 35, 43, 51, 59]
     }
   ],
+  "doors": {
+    "xFt": -15,
+    "downstageFt": 21,
+    "note": "Back corner, house left, about 25ft from the BACK of the stage; the stage is 4ft deep so 21ft out from the front edge. xFt -15 assumes the corner sits at the edge of a room about as wide as the 30ft stage - measure at the venue and correct."
+  },
   "controller": {
     "launchpad": true,
     "model": "Novation Launchpad Mini MK3",

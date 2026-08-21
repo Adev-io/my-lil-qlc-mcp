@@ -86,6 +86,30 @@
       "momentary": false
     },
     {
+      "note": 74,
+      "crc": 42662,
+      "path": "/door_spot_r2c4",
+      "page": 0,
+      "rgb": [
+        245,
+        245,
+        235
+      ],
+      "momentary": false
+    },
+    {
+      "note": 75,
+      "crc": 56398,
+      "path": "/door_gobo_r2c5",
+      "page": 0,
+      "rgb": [
+        255,
+        190,
+        70
+      ],
+      "momentary": false
+    },
+    {
       "note": 21,
       "crc": 29966,
       "path": "/dim_25_p1_r7c1",
@@ -771,8 +795,8 @@
     },
     {
       "note": 73,
-      "crc": 11952,
-      "path": "/gobo_spin_r2c3",
+      "crc": 33361,
+      "path": "/gobo_beam_r2c3",
       "page": 3,
       "rgb": [
         235,
@@ -1047,8 +1071,8 @@
     },
     {
       "note": 76,
-      "crc": 42649,
-      "path": "/prism_spin_r2c6",
+      "crc": 45801,
+      "path": "/gobo_wide_r2c6",
       "page": 4,
       "rgb": [
         255,

@@ -303,18 +303,21 @@ function pParVal(id: number, c: number[]): FixVal {
 // Gobo, gobo-rotation and prism are LTP exactly like the sound macro, so a plain colour look has
 // to CLEAR them or the first gobo look of the night textures every look that follows it for the
 // rest of the party. Same rule, same reason as ch13 — see the LTP RECLAIM note above.
-const BEAM_CLEAR = [6, GOBO.open, 7, GROT.off, 8, PRISM.off, 13, 0];
+// The split with the MiniLab knobs: a LOOK owns ch6, WHICH gobo is in the beam. The knobs own
+// ch7 gobo rotation and ch8 prism — how the beam MOVES — because those are the live "scroll"
+// controls, and a Level slider owns its channel outright, so the two cannot both have them.
+// Scenes therefore never write ch7 or ch8: a value there would be silently ignored.
+const BEAM_CLEAR = [6, GOBO.open, 13, 0];
 const trussColor = (color: number): FixVal[] =>
   trussHeads.map((f) => ({ id: f.id, pairs: [5, color, ...BEAM_CLEAR] }));
-// A beam look: colour plus an explicit gobo / rotation / prism. Anything not passed is cleared,
-// so beams never inherit half of the previous look.
-const trussBeam = (color: number, gobo: number, rot = GROT.off, prism = PRISM.off): FixVal[] =>
-  trussHeads.map((f) => ({ id: f.id, pairs: [5, color, 6, gobo, 7, rot, 8, prism, 13, 0] }));
+// A beam look: colour plus a gobo. Rotation and prism come from the knobs.
+const trussBeam = (color: number, gobo: number): FixVal[] =>
+  trussHeads.map((f) => ({ id: f.id, pairs: [5, color, 6, gobo, 13, 0] }));
 const floorVal = (dim: number, color: number): FixVal[] =>
   floorHeads.map((f) => ({ id: f.id, pairs: [5, color, 10, dim, 11, SHUTTER_OPEN, ...BEAM_CLEAR] }));
 // Banner texture: the floor pair projects a gobo onto the banner instead of a flat wash.
-const floorBeam = (dim: number, color: number, gobo: number, rot = GROT.off): FixVal[] =>
-  floorHeads.map((f) => ({ id: f.id, pairs: [5, color, 6, gobo, 7, rot, 8, PRISM.off, 10, dim, 11, SHUTTER_OPEN, 13, 0] }));
+const floorBeam = (dim: number, color: number, gobo: number): FixVal[] =>
+  floorHeads.map((f) => ({ id: f.id, pairs: [5, color, 6, gobo, 10, dim, 11, SHUTTER_OPEN, 13, 0] }));
 const floorOff = (): FixVal[] => floorHeads.map((f) => ({ id: f.id, pairs: [10, 0] }));
 
 // THEME palette — gold / blue / UV. [r,g,b,w,a,uv] on par ch2..7.
@@ -422,6 +425,11 @@ addScene("White Burst",    [...wall(PWHT), ...trussColor(HEAD_COLOR.white)], 60,
 addScene("Entrance",       [...wallAlt(GOLD, BLUE), ...trussColor(HEAD_COLOR.orange), ...floorVal(255, HEAD_COLOR.orange)], 60);
 
 // --- truss head positions + sweeps -------------------------------------------
+// Doors: where the guests come in. Optional in rig.json — without it there is no door look.
+// downstageFt is measured from the FRONT edge of the stage, so it is negative on the y axis.
+const DOORS: { x: number; y: number } | null = (rig as any).doors
+  ? { x: (rig as any).doors.xFt, y: -Math.abs((rig as any).doors.downstageFt) }
+  : null;
 const dfC = { x: 0, y: DF_CENTER_Y };
 const dfL = { x: -DF_W / 2 + 2, y: DF_CENTER_Y }, dfR = { x: DF_W / 2 - 2, y: DF_CENTER_Y };
 
@@ -468,17 +476,38 @@ addChaser("Circles", [
   sweepScene("Cir D", aim("L", dfC.x + 4, dfC.y - 4), aim("R", dfC.x - 4, dfC.y - 4)),
 ], 1200, 900);
 
+// --- the doorway ---------------------------------------------------------------
+// Both truss heads put a beam on the doors for arrivals and the grand entrance. Only built when
+// rig.doors exists, so a rig without a measured doorway simply has no door look rather than a
+// pad that aims somewhere invented. The floor pair stays on the banner throughout.
+if (DOORS) {
+  addScene("Door Spot", [
+    ...wallDim(BLUE, 0.35),
+    ...trussHeads.map((f, i) => {
+      const [p, t] = aim(i === 0 ? "L" : "R", DOORS.x, DOORS.y);
+      return { id: f.id, pairs: [0, p, 2, t, 5, HEAD_COLOR.white, 10, 255, 11, SHUTTER_OPEN, ...BEAM_CLEAR] };
+    }),
+  ], 400, 400);
+  addScene("Door Gobo", [
+    ...wallDim(GOLD, 0.3),
+    ...trussHeads.map((f, i) => {
+      const [p, t] = aim(i === 0 ? "L" : "R", DOORS.x, DOORS.y);
+      return { id: f.id, pairs: [0, p, 2, t, 5, HEAD_COLOR.orange, 6, GOBO.slot(2), 10, 255, 11, SHUTTER_OPEN, 13, 0] };
+    }),
+  ], 400, 400);
+}
+
 // --- beam looks: gobo wheel, gobo rotation, prism -----------------------------
 // Colour looks clear these (BEAM_CLEAR); the ones below deliberately texture the beam. Gobos only
 // read as gobos where a beam lands on something — the truss pair on the dance floor and the walls,
 // the floor pair on the banner — so that is where they are used.
-addScene("Doors Gobo",   [...wallDim(BLUE, 0.5), ...trussBeam(HEAD_COLOR.cyan, GOBO.slot(0), GROT.hold)], 300, 300);
-addScene("Banner Gobo",  [...wallDim(GOLD, 0.3), ...floorBeam(220, HEAD_COLOR.orange, GOBO.slot(2), GROT.hold)], 300, 300);
-addScene("Banner Swirl", [...wallDim(UVC, 0.4), ...floorBeam(220, HEAD_COLOR.magenta, GOBO.slot(4), GROT.slow)], 300, 300);
-addScene("Gobo Spin",    [...wall(GOLD), ...trussBeam(HEAD_COLOR.orange, GOBO.slot(1), GROT.mid)]);
-addScene("Gobo Cycle",   [...wall(BLUE), ...trussBeam(HEAD_COLOR.cyan, GOBO.cycleSlow, GROT.slow)]);
-addScene("Gobo Shake",   [...wall(UVC), ...trussBeam(HEAD_COLOR.magenta, GOBO.shake, GROT.off)]);
-addScene("Prism Spin",   [...wall(GOLD), ...trussBeam(HEAD_COLOR.orange, GOBO.slot(3), GROT.slow, PRISM.spinSlow)]);
+addScene("Doors Gobo",   [...wallDim(BLUE, 0.5), ...trussBeam(HEAD_COLOR.cyan, GOBO.slot(0))], 300, 300);
+addScene("Banner Gobo",  [...wallDim(GOLD, 0.3), ...floorBeam(220, HEAD_COLOR.orange, GOBO.slot(2))], 300, 300);
+addScene("Banner Swirl", [...wallDim(UVC, 0.4), ...floorBeam(220, HEAD_COLOR.magenta, GOBO.slot(4))], 300, 300);
+addScene("Gobo Beam",    [...wall(GOLD), ...trussBeam(HEAD_COLOR.orange, GOBO.slot(1))]);
+addScene("Gobo Cycle",   [...wall(BLUE), ...trussBeam(HEAD_COLOR.cyan, GOBO.cycleSlow)]);
+addScene("Gobo Shake",   [...wall(UVC), ...trussBeam(HEAD_COLOR.magenta, GOBO.shake)]);
+addScene("Gobo Wide",    [...wall(GOLD), ...trussBeam(HEAD_COLOR.orange, GOBO.slot(3))]);
 
 // --- more static looks per part of the night ---------------------------------
 addScene("All Gold",  [...wall(GOLD), ...trussColor(HEAD_COLOR.orange), ...floorVal(255, HEAD_COLOR.orange)]);
@@ -501,14 +530,14 @@ addChaser("Slow Build", ["SBD S1", "SBD S2", "SBD S3", "SBD S4"], 1400, 600);
 
 // Gold Pulse — hora. Full gold punching against a dark beat, gobo spinning throughout so the
 // heads keep moving while the wall blinks.
-addScene("GPL S1", [...wall(GOLD), ...trussBeam(HEAD_COLOR.orange, GOBO.slot(1), GROT.fast)], 0, 0);
-addScene("GPL S2", [...wall(OFF6), ...trussBeam(HEAD_COLOR.orange, GOBO.slot(1), GROT.fast)], 0, 0);
+addScene("GPL S1", [...wall(GOLD), ...trussBeam(HEAD_COLOR.orange, GOBO.slot(1))], 0, 0);
+addScene("GPL S2", [...wall(OFF6), ...trussBeam(HEAD_COLOR.orange, GOBO.slot(1))], 0, 0);
 addChaser("Gold Pulse", ["GPL S1", "GPL S2"], 400);
 
 // Beam Punch — party. The gobo and prism hold while colour and wheel jump on the beat.
-addScene("BPN S1", [...wall(GOLD), ...trussBeam(HEAD_COLOR.orange, GOBO.slot(5), GROT.mid, PRISM.on)], 0, 0);
-addScene("BPN S2", [...wall(BLUE), ...trussBeam(HEAD_COLOR.cyan, GOBO.slot(5), GROT.reverse, PRISM.on)], 0, 0);
-addScene("BPN S3", [...wall(UVC), ...trussBeam(HEAD_COLOR.magenta, GOBO.slot(5), GROT.mid, PRISM.on)], 0, 0);
+addScene("BPN S1", [...wall(GOLD), ...trussBeam(HEAD_COLOR.orange, GOBO.slot(5))], 0, 0);
+addScene("BPN S2", [...wall(BLUE), ...trussBeam(HEAD_COLOR.cyan, GOBO.slot(5))], 0, 0);
+addScene("BPN S3", [...wall(UVC), ...trussBeam(HEAD_COLOR.magenta, GOBO.slot(5))], 0, 0);
 addChaser("Beam Punch", ["BPN S1", "BPN S2", "BPN S3"], 300);
 
 // --- audio fallback + beat pulse ---------------------------------------------
@@ -585,6 +614,11 @@ const PAGES: { name: string; blurb: string; looks: PageLook[] }[] = [
     { cap: "Slow Build",   fn: "Slow Build",   row: 1, col: 0, led: LED.blue,  bg: [60, 90, 200] },
     { cap: "Doors Gobo",   fn: "Doors Gobo",   row: 1, col: 1, led: LED.cyan,  bg: [0, 160, 210] },
     { cap: "Banner Gobo",  fn: "Banner Gobo",  row: 1, col: 2, led: LED.gold,  bg: [230, 170, 60] },
+    // Only when rig.doors is measured — no doorway, no door pads.
+    ...(DOORS ? [
+      { cap: "Door Spot", fn: "Door Spot", row: 1, col: 3, led: LED.white, bg: [245, 245, 235] },
+      { cap: "Door Gobo", fn: "Door Gobo", row: 1, col: 4, led: LED.gold,  bg: [255, 190, 70] },
+    ] : []),
   ]},
   { name: "DINNER", blurb: "static ambient, zero motion", looks: [
     { cap: "Gold Wall",   fn: "Gold Wall",     row: 0, col: 0, led: LED.gold,  bg: [255, 170, 0] },
@@ -615,7 +649,7 @@ const PAGES: { name: string; blurb: string; looks: PageLook[] }[] = [
     { cap: "White Burst",    fn: "White Burst",    row: 0, col: 3, led: LED.white, bg: [255, 255, 255], action: "Flash" },
     { cap: "All Gold",       fn: "All Gold",       row: 1, col: 0, led: LED.gold,  bg: [255, 185, 40] },
     { cap: "Gold Pulse",     fn: "Gold Pulse",     row: 1, col: 1, led: LED.amber, bg: [255, 140, 20] },
-    { cap: "Gobo Spin",      fn: "Gobo Spin",      row: 1, col: 2, led: LED.gold,  bg: [235, 165, 55] },
+    { cap: "Gobo Beam",      fn: "Gobo Beam",      row: 1, col: 2, led: LED.gold,  bg: [235, 165, 55] },
   ]},
   { name: "PARTY", blurb: "the dance floor", looks: [
     { cap: "GB Chase",     fn: "Chase Gold Blue", row: 0, col: 0, led: LED.gold,    bg: [255, 160, 20] },
@@ -629,7 +663,7 @@ const PAGES: { name: string; blurb: string; looks: PageLook[] }[] = [
     { cap: "Sweep Punch",  fn: "Sweep Punch",     row: 1, col: 2, led: LED.cyan,    bg: [0, 140, 190] },
     { cap: "Gobo Cycle",   fn: "Gobo Cycle",      row: 1, col: 3, led: LED.blue,    bg: [40, 120, 255] },
     { cap: "Gobo Shake",   fn: "Gobo Shake",      row: 1, col: 4, led: LED.uv,      bg: [170, 70, 255] },
-    { cap: "Prism Spin",   fn: "Prism Spin",      row: 1, col: 5, led: LED.gold,    bg: [255, 175, 45] },
+    { cap: "Gobo Wide",    fn: "Gobo Wide",       row: 1, col: 5, led: LED.gold,    bg: [255, 175, 45] },
     { cap: "Beam Punch",   fn: "Beam Punch",      row: 1, col: 6, led: LED.magenta, bg: [255, 40, 170] },
   ]},
 ];
@@ -756,6 +790,27 @@ ${channels}
     </Slider>`;
 }
 
+// Playback-mode slider: runs one function at the slider's intensity. Unlike Level mode it does
+// not own any channel — at 0 the function is simply not running.
+function playbackSliderXml(id: number, caption: string, x: number, funcId: number, oscName: string): string {
+  return `    <Slider Caption="${esc(caption)}" ID="${id}" WidgetStyle="Slider" InvertedAppearance="false">
+     <Appearance>
+      <FrameStyle>None</FrameStyle>
+      <ForegroundColor>Default</ForegroundColor>
+      <BackgroundColor>Default</BackgroundColor>
+      <BackgroundImage>None</BackgroundImage>
+      <Font>Default</Font>
+     </Appearance>
+     <WindowState Visible="True" X="${x}" Y="16" Width="60" Height="320"/>
+     <SliderMode ValueDisplayStyle="Percentage" ClickAndGoType="None" Monitor="false">Playback</SliderMode>
+     <Level LowLimit="0" HighLimit="255" Value="0"/>
+     <Playback>
+      <Function>${funcId}</Function>
+     </Playback>
+     <Input Universe="0" Channel="${crc16(oscName)}"/>
+    </Slider>`;
+}
+
 // VCSpeedDial — tap tempo. XML pinned from QLC+ 4.14.3 vcspeeddial.cpp + vcspeeddialfunction.cpp;
 // see docs/qlc-xml-notes.md. Function multipliers are INDEXES into speedMultiplierNames:
 // 0 = "(Not Sent)", 6 = "1" (dial time applied as-is). So FadeIn/FadeOut untouched, Duration = the
@@ -818,9 +873,42 @@ ${togglePad === null ? "" : `     <Input Universe="1" Channel="${togglePad}"/>\n
 // Continuous master dimming is the built-in GRAND MASTER (top-left of the console, Intensity /
 // Reduce) — it scales intensity channels without owning them, which is exactly the semantic the
 // dim faders were reaching for.
+// EFFECT SCROLLS — the MiniLab's knobs. Level mode is CORRECT here, and only here: every one of
+// these channels is one no scene writes, so owning it outright is exactly what we want. Gobo
+// rotation and prism were deliberately taken out of the looks to make that true (see BEAM_CLEAR);
+// pan/tilt speed and focus were never used by anything.
 const faderDefs: { id: number; caption: string; chans: { fixture: number; ch: number }[]; value: number; osc: string }[] = [
   { id: 905, caption: "Heads Zoom", chans: heads.map((f) => ({ fixture: f.id, ch: 14 })), value: 128, osc: "/heads_zoom" },
+  { id: 906, caption: "Gobo Spin", chans: heads.map((f) => ({ fixture: f.id, ch: 7 })), value: GROT.off, osc: "/knob_gobo_spin" },
+  { id: 907, caption: "Prism", chans: trussHeads.map((f) => ({ fixture: f.id, ch: 8 })), value: PRISM.off, osc: "/knob_prism" },
+  { id: 908, caption: "Focus", chans: heads.map((f) => ({ fixture: f.id, ch: 9 })), value: 128, osc: "/knob_focus" },
+  { id: 909, caption: "Move Speed", chans: heads.map((f) => ({ fixture: f.id, ch: 4 })), value: 0, osc: "/knob_move_speed" },
 ];
+// GROUP INTENSITY FADERS — Playback mode, and that choice is the whole point.
+//
+// A Level slider OWNS its channels (verified on the rig, see the fader note above), so four Level
+// faders on the group dimmers would kill the R7 brightness row stone dead and pin the rig at
+// whatever the faders happened to be sitting at. A PLAYBACK slider instead runs a function at the
+// slider's intensity: at 0 it contributes nothing and the pads rule, raised it blends on HTP and
+// pushes that group brighter. That is a fader that adds rather than one that takes over.
+//
+// Consequence worth knowing at the desk: these push a group UP, they cannot pull it below what
+// the R7 row is holding. Stepped-down brightness stays on the pads; the console's Grand Master is
+// still the one control that brings everything down together.
+const parsL = pars.slice(0, Math.ceil(pars.length / 2));
+const parsR = pars.slice(Math.ceil(pars.length / 2));
+addScene("Pars L Full", parsL.map((f) => ({ id: f.id, pairs: [0, 255] })), 0, 0);
+addScene("Pars R Full", parsR.map((f) => ({ id: f.id, pairs: [0, 255] })), 0, 0);
+addScene("Truss Full", trussHeads.map((f) => ({ id: f.id, pairs: [10, 255, 11, SHUTTER_OPEN] })), 0, 0);
+addScene("Banner Full", floorHeads.map((f) => ({ id: f.id, pairs: [10, 255, 11, SHUTTER_OPEN] })), 0, 0);
+
+const groupFaderDefs = [
+  { id: 910, caption: "Pars L", fn: "Pars L Full", osc: "/fader_pars_l" },
+  { id: 911, caption: "Pars R", fn: "Pars R Full", osc: "/fader_pars_r" },
+  { id: 912, caption: "Truss", fn: "Truss Full", osc: "/fader_truss" },
+  { id: 913, caption: "Banner", fn: "Banner Full", osc: "/fader_banner" },
+].filter((d) => funcIdByName.has(d.fn));
+
 const TAP_PAD = padCh(7, 3);    // R8C4 — SpeedDial tap
 const PAGE_PAD = padCh(7, 7);   // R8C8 — multipage next
 const tempoFuncIds = ["Sync Strobe", "Chase Gold Blue", "Chase Blue UV", "Chase Gold UV", "Rainbow Chase",
@@ -841,12 +929,14 @@ const tempoFuncIds = ["Sync Strobe", "Chase Gold Blue", "Chase Blue UV", "Chase 
 // PARTY_AUDIO=1 builds the widget back in, for the day an AudioBox is plugged in. It carries no
 // Launchpad input then — R8C6 belongs to the heads now — so arm it in the Virtual Console.
 const AUDIO_TRIGGERS = process.env.PARTY_AUDIO === "1";
+const allFaders = groupFaderDefs.length + faderDefs.length;
 const fadersInner = [
-  ...faderDefs.map((d, i) => sliderXml(d.id, d.caption, 12 + i * 72, d.chans, d.value, d.osc)),
+  ...groupFaderDefs.map((d, i) => playbackSliderXml(d.id, d.caption, 12 + i * 72, funcIdByName.get(d.fn)!, d.osc)),
+  ...faderDefs.map((d, i) => sliderXml(d.id, d.caption, 12 + (groupFaderDefs.length + i) * 72, d.chans, d.value, d.osc)),
   speedDialXml(920, "Tempo", 12, 348, TAP_PAD, tempoFuncIds, 500),
   ...(AUDIO_TRIGGERS ? [audioTriggersXml(930, "Audio", 204, 348, null, funcIdByName.get("Beat Pulse")!)] : []),
 ];
-const fadersFrame = frame("Frame", "FADERS", 9, 805, 8, 12 + faderDefs.length * 72, 520, fadersInner);
+const fadersFrame = frame("Frame", "FADERS", 9, 805, 8, 12 + allFaders * 72, 520, fadersInner);
 
 // HEAD SETTINGS — dashboard/MCP buttons, off the Launchpad grid. Truss positions are mutually
 // exclusive (SoloFrame); the banner pair overlays whatever position is active.

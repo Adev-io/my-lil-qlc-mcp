@@ -163,35 +163,55 @@ describe("party generator — looks", () => {
       expect(chVal(fv(look, 10), 13), `${look} truss ch13`).toBe(0);
   });
 
-  it("BEAM RECLAIM: colour looks clear gobo, gobo-rotation and prism so a beam look cannot stick", () => {
+  it("BEAM RECLAIM: colour looks clear the gobo wheel so a beam look cannot stick", () => {
     // Same LTP trap as the sound macro: ch6/ch7/ch8 keep their last value after the scene that
     // set them stops. Without this the first gobo look of the night textures every look after it.
     // Panic and Truss Home are the two "put it back to normal" buttons, so they clear beams too.
     // Sweeps deliberately do not — a gobo sweeping across the floor is a look, not a leak.
     for (const look of ["Gold Wall", "Blue Wall", "Warm White", "Doors Blue", "All Gold", "Panic White", "Truss Home"])
-      for (const ch of [6, 7, 8])
-        expect(chVal(fv(look, 10), ch), `${look} truss ch${ch}`).toBe(0);
-    // Banner washes clear them on the floor pair too.
+      expect(chVal(fv(look, 10), 6), `${look} truss gobo`).toBe(0);
     for (const look of ["Banner Bright", "Banner Soft", "All Gold"])
-      for (const ch of [6, 7, 8])
-        expect(chVal(fv(look, 12), ch), `${look} floor ch${ch}`).toBe(0);
+      expect(chVal(fv(look, 12), 6), `${look} floor gobo`).toBe(0);
+    // ch7 rotation and ch8 prism belong to the MiniLab knobs, so NO scene may write them —
+    // a Level fader owns its channel and the scene's value would be silently ignored.
+    for (const sc of raw.matchAll(/Type="Scene" Name="([^"]*)"[^]*?<\/Function>/g))
+      for (const f of sc[0].matchAll(/<FixtureVal ID="(1[0-3])">([^<]*)</g)) {
+        const n = f[2] ? f[2].split(",").map(Number) : [];
+        for (let k = 0; k + 1 < n.length; k += 2)
+          expect([7, 8], `scene "${sc[1]}" writes head ch${n[k]}, which a knob owns`).not.toContain(n[k]);
+      }
   });
 
-  it("beam looks use real gobo/prism bands from the 375Z definition", () => {
+  it("beam looks use real gobo bands from the 375Z definition", () => {
     // ch6: 8-63 = the seven gobos, 64-119 = the same gobos shaking, 128-189 = cycle gobos.
     const goboOk = (v: number) => (v >= 8 && v <= 119) || (v >= 128 && v <= 189);
-    for (const look of ["Gobo Spin", "Gobo Cycle", "Gobo Shake", "Prism Spin"]) {
+    for (const look of ["Gobo Beam", "Gobo Cycle", "Gobo Shake", "Gobo Wide"]) {
       const g = chVal(fv(look, 10), 6);
       expect(g, `${look} gobo`).not.toBeNull();
       expect(goboOk(g!), `${look} gobo ${g} outside the fixture's usable bands`).toBe(true);
     }
-    // ch8 prism: 4-65 is the six-facet in / rotating band.
-    const p = chVal(fv("Prism Spin", 10), 8);
-    expect(p, "Prism Spin prism").toBeGreaterThanOrEqual(4);
-    expect(p, "Prism Spin prism").toBeLessThanOrEqual(65);
     // The floor pair textures the banner, and never gets a movement macro.
     expect(chVal(fv("Banner Gobo", 12), 6), "Banner Gobo floor gobo").toBeGreaterThan(0);
     expect(chVal(fv("Banner Gobo", 12), 13), "Banner Gobo floor macro").toBe(0);
+  });
+
+  it("the door looks aim both truss heads at the measured doorway", () => {
+    // Do NOT assert the two pans sit on the same side of centre: this fixture pans 540 degrees,
+    // so two heads aiming at one point legitimately land either side of 128 (measured: 213 and
+    // 69 for a house-left doorway). What must be true is that the doorway is a DIFFERENT aim
+    // from the dance floor, on both heads, with the beam actually on.
+    const homeL = chVal(fv("Truss Home", 10), 0), homeR = chVal(fv("Truss Home", 11), 0);
+    for (const look of ["Door Spot", "Door Gobo"]) {
+      for (const [id, home] of [[10, homeL], [11, homeR]] as const) {
+        const pan = chVal(fv(look, id), 0), tilt = chVal(fv(look, id), 2);
+        expect(pan, `${look} fx${id} pan`).not.toBeNull();
+        expect(tilt, `${look} fx${id} tilt`).not.toBeNull();
+        expect(pan, `${look} fx${id} aims somewhere other than the dance floor`).not.toBe(home);
+      }
+      expect(chVal(fv(look, 10), 10), `${look} left dimmer`).toBe(255);
+      // The floor pair stays on the banner — a door look never moves it.
+      expect(sceneXml(look)).not.toContain('<FixtureVal ID="12">');
+    }
   });
 
   it("Truss Sound hands the truss pair to their own mics, lit, and never touches the floor pair", () => {
@@ -295,14 +315,37 @@ describe("party VC — 5 pages, shared rows, faders, tempo, audio", () => {
     }
   });
 
-  it("ships only the Heads Zoom fader — the one channel no function touches", () => {
-    expect((raw.match(/<Slider Caption=/g) || []).length).toBe(1);
-    expect(names).toContain("Heads Zoom");
+  it("THE FADER RULE: no Level fader touches a channel any scene writes", () => {
+    // The rule, not a headcount. A QLC+ Level slider OWNS its channels, so a Level fader on a
+    // channel a scene also drives means the scene loses — that is what pinned the whole rig dark
+    // the first time. Group INTENSITY faders dodge this by being Playback sliders instead.
+    const sceneWrites = new Set<string>();
+    for (const sc of raw.matchAll(/Type="Scene" Name="[^"]*">[^]*?<\/Function>/g))
+      for (const f of sc[0].matchAll(/<FixtureVal ID="(\d+)">([^<]*)</g)) {
+        const n = f[2] ? f[2].split(",").map(Number) : [];
+        for (let k = 0; k + 1 < n.length; k += 2) sceneWrites.add(`${f[1]}:${n[k]}`);
+      }
+    for (const s of raw.matchAll(/<Slider Caption="([^"]*)"[^]*?<\/Slider>/g)) {
+      if (!s[0].includes(">Level</SliderMode>")) continue;
+      for (const c of s[0].matchAll(/<Channel Fixture="(\d+)">(\d+)<\/Channel>/g))
+        expect(sceneWrites.has(`${c[1]}:${c[2]}`), `Level fader "${s[1]}" owns fx${c[1]} ch${c[2]}, which a scene also writes`).toBe(false);
+    }
     for (const gone of ["Pars Dim", "Truss Dim", "Banner Dim", "UV Level", "Strobe Rate"])
       expect(names, `${gone} must not be a Level fader`).not.toContain(gone);
     const zoom = raw.match(/<Slider Caption="Heads Zoom"[^]*?<\/Slider>/)?.[0] || "";
     expect(zoom).toContain('Value="128"');
     expect(zoom).toContain(">Level</SliderMode>");
+  });
+
+  it("group intensity faders are Playback sliders bound to a real function", () => {
+    for (const cap of ["Pars L", "Pars R", "Truss", "Banner"]) {
+      const s = raw.match(new RegExp(`<Slider Caption="${cap}"[^]*?</Slider>`))?.[0] || "";
+      expect(s, `${cap} fader`).toContain(">Playback</SliderMode>");
+      const fid = s.match(/<Playback>\s*<Function>(\d+)<\/Function>/)?.[1];
+      expect(fid, `${cap} playback function`).toBeTruthy();
+      expect(raw, `${cap} function ${fid} exists`).toContain(`<Function ID="${fid}" Type="Scene"`);
+      expect(s, `${cap} starts at zero so the pads rule until it is raised`).toContain('Value="0"');
+    }
   });
 
   it("binds the fader's OSC input to its own path, not a double-slashed one", () => {

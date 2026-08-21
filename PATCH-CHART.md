@@ -66,7 +66,7 @@ beat and the mics can run together.
 ```
   | Doors        | Build        | Entrance     | Banner Blast |              |              |              |              |
   ------------------------------------------------------------------------------------------------------------------------
-  | Slow Build   | Doors Gobo   | Banner Gobo  |              |              |              |              |              |
+  | Slow Build   | Doors Gobo   | Banner Gobo  | Door Spot    | Door Gobo    |              |              |              |
   ------------------------------------------------------------------------------------------------------------------------
   |              |              |              |              |              |              |              |              |
   ------------------------------------------------------------------------------------------------------------------------
@@ -123,7 +123,7 @@ beat and the mics can run together.
 ```
   | Gold Blue Fu | Circles      | Fast Chase   | White Burst  |              |              |              |              |
   ------------------------------------------------------------------------------------------------------------------------
-  | All Gold     | Gold Pulse   | Gobo Spin    |              |              |              |              |              |
+  | All Gold     | Gold Pulse   | Gobo Beam    |              |              |              |              |              |
   ------------------------------------------------------------------------------------------------------------------------
   |              |              |              |              |              |              |              |              |
   ------------------------------------------------------------------------------------------------------------------------
@@ -142,7 +142,7 @@ beat and the mics can run together.
 ```
   | GB Chase     | Blue UV      | Gold UV      | Rainbow      | Rainbow Fast | UV Black     |              |              |
   ------------------------------------------------------------------------------------------------------------------------
-  | Sweep Wide   | Sweep Cross  | Sweep Punch  | Gobo Cycle   | Gobo Shake   | Prism Spin   | Beam Punch   |              |
+  | Sweep Wide   | Sweep Cross  | Sweep Punch  | Gobo Cycle   | Gobo Shake   | Gobo Wide    | Beam Punch   |              |
   ------------------------------------------------------------------------------------------------------------------------
   |              |              |              |              |              |              |              |              |
   ------------------------------------------------------------------------------------------------------------------------
@@ -179,6 +179,8 @@ R1C1); **Pad** = the Launchpad MIDI channel; **OSC** = the dashboard path.
 | Slow Build | 1 | R2C1 | 199 | `/slow_build_r2c1` |
 | Doors Gobo | 1 | R2C2 | 200 | `/doors_gobo_r2c2` |
 | Banner Gobo | 1 | R2C3 | 201 | `/banner_gobo_r2c3` |
+| Door Spot | 1 | R2C4 | 202 | `/door_spot_r2c4` |
+| Door Gobo | 1 | R2C5 | 203 | `/door_gobo_r2c5` |
 | Dim 25 P1 | 1 | R7C1 | 149 | `/dim_25_p1_r7c1` |
 | Dim 50 P1 | 1 | R7C2 | 150 | `/dim_50_p1_r7c2` |
 | Dim 75 P1 | 1 | R7C3 | 151 | `/dim_75_p1_r7c3` |
@@ -236,7 +238,7 @@ R1C1); **Pad** = the Launchpad MIDI channel; **OSC** = the dashboard path.
 | White Burst | 4 | R1C4 | 212 | `/white_burst_r1c4` |
 | All Gold | 4 | R2C1 | 199 | `/all_gold_r2c1` |
 | Gold Pulse | 4 | R2C2 | 200 | `/gold_pulse_r2c2` |
-| Gobo Spin | 4 | R2C3 | 201 | `/gobo_spin_r2c3` |
+| Gobo Beam | 4 | R2C3 | 201 | `/gobo_beam_r2c3` |
 | Dim 25 P4 | 4 | R7C1 | 149 | `/dim_25_p4_r7c1` |
 | Dim 50 P4 | 4 | R7C2 | 150 | `/dim_50_p4_r7c2` |
 | Dim 75 P4 | 4 | R7C3 | 151 | `/dim_75_p4_r7c3` |
@@ -259,7 +261,7 @@ R1C1); **Pad** = the Launchpad MIDI channel; **OSC** = the dashboard path.
 | Sweep Punch | 5 | R2C3 | 201 | `/sweep_punch_r2c3` |
 | Gobo Cycle | 5 | R2C4 | 202 | `/gobo_cycle_r2c4` |
 | Gobo Shake | 5 | R2C5 | 203 | `/gobo_shake_r2c5` |
-| Prism Spin | 5 | R2C6 | 204 | `/prism_spin_r2c6` |
+| Gobo Wide | 5 | R2C6 | 204 | `/gobo_wide_r2c6` |
 | Beam Punch | 5 | R2C7 | 205 | `/beam_punch_r2c7` |
 | Dim 25 P5 | 5 | R7C1 | 149 | `/dim_25_p5_r7c1` |
 | Dim 50 P5 | 5 | R7C2 | 150 | `/dim_50_p5_r7c2` |

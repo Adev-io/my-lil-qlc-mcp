@@ -103,6 +103,16 @@ export const RigSchema = z.object({
       centerHeightFt: z.number().positive().default(8), // banner centre above the floor
     })
     .optional(),
+  // Where the guests come in, so a look can put a beam on the doorway. Same axes as the stage:
+  // x is feet from stage centre (negative = house left, as the audience faces the stage) and
+  // downstageFt is feet out from the FRONT edge of the stage.
+  doors: z
+    .object({
+      xFt: z.number(),
+      downstageFt: z.number().positive(),
+      note: z.string().optional(),
+    })
+    .optional(),
 });
 
 export type Rig = z.infer<typeof RigSchema>;

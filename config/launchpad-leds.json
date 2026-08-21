@@ -15,8 +15,68 @@
     },
     {
       "note": 82,
-      "crc": 51255,
-      "path": "/build_r1c2",
+      "crc": 33458,
+      "path": "/gold_wall_r1c2",
+      "page": 0,
+      "rgb": [
+        255,
+        170,
+        0
+      ],
+      "momentary": false
+    },
+    {
+      "note": 83,
+      "crc": 57199,
+      "path": "/blue_wall_r1c3",
+      "page": 0,
+      "rgb": [
+        0,
+        60,
+        255
+      ],
+      "momentary": false
+    },
+    {
+      "note": 84,
+      "crc": 342,
+      "path": "/gold_blue_r1c4",
+      "page": 0,
+      "rgb": [
+        220,
+        130,
+        60
+      ],
+      "momentary": false
+    },
+    {
+      "note": 85,
+      "crc": 21774,
+      "path": "/warm_white_r1c5",
+      "page": 0,
+      "rgb": [
+        255,
+        230,
+        200
+      ],
+      "momentary": false
+    },
+    {
+      "note": 86,
+      "crc": 2668,
+      "path": "/uv_accent_r1c6",
+      "page": 0,
+      "rgb": [
+        120,
+        60,
+        220
+      ],
+      "momentary": false
+    },
+    {
+      "note": 71,
+      "crc": 5576,
+      "path": "/build_r2c1",
       "page": 0,
       "rgb": [
         200,
@@ -26,33 +86,9 @@
       "momentary": false
     },
     {
-      "note": 83,
-      "crc": 40169,
-      "path": "/entrance_r1c3",
-      "page": 0,
-      "rgb": [
-        255,
-        180,
-        0
-      ],
-      "momentary": false
-    },
-    {
-      "note": 84,
-      "crc": 61245,
-      "path": "/banner_blast_r1c4",
-      "page": 0,
-      "rgb": [
-        150,
-        80,
-        255
-      ],
-      "momentary": false
-    },
-    {
-      "note": 71,
-      "crc": 7240,
-      "path": "/slow_build_r2c1",
+      "note": 72,
+      "crc": 11987,
+      "path": "/slow_build_r2c2",
       "page": 0,
       "rgb": [
         60,
@@ -62,21 +98,57 @@
       "momentary": false
     },
     {
-      "note": 72,
-      "crc": 9782,
-      "path": "/doors_gobo_r2c2",
+      "note": 61,
+      "crc": 64623,
+      "path": "/ceiling_circle_r3c1",
       "page": 0,
       "rgb": [
         0,
-        160,
-        210
+        190,
+        220
       ],
       "momentary": false
     },
     {
-      "note": 73,
-      "crc": 2092,
-      "path": "/banner_gobo_r2c3",
+      "note": 62,
+      "crc": 25381,
+      "path": "/figure_8_r3c2",
+      "page": 0,
+      "rgb": [
+        0,
+        160,
+        200
+      ],
+      "momentary": false
+    },
+    {
+      "note": 51,
+      "crc": 15733,
+      "path": "/banner_soft_r4c1",
+      "page": 0,
+      "rgb": [
+        170,
+        120,
+        255
+      ],
+      "momentary": false
+    },
+    {
+      "note": 52,
+      "crc": 46006,
+      "path": "/banner_blast_r4c2",
+      "page": 0,
+      "rgb": [
+        150,
+        80,
+        255
+      ],
+      "momentary": false
+    },
+    {
+      "note": 53,
+      "crc": 57077,
+      "path": "/banner_gobo_r4c3",
       "page": 0,
       "rgb": [
         230,
@@ -86,9 +158,9 @@
       "momentary": false
     },
     {
-      "note": 74,
-      "crc": 42662,
-      "path": "/door_spot_r2c4",
+      "note": 41,
+      "crc": 32014,
+      "path": "/door_spot_r5c1",
       "page": 0,
       "rgb": [
         245,
@@ -98,14 +170,26 @@
       "momentary": false
     },
     {
-      "note": 75,
-      "crc": 56398,
-      "path": "/door_gobo_r2c5",
+      "note": 42,
+      "crc": 60929,
+      "path": "/entrance_r5c2",
       "page": 0,
       "rgb": [
         255,
-        190,
-        70
+        180,
+        0
+      ],
+      "momentary": false
+    },
+    {
+      "note": 43,
+      "crc": 62172,
+      "path": "/truss_home_r5c3",
+      "page": 0,
+      "rgb": [
+        245,
+        245,
+        235
       ],
       "momentary": false
     },
@@ -218,18 +302,6 @@
       "momentary": true
     },
     {
-      "note": 16,
-      "crc": 16245,
-      "path": "/truss_sound_p1_r8c6",
-      "page": 0,
-      "rgb": [
-        255,
-        80,
-        200
-      ],
-      "momentary": false
-    },
-    {
       "note": 17,
       "crc": 22275,
       "path": "/par_sound_p1_r8c7",
@@ -315,13 +387,25 @@
     },
     {
       "note": 87,
-      "crc": 25086,
-      "path": "/banner_soft_r1c7",
+      "crc": 41064,
+      "path": "/blue_low_r1c7",
       "page": 1,
       "rgb": [
-        170,
-        120,
-        255
+        30,
+        60,
+        170
+      ],
+      "momentary": false
+    },
+    {
+      "note": 88,
+      "crc": 7787,
+      "path": "/half_warm_r1c8",
+      "page": 1,
+      "rgb": [
+        230,
+        210,
+        180
       ],
       "momentary": false
     },
@@ -338,38 +422,62 @@
       "momentary": false
     },
     {
-      "note": 72,
-      "crc": 6305,
-      "path": "/blue_low_r2c2",
+      "note": 51,
+      "crc": 15733,
+      "path": "/banner_soft_r4c1",
       "page": 1,
       "rgb": [
-        30,
-        60,
-        170
+        170,
+        120,
+        255
       ],
       "momentary": false
     },
     {
-      "note": 73,
-      "crc": 20444,
-      "path": "/half_warm_r2c3",
-      "page": 1,
-      "rgb": [
-        230,
-        210,
-        180
-      ],
-      "momentary": false
-    },
-    {
-      "note": 74,
-      "crc": 31220,
-      "path": "/banner_swirl_r2c4",
+      "note": 52,
+      "crc": 51739,
+      "path": "/banner_swirl_r4c2",
       "page": 1,
       "rgb": [
         190,
         120,
         255
+      ],
+      "momentary": false
+    },
+    {
+      "note": 53,
+      "crc": 27324,
+      "path": "/banner_bright_r4c3",
+      "page": 1,
+      "rgb": [
+        255,
+        190,
+        60
+      ],
+      "momentary": false
+    },
+    {
+      "note": 41,
+      "crc": 53710,
+      "path": "/truss_home_r5c1",
+      "page": 1,
+      "rgb": [
+        245,
+        245,
+        235
+      ],
+      "momentary": false
+    },
+    {
+      "note": 42,
+      "crc": 45456,
+      "path": "/speaker_r5c2",
+      "page": 1,
+      "rgb": [
+        240,
+        240,
+        240
       ],
       "momentary": false
     },
@@ -482,18 +590,6 @@
       "momentary": true
     },
     {
-      "note": 16,
-      "crc": 13064,
-      "path": "/truss_sound_p2_r8c6",
-      "page": 1,
-      "rgb": [
-        255,
-        80,
-        200
-      ],
-      "momentary": false
-    },
-    {
       "note": 17,
       "crc": 23422,
       "path": "/par_sound_p2_r8c7",
@@ -507,20 +603,8 @@
     },
     {
       "note": 81,
-      "crc": 28691,
-      "path": "/banner_bright_r1c1",
-      "page": 2,
-      "rgb": [
-        255,
-        190,
-        60
-      ],
-      "momentary": false
-    },
-    {
-      "note": 82,
-      "crc": 59827,
-      "path": "/wall_low_r1c2",
+      "crc": 56104,
+      "path": "/wall_low_r1c1",
       "page": 2,
       "rgb": [
         180,
@@ -530,45 +614,9 @@
       "momentary": false
     },
     {
-      "note": 83,
-      "crc": 50040,
-      "path": "/speaker_r1c3",
-      "page": 2,
-      "rgb": [
-        240,
-        240,
-        240
-      ],
-      "momentary": false
-    },
-    {
-      "note": 84,
-      "crc": 45545,
-      "path": "/banner_only_r1c4",
-      "page": 2,
-      "rgb": [
-        150,
-        100,
-        255
-      ],
-      "momentary": false
-    },
-    {
-      "note": 85,
-      "crc": 22052,
-      "path": "/house_bright_r1c5",
-      "page": 2,
-      "rgb": [
-        255,
-        255,
-        255
-      ],
-      "momentary": false
-    },
-    {
-      "note": 71,
-      "crc": 8435,
-      "path": "/warm_low_r2c1",
+      "note": 82,
+      "crc": 64780,
+      "path": "/warm_low_r1c2",
       "page": 2,
       "rgb": [
         220,
@@ -578,14 +626,110 @@
       "momentary": false
     },
     {
-      "note": 72,
-      "crc": 16823,
-      "path": "/banner_spin_r2c2",
+      "note": 83,
+      "crc": 12344,
+      "path": "/warm_white_r1c3",
+      "page": 2,
+      "rgb": [
+        255,
+        230,
+        200
+      ],
+      "momentary": false
+    },
+    {
+      "note": 84,
+      "crc": 18349,
+      "path": "/house_bright_r1c4",
+      "page": 2,
+      "rgb": [
+        255,
+        255,
+        255
+      ],
+      "momentary": false
+    },
+    {
+      "note": 61,
+      "crc": 19914,
+      "path": "/banner_wave_r3c1",
+      "page": 2,
+      "rgb": [
+        170,
+        110,
+        255
+      ],
+      "momentary": false
+    },
+    {
+      "note": 51,
+      "crc": 18862,
+      "path": "/banner_bright_r4c1",
+      "page": 2,
+      "rgb": [
+        255,
+        190,
+        60
+      ],
+      "momentary": false
+    },
+    {
+      "note": 52,
+      "crc": 60770,
+      "path": "/banner_only_r4c2",
+      "page": 2,
+      "rgb": [
+        150,
+        100,
+        255
+      ],
+      "momentary": false
+    },
+    {
+      "note": 53,
+      "crc": 48945,
+      "path": "/banner_beams_r4c3",
+      "page": 2,
+      "rgb": [
+        240,
+        235,
+        220
+      ],
+      "momentary": false
+    },
+    {
+      "note": 54,
+      "crc": 62040,
+      "path": "/banner_spin_r4c4",
       "page": 2,
       "rgb": [
         180,
         110,
         240
+      ],
+      "momentary": false
+    },
+    {
+      "note": 41,
+      "crc": 33547,
+      "path": "/speaker_r5c1",
+      "page": 2,
+      "rgb": [
+        240,
+        240,
+        240
+      ],
+      "momentary": false
+    },
+    {
+      "note": 42,
+      "crc": 58197,
+      "path": "/truss_home_r5c2",
+      "page": 2,
+      "rgb": [
+        245,
+        245,
+        235
       ],
       "momentary": false
     },
@@ -698,18 +842,6 @@
       "momentary": true
     },
     {
-      "note": 16,
-      "crc": 14115,
-      "path": "/truss_sound_p3_r8c6",
-      "page": 2,
-      "rgb": [
-        255,
-        80,
-        200
-      ],
-      "momentary": false
-    },
-    {
       "note": 17,
       "crc": 24405,
       "path": "/par_sound_p3_r8c7",
@@ -735,49 +867,61 @@
     },
     {
       "note": 82,
-      "crc": 18991,
-      "path": "/circles_r1c2",
-      "page": 3,
-      "rgb": [
-        60,
-        110,
-        255
-      ],
-      "momentary": false
-    },
-    {
-      "note": 83,
-      "crc": 52560,
-      "path": "/fast_chase_r1c3",
-      "page": 3,
-      "rgb": [
-        230,
-        150,
-        50
-      ],
-      "momentary": false
-    },
-    {
-      "note": 84,
-      "crc": 40931,
-      "path": "/white_burst_r1c4",
-      "page": 3,
-      "rgb": [
-        255,
-        255,
-        255
-      ],
-      "momentary": true
-    },
-    {
-      "note": 71,
-      "crc": 59431,
-      "path": "/all_gold_r2c1",
+      "crc": 13784,
+      "path": "/all_gold_r1c2",
       "page": 3,
       "rgb": [
         255,
         185,
         40
+      ],
+      "momentary": false
+    },
+    {
+      "note": 83,
+      "crc": 37691,
+      "path": "/gold_wall_r1c3",
+      "page": 3,
+      "rgb": [
+        255,
+        170,
+        0
+      ],
+      "momentary": false
+    },
+    {
+      "note": 84,
+      "crc": 10368,
+      "path": "/ceiling_gold_r1c4",
+      "page": 3,
+      "rgb": [
+        240,
+        170,
+        50
+      ],
+      "momentary": false
+    },
+    {
+      "note": 85,
+      "crc": 12570,
+      "path": "/ceiling_blue_r1c5",
+      "page": 3,
+      "rgb": [
+        40,
+        100,
+        255
+      ],
+      "momentary": false
+    },
+    {
+      "note": 71,
+      "crc": 294,
+      "path": "/fast_chase_r2c1",
+      "page": 3,
+      "rgb": [
+        230,
+        150,
+        50
       ],
       "momentary": false
     },
@@ -795,13 +939,109 @@
     },
     {
       "note": 73,
-      "crc": 33361,
-      "path": "/gobo_beam_r2c3",
+      "crc": 8167,
+      "path": "/gb_chase_r2c3",
       "page": 3,
       "rgb": [
-        235,
-        165,
-        55
+        255,
+        160,
+        20
+      ],
+      "momentary": false
+    },
+    {
+      "note": 61,
+      "crc": 64623,
+      "path": "/ceiling_circle_r3c1",
+      "page": 3,
+      "rgb": [
+        0,
+        190,
+        220
+      ],
+      "momentary": false
+    },
+    {
+      "note": 62,
+      "crc": 25381,
+      "path": "/figure_8_r3c2",
+      "page": 3,
+      "rgb": [
+        0,
+        160,
+        200
+      ],
+      "momentary": false
+    },
+    {
+      "note": 63,
+      "crc": 45915,
+      "path": "/diamond_r3c3",
+      "page": 3,
+      "rgb": [
+        0,
+        130,
+        180
+      ],
+      "momentary": false
+    },
+    {
+      "note": 64,
+      "crc": 6868,
+      "path": "/ceiling_line_r3c4",
+      "page": 3,
+      "rgb": [
+        0,
+        170,
+        210
+      ],
+      "momentary": false
+    },
+    {
+      "note": 51,
+      "crc": 18862,
+      "path": "/banner_bright_r4c1",
+      "page": 3,
+      "rgb": [
+        255,
+        190,
+        60
+      ],
+      "momentary": false
+    },
+    {
+      "note": 52,
+      "crc": 46006,
+      "path": "/banner_blast_r4c2",
+      "page": 3,
+      "rgb": [
+        150,
+        80,
+        255
+      ],
+      "momentary": false
+    },
+    {
+      "note": 41,
+      "crc": 43823,
+      "path": "/white_burst_r5c1",
+      "page": 3,
+      "rgb": [
+        255,
+        255,
+        255
+      ],
+      "momentary": true
+    },
+    {
+      "note": 42,
+      "crc": 58197,
+      "path": "/truss_home_r5c2",
+      "page": 3,
+      "rgb": [
+        245,
+        245,
+        235
       ],
       "momentary": false
     },
@@ -914,18 +1154,6 @@
       "momentary": true
     },
     {
-      "note": 16,
-      "crc": 11250,
-      "path": "/truss_sound_p4_r8c6",
-      "page": 3,
-      "rgb": [
-        255,
-        80,
-        200
-      ],
-      "momentary": false
-    },
-    {
       "note": 17,
       "crc": 17284,
       "path": "/par_sound_p4_r8c7",
@@ -939,68 +1167,8 @@
     },
     {
       "note": 81,
-      "crc": 54161,
-      "path": "/gb_chase_r1c1",
-      "page": 4,
-      "rgb": [
-        255,
-        160,
-        20
-      ],
-      "momentary": false
-    },
-    {
-      "note": 82,
-      "crc": 25154,
-      "path": "/blue_uv_r1c2",
-      "page": 4,
-      "rgb": [
-        70,
-        60,
-        255
-      ],
-      "momentary": false
-    },
-    {
-      "note": 83,
-      "crc": 55290,
-      "path": "/gold_uv_r1c3",
-      "page": 4,
-      "rgb": [
-        200,
-        120,
-        255
-      ],
-      "momentary": false
-    },
-    {
-      "note": 84,
-      "crc": 2056,
-      "path": "/rainbow_r1c4",
-      "page": 4,
-      "rgb": [
-        0,
-        220,
-        100
-      ],
-      "momentary": false
-    },
-    {
-      "note": 85,
-      "crc": 45219,
-      "path": "/rainbow_fast_r1c5",
-      "page": 4,
-      "rgb": [
-        255,
-        0,
-        180
-      ],
-      "momentary": false
-    },
-    {
-      "note": 86,
-      "crc": 31139,
-      "path": "/uv_black_r1c6",
+      "crc": 3356,
+      "path": "/uv_black_r1c1",
       "page": 4,
       "rgb": [
         110,
@@ -1010,9 +1178,141 @@
       "momentary": false
     },
     {
+      "note": 82,
+      "crc": 43990,
+      "path": "/gold_blue_full_r1c2",
+      "page": 4,
+      "rgb": [
+        255,
+        170,
+        30
+      ],
+      "momentary": false
+    },
+    {
+      "note": 83,
+      "crc": 24001,
+      "path": "/uv_accent_r1c3",
+      "page": 4,
+      "rgb": [
+        120,
+        60,
+        220
+      ],
+      "momentary": false
+    },
+    {
+      "note": 84,
+      "crc": 10368,
+      "path": "/ceiling_gold_r1c4",
+      "page": 4,
+      "rgb": [
+        240,
+        170,
+        50
+      ],
+      "momentary": false
+    },
+    {
+      "note": 85,
+      "crc": 12570,
+      "path": "/ceiling_blue_r1c5",
+      "page": 4,
+      "rgb": [
+        40,
+        100,
+        255
+      ],
+      "momentary": false
+    },
+    {
       "note": 71,
-      "crc": 41757,
-      "path": "/sweep_wide_r2c1",
+      "crc": 15605,
+      "path": "/gb_chase_r2c1",
+      "page": 4,
+      "rgb": [
+        255,
+        160,
+        20
+      ],
+      "momentary": false
+    },
+    {
+      "note": 72,
+      "crc": 36134,
+      "path": "/blue_uv_r2c2",
+      "page": 4,
+      "rgb": [
+        70,
+        60,
+        255
+      ],
+      "momentary": false
+    },
+    {
+      "note": 73,
+      "crc": 14494,
+      "path": "/gold_uv_r2c3",
+      "page": 4,
+      "rgb": [
+        200,
+        120,
+        255
+      ],
+      "momentary": false
+    },
+    {
+      "note": 74,
+      "crc": 59244,
+      "path": "/rainbow_r2c4",
+      "page": 4,
+      "rgb": [
+        0,
+        220,
+        100
+      ],
+      "momentary": false
+    },
+    {
+      "note": 75,
+      "crc": 24519,
+      "path": "/rainbow_fast_r2c5",
+      "page": 4,
+      "rgb": [
+        255,
+        0,
+        180
+      ],
+      "momentary": false
+    },
+    {
+      "note": 76,
+      "crc": 171,
+      "path": "/beam_punch_r2c6",
+      "page": 4,
+      "rgb": [
+        255,
+        40,
+        170
+      ],
+      "momentary": false
+    },
+    {
+      "note": 77,
+      "crc": 22967,
+      "path": "/gold_pulse_r2c7",
+      "page": 4,
+      "rgb": [
+        255,
+        140,
+        20
+      ],
+      "momentary": false
+    },
+    {
+      "note": 61,
+      "crc": 51327,
+      "path": "/ceiling_circle_fast_r3c1",
       "page": 4,
       "rgb": [
         0,
@@ -1022,9 +1322,9 @@
       "momentary": false
     },
     {
-      "note": 72,
-      "crc": 53359,
-      "path": "/sweep_cross_r2c2",
+      "note": 62,
+      "crc": 32738,
+      "path": "/ceiling_line_r3c2",
       "page": 4,
       "rgb": [
         0,
@@ -1034,62 +1334,110 @@
       "momentary": false
     },
     {
-      "note": 73,
-      "crc": 54748,
-      "path": "/sweep_punch_r2c3",
+      "note": 63,
+      "crc": 45915,
+      "path": "/diamond_r3c3",
       "page": 4,
       "rgb": [
         0,
-        140,
-        190
+        130,
+        180
       ],
       "momentary": false
     },
     {
-      "note": 74,
-      "crc": 11571,
-      "path": "/gobo_cycle_r2c4",
+      "note": 64,
+      "crc": 1555,
+      "path": "/figure_8_r3c4",
       "page": 4,
       "rgb": [
-        40,
+        0,
+        160,
+        200
+      ],
+      "momentary": false
+    },
+    {
+      "note": 65,
+      "crc": 3054,
+      "path": "/banner_wave_r3c5",
+      "page": 4,
+      "rgb": [
+        170,
+        110,
+        255
+      ],
+      "momentary": false
+    },
+    {
+      "note": 51,
+      "crc": 33069,
+      "path": "/banner_blast_r4c1",
+      "page": 4,
+      "rgb": [
+        150,
+        80,
+        255
+      ],
+      "momentary": false
+    },
+    {
+      "note": 52,
+      "crc": 51739,
+      "path": "/banner_swirl_r4c2",
+      "page": 4,
+      "rgb": [
+        190,
         120,
         255
       ],
       "momentary": false
     },
     {
-      "note": 75,
-      "crc": 37110,
-      "path": "/gobo_shake_r2c5",
+      "note": 53,
+      "crc": 57077,
+      "path": "/banner_gobo_r4c3",
       "page": 4,
       "rgb": [
+        230,
         170,
-        70,
+        60
+      ],
+      "momentary": false
+    },
+    {
+      "note": 41,
+      "crc": 43823,
+      "path": "/white_burst_r5c1",
+      "page": 4,
+      "rgb": [
+        255,
+        255,
         255
       ],
-      "momentary": false
+      "momentary": true
     },
     {
-      "note": 76,
-      "crc": 45801,
-      "path": "/gobo_wide_r2c6",
+      "note": 42,
+      "crc": 60929,
+      "path": "/entrance_r5c2",
       "page": 4,
       "rgb": [
         255,
-        175,
-        45
+        180,
+        0
       ],
       "momentary": false
     },
     {
-      "note": 77,
-      "crc": 4386,
-      "path": "/beam_punch_r2c7",
+      "note": 43,
+      "crc": 62172,
+      "path": "/truss_home_r5c3",
       "page": 4,
       "rgb": [
-        255,
-        40,
-        170
+        245,
+        245,
+        235
       ],
       "momentary": false
     },
@@ -1200,18 +1548,6 @@
         220
       ],
       "momentary": true
-    },
-    {
-      "note": 16,
-      "crc": 12249,
-      "path": "/truss_sound_p5_r8c6",
-      "page": 4,
-      "rgb": [
-        255,
-        80,
-        200
-      ],
-      "momentary": false
     },
     {
       "note": 17,

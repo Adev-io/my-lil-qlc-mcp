@@ -117,8 +117,12 @@ public static class MIDX {
 }
 "@
   }
-  $lpIn  = [MIDX]::In('LPMiniMK3 MIDI')
-  $lpOut = [MIDX]::Out('LPMiniMK3 MIDI')
+  # SECOND port. The Mini MK3 exposes two: 'LPMiniMK3 MIDI' (the DAW port) and 'MIDIIN2/MIDIOUT2
+  # (LPMiniMK3 MIDI)' — Programmer-mode pad notes travel on the second one (SETUP-MANUAL step 4;
+  # the punk rig ran on it for months). Caught 2026-08-20: matching the bare name bound the DAW
+  # port, so QLC+ was listening to a port the pads never speak on.
+  $lpIn  = [MIDX]::In('MIDIIN2 (LPMiniMK3 MIDI)')
+  $lpOut = [MIDX]::Out('MIDIOUT2 (LPMiniMK3 MIDI)')
   if ($lpIn -lt 0 -or $lpOut -lt 0) {
     Write-Host ''
     Write-Host '  [!!] LAUNCHPAD NOT CONNECTED — and the show maps MIDI by device INDEX.' -ForegroundColor Red
@@ -140,8 +144,9 @@ public static class MIDX {
       foreach ($f in @($show, $autosave)) {
         if (-not (Test-Path $f)) { continue }
         $t = [System.IO.File]::ReadAllText($f)
-        $n = $t -replace '<Input Plugin="MIDI" UID="\d+" Line="\d+"/>', "<Input Plugin=`"MIDI`" UID=`"$lpIn`" Line=`"$lpIn`"/>"
-        $n = $n -replace '<Feedback Plugin="MIDI" UID="\d+" Line="\d+"/>', "<Feedback Plugin=`"MIDI`" UID=`"$lpOut`" Line=`"$lpOut`"/>"
+        # UID="[^"]*": QLC+ rewrites the UID as the device NAME when it autosaves, so \d+ skipped the autosave.
+        $n = $t -replace '<Input Plugin="MIDI" UID="[^"]*" Line="\d+"/>', "<Input Plugin=`"MIDI`" UID=`"$lpIn`" Line=`"$lpIn`"/>"
+        $n = $n -replace '<Feedback Plugin="MIDI" UID="[^"]*" Line="\d+"/>', "<Feedback Plugin=`"MIDI`" UID=`"$lpOut`" Line=`"$lpOut`"/>"
         if ($n -eq $t) { continue }
         Copy-Item $f "$f.midibak" -Force
         $ro = (Get-Item $f).IsReadOnly            # the generated show ships read-only

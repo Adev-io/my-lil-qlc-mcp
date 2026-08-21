@@ -3,7 +3,7 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 import os from "node:os";
 import fs from "node:fs/promises";
-import { readFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { beforeAll, describe, expect, it } from "vitest";
 import { parseQxwFile } from "../src/qlc/qxwParser";
 import { panTiltSafe } from "../scripts/party-geometry";
@@ -70,6 +70,17 @@ describe("party generator — boot + rig binding", () => {
       execSync(`npx tsx scripts/build-party.ts "${path.join(ROOT, "rigs", "punk-rock-show.rig.json")}"`,
         { cwd: ROOT, stdio: "pipe", env: { ...process.env, QLC_BUILD_OUT: OUT } }),
     ).toThrow();
+  });
+
+  it("guards captured head positions against the beam rule", () => {
+    const badRig = JSON.parse(readFileSync(RIG, "utf8"));
+    badRig.movingHeadSettings = { trussL: { home: { pan: 213, tilt: 128 } } }; // overshoots the guard
+    const tempPath = path.join(OUT, "bad-capture-rig.json");
+    writeFileSync(tempPath, JSON.stringify(badRig));
+    expect(() =>
+      execSync(`npx tsx scripts/build-party.ts "${tempPath}"`,
+        { cwd: ROOT, stdio: "pipe", env: { ...process.env, QLC_BUILD_OUT: OUT } }),
+    ).toThrow(/movingHeadSettings/);
   });
 });
 

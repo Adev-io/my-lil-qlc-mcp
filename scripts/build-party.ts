@@ -11,7 +11,7 @@
  *   - LOOKS NEVER WRITE A DIMMER. Brightness belongs to the R7 dim pads + the faders. The two
  *     deliberate exceptions are marked inline (Panic, Strobe Burst, Speaker Light) — break-glass
  *     buttons that must light the room whatever else is set.
- *   - Two head groups: "Truss" (2 on 8ft truss, dance-floor sweeps + speaker light) and "Floor"
+ *   - Two head groups: "Truss" (2 on 8ft truss, speaker light) and "Floor"
  *     (2 on the floor directly below them, cross-shooting the backdrop banner).
  *   - Tap tempo (VCSpeedDial) drives every chaser; audio triggers pulse the pars off the beat.
  *
@@ -284,7 +284,11 @@ const trussKey = (f: Fixture) => (f.id === trussHeads[0].id ? "trussL" : "trussR
 const floorKey = (f: Fixture) => (f.id === floorHeads[0].id ? "floorL" : "floorR");
 function trussPos(which: "home" | "speaker", f: Fixture, computed: [number, number]): [number, number] {
   const m = PMH[trussKey(f)]?.[which];
-  return m && m.pan !== undefined && m.tilt !== undefined ? [m.pan, m.tilt] : computed;
+  if (!m || m.pan === undefined || m.tilt === undefined) return computed;
+  // Captured on site, but still subject to the rule: a mis-typed tilt must fail the build, not the room.
+  const why = panTiltSafe(HEAD_XYZ[f.id === trussHeads[0].id ? "L" : "R"], m.pan, m.tilt);
+  if (why) throw new Error(`movingHeadSettings.${trussKey(f)}.${which} (pan ${m.pan}, tilt ${m.tilt}): ${why}`);
+  return [m.pan, m.tilt];
 }
 function floorPos(f: Fixture): [number, number] {
   const m = PMH[floorKey(f)]?.banner;
@@ -903,13 +907,13 @@ const tempoFuncIds = ["Sync Strobe", "Chase Gold Blue", "Chase Blue UV", "Chase 
 
 // Audio triggers are the one feature with a pre-agreed kill switch (spec: audio go/no-go), and the
 // switch is now OFF: the AudioBox is out for this show and reactivity comes from the fixtures' own
-// microphones (R8C6 Truss Sound, R8C7 Par Sound) plus tap tempo. That is not just a preference —
+// microphones (R8C7 Par Sound) plus tap tempo. That is not just a preference —
 // QLC+ stores the capture device as an APPLICATION preference, so a widget with no device chosen
 // listens to the machine's DEFAULT input. On this laptop that is the built-in mic, which would
 // drive the beat pulse off room noise and read as the show flickering on its own.
 //
 // PARTY_AUDIO=1 builds the widget back in, for the day an AudioBox is plugged in. It carries no
-// Launchpad input then — R8C6 belongs to the heads now — so arm it in the Virtual Console.
+// Launchpad input then — R8C6 is empty — so arm it in the Virtual Console if audio is live.
 const AUDIO_TRIGGERS = process.env.PARTY_AUDIO === "1";
 const allFaders = groupFaderDefs.length + faderDefs.length;
 const fadersInner = [
@@ -1205,10 +1209,7 @@ hands the pars to their internal mic. Tap tempo still drives every chase.
 > sound channels back to zero (par ch9, head ch13), and so do **Panic** and **Truss Home**. One
 > rule: **any look press takes the fixtures back.**
 
-> **Truss heads only, and that is deliberate.** A head running a firmware program ignores DMX
-> pan/tilt, so nothing can fence where its beam lands. The truss pair is 8ft up over the dance
-> floor where sweeping is the point. The floor pair is at ankle height aimed at the banner —
-> loose, it would rake guests' eyes at close range — so it stays under DMX aim.
+> **Head firmware sound/auto programs are not built at all** — a head in a firmware program ignores DMX aim and the beam guard cannot fence it.
 
 ${pageSections}
 Pads glow at ~30% in their look colour when idle and jump to 100% while running. To the right of the
@@ -1232,11 +1233,11 @@ ${lookIndex()}
 - **MCP / dashboard** (OSC): every look has an OSC path = \`/\` + lowercase name, spaces -> \`_\`.
   Bindings are pre-baked (CRC-16 of the path); no Auto-Detect needed.
 - **No audio feed into QLC+ for this show.** Reactivity comes from the fixtures' built-in mics
-  (R8C6 / R8C7). The QLC+ audio-trigger widget is deliberately not built: its capture device is a
+  (R8C7). The QLC+ audio-trigger widget is deliberately not built: its capture device is a
   **QLC+ preference, not part of this file**, so with none chosen it listens to the machine's
   default input — the laptop mic — and pulses the pars off room noise. To bring it back the day an
   AudioBox USB96 is patched in: \`PARTY_AUDIO=1 npm run generate\`, then select the AudioBox in
-  QLC+ and arm the widget in the Virtual Console (it has no Launchpad pad; R8C6 is the heads).
+  QLC+ and arm the widget in the Virtual Console (it has no Launchpad pad; R8C6 is empty).
 `;
 
 writeFileSync(path.join(OUT, "PATCH-CHART.md"), chart, "utf8");

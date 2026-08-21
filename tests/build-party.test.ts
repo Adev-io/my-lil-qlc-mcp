@@ -337,6 +337,31 @@ describe("party VC — 5 pages, shared rows, faders, tempo, audio", () => {
     expect(zoom).toContain(">Level</SliderMode>");
   });
 
+  it("every slider answers the OSC path the widget map advertises", () => {
+    // generate:widgets re-derives the path from the CAPTION when it parses the .qxw, so a
+    // hand-written osc name binds one path while the dashboard calls another. Shipped exactly
+    // that way once: the faders answered "/fader_pars_l" and the map said "/pars_l".
+    const crcOf = (s: string) => {
+      const T = [0x0000,0x1081,0x2102,0x3183,0x4204,0x5285,0x6306,0x7387,0x8408,0x9489,0xa50a,0xb58b,0xc60c,0xd68d,0xe70e,0xf78f];
+      let crc = 0xffff;
+      for (const b of Buffer.from(s, "utf8")) {
+        let c = b;
+        crc = ((crc >> 4) & 0x0fff) ^ T[(crc ^ c) & 15];
+        c = c >> 4;
+        crc = ((crc >> 4) & 0x0fff) ^ T[(crc ^ c) & 15];
+      }
+      return ~crc & 0xffff; // X-25 final inversion — leaving it off shifts every expected channel
+    };
+    let seen = 0;
+    for (const s of raw.matchAll(/<Slider Caption="([^"]*)"[^]*?<\/Slider>/g)) {
+      const want = crcOf(`/${s[1].toLowerCase().replace(/ /g, "_")}`);
+      expect(s[0], `slider "${s[1]}" must answer /${s[1].toLowerCase().replace(/ /g, "_")}`)
+        .toContain(`<Input Universe="0" Channel="${want}"/>`);
+      seen++;
+    }
+    expect(seen, "sliders found").toBeGreaterThan(4);
+  });
+
   it("group intensity faders are Playback sliders bound to a real function", () => {
     for (const cap of ["Pars L", "Pars R", "Truss", "Banner"]) {
       const s = raw.match(new RegExp(`<Slider Caption="${cap}"[^]*?</Slider>`))?.[0] || "";

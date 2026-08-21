@@ -747,7 +747,7 @@
       "name": "Pars L",
       "path": "/pars_l",
       "type": "slider",
-      "description": "Slider: Pars L (Input Universe 0, Channel 4722)",
+      "description": "Slider: Pars L (Input Universe 0, Channel 27691)",
       "minValue": 0,
       "maxValue": 255
     },
@@ -756,7 +756,7 @@
       "name": "Pars R",
       "path": "/pars_r",
       "type": "slider",
-      "description": "Slider: Pars R (Input Universe 0, Channel 60301)",
+      "description": "Slider: Pars R (Input Universe 0, Channel 38356)",
       "minValue": 0,
       "maxValue": 255
     },
@@ -765,7 +765,7 @@
       "name": "Truss",
       "path": "/truss",
       "type": "slider",
-      "description": "Slider: Truss (Input Universe 0, Channel 32974)",
+      "description": "Slider: Truss (Input Universe 0, Channel 13923)",
       "minValue": 0,
       "maxValue": 255
     },
@@ -774,7 +774,7 @@
       "name": "Banner",
       "path": "/banner",
       "type": "slider",
-      "description": "Slider: Banner (Input Universe 0, Channel 50374)",
+      "description": "Slider: Banner (Input Universe 0, Channel 47775)",
       "minValue": 0,
       "maxValue": 255
     },
@@ -792,7 +792,7 @@
       "name": "Gobo Spin",
       "path": "/gobo_spin",
       "type": "slider",
-      "description": "Slider: Gobo Spin (Input Universe 0, Channel 35089)",
+      "description": "Slider: Gobo Spin (Input Universe 0, Channel 2535)",
       "minValue": 0,
       "maxValue": 255
     },
@@ -801,7 +801,7 @@
       "name": "Prism",
       "path": "/prism",
       "type": "slider",
-      "description": "Slider: Prism (Input Universe 0, Channel 55978)",
+      "description": "Slider: Prism (Input Universe 0, Channel 49850)",
       "minValue": 0,
       "maxValue": 255
     },
@@ -810,7 +810,7 @@
       "name": "Focus",
       "path": "/focus",
       "type": "slider",
-      "description": "Slider: Focus (Input Universe 0, Channel 49929)",
+      "description": "Slider: Focus (Input Universe 0, Channel 56089)",
       "minValue": 0,
       "maxValue": 255
     },
@@ -819,11 +819,11 @@
       "name": "Move Speed",
       "path": "/move_speed",
       "type": "slider",
-      "description": "Slider: Move Speed (Input Universe 0, Channel 70)",
+      "description": "Slider: Move Speed (Input Universe 0, Channel 37503)",
       "minValue": 0,
       "maxValue": 255
     }
   ],
   "generated": true,
-  "generatedAt": "2026-08-21T00:29:34.709Z"
+  "generatedAt": "2026-08-21T00:39:59.619Z"
 }

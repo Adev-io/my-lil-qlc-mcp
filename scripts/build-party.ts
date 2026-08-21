@@ -877,12 +877,12 @@ ${togglePad === null ? "" : `     <Input Universe="1" Channel="${togglePad}"/>\n
 // these channels is one no scene writes, so owning it outright is exactly what we want. Gobo
 // rotation and prism were deliberately taken out of the looks to make that true (see BEAM_CLEAR);
 // pan/tilt speed and focus were never used by anything.
-const faderDefs: { id: number; caption: string; chans: { fixture: number; ch: number }[]; value: number; osc: string }[] = [
-  { id: 905, caption: "Heads Zoom", chans: heads.map((f) => ({ fixture: f.id, ch: 14 })), value: 128, osc: "/heads_zoom" },
-  { id: 906, caption: "Gobo Spin", chans: heads.map((f) => ({ fixture: f.id, ch: 7 })), value: GROT.off, osc: "/knob_gobo_spin" },
-  { id: 907, caption: "Prism", chans: trussHeads.map((f) => ({ fixture: f.id, ch: 8 })), value: PRISM.off, osc: "/knob_prism" },
-  { id: 908, caption: "Focus", chans: heads.map((f) => ({ fixture: f.id, ch: 9 })), value: 128, osc: "/knob_focus" },
-  { id: 909, caption: "Move Speed", chans: heads.map((f) => ({ fixture: f.id, ch: 4 })), value: 0, osc: "/knob_move_speed" },
+const faderDefs: { id: number; caption: string; chans: { fixture: number; ch: number }[]; value: number }[] = [
+  { id: 905, caption: "Heads Zoom", chans: heads.map((f) => ({ fixture: f.id, ch: 14 })), value: 128 },
+  { id: 906, caption: "Gobo Spin", chans: heads.map((f) => ({ fixture: f.id, ch: 7 })), value: GROT.off },
+  { id: 907, caption: "Prism", chans: trussHeads.map((f) => ({ fixture: f.id, ch: 8 })), value: PRISM.off },
+  { id: 908, caption: "Focus", chans: heads.map((f) => ({ fixture: f.id, ch: 9 })), value: 128 },
+  { id: 909, caption: "Move Speed", chans: heads.map((f) => ({ fixture: f.id, ch: 4 })), value: 0 },
 ];
 // GROUP INTENSITY FADERS — Playback mode, and that choice is the whole point.
 //
@@ -902,11 +902,15 @@ addScene("Pars R Full", parsR.map((f) => ({ id: f.id, pairs: [0, 255] })), 0, 0)
 addScene("Truss Full", trussHeads.map((f) => ({ id: f.id, pairs: [10, 255, 11, SHUTTER_OPEN] })), 0, 0);
 addScene("Banner Full", floorHeads.map((f) => ({ id: f.id, pairs: [10, 255, 11, SHUTTER_OPEN] })), 0, 0);
 
+// The OSC path is DERIVED from the caption, never hand-written. generate:widgets re-derives it
+// the same way when it parses the .qxw, so any hand-chosen name silently disagrees with the map
+// the dashboard uses — caught exactly that way: the sliders answered "/fader_pars_l" while
+// widgets.json advertised "/pars_l".
 const groupFaderDefs = [
-  { id: 910, caption: "Pars L", fn: "Pars L Full", osc: "/fader_pars_l" },
-  { id: 911, caption: "Pars R", fn: "Pars R Full", osc: "/fader_pars_r" },
-  { id: 912, caption: "Truss", fn: "Truss Full", osc: "/fader_truss" },
-  { id: 913, caption: "Banner", fn: "Banner Full", osc: "/fader_banner" },
+  { id: 910, caption: "Pars L", fn: "Pars L Full" },
+  { id: 911, caption: "Pars R", fn: "Pars R Full" },
+  { id: 912, caption: "Truss", fn: "Truss Full" },
+  { id: 913, caption: "Banner", fn: "Banner Full" },
 ].filter((d) => funcIdByName.has(d.fn));
 
 const TAP_PAD = padCh(7, 3);    // R8C4 — SpeedDial tap
@@ -931,8 +935,8 @@ const tempoFuncIds = ["Sync Strobe", "Chase Gold Blue", "Chase Blue UV", "Chase 
 const AUDIO_TRIGGERS = process.env.PARTY_AUDIO === "1";
 const allFaders = groupFaderDefs.length + faderDefs.length;
 const fadersInner = [
-  ...groupFaderDefs.map((d, i) => playbackSliderXml(d.id, d.caption, 12 + i * 72, funcIdByName.get(d.fn)!, d.osc)),
-  ...faderDefs.map((d, i) => sliderXml(d.id, d.caption, 12 + (groupFaderDefs.length + i) * 72, d.chans, d.value, d.osc)),
+  ...groupFaderDefs.map((d, i) => playbackSliderXml(d.id, d.caption, 12 + i * 72, funcIdByName.get(d.fn)!, oscPath(d.caption))),
+  ...faderDefs.map((d, i) => sliderXml(d.id, d.caption, 12 + (groupFaderDefs.length + i) * 72, d.chans, d.value, oscPath(d.caption))),
   speedDialXml(920, "Tempo", 12, 348, TAP_PAD, tempoFuncIds, 500),
   ...(AUDIO_TRIGGERS ? [audioTriggersXml(930, "Audio", 204, 348, null, funcIdByName.get("Beat Pulse")!)] : []),
 ];

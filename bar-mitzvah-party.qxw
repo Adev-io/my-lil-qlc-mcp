@@ -4491,7 +4491,7 @@
      <Playback>
       <Function>108</Function>
      </Playback>
-     <Input Universe="0" Channel="4722"/>
+     <Input Universe="0" Channel="27691"/>
     </Slider>
     <Slider Caption="Pars R" ID="911" WidgetStyle="Slider" InvertedAppearance="false">
      <Appearance>
@@ -4507,7 +4507,7 @@
      <Playback>
       <Function>109</Function>
      </Playback>
-     <Input Universe="0" Channel="60301"/>
+     <Input Universe="0" Channel="38356"/>
     </Slider>
     <Slider Caption="Truss" ID="912" WidgetStyle="Slider" InvertedAppearance="false">
      <Appearance>
@@ -4523,7 +4523,7 @@
      <Playback>
       <Function>110</Function>
      </Playback>
-     <Input Universe="0" Channel="32974"/>
+     <Input Universe="0" Channel="13923"/>
     </Slider>
     <Slider Caption="Banner" ID="913" WidgetStyle="Slider" InvertedAppearance="false">
      <Appearance>
@@ -4539,7 +4539,7 @@
      <Playback>
       <Function>111</Function>
      </Playback>
-     <Input Universe="0" Channel="50374"/>
+     <Input Universe="0" Channel="47775"/>
     </Slider>
     <Slider Caption="Heads Zoom" ID="905" WidgetStyle="Slider" InvertedAppearance="false">
      <Appearance>
@@ -4581,7 +4581,7 @@
      <Playback>
       <Function>4294967295</Function>
      </Playback>
-     <Input Universe="0" Channel="35089"/>
+     <Input Universe="0" Channel="2535"/>
     </Slider>
     <Slider Caption="Prism" ID="907" WidgetStyle="Slider" InvertedAppearance="false">
      <Appearance>
@@ -4600,7 +4600,7 @@
      <Playback>
       <Function>4294967295</Function>
      </Playback>
-     <Input Universe="0" Channel="55978"/>
+     <Input Universe="0" Channel="49850"/>
     </Slider>
     <Slider Caption="Focus" ID="908" WidgetStyle="Slider" InvertedAppearance="false">
      <Appearance>
@@ -4621,7 +4621,7 @@
      <Playback>
       <Function>4294967295</Function>
      </Playback>
-     <Input Universe="0" Channel="49929"/>
+     <Input Universe="0" Channel="56089"/>
     </Slider>
     <Slider Caption="Move Speed" ID="909" WidgetStyle="Slider" InvertedAppearance="false">
      <Appearance>
@@ -4642,7 +4642,7 @@
      <Playback>
       <Function>4294967295</Function>
      </Playback>
-     <Input Universe="0" Channel="70"/>
+     <Input Universe="0" Channel="37503"/>
     </Slider>
     <SpeedDial Caption="Tempo" ID="920">
      <Appearance>

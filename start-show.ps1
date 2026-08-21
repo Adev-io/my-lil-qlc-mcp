@@ -2,7 +2,8 @@
 #  One-shot full launcher for the QLC+ lighting stack.
 #  Brings up every connection in the rig, in order:
 #
-#    QLC+ (your rig.json show)  -> Launchpad MIDI IN (pad presses only)
+#    QLC+ (your rig.json show)  -> Launchpad MIDI IN (pad presses only, universe 1)
+#                               -> MiniLab 3 MIDI IN (knobs/faders, universe 2)
 #                               -> Art-Net  Universe 0  (to 3D monitor + real rig)
 #                               -> OSC in   (driven by the MCP server)
 #    MCP server (HTTP mode)     -> dashboard + OSC control  -> QLC+ :9000
@@ -123,13 +124,19 @@ public static class MIDX {
   # port, so QLC+ was listening to a port the pads never speak on.
   $lpIn  = [MIDX]::In('MIDIIN2 (LPMiniMK3 MIDI)')
   $lpOut = [MIDX]::Out('MIDIOUT2 (LPMiniMK3 MIDI)')
+  # MiniLab 3 optional second MIDI universe for knobs/faders
+  $mlName = $null
+  if ($rig.controller2 -and $rig.controller2.portName) { $mlName = $rig.controller2.portName }
+  $mlIn = -1
+  if ($mlName) { $mlIn = [MIDX]::In($mlName) }
   if ($lpIn -lt 0 -or $lpOut -lt 0) {
     Write-Host ''
     Write-Host '  [!!] LAUNCHPAD NOT CONNECTED — and the show maps MIDI by device INDEX.' -ForegroundColor Red
     Write-Host "       QLC+ will bind index $($rig.controller.inputUid) to whatever MIDI device sits there instead," -ForegroundColor Yellow
     Write-Host '       and stray traffic on it fires looks at random. Plug the Launchpad in and re-run.' -ForegroundColor Yellow
     Write-Host ''
-  } elseif ("$lpIn" -ne "$($rig.controller.inputUid)" -or "$lpOut" -ne "$($rig.controller.outputUid)") {
+  } elseif ("$lpIn" -ne "$($rig.controller.inputUid)" -or "$lpOut" -ne "$($rig.controller.outputUid)" -or `
+            ($mlIn -ge 0 -and "$mlIn" -ne "$($rig.controller2.inputUid)")) {
     # REPAIR, don't just complain. Watched live 2026-08-20: plugging in an Arturia Minilab3 (four
     # MIDI ports, sorting before "LPMiniMK3") moved the Launchpad from index 3 to 7 between two
     # launches. Telling the operator to edit rig.json and regenerate is not a thing anyone should
@@ -145,8 +152,20 @@ public static class MIDX {
         if (-not (Test-Path $f)) { continue }
         $t = [System.IO.File]::ReadAllText($f)
         # UID="[^"]*": QLC+ rewrites the UID as the device NAME when it autosaves, so \d+ skipped the autosave.
-        $n = $t -replace '<Input Plugin="MIDI" UID="[^"]*" Line="\d+"/>', "<Input Plugin=`"MIDI`" UID=`"$lpIn`" Line=`"$lpIn`"/>"
-        $n = $n -replace '<Feedback Plugin="MIDI" UID="[^"]*" Line="\d+"/>', "<Feedback Plugin=`"MIDI`" UID=`"$lpOut`" Line=`"$lpOut`"/>"
+        # Per-universe repair: isolate each <Universe> block so Launchpad patches don't touch MiniLab.
+        $fixUni = {
+          param($xml, $uniName, $inIdx, $outIdx)
+          $pat = '(?s)(<Universe Name="' + [regex]::Escape($uniName) + '" ID="\d+"[^>]*>)(.*?)(</Universe>)'
+          [regex]::Replace($xml, $pat, [System.Text.RegularExpressions.MatchEvaluator]{
+            param($m)
+            $body = $m.Groups[2].Value
+            $body = $body -replace '<Input Plugin="MIDI" UID="[^"]*" Line="\d+"/>', ('<Input Plugin="MIDI" UID="' + $inIdx + '" Line="' + $inIdx + '"/>')
+            if ($null -ne $outIdx) { $body = $body -replace '<Feedback Plugin="MIDI" UID="[^"]*" Line="\d+"/>', ('<Feedback Plugin="MIDI" UID="' + $outIdx + '" Line="' + $outIdx + '"/>') }
+            $m.Groups[1].Value + $body + $m.Groups[3].Value
+          })
+        }
+        $n = & $fixUni $t 'Launchpad' $lpIn $lpOut
+        if ($mlIn -ge 0) { $n = & $fixUni $n 'MiniLab' $mlIn $null }
         if ($n -eq $t) { continue }
         Copy-Item $f "$f.midibak" -Force
         $ro = (Get-Item $f).IsReadOnly            # the generated show ships read-only
@@ -158,8 +177,16 @@ public static class MIDX {
       # Keep rig.json in step by text, not ConvertTo-Json, so the file's formatting survives —
       # otherwise the next "npm run generate" would hand the stale index straight back.
       $rt = [System.IO.File]::ReadAllText($rigFile)
-      $rt = $rt -replace '("input(?:Uid|Line)"\s*:\s*")\d+(")', "`${1}$lpIn`${2}"
-      $rt = $rt -replace '("output(?:Uid|Line)"\s*:\s*")\d+(")', "`${1}$lpOut`${2}"
+      # Anchor Launchpad patches to "controller" block so they don't touch "controller2"
+      $rt = [regex]::Replace($rt, '(?s)("controller"\s*:\s*\{[^}]*?"inputUid"\s*:\s*")\d+(")',  ('${1}' + $lpIn + '${2}'))
+      $rt = [regex]::Replace($rt, '(?s)("controller"\s*:\s*\{[^}]*?"inputLine"\s*:\s*")\d+(")', ('${1}' + $lpIn + '${2}'))
+      $rt = [regex]::Replace($rt, '(?s)("controller"\s*:\s*\{[^}]*?"outputUid"\s*:\s*")\d+(")',  ('${1}' + $lpOut + '${2}'))
+      $rt = [regex]::Replace($rt, '(?s)("controller"\s*:\s*\{[^}]*?"outputLine"\s*:\s*")\d+(")', ('${1}' + $lpOut + '${2}'))
+      # MiniLab patches anchor to "controller2" block (has nested "cc" object, so use .*? not [^}]*)
+      if ($mlIn -ge 0) {
+        $rt = [regex]::Replace($rt, '(?s)("controller2"\s*:\s*\{.*?"inputUid"\s*:\s*")\d+(")',  ('${1}' + $mlIn + '${2}'))
+        $rt = [regex]::Replace($rt, '(?s)("controller2"\s*:\s*\{.*?"inputLine"\s*:\s*")\d+(")', ('${1}' + $mlIn + '${2}'))
+      }
       [System.IO.File]::WriteAllText($rigFile, $rt, $utf8)
       Write-Host '      rig.json updated to match.' -ForegroundColor Green
     } catch {
@@ -170,6 +197,12 @@ public static class MIDX {
     Write-Host ''
   } else {
     Write-Host "  -> Launchpad MIDI index check OK (in=$lpIn out=$lpOut)" -ForegroundColor DarkGray
+  }
+  # MiniLab status — print in every branch so it shows whether available or not
+  if ($mlIn -ge 0) {
+    Write-Host "  -> MiniLab MIDI index in=$mlIn" -ForegroundColor DarkGray
+  } elseif ($mlName) {
+    Write-Host "  [!] MiniLab ($mlName) not found - knobs/faders stay unbound this launch" -ForegroundColor Yellow
   }
 }
 

@@ -74,17 +74,21 @@ QLC+ 4 = one input device per universe. Universe 1 = Launchpad (exists). **Unive
 
 Arturia factory CC map, MIDI ch 1 (verify with `./scripts/midi-learn.ps1` — a relearned map just changes these numbers in rig.json `controller2.cc`):
 
-| Control | CC | QLC+ input ch (128 + CC) | Binds |
+| Control | CC | QLC+ input ch (= CC; notes are 128 + note) | Binds |
 |---|---|---|---|
-| Fader 1–4 | 82 83 85 17 | 210 211 213 145 | Pars L · Pars R · Truss · Banner (Playback, existing) |
-| Knob 1 | 74 | 202 | Truss Zoom (ch14, truss) |
-| Knob 2 | 71 | 199 | Banner Zoom (ch14, floor) |
-| Knob 3 | 76 | 204 | Truss Focus (ch9, truss) |
-| Knob 4 | 77 | 205 | Banner Focus (ch9, floor) |
-| Knob 5 | 93 | 221 | Gobo Spin (ch7, all heads) |
-| Knob 6 | 18 | 146 | Prism (ch8, all heads) |
-| Knob 7 | 19 | 147 | Move Speed (ch4, all heads) |
-| Knob 8 | 16 | 144 | UV Wash — Playback slider on a new `UV Full` scene (pars ch7 255), HTP blend |
+| Fader 1–4 | 82 83 85 17 | 82 83 85 17 | Pars L · Pars R · Truss · Banner (Playback twins of the OSC faders; a QLC+ widget has one input source) |
+| Knob 1 | 74 | 74 | Truss Zoom (ch14, truss) |
+| Knob 2 | 71 | 71 | Banner Zoom (ch14, floor) |
+| Knob 3 | 76 | 76 | Truss Focus (ch9, truss) |
+| Knob 4 | 77 | 77 | Banner Focus (ch9, floor) |
+| Knob 5 | 93 | 93 | Gobo Spin (ch7, all heads) |
+| Knob 6 | 18 | 18 | Prism (ch8, all heads) |
+| Knob 7 | 19 | 19 | Move Speed (ch4, all heads) |
+| Knob 8 | 16 | 16 | UV Wash — Playback slider on a new `UV Full` scene (pars ch7 255), HTP blend |
+
+Level knobs bind MIDI only (a Level twin would fight over the channel), so they leave the dashboard; `src/qlc/qxwParser.ts` drops every widget whose input universe is not 0 so the map never advertises a dead path. Door target is the wall **above** the door at z 9 (the 7 ft header itself dips the centre line under 8 ft on the way).
+
+Motion looks are **Collections** of two EFX (one per truss head) — a QLC+ EFX has one X/Y offset, and the towers mirror each other.
 
 Existing `Heads Zoom`/`Focus` split into truss/banner pairs. Fader rule holds: no Level knob touches a channel any scene writes (ch4/7/8/9/14 are knob-owned; UV is Playback).
 

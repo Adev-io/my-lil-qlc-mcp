@@ -989,6 +989,10 @@ ${togglePad === null ? "" : `     <Input Universe="1" Channel="${togglePad}"/>\n
 // OSC and MIDI input helpers for slider/widget emitters.
 const oscInput  = (caption: string) => `     <Input Universe="0" Channel="${crc16(oscPath(caption))}"/>`;
 const midiInput = (cc: number)      => `     <Input Universe="2" Channel="${cc}"/>`;
+// NX Touch arrives as sACN DMX on universe 3 (see "NX TOUCH FRAME"): ONYX address n is QLC+ input
+// channel n-1 — DMX-in channels are 0-based in QLC+, unlike the MIDI note/CC numbers above.
+const NX_UNI = 3;
+const nxInput = (fader: number)     => `     <Input Universe="${NX_UNI}" Channel="${fader - 1}"/>`;
 
 // DASHBOARD FADERS — OSC-driven, universe 0 only.
 // VERIFIED ON THE RIG 2026-08-20: a QLC+ VCSlider in Level mode does NOT contribute to HTP — it
@@ -1066,6 +1070,7 @@ const AUDIO_TRIGGERS = process.env.PARTY_AUDIO === "1";
 // rotation and prism were deliberately taken out of the looks to make that true (see BEAM_CLEAR);
 // pan/tilt speed were never used by anything. Fade and Speed dials get AbsoluteValue inputs instead.
 const ML = (rig as any).controller2 as { inputUid: string; inputLine: string; cc: Record<string, number> } | undefined;
+const NX = rig.controller3;
 
 // Fade dial (MiniLab K1): fade in/out of every LOOK scene. Derived from the function list, not a
 // hand-kept name list, so a new look is covered the day it is added. Excluded: chase steps (their
@@ -1137,6 +1142,27 @@ const miniInner = ML ? [
 ] : [];
 const miniFrame = ML ? frame("Frame", "MINILAB", 11, 0, 470, 12 + 10 * 72, SLIDER_H + 40, miniInner) : "";
 
+// NX TOUCH FRAME — Obsidian NX Touch, bridged through ONYX as sACN on universe 3 (docs/NX-TOUCH.md).
+// QLC+ cannot see the NX itself (vendor-class USB, no MIDI/HID endpoint), so ONYX runs ten Generic
+// Dimmers on its ten playbacks and QLC+ reads them back as a DMX input universe. Every NX fader is
+// a Playback twin of the function named in rig.json controller3.faders — Playback, never Level,
+// for the reason spelled out above the dashboard faders: it adds on HTP and owns nothing, so at 0
+// the pads rule and raised it pushes that look brighter. The ONYX flash pad bumps its dimmer to
+// 255 while held, which lands here as the slider at full. Geometry: right column under TRUSS
+// POSITION / BANNER; a 66-px pitch is what lets ten faders fit inside the 1480-wide console
+// (805 + 12 + 10*66 = 1477).
+const NX_PITCH = 66;
+const NX_Y = 400 + Math.max(28 + headPosDefs.length * 44, 28 + headBeamDefs.length * 44) + 8;
+const nxInner = NX ? NX.faders.map((name, i) => {
+  const fid = funcIdByName.get(name);
+  if (fid === undefined) {
+    const hint = [...funcIdByName.keys()].filter((n) => / Full$/.test(n)).join(", ");
+    throw new Error(`controller3.faders[${i}] "${name}" is not a function in this show (intensity scenes: ${hint})`);
+  }
+  return playbackSliderXml(940 + i, name.replace(/ Full$/, ""), 12 + i * NX_PITCH, fid, nxInput(i + 1));
+}) : [];
+const nxFrame = NX ? frame("Frame", "NX TOUCH", 12, RIGHT_X, NX_Y, 12 + NX.faders.length * NX_PITCH, SLIDER_H + 40, nxInner) : "";
+
 // Frames are sized to the tight bounding box of their buttons. Per page the three frames are
 // non-overlapping row bands (rows 0-1 / 6 / 7) — QLC+ frames are opaque, so overlap hides pads.
 function frameBBox(name: string) {
@@ -1180,7 +1206,7 @@ const vc = `<VirtualConsole>
   </Appearance>
 ${grid}
 ${fadersFrame}
-${miniFrame}
+${miniFrame}${nxFrame ? "\n" + nxFrame : ""}
 ${headPosFrame}
 ${headBeamFrame}
  </Frame>
@@ -1304,6 +1330,17 @@ const miniUniverse = ML
   ? `   <Universe Name="MiniLab" ID="2">
     <Input Plugin="MIDI" UID="${esc(ML.inputUid)}" Line="${esc(ML.inputLine)}"/>
    </Universe>`
+  : NX ? `   <Universe Name="MiniLab" ID="2"/>` : ""; // keep IDs contiguous when only the NX is present
+
+// NX Touch: E1.31 (sACN) INPUT. Parameter keys are the plugin's own (plugins/E1.31/e131plugin.h:
+// universe, multicast, mcastIP, ucastPort); Line is the NIC's index in the plugin's sorted-by-IP
+// interface list — machine-specific, like the MIDI indexes, and start-show.ps1 sanity-checks it.
+const nxUniverse = NX
+  ? `   <Universe Name="NX Touch" ID="${NX_UNI}">
+    <Input Plugin="E1.31" UID="None" Line="${esc(NX.line)}">
+     <PluginParameters universe="${NX.sacnUniverse}" multicast="1"/>
+    </Input>
+   </Universe>`
   : "";
 
 const qxw = `<?xml version="1.0" encoding="UTF-8"?>
@@ -1325,7 +1362,7 @@ const qxw = `<?xml version="1.0" encoding="UTF-8"?>
     <Feedback Plugin="OSC" UID="None" Line="0"/>
    </Universe>
 ${launchpadUniverse}
-${miniUniverse}
+${miniUniverse}${nxUniverse ? "\n" + nxUniverse : ""}
   </InputOutputMap>
 ${fixtures.map(fixtureXml).join("\n")}
 ${funcs.map(funcXml).join("\n")}

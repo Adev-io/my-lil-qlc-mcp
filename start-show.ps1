@@ -206,6 +206,34 @@ public static class MIDX {
   }
 }
 
+# 0b. NX Touch (docs/NX-TOUCH.md) — ONYX translates the console to sACN, QLC+ reads it on the E1.31
+#     input line named in rig.json. Two things go wrong in practice: the NIC is down, or ONYX is not
+#     running. Neither blocks the launch; the NX faders just stay dead.
+if ($rig -and $rig.controller3) {
+  $nxIp = $rig.controller3.interfaceIp
+  $ips  = @(Get-NetIPAddress -AddressFamily IPv4 -ErrorAction SilentlyContinue | Select-Object -ExpandProperty IPAddress | Sort-Object)
+  if ($ips -notcontains $nxIp) {
+    Write-Host "  [!] NX Touch: sACN interface $nxIp is not up - NX faders stay dead this launch" -ForegroundColor Yellow
+  } else {
+    # ponytail: warn-only. QLC+'s E1.31 plugin sorts its interface list by IP string; this mirrors that
+    # sort, but parity with Qt's enumeration is unproven, so it hints instead of patching the .qxw.
+    $guess = [array]::IndexOf($ips, $nxIp)
+    if ("$guess" -ne "$($rig.controller3.line)") {
+      Write-Host "  [!] NX Touch: QLC+ E1.31 line for $nxIp is probably $guess, rig.json says $($rig.controller3.line) - check Inputs/Outputs" -ForegroundColor Yellow
+    } else {
+      Write-Host "  -> NX Touch: sACN interface $nxIp up (E1.31 line $guess)" -ForegroundColor DarkGray
+    }
+  }
+  if (-not (Get-Process Onyx -ErrorAction SilentlyContinue)) {
+    if ($env:ONYX_EXE -and (Test-Path $env:ONYX_EXE)) {
+      Write-Host '  -> launching ONYX ...' -ForegroundColor Green
+      Start-Process $env:ONYX_EXE
+    } else {
+      Write-Host '  [!] ONYX not running - start it and load the NX-to-QLC show, or set $env:ONYX_EXE' -ForegroundColor Yellow
+    }
+  }
+}
+
 # 1. QLC+ — reads Launchpad MIDI IN (pad presses), lights the pads via MIDI feedback (the show's
 #    <Feedback> line: dim idle / bright active), Art-Net U0 out + OSC in.
 if (Get-Process qlcplus -ErrorAction SilentlyContinue) {

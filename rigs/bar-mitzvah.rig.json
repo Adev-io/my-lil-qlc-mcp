@@ -79,6 +79,14 @@
     "cc": { "f1": 82, "f2": 83, "f3": 85, "f4": 17,
             "k1": 74, "k2": 71, "k3": 76, "k4": 77, "k5": 93, "k6": 18, "k7": 19, "k8": 16 }
   },
+  "controller3": {
+    "model": "Obsidian NX Touch",
+    "bridge": "onyx-sacn",
+    "sacnUniverse": 1,
+    "interfaceIp": "10.201.6.1",
+    "line": "0",
+    "faders": ["Pars L Full", "Pars R Full", "Truss Full", "Banner Full", "UV Full", "Warm Full"]
+  },
   "dmxOutput": {
     "plugin": "ArtNet",
     "universe": 0,

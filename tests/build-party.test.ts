@@ -672,13 +672,13 @@ describe("party generator — console fits the show laptop", () => {
   const topFrames = () => {
     const root = raw.match(/<VirtualConsole>\s*<Frame Caption="">[^]*?<\/VirtualConsole>/)![0];
     const out: { name: string; x: number; y: number; w: number; h: number }[] = [];
-    for (const m of root.matchAll(/<(?:Solo)?Frame Caption="(Pages|FADERS|MINILAB|TRUSS POSITION|BANNER)" ID="\d+">[^]*?<WindowState Visible="True" X="(\d+)" Y="(\d+)" Width="(\d+)" Height="(\d+)"\/>/g))
+    for (const m of root.matchAll(/<(?:Solo)?Frame Caption="(Pages|FADERS|MINILAB|NX TOUCH|TRUSS POSITION|BANNER)" ID="\d+">[^]*?<WindowState Visible="True" X="(\d+)" Y="(\d+)" Width="(\d+)" Height="(\d+)"\/>/g))
       out.push({ name: m[1], x: +m[2], y: +m[3], w: +m[4], h: +m[5] });
     return out;
   };
   it("every top-level frame sits inside 1500x820", () => {
     const fr = topFrames();
-    expect(fr.map((f) => f.name).sort()).toEqual(["BANNER", "FADERS", "MINILAB", "Pages", "TRUSS POSITION"]);
+    expect(fr.map((f) => f.name).sort()).toEqual(["BANNER", "FADERS", "MINILAB", "NX TOUCH", "Pages", "TRUSS POSITION"]);
     for (const f of fr) {
       expect(f.x + f.w, `${f.name} right edge`).toBeLessThanOrEqual(CANVAS.w);
       expect(f.y + f.h, `${f.name} bottom edge`).toBeLessThanOrEqual(CANVAS.h);
@@ -693,7 +693,7 @@ describe("party generator — console fits the show laptop", () => {
     }
   });
   it("every slider and dial fits inside its frame", () => {
-    for (const name of ["FADERS", "MINILAB"]) {
+    for (const name of ["FADERS", "MINILAB", "NX TOUCH"]) {
       const fx = raw.match(new RegExp(`<Frame Caption="${name}" ID="\\d+">[^]*?<WindowState Visible="True" X="\\d+" Y="\\d+" Width="(\\d+)" Height="(\\d+)"\\/>([^]*?)\\n   </Frame>`))!;
       expect(fx, `${name} frame`).toBeTruthy();
       const fw = +fx[1], fh = +fx[2], body = fx[3];
@@ -713,5 +713,71 @@ describe("party generator — console fits the show laptop", () => {
     let pairs = 0;
     for (const [cap, geos] of byCaption) if (geos.length > 1) { pairs++; expect(new Set(geos).size, cap).toBe(1); }
     expect(pairs).toBeGreaterThan(50);
+  });
+});
+
+// NX Touch reaches QLC+ as sACN through ONYX (docs/NX-TOUCH.md): universe 3 is an E1.31 INPUT and
+// every rig.controller3.faders[i] becomes a Playback slider on input channel i (DMX address i+1).
+describe("party generator — NX Touch (ONYX sACN bridge)", () => {
+  const rig = JSON.parse(readFileSync(RIG, "utf8"));
+  const faders = rig.controller3.faders as string[];
+  const sliderByNxChannel = (ch: number) =>
+    [...raw.matchAll(/<Slider Caption="([^"]*)"[^]*?<\/Slider>/g)].find((m) => m[0].includes(`<Input Universe="3" Channel="${ch}"/>`));
+  const buildTo = (rigObj: unknown, sub: string): string => {
+    const dir = path.join(OUT, sub);
+    const tempRig = path.join(OUT, `${sub}.rig.json`);
+    writeFileSync(tempRig, JSON.stringify(rigObj));
+    execSync(`npx tsx scripts/build-party.ts "${tempRig}"`, { cwd: ROOT, stdio: "pipe", env: { ...process.env, QLC_BUILD_OUT: dir } });
+    return readFileSync(path.join(dir, "bar-mitzvah-party.qxw"), "utf8");
+  };
+
+  it("declares universe 3 as an E1.31 input on the rig's sACN universe, after a real MiniLab universe 2", () => {
+    expect(raw).toMatch(/<Universe Name="MiniLab" ID="2">\s*<Input Plugin="MIDI"/);
+    expect(raw).toMatch(new RegExp(
+      `<Universe Name="NX Touch" ID="3">\\s*<Input Plugin="E1.31" UID="None" Line="${rig.controller3.line}">\\s*` +
+      `<PluginParameters universe="${rig.controller3.sacnUniverse}" multicast="1"/>\\s*</Input>\\s*</Universe>`));
+  });
+
+  it("one Playback slider per fader, channel = index, running exactly the named function", () => {
+    expect(faders.length).toBe(6);
+    for (const [i, name] of faders.entries()) {
+      const s = sliderByNxChannel(i);
+      expect(s, `fader ${i + 1} -> ${name}`).toBeTruthy();
+      expect(s![1]).toBe(name.replace(/ Full$/, ""));
+      expect(s![0]).toContain(">Playback</SliderMode>");
+      const fid = s![0].match(/<Playback>\s*<Function>(\d+)/)![1];
+      expect(raw).toContain(`<Function ID="${fid}" Type="Scene" Name="${name}"`);
+    }
+    const chans = [...raw.matchAll(/<Input Universe="3" Channel="(\d+)"\/>/g)].map((m) => +m[1]);
+    expect(chans.sort((a, b) => a - b)).toEqual(faders.map((_, i) => i));
+  });
+
+  it("NX sliders never reach widgets.json (no OSC path, universe 3 is filtered)", () => {
+    // Six Playback twins on captions the OSC faders already own; the dashboard must not grow.
+    const nxCaptions = faders.map((n) => n.replace(/ Full$/, ""));
+    const osc = names.filter((n) => nxCaptions.includes(n));
+    expect(osc.length).toBe(4); // Pars L, Pars R, Truss, Banner: the OSC originals, once each
+  });
+
+  it("a rig without controller3 emits no NX universe, frame or E1.31 line at all", () => {
+    const { controller3: _drop, ...plain } = rig;
+    const out = buildTo(plain, "nonx");
+    expect(out).not.toContain("NX Touch");
+    expect(out).not.toContain("NX TOUCH");
+    expect(out).not.toContain("E1.31");
+    expect(out).not.toContain('Universe="3"');
+    expect(out).toMatch(/<Universe Name="MiniLab" ID="2">\s*<Input Plugin="MIDI"/);
+  });
+
+  it("keeps universe IDs contiguous when the NX is present without a MiniLab", () => {
+    const { controller2: _drop, ...noMini } = rig;
+    const out = buildTo(noMini, "nx-nomini");
+    expect(out).toContain('<Universe Name="MiniLab" ID="2"/>');
+    expect(out).toContain('<Universe Name="NX Touch" ID="3">');
+  });
+
+  it("refuses a fader that names a function the show does not have", () => {
+    const bad = { ...rig, controller3: { ...rig.controller3, faders: ["Pars L Full", "Bogus Look"] } };
+    expect(() => buildTo(bad, "nx-bad")).toThrow(/controller3\.faders\[1\] "Bogus Look"/);
   });
 });

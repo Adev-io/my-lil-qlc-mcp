@@ -55,3 +55,37 @@ describe("bar-mitzvah rig file", () => {
     expect(rig.fixtures.some((g) => g.kind === "bar")).toBe(false);
   });
 });
+
+describe("rig schema — controller3 (NX Touch via ONYX sACN)", () => {
+  const nx = { bridge: "onyx-sacn", interfaceIp: "10.201.6.1", faders: ["Pars L Full", "UV Full"] };
+
+  it("accepts the block and fills the defaults", () => {
+    const r = RigSchema.safeParse({ ...punk, controller3: nx });
+    expect(r.success).toBe(true);
+    if (r.success) {
+      expect(r.data.controller3?.model).toBe("Obsidian NX Touch");
+      expect(r.data.controller3?.sacnUniverse).toBe(1);
+      expect(r.data.controller3?.line).toBe("0");
+      expect(r.data.controller3?.faders).toEqual(["Pars L Full", "UV Full"]);
+    }
+  });
+
+  it("rejects an 11th fader, an empty list, a missing NIC, and any bridge but onyx-sacn", () => {
+    expect(RigSchema.safeParse({ ...punk, controller3: { ...nx, faders: Array(11).fill("Pars L Full") } }).success).toBe(false);
+    expect(RigSchema.safeParse({ ...punk, controller3: { ...nx, faders: [] } }).success).toBe(false);
+    expect(RigSchema.safeParse({ ...punk, controller3: { bridge: nx.bridge, faders: nx.faders } }).success).toBe(false);
+    expect(RigSchema.safeParse({ ...punk, controller3: { ...nx, bridge: "midi" } }).success).toBe(false);
+  });
+
+  it("is optional: the punk rig parses with controller3 undefined", () => {
+    const r = RigSchema.safeParse(punk);
+    expect(r.success).toBe(true);
+    if (r.success) expect(r.data.controller3).toBeUndefined();
+  });
+
+  it("the bar-mitzvah example carries a six-fader NX block", () => {
+    const { rig } = loadRig(path.join(ROOT, "rigs", "bar-mitzvah.rig.json"));
+    expect(rig.controller3?.bridge).toBe("onyx-sacn");
+    expect(rig.controller3?.faders).toHaveLength(6);
+  });
+});

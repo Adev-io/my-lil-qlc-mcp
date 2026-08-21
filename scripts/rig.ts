@@ -97,6 +97,19 @@ export const RigSchema = z.object({
       }),
     })
     .optional(),
+  // Obsidian NX Touch. Vendor-class USB (VID 11BE / Class FF) — QLC+ cannot read it, so ONYX
+  // (free, NOVA+ with the NX plugged in) translates: 10 Generic Dimmers on 10 playbacks -> sACN ->
+  // QLC+ E1.31 input universe -> Playback sliders. docs/NX-TOUCH.md has the ONYX-side setup.
+  controller3: z
+    .object({
+      model: z.string().default("Obsidian NX Touch"),
+      bridge: z.literal("onyx-sacn"), // the only bridge there is; a literal so a typo fails loudly
+      sacnUniverse: z.number().int().min(1).max(63999).default(1),
+      interfaceIp: z.string(), // NIC QLC+ listens on; the launcher checks it is up
+      line: z.string().default("0"), // QLC+ E1.31 line = index of interfaceIp in the plugin's sorted-by-IP list
+      faders: z.array(z.string().min(1)).min(1).max(10), // function NAMES; index = NX fader 1..10
+    })
+    .optional(),
   dmxOutput: z
     .object({
       plugin: z.string().default("ArtNet"),

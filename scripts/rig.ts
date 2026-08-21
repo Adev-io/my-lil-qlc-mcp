@@ -81,6 +81,22 @@ export const RigSchema = z.object({
       outputLine: z.string().default("0"),
     })
     .optional(),
+  controller2: z
+    .object({
+      model: z.string(),
+      portName: z.string(),            // winmm device name the launcher resolves by
+      inputUid: z.string(),
+      inputLine: z.string(),
+      cc: z.object({
+        f1: z.number().int().min(0).max(127), f2: z.number().int().min(0).max(127),
+        f3: z.number().int().min(0).max(127), f4: z.number().int().min(0).max(127),
+        k1: z.number().int().min(0).max(127), k2: z.number().int().min(0).max(127),
+        k3: z.number().int().min(0).max(127), k4: z.number().int().min(0).max(127),
+        k5: z.number().int().min(0).max(127), k6: z.number().int().min(0).max(127),
+        k7: z.number().int().min(0).max(127), k8: z.number().int().min(0).max(127),
+      }),
+    })
+    .optional(),
   dmxOutput: z
     .object({
       plugin: z.string().default("ArtNet"),

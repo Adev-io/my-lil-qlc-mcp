@@ -371,10 +371,9 @@ function pParVal(id: number, c: number[]): FixVal {
 // Gobo, gobo-rotation and prism are LTP exactly like the sound macro, so a plain colour look has
 // to CLEAR them or the first gobo look of the night textures every look that follows it for the
 // rest of the party. Same rule, same reason as ch13 — see the LTP RECLAIM note above.
-// The split with the MiniLab knobs: a LOOK owns ch6, WHICH gobo is in the beam. The knobs own
-// ch7 gobo rotation and ch8 prism — how the beam MOVES — because those are the live "scroll"
-// controls, and a Level slider owns its channel outright, so the two cannot both have them.
-// Scenes therefore never write ch7 or ch8: a value there would be silently ignored.
+// The split with the MiniLab knobs: colour looks clear ch6 (gobo position) + ch13 (movement macro).
+// Beam looks that set a specific gobo (Banner Gobo, Banner Swirl) skip the gobo clear (they set
+// it explicitly). The knobs own ch7 (gobo rotation), ch8 (prism), ch14 (zoom): scenes never write them.
 const BEAM_CLEAR = [6, GOBO.open, 13, 0];
 const trussColor = (color: number): FixVal[] =>
   trussHeads.map((f) => ({ id: f.id, pairs: [5, color, ...BEAM_CLEAR] }));
@@ -868,7 +867,7 @@ ${inner.join("\n")}
 }
 
 // VCSlider in Level mode (ui/src/virtualconsole/vcslider.cpp loadXML).
-function sliderXml(id: number, caption: string, x: number, chans: { fixture: number; ch: number }[], value: number, oscName: string): string {
+function sliderXml(id: number, caption: string, x: number, chans: { fixture: number; ch: number }[], value: number, inputXml: string): string {
   const channels = chans.map((c) => `     <Channel Fixture="${c.fixture}">${c.ch}</Channel>`).join("\n");
   return `    <Slider Caption="${esc(caption)}" ID="${id}" WidgetStyle="Slider" InvertedAppearance="false">
      <Appearance>
@@ -886,13 +885,13 @@ ${channels}
      <Playback>
       <Function>4294967295</Function>
      </Playback>
-     <Input Universe="0" Channel="${crc16(oscName)}"/>
+${inputXml}
     </Slider>`;
 }
 
 // Playback-mode slider: runs one function at the slider's intensity. Unlike Level mode it does
 // not own any channel — at 0 the function is simply not running.
-function playbackSliderXml(id: number, caption: string, x: number, funcId: number, oscName: string): string {
+function playbackSliderXml(id: number, caption: string, x: number, funcId: number, inputXml: string): string {
   return `    <Slider Caption="${esc(caption)}" ID="${id}" WidgetStyle="Slider" InvertedAppearance="false">
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -907,7 +906,7 @@ function playbackSliderXml(id: number, caption: string, x: number, funcId: numbe
      <Playback>
       <Function>${funcId}</Function>
      </Playback>
-     <Input Universe="0" Channel="${crc16(oscName)}"/>
+${inputXml}
     </Slider>`;
 }
 
@@ -917,10 +916,36 @@ function playbackSliderXml(id: number, caption: string, x: number, funcId: numbe
 // tapped time -> every chaser's step length follows the tap.
 const SPEED_MULT_ONE = 6;
 const SPEED_MULT_NOT_SENT = 0;
-function speedDialXml(id: number, caption: string, x: number, y: number, tapPad: number, functionIds: number[], timeMs: number): string {
+const SPEED_MULT_FADE = 6;       // for Fade dial: FadeIn/FadeOut = 6 ("1")
+const SPEED_MULT_DURATION = 0;   // for Fade dial: Duration = 0 ("(Not Sent)")
+function speedDialXml(
+  id: number,
+  caption: string,
+  x: number,
+  y: number,
+  tapPad: number | null,
+  functionIds: number[],
+  timeMs: number,
+  absoluteInput: { cc: number; min: number; max: number } | null = null,
+  mode: "duration" | "fade" = "duration",
+): string {
   const fns = functionIds
-    .map((fid) => `     <Function FadeIn="${SPEED_MULT_NOT_SENT}" FadeOut="${SPEED_MULT_NOT_SENT}" Duration="${SPEED_MULT_ONE}">${fid}</Function>`)
+    .map((fid) => {
+      if (mode === "fade") {
+        return `     <Function FadeIn="${SPEED_MULT_FADE}" FadeOut="${SPEED_MULT_FADE}" Duration="${SPEED_MULT_DURATION}">${fid}</Function>`;
+      } else {
+        return `     <Function FadeIn="${SPEED_MULT_NOT_SENT}" FadeOut="${SPEED_MULT_NOT_SENT}" Duration="${SPEED_MULT_ONE}">${fid}</Function>`;
+      }
+    })
     .join("\n");
+  const absValue = absoluteInput
+    ? `     <AbsoluteValue Minimum="${absoluteInput.min}" Maximum="${absoluteInput.max}">
+      <Input Universe="2" Channel="${absoluteInput.cc}"/>
+     </AbsoluteValue>`
+    : `     <AbsoluteValue Minimum="100" Maximum="4000"/>`;
+  const tap = tapPad !== null ? `     <Tap>
+      <Input Universe="1" Channel="${tapPad}"/>
+     </Tap>` : "";
   return `    <SpeedDial Caption="${esc(caption)}" ID="${id}">
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -930,10 +955,8 @@ function speedDialXml(id: number, caption: string, x: number, y: number, tapPad:
       <Font>Default</Font>
      </Appearance>
      <WindowState Visible="True" X="${x}" Y="${y}" Width="180" Height="120"/>
-     <AbsoluteValue Minimum="100" Maximum="4000"/>
-     <Tap>
-      <Input Universe="1" Channel="${tapPad}"/>
-     </Tap>
+${absValue}
+${tap}
      <Time>${timeMs}</Time>
 ${fns}
     </SpeedDial>`;
@@ -957,8 +980,11 @@ ${togglePad === null ? "" : `     <Input Universe="1" Channel="${togglePad}"/>\n
     </AudioTriggers>`;
 }
 
-// FADERS — deliberately minimal, and this is load-bearing.
-//
+// OSC and MIDI input helpers for slider/widget emitters.
+const oscInput  = (caption: string) => `     <Input Universe="0" Channel="${crc16(oscPath(caption))}"/>`;
+const midiInput = (cc: number)      => `     <Input Universe="2" Channel="${cc}"/>`;
+
+// DASHBOARD FADERS — OSC-driven, universe 0 only.
 // VERIFIED ON THE RIG 2026-08-20: a QLC+ VCSlider in Level mode does NOT contribute to HTP — it
 // OWNS every channel it lists and forces its own value out, always. The first cut of this show
 // shipped Pars/Truss/Banner Dim faders defaulting to 0 on the theory that the R7 dim pads would
@@ -967,20 +993,11 @@ ${togglePad === null ? "" : `     <Input Universe="1" Channel="${togglePad}"/>\n
 // gave the game away: only fader-covered channels were dead.
 //
 // So: any channel a look or a pad needs to drive must NOT appear on a Level fader. That rules out
-// dimmers (R7 pads), par UV (UV looks), and strobe (the R8C5 hold pad). Zoom is the one channel no
-// function touches, so it is the one fader that can safely exist.
-//
-// Continuous master dimming is the built-in GRAND MASTER (top-left of the console, Intensity /
-// Reduce) — it scales intensity channels without owning them, which is exactly the semantic the
-// dim faders were reaching for.
-// EFFECT SCROLLS — the MiniLab's knobs. Level mode is CORRECT here, and only here: every one of
-// these channels is one no scene writes, so owning it outright is exactly what we want. Gobo
-// rotation and prism were deliberately taken out of the looks to make that true (see BEAM_CLEAR);
-// pan/tilt speed and focus were never used by anything.
+// dimmers (R7 pads), par UV (UV looks), and strobe (the R8C5 hold pad). Focus and Move Speed are
+// the only dashboard faders — they are never written by any scene. MIDI-only effect scrolls (gobo,
+// gobo rotation, prism, zoom) come from the MiniLab knobs; the old OSC dashboard sliders are gone
+// (a Level fader on those channels would fight the knob, see "MIDI KNOBS" below).
 const faderDefs: { id: number; caption: string; chans: { fixture: number; ch: number }[]; value: number }[] = [
-  { id: 905, caption: "Heads Zoom", chans: heads.map((f) => ({ fixture: f.id, ch: 14 })), value: 128 },
-  { id: 906, caption: "Gobo Spin", chans: heads.map((f) => ({ fixture: f.id, ch: 7 })), value: GROT.off },
-  { id: 907, caption: "Prism", chans: trussHeads.map((f) => ({ fixture: f.id, ch: 8 })), value: PRISM.off },
   { id: 908, caption: "Focus", chans: heads.map((f) => ({ fixture: f.id, ch: 9 })), value: 128 },
   { id: 909, caption: "Move Speed", chans: heads.map((f) => ({ fixture: f.id, ch: 4 })), value: 0 },
 ];
@@ -1001,6 +1018,10 @@ addScene("Pars L Full", parsL.map((f) => ({ id: f.id, pairs: [0, 255] })), 0, 0)
 addScene("Pars R Full", parsR.map((f) => ({ id: f.id, pairs: [0, 255] })), 0, 0);
 addScene("Truss Full", trussHeads.map((f) => ({ id: f.id, pairs: [10, 255, 11, SHUTTER_OPEN] })), 0, 0);
 addScene("Banner Full", floorHeads.map((f) => ({ id: f.id, pairs: [10, 255, 11, SHUTTER_OPEN] })), 0, 0);
+
+// PLAYBACK KNOBS — MiniLab K7/K8. Additive washes on HTP, nothing at 0.
+addScene("UV Full", pars.map((f) => ({ id: f.id, pairs: [7, 255] })), 0, 0);
+addScene("Warm Full", pars.map((f) => ({ id: f.id, pairs: [5, 255, 6, 255] })), 0, 0);
 
 // The OSC path is DERIVED from the caption, never hand-written. generate:widgets re-derives it
 // the same way when it parses the .qxw, so any hand-chosen name silently disagrees with the map
@@ -1033,11 +1054,36 @@ const tempoFuncIds = ["Sync Strobe", "Chase Gold Blue", "Chase Blue UV", "Chase 
 // PARTY_AUDIO=1 builds the widget back in, for the day an AudioBox is plugged in. It carries no
 // Launchpad input then — R8C6 is empty — so arm it in the Virtual Console if audio is live.
 const AUDIO_TRIGGERS = process.env.PARTY_AUDIO === "1";
+
+// MIDI KNOBS — MiniLab 3 on universe 2. Level mode is CORRECT here, and only here: every one of
+// these channels is one no scene writes, so owning it outright is exactly what we want. Gobo
+// rotation and prism were deliberately taken out of the looks to make that true (see BEAM_CLEAR);
+// pan/tilt speed were never used by anything. Fade and Speed dials get AbsoluteValue inputs instead.
+const ML = (rig as any).controller2 as { inputUid: string; inputLine: string; cc: Record<string, number> } | undefined;
+
+// Fade dial: applies to every look scene that isn't a utility, preset, or fader-backing scene.
+const fadeFuncIds = [
+  "Gold Wall", "Blue Wall", "Gold Blue Alt", "Soft Amber", "Warm White", "UV Accent", "Doors Blue",
+  "Wall Low Gold", "House Bright", "Banner Only",
+  "Banner Soft", "Banner Bright",
+  "Entrance", "UV Blacklight", "Gold Blue Full", "White Burst",
+  "Ceiling Gold", "Ceiling Blue", "Banner Beams", "Banner Gobo", "Banner Swirl", "All Gold", "Half Warm", "Blue Low",
+  "CDL S1", "CDL S2", "SBD S1", "SBD S2", "SBD S3", "SBD S4",
+  "GPL S1", "GPL S2", "GPL S3", "GPL S4", "GPL S5",
+  "Ceiling Circle", "Ceiling Circle Fast", "Figure 8", "Ceiling Line", "Diamond", "Banner Wave",
+  "Sync Strobe", "Chase Gold Blue", "Chase Blue UV", "Chase Gold UV", "Rainbow Chase",
+  "Rainbow Fast", "Fast Gold Blue", "Build Chase", "Gold Pulse", "Beam Punch",
+  "Truss Home", "Speaker Light", "Door Spot",
+]
+  .map((n) => funcIdByName.get(n))
+  .filter((v): v is number => v !== undefined);
+
 const allFaders = groupFaderDefs.length + faderDefs.length;
 const fadersInner = [
-  ...groupFaderDefs.map((d, i) => playbackSliderXml(d.id, d.caption, 12 + i * 72, funcIdByName.get(d.fn)!, oscPath(d.caption))),
-  ...faderDefs.map((d, i) => sliderXml(d.id, d.caption, 12 + (groupFaderDefs.length + i) * 72, d.chans, d.value, oscPath(d.caption))),
-  speedDialXml(920, "Tempo", 12, 348, TAP_PAD, tempoFuncIds, 500),
+  ...groupFaderDefs.map((d, i) => playbackSliderXml(d.id, d.caption, 12 + i * 72, funcIdByName.get(d.fn)!, oscInput(d.caption))),
+  ...faderDefs.map((d, i) => sliderXml(d.id, d.caption, 12 + (groupFaderDefs.length + i) * 72, d.chans, d.value, oscInput(d.caption))),
+  speedDialXml(920, "Tempo", 12, 348, TAP_PAD, tempoFuncIds, 500, ML ? { cc: ML.cc.k2, min: 100, max: 5000 } : null),
+  speedDialXml(921, "Fade", 204, 348, null, fadeFuncIds, 400, ML ? { cc: ML.cc.k1, min: 0, max: 4000 } : null, "fade"),
   ...(AUDIO_TRIGGERS ? [audioTriggersXml(930, "Audio", 204, 348, null, funcIdByName.get("Beat Pulse")!)] : []),
 ];
 const fadersFrame = frame("Frame", "FADERS", 9, 805, 8, 12 + allFaders * 72, 520, fadersInner);
@@ -1068,6 +1114,25 @@ const headBtnXml = (defs: { id: number; caption: string; fn: string }[]) => defs
     </Button>`);
 const headPosFrame = frame("SoloFrame", "TRUSS POSITION", 8, 805, 540, 156, 28 + headPosDefs.length * 44, headBtnXml(headPosDefs));
 const headBeamFrame = frame("Frame", "BANNER", 7, 968, 540, 156, 28 + headBeamDefs.length * 44, headBtnXml(headBeamDefs));
+
+// MINILAB FRAME — Arturia MiniLab 3 on universe 2. Faders 1-4 are Playback twins of the OSC
+// group-intensity faders. Knobs 3-8: Level knobs for beam channels (gobo, gobo spin, prism, zoom)
+// that no scene touches; K7/K8 are Playback washes (UV Full, Warm Full) on the same functions
+// as the Fade dial multipliers. Tap/Speed dials stay in the FADERS frame above.
+const miniInner = ML ? [
+  ...["Pars L", "Pars R", "Truss", "Banner"].map((cap, i) => {
+    const fid = funcIdByName.get(`${cap} Full`)!;
+    return playbackSliderXml(930 + i, cap, 12 + i * 72, fid, midiInput(ML.cc[`f${i + 1}` as keyof typeof ML.cc]));
+  }),
+  // Level knobs: gobo spin, prism, zoom. (Gobo position is scene-driven via BEAM_CLEAR/beam looks; no knob.)
+  sliderXml(934, "Gobo Spin", 12, heads.map((f) => ({ fixture: f.id, ch: 7 })), GROT.off, midiInput(ML.cc.k3)),
+  sliderXml(935, "Prism", 84, heads.map((f) => ({ fixture: f.id, ch: 8 })), PRISM.off, midiInput(ML.cc.k4)),
+  sliderXml(936, "Zoom", 156, heads.map((f) => ({ fixture: f.id, ch: 14 })), 128, midiInput(ML.cc.k5)),
+  // Playback washes: UV and Warm on HTP, nothing at 0.
+  playbackSliderXml(937, "UV Wash", 228, funcIdByName.get("UV Full")!, midiInput(ML.cc.k7)),
+  playbackSliderXml(938, "Warm Wash", 300, funcIdByName.get("Warm Full")!, midiInput(ML.cc.k8)),
+] : [];
+const miniFrame = ML ? frame("Frame", "MINILAB", 11, 805, 680, 444, 360, miniInner) : "";
 
 // Frames are sized to the tight bounding box of their buttons. Per page the three frames are
 // non-overlapping row bands (rows 0-1 / 6 / 7) — QLC+ frames are opaque, so overlap hides pads.
@@ -1112,6 +1177,7 @@ const vc = `<VirtualConsole>
   </Appearance>
 ${grid}
 ${fadersFrame}
+${miniFrame}
 ${headPosFrame}
 ${headBeamFrame}
  </Frame>
@@ -1228,6 +1294,12 @@ const launchpadUniverse = LP.launchpad
    </Universe>`
   : `   <Universe Name="Controller" ID="1"/>`;
 
+const miniUniverse = ML
+  ? `   <Universe Name="MiniLab" ID="2">
+    <Input Plugin="MIDI" UID="${esc(ML.inputUid)}" Line="${esc(ML.inputLine)}"/>
+   </Universe>`
+  : "";
+
 const qxw = `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE Workspace>
 <Workspace xmlns="http://www.qlcplus.org/Workspace" CurrentWindow="VirtualConsole">
@@ -1247,6 +1319,7 @@ const qxw = `<?xml version="1.0" encoding="UTF-8"?>
     <Feedback Plugin="OSC" UID="None" Line="0"/>
    </Universe>
 ${launchpadUniverse}
+${miniUniverse}
   </InputOutputMap>
 ${fixtures.map(fixtureXml).join("\n")}
 ${funcs.map(funcXml).join("\n")}

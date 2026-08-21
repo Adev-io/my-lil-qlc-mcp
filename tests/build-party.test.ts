@@ -345,15 +345,16 @@ describe("party VC — 5 pages, shared rows, faders, tempo, audio", () => {
     }
     for (const gone of ["Pars Dim", "Truss Dim", "Banner Dim", "UV Level", "Strobe Rate"])
       expect(names, `${gone} must not be a Level fader`).not.toContain(gone);
-    const zoom = raw.match(/<Slider Caption="Heads Zoom"[^]*?<\/Slider>/)?.[0] || "";
-    expect(zoom).toContain('Value="128"');
-    expect(zoom).toContain(">Level</SliderMode>");
+    const focus = raw.match(/<Slider Caption="Focus"[^]*?<\/Slider>/)?.[0] || "";
+    expect(focus).toContain('Value="128"');
+    expect(focus).toContain(">Level</SliderMode>");
   });
 
   it("every slider answers the OSC path the widget map advertises", () => {
     // generate:widgets re-derives the path from the CAPTION when it parses the .qxw, so a
     // hand-written osc name binds one path while the dashboard calls another. Shipped exactly
     // that way once: the faders answered "/fader_pars_l" and the map said "/pars_l".
+    // Skip sliders whose Input is not Universe="0" (MIDI-only sliders).
     const crcOf = (s: string) => {
       const T = [0x0000,0x1081,0x2102,0x3183,0x4204,0x5285,0x6306,0x7387,0x8408,0x9489,0xa50a,0xb58b,0xc60c,0xd68d,0xe70e,0xf78f];
       let crc = 0xffff;
@@ -367,6 +368,7 @@ describe("party VC — 5 pages, shared rows, faders, tempo, audio", () => {
     };
     let seen = 0;
     for (const s of raw.matchAll(/<Slider Caption="([^"]*)"[^]*?<\/Slider>/g)) {
+      if (!s[0].includes(`<Input Universe="0"`)) continue; // skip MIDI-only sliders
       const want = crcOf(`/${s[1].toLowerCase().replace(/ /g, "_")}`);
       expect(s[0], `slider "${s[1]}" must answer /${s[1].toLowerCase().replace(/ /g, "_")}`)
         .toContain(`<Input Universe="0" Channel="${want}"/>`);
@@ -384,25 +386,6 @@ describe("party VC — 5 pages, shared rows, faders, tempo, audio", () => {
       expect(raw, `${cap} function ${fid} exists`).toContain(`<Function ID="${fid}" Type="Scene"`);
       expect(s, `${cap} starts at zero so the pads rule until it is raised`).toContain('Value="0"');
     }
-  });
-
-  it("binds the fader's OSC input to its own path, not a double-slashed one", () => {
-    // crc16("/heads_zoom"); the earlier emitter ran the path through oscPath() a second time and
-    // bound crc16("//heads_zoom"), so the slider never answered OSC at all.
-    const zoom = raw.match(/<Slider Caption="Heads Zoom"[^]*?<\/Slider>/)?.[0] || "";
-    const crcOf = (s: string) => {
-      const T = [0x0000,0x1081,0x2102,0x3183,0x4204,0x5285,0x6306,0x7387,0x8408,0x9489,0xa50a,0xb58b,0xc60c,0xd68d,0xe70e,0xf78f];
-      let crc = 0xffff;
-      for (const b of Buffer.from(s, "utf8")) {
-        let c = b;
-        crc = ((crc >> 4) & 0x0fff) ^ T[(crc ^ c) & 15];
-        c = c >> 4;
-        crc = ((crc >> 4) & 0x0fff) ^ T[(crc ^ c) & 15];
-      }
-      return ~crc & 0xffff;
-    };
-    expect(zoom).toContain(`<Input Universe="0" Channel="${crcOf("/heads_zoom")}"/>`);
-    expect(zoom).not.toContain(`Channel="${crcOf("//heads_zoom")}"`);
   });
 
   it("emits a tap-tempo SpeedDial on R8C4 (pad 142) driving every chaser incl. Sync Strobe", () => {
@@ -426,6 +409,76 @@ describe("party VC — 5 pages, shared rows, faders, tempo, audio", () => {
   it("Beat Pulse bumps only par dimmers, so audio reactivity never overrides look colours", () => {
     expect(fv("Beat Pulse", 0)).toBe("0,255");
     expect(sceneXml("Beat Pulse")).not.toContain('<FixtureVal ID="10">');
+  });
+});
+
+describe("party generator — MiniLab 3", () => {
+  const rig = JSON.parse(readFileSync(RIG, "utf8"));
+  const cc = rig.controller2.cc as Record<string, number>;
+  const sliderByInput = (ch: number) =>
+    [...raw.matchAll(/<Slider Caption="([^"]*)"[^]*?<\/Slider>/g)].find((m) => m[0].includes(`<Input Universe="2" Channel="${ch}"/>`));
+  const dial = (cap: string) => raw.match(new RegExp(`<SpeedDial Caption="${cap}"[^]*?</SpeedDial>`))?.[0] || "";
+  const fv = (scene: string, id: number): string =>
+    raw.match(new RegExp(`Name="${scene}">[^]*?<FixtureVal ID="${id}">([^<]*)<`))?.[1] || "";
+
+  it("declares universe 2 as the MiniLab input", () => {
+    expect(raw).toMatch(/<Universe Name="MiniLab" ID="2">\s*<Input Plugin="MIDI" UID="\d+" Line="\d+"\/>\s*<\/Universe>/);
+  });
+
+  it("faders 1-4 are Playback twins of Pars L / Pars R / Truss / Banner", () => {
+    const fid = (x: string) => x.match(/<Playback>\s*<Function>(\d+)/)?.[1];
+    for (const [k, cap] of [["f1", "Pars L"], ["f2", "Pars R"], ["f3", "Truss"], ["f4", "Banner"]] as const) {
+      const s = sliderByInput(cc[k]);
+      expect(s, `${k} -> ${cap}`).toBeTruthy();
+      expect(s![1]).toBe(cap);
+      expect(s![0]).toContain(">Playback</SliderMode>");
+      const osc = raw.match(new RegExp(`<Slider Caption="${cap}"[^]*?<Input Universe="0"[^]*?</Slider>`))?.[0] || "";
+      expect(fid(s![0]), `${cap} MIDI twin runs the same function`).toBe(fid(osc));
+    }
+  });
+
+  it("knobs 3-8: Level knobs own beam channels no scene writes; washes are Playback", () => {
+    const want: Record<string, { cap: string; ch?: number; fx?: number[]; fn?: string }> = {
+      k3: { cap: "Gobo Spin", ch: 7, fx: [10, 11, 12, 13] },
+      k4: { cap: "Prism", ch: 8, fx: [10, 11, 12, 13] },
+      k5: { cap: "Zoom", ch: 14, fx: [10, 11, 12, 13] },
+      k7: { cap: "UV Wash", fn: "UV Full" },
+      k8: { cap: "Warm Wash", fn: "Warm Full" },
+    };
+    for (const [k, w] of Object.entries(want)) {
+      const s = sliderByInput(cc[k]);
+      expect(s, `${k} -> ${w.cap}`).toBeTruthy();
+      expect(s![1]).toBe(w.cap);
+      if (w.fn) {
+        expect(s![0]).toContain(">Playback</SliderMode>");
+        const fid = s![0].match(/<Playback>\s*<Function>(\d+)/)![1];
+        expect(raw).toContain(`<Function ID="${fid}" Type="Scene" Name="${w.fn}"`);
+      } else {
+        expect(s![0]).toContain(">Level</SliderMode>");
+        for (const f of w.fx!) expect(s![0], `${w.cap} fx${f}`).toContain(`<Channel Fixture="${f}">${w.ch}</Channel>`);
+        expect((s![0].match(/<Channel /g) || []).length).toBe(w.fx!.length);
+      }
+    }
+    expect(fv("UV Full", 0)).toBe("7,255");
+    expect(fv("Warm Full", 0)).toBe("5,255,6,255");
+  });
+
+  it("K1 drives a Fade dial over every look; K2 sets the Tempo dial absolutely while tap stays on the pad", () => {
+    const fade = dial("Fade"), tempo = dial("Tempo");
+    expect(fade).toMatch(new RegExp(`<AbsoluteValue[^>]*>\\s*<Input Universe="2" Channel="${cc.k1}"/>`));
+    expect(tempo).toMatch(new RegExp(`<AbsoluteValue[^>]*>\\s*<Input Universe="2" Channel="${cc.k2}"/>`));
+    expect(tempo).toMatch(/<Tap>\s*<Input Universe="1" Channel="\d+"\/>/);
+    // Fade: FadeIn/FadeOut multiplier index 6 ("1"), Duration index 0 ("(Not Sent)"); covers every look scene.
+    const fadeFns = [...fade.matchAll(/<Function ID="(\d+)" FadeIn="(\d+)" FadeOut="(\d+)" Duration="(\d+)"\/>/g)];
+    expect(fadeFns.length).toBeGreaterThan(20);
+    for (const f of fadeFns) { expect(f[2]).toBe("6"); expect(f[3]).toBe("6"); expect(f[4]).toBe("0"); }
+    const looks = ["Gold Wall", "Doors Blue", "All Gold", "Ceiling Gold", "House Bright"].map((n) => raw.match(new RegExp(`<Function ID="(\\d+)" Type="Scene" Name="${n}">`))![1]);
+    for (const id of looks) expect(fadeFns.some((f) => f[1] === id), `Fade covers function ${id}`).toBe(true);
+  });
+
+  it("no two MiniLab controls share an input channel", () => {
+    const chans = [...raw.matchAll(/<Input Universe="2" Channel="(\d+)"\/>/g)].map((m) => m[1]);
+    expect(new Set(chans).size).toBe(chans.length);
   });
 });
 

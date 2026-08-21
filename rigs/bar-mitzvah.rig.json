@@ -71,6 +71,14 @@
     "outputUid": "3",
     "outputLine": "3"
   },
+  "controller2": {
+    "model": "Arturia MiniLab 3",
+    "portName": "Minilab3",
+    "inputUid": "3",
+    "inputLine": "3",
+    "cc": { "f1": 82, "f2": 83, "f3": 85, "f4": 17,
+            "k1": 74, "k2": 71, "k3": 76, "k4": 77, "k5": 93, "k6": 18, "k7": 19, "k8": 16 }
+  },
   "dmxOutput": {
     "plugin": "ArtNet",
     "universe": 0,

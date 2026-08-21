@@ -554,9 +554,9 @@ addHeadEfx("Ceiling Circle Fast", "Circle",  CEIL, 20, 12, 3000);
 addHeadEfx("Figure 8",            "Eight",   CEIL, 24, 10, 6000);
 addHeadEfx("Ceiling Line",        "Line",    CEIL, 26, 0,  4000);
 addHeadEfx("Diamond",             "Diamond", CEIL, 18, 12, 5000);
-// Banner Wave: a horizontal line across the banner face from each tower (banner 12 ft wide at
-// ~15.5 ft from the lens ≈ ±21° ≈ 10 DMX). Stage zone, so no clearance applies. Guard rejected 10, then 5; reduced to 3.
-addHeadEfx("Banner Wave", "Line", { xFromTower: HEAD_SEP / 2 + BANNER.centerX, y: WALL_Y, z: BANNER.centerHeightFt }, 3, 0, 6000);
+// Banner Wave: sweep the upper half of the banner so the line angles upward. A beam that overshoots
+// the wall edge is rising toward the ceiling, not sweeping across the room at head height.
+addHeadEfx("Banner Wave", "Line", { xFromTower: HEAD_SEP / 2 + BANNER.centerX, y: WALL_Y, z: BANNER.centerHeightFt + BANNER.heightFt / 4 }, 10, 0, 6000);
 
 // Static ceiling/banner looks for the truss pair. Position + beam; wall colour rides along.
 addScene("Ceiling Gobo Gold", [...wall(GOLD), ...trussHeads.map((f, i) => { const [p, t] = homeAim(i);

@@ -508,3 +508,49 @@ describe("party generator — patch chart", () => {
     expect(chart).toContain("QLC+ preference"); // the audio-input-device warning
   });
 });
+
+describe("party generator — EFX motion", () => {
+  const MOTION = ["Ceiling Circle", "Ceiling Circle Fast", "Figure 8", "Ceiling Line", "Diamond", "Banner Wave"];
+  const heads = { 10: { x: -15, y: 0, z: 8 }, 11: { x: 15, y: 0, z: 8 } } as const;
+  const collXml = (n: string) => raw.match(new RegExp(`<Function ID="\\d+" Type="Collection" Name="${n}">[^]*?</Function>`))?.[0] || "";
+  const efxById = (id: string) => raw.match(new RegExp(`<Function ID="${id}" Type="EFX" Name="[^"]*">[^]*?</Function>`))?.[0] || "";
+  const members = (n: string) => [...collXml(n).matchAll(/<Step Number="\d+">(\d+)<\/Step>/g)].map((m) => efxById(m[1]));
+
+  it("each motion look is a Collection of two EFX, one per truss head, Position mode, never a floor head", () => {
+    for (const n of MOTION) {
+      const ms = members(n);
+      expect(ms.length, n).toBe(2);
+      const ids = ms.map((e) => e.match(/<Fixture>\s*<ID>(\d+)<\/ID>/)![1]).sort();
+      expect(ids, n).toEqual(["10", "11"]);
+      for (const e of ms) {
+        expect(e).toContain("<Mode>Position</Mode>");
+        expect(e).toContain("<IsRelative>0</IsRelative>");
+        expect((e.match(/<Fixture>/g) || []).length).toBe(1);
+      }
+    }
+  });
+
+  it("every EFX box stays inside the rule: centre + 16 perimeter points pass the guard", () => {
+    for (const n of MOTION)
+      for (const e of members(n)) {
+        const id = Number(e.match(/<Fixture>\s*<ID>(1[01])<\/ID>/)![1]) as 10 | 11;
+        const w = Number(e.match(/<Width>(\d+)</)![1]), h = Number(e.match(/<Height>(\d+)</)![1]);
+        const cx = Number(e.match(/<Axis Name="X">\s*<Offset>(\d+)</)![1]);
+        const cy = Number(e.match(/<Axis Name="Y">\s*<Offset>(\d+)</)![1]);
+        const pts: [number, number][] = [[cx, cy]];
+        for (let i = 0; i < 16; i++) {
+          const a = (i / 16) * 2 * Math.PI;
+          pts.push([cx + w * Math.cos(a), cy + h * Math.sin(a)]);
+        }
+        for (const [p, t] of pts)
+          expect(panTiltSafe(heads[id], p, t), `${n} fx${id} pan ${p.toFixed(0)} tilt ${t.toFixed(0)}`).toBeNull();
+      }
+  });
+
+  it("places the motion pads on row 3 of HORA and PARTY and the statics exist", () => {
+    for (const cap of ["Ceiling Circle", "Figure 8", "Ceiling Line", "Diamond", "Banner Wave", "Ceiling Circle Fast"])
+      expect(baseNames, cap).toContain(cap);
+    for (const fn of ["Ceiling Gobo Gold", "Ceiling Gobo Blue", "Banner Beams"]) expect(raw).toContain(`Name="${fn}"`);
+    expect(names.filter((n) => /R3C\d$/.test(n)).length).toBeGreaterThanOrEqual(8);
+  });
+});

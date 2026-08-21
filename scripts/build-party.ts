@@ -166,7 +166,10 @@ const chanOf = (v: FixVal, ch: number): number | null => {
 type FixVal = { id: number; pairs: number[] };
 interface SceneDef { type: "Scene"; id: number; name: string; fadeIn: number; fadeOut: number; vals: FixVal[]; }
 interface ChaserDef { type: "Chaser"; id: number; name: string; steps: number[]; hold: number; fade: number; direction: string; runOrder: string; }
-type FuncDef = SceneDef | ChaserDef;
+interface EfxDef { type: "EFX"; id: number; name: string; algorithm: string; width: number; height: number;
+  panOffset: number; tiltOffset: number; durationMs: number; fixture: number; startOffsetDeg: number; rotationDeg: number; }
+interface CollectionDef { type: "Collection"; id: number; name: string; members: number[]; }
+type FuncDef = SceneDef | ChaserDef | EfxDef | CollectionDef;
 
 const funcs: FuncDef[] = [];
 const funcIdByName = new Map<string, number>();
@@ -226,6 +229,51 @@ function addChaser(name: string, stepNames: string[], hold: number, fade = 0, di
   funcs.push({ type: "Chaser", id, name, steps, hold, fade, direction, runOrder });
   funcIdByName.set(name, id);
   return id;
+}
+
+// One QLC+ EFX drives ONE head here: the function has a single X/Y offset, and two towers that
+// mirror each other need two different pan centres. A Collection starts both from one pad.
+// Every box is guarded: centre + 16 perimeter points must pass panTiltSafe from that head.
+function addEfx(name: string, f: Fixture, algorithm: string, centre: Vec3, widthDmx: number, heightDmx: number,
+                durationMs: number, startOffsetDeg = 0, rotationDeg = 0): number {
+  const side = f.id === trussHeads[0].id ? "L" : "R";
+  const h = HEAD_XYZ[side];
+  const [pan, tilt] = aim(side, centre.x, centre.y, centre.z);
+  for (let i = 0; i <= 16; i++) {
+    const a = (i / 16) * 2 * Math.PI;
+    const p = i === 16 ? pan : pan + widthDmx * Math.cos(a), t = i === 16 ? tilt : tilt + heightDmx * Math.sin(a);
+    const why = panTiltSafe(h, p, t);
+    if (why) throw new Error(`EFX "${name}" ${f.name} pan ${p.toFixed(0)} tilt ${t.toFixed(0)}: ${why}`);
+  }
+  const id = funcId++;
+  funcs.push({ type: "EFX", id, name, algorithm, width: widthDmx, height: heightDmx, panOffset: pan, tiltOffset: tilt,
+               durationMs, fixture: f.id, startOffsetDeg, rotationDeg });
+  funcIdByName.set(name, id);
+  return id;
+}
+
+function addCollection(name: string, memberNames: string[]): number {
+  const id = funcId++;
+  const members = memberNames.map((n) => {
+    const m = funcIdByName.get(n);
+    if (m === undefined) throw new Error(`Collection "${name}" references unknown function "${n}"`);
+    return m;
+  });
+  funcs.push({ type: "Collection", id, name, members });
+  funcIdByName.set(name, id);
+  return id;
+}
+
+// Both truss heads, mirrored about x = 0, counter-phased so the shapes interleave.
+function addHeadEfx(name: string, algorithm: string, centre: { xFromTower: number; y: number; z: number },
+                    widthDmx: number, heightDmx: number, durationMs: number, rotationDeg = 0): void {
+  const memberNames = trussHeads.map((f, i) => {
+    const x = i === 0 ? -HEAD_SEP / 2 + centre.xFromTower : HEAD_SEP / 2 - centre.xFromTower;
+    const n = `${name} ${i === 0 ? "L" : "R"}`;
+    addEfx(n, f, algorithm, { x, y: centre.y, z: centre.z }, widthDmx, heightDmx, durationMs, i === 0 ? 0 : 180, rotationDeg);
+    return n;
+  });
+  addCollection(name, memberNames);
 }
 
 // ----------------------------------------------------------------------------
@@ -496,6 +544,29 @@ if (DOORS) {
   ], 400, 400);
 }
 
+// --- motion: ceiling + banner, never the floor -----------------------------------------
+// Each box centre is a point the guard accepts; addEfx then proves the whole perimeter. If a box
+// throws, SHRINK it — the rule does not move. Widths/heights are DMX half-extents (540°/255 pan,
+// 270°/255 tilt), so pan 20 ≈ ±42°, tilt 12 ≈ ±13°.
+const CEIL = { xFromTower: 0, y: -5, z: ZONES.ceilingZ };          // ceiling 5 ft in front of each tower
+addHeadEfx("Ceiling Circle",      "Circle",  CEIL, 20, 12, 8000);
+addHeadEfx("Ceiling Circle Fast", "Circle",  CEIL, 20, 12, 3000);
+addHeadEfx("Figure 8",            "Eight",   CEIL, 24, 10, 6000);
+addHeadEfx("Ceiling Line",        "Line",    CEIL, 26, 0,  4000);
+addHeadEfx("Diamond",             "Diamond", CEIL, 18, 12, 5000);
+// Banner Wave: a horizontal line across the banner face from each tower (banner 12 ft wide at
+// ~15.5 ft from the lens ≈ ±21° ≈ 10 DMX). Stage zone, so no clearance applies. Guard rejected 10, then 5; reduced to 3.
+addHeadEfx("Banner Wave", "Line", { xFromTower: HEAD_SEP / 2 + BANNER.centerX, y: WALL_Y, z: BANNER.centerHeightFt }, 3, 0, 6000);
+
+// Static ceiling/banner looks for the truss pair. Position + beam; wall colour rides along.
+addScene("Ceiling Gobo Gold", [...wall(GOLD), ...trussHeads.map((f, i) => { const [p, t] = homeAim(i);
+  return { id: f.id, pairs: [0, p, 2, t, 5, HEAD_COLOR.orange, 6, GOBO.slot(1), 11, SHUTTER_OPEN, 13, 0] }; })]);
+addScene("Ceiling Gobo Blue", [...wall(BLUE), ...trussHeads.map((f, i) => { const [p, t] = homeAim(i);
+  return { id: f.id, pairs: [0, p, 2, t, 5, HEAD_COLOR.cyan, 6, GOBO.slot(3), 11, SHUTTER_OPEN, 13, 0] }; })]);
+addScene("Banner Beams", [...wallDim(GOLD, 0.3), ...trussHeads.map((f, i) => {
+  const [p, t] = aim(i === 0 ? "L" : "R", BANNER.centerX, WALL_Y, BANNER.centerHeightFt);
+  return { id: f.id, pairs: [0, p, 2, t, 5, HEAD_COLOR.white, 10, 255, 11, SHUTTER_OPEN, ...BEAM_CLEAR] }; })], 300, 300);
+
 // --- beam looks: gobo wheel, gobo rotation, prism -----------------------------
 // Colour looks clear these (BEAM_CLEAR); the ones below deliberately texture the beam. Gobos only
 // read as gobos where a beam lands on something — the truss pair on the dance floor and the walls,
@@ -628,6 +699,7 @@ const PAGES: { name: string; blurb: string; looks: PageLook[] }[] = [
     { cap: "House Bright",  fn: "House Bright",  row: 0, col: 4, led: LED.white, bg: [255, 255, 255] },
     { cap: "Warm Low",      fn: "Half Warm",     row: 1, col: 0, led: LED.white, bg: [220, 200, 170] },
     { cap: "Banner Spin",   fn: "Banner Swirl",  row: 1, col: 1, led: LED.uv,    bg: [180, 110, 240] },
+    { cap: "Banner Beams",  fn: "Banner Beams",  row: 1, col: 2, led: LED.white, bg: [240, 235, 220] },
   ]},
   { name: "HORA", blurb: "lift the chairs", looks: [
     { cap: "Gold Blue Full", fn: "Gold Blue Full", row: 0, col: 0, led: LED.gold,  bg: [255, 170, 30] },
@@ -636,6 +708,10 @@ const PAGES: { name: string; blurb: string; looks: PageLook[] }[] = [
     { cap: "All Gold",       fn: "All Gold",       row: 1, col: 0, led: LED.gold,  bg: [255, 185, 40] },
     { cap: "Gold Pulse",     fn: "Gold Pulse",     row: 1, col: 1, led: LED.amber, bg: [255, 140, 20] },
     { cap: "Gobo Beam",      fn: "Gobo Beam",      row: 1, col: 2, led: LED.gold,  bg: [235, 165, 55] },
+    { cap: "Ceiling Circle", fn: "Ceiling Circle",    row: 2, col: 0, led: LED.cyan, bg: [0, 190, 220] },
+    { cap: "Figure 8",       fn: "Figure 8",          row: 2, col: 1, led: LED.cyan, bg: [0, 160, 200] },
+    { cap: "Diamond",        fn: "Diamond",           row: 2, col: 2, led: LED.cyan, bg: [0, 130, 180] },
+    { cap: "Ceiling Gold",   fn: "Ceiling Gobo Gold", row: 2, col: 3, led: LED.gold, bg: [240, 170, 50] },
   ]},
   { name: "PARTY", blurb: "the dance floor", looks: [
     { cap: "GB Chase",     fn: "Chase Gold Blue", row: 0, col: 0, led: LED.gold,    bg: [255, 160, 20] },
@@ -648,6 +724,10 @@ const PAGES: { name: string; blurb: string; looks: PageLook[] }[] = [
     { cap: "Gobo Shake",   fn: "Gobo Shake",      row: 1, col: 4, led: LED.uv,      bg: [170, 70, 255] },
     { cap: "Gobo Wide",    fn: "Gobo Wide",       row: 1, col: 5, led: LED.gold,    bg: [255, 175, 45] },
     { cap: "Beam Punch",   fn: "Beam Punch",      row: 1, col: 6, led: LED.magenta, bg: [255, 40, 170] },
+    { cap: "Ceiling Circle Fast", fn: "Ceiling Circle Fast", row: 2, col: 0, led: LED.cyan, bg: [0, 200, 230] },
+    { cap: "Ceiling Line",        fn: "Ceiling Line",        row: 2, col: 1, led: LED.cyan, bg: [0, 170, 210] },
+    { cap: "Banner Wave",         fn: "Banner Wave",         row: 2, col: 2, led: LED.uv,   bg: [170, 110, 255] },
+    { cap: "Ceiling Blue",        fn: "Ceiling Gobo Blue",   row: 2, col: 3, led: LED.blue, bg: [40, 100, 255] },
   ]},
 ];
 
@@ -1028,6 +1108,44 @@ function funcXml(fn: FuncDef): string {
     return `  <Function ID="${fn.id}" Type="Scene" Name="${esc(fn.name)}">
    <Speed FadeIn="${fn.fadeIn}" FadeOut="${fn.fadeOut}" Duration="0"/>
 ${fv}
+  </Function>`;
+  }
+  if (fn.type === "EFX") {
+    // Tag order from engine/src/efx.cpp saveXML (QLC+ 4.14). Width/Height are 0-127 half-extents in
+    // DMX; Axis Offset is the pattern centre. IsRelative=0: absolute pan/tilt.
+    return `  <Function ID="${fn.id}" Type="EFX" Name="${esc(fn.name)}">
+   <Speed FadeIn="0" FadeOut="0" Duration="${fn.durationMs}"/>
+   <Direction>Forward</Direction>
+   <RunOrder>Loop</RunOrder>
+   <Algorithm>${fn.algorithm}</Algorithm>
+   <Width>${fn.width}</Width>
+   <Height>${fn.height}</Height>
+   <Rotation>${fn.rotationDeg}</Rotation>
+   <StartOffset>0</StartOffset>
+   <IsRelative>0</IsRelative>
+   <Axis Name="X">
+    <Offset>${fn.panOffset}</Offset>
+    <Frequency>2</Frequency>
+    <Phase>90</Phase>
+   </Axis>
+   <Axis Name="Y">
+    <Offset>${fn.tiltOffset}</Offset>
+    <Frequency>3</Frequency>
+    <Phase>0</Phase>
+   </Axis>
+   <Fixture>
+    <ID>${fn.fixture}</ID>
+    <Head>0</Head>
+    <Mode>Position</Mode>
+    <Direction>Forward</Direction>
+    <StartOffset>${fn.startOffsetDeg}</StartOffset>
+   </Fixture>
+   <PropagationMode>Parallel</PropagationMode>
+  </Function>`;
+  }
+  if (fn.type === "Collection") {
+    return `  <Function ID="${fn.id}" Type="Collection" Name="${esc(fn.name)}">
+${fn.members.map((m, i) => `   <Step Number="${i}">${m}</Step>`).join("\n")}
   </Function>`;
   }
   const steps = fn.steps

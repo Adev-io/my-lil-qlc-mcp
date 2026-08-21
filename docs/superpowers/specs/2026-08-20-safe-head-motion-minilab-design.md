@@ -106,3 +106,46 @@ rig.json gains `controller2: { model, inputUid, inputLine, cc: { f1..f4, k1..k8 
 ## Saturday
 
 Plot sheet → `movingHeadSettings` → `npm run generate` (guard re-runs on captured positions) → 47-look wire sweep → MiniLab sweep (`midi-learn`) if any control is dead.
+
+## Addendum 2026-08-20 (evening) — every look on a pad, row grammar, MiniLab as a performance surface
+
+Approved in-session. Supersedes the MiniLab table above.
+
+### Launchpad: one grammar, five pages
+
+Rows mean the same thing on every page. A row that has nothing for that part of the night stays dark.
+
+| Row | Kind |
+|---|---|
+| R1 | static colour looks (wall + heads) |
+| R2 | chases / builds |
+| R3 | head motion (EFX collections) |
+| R4 | banner looks (floor pair) |
+| R5 | specials + positions (doors, entrance, speaker, truss home, white burst) |
+| R6 | spare |
+| R7 | brightness (Dim 25/50/75/Full, Sync Strobe) — unchanged |
+| R8 | utility (Blackout, Panic, Banner, tap, Strobe, —, Par Sound, page) — unchanged |
+
+**Every function** that is not a chase step, a fader-backing scene or a utility/dim function sits on at least one pad (test-enforced).
+
+### MiniLab 3 (final)
+
+Knobs that OWN a channel only own channels no look writes; everything colour-like is **additive** (Playback, HTP blend, nothing at 0).
+
+| Control | Role | How |
+|---|---|---|
+| F1–F4 | Pars L · Pars R · Truss · Banner intensity | Playback sliders (MIDI twins of the OSC faders) |
+| K1 | **Fade** — fade in/out of every look | second VCSpeedDial "Fade", FadeIn/FadeOut multiplier 1, Duration not sent, absolute-value input = K1 |
+| K2 | **Speed** — chase tempo | existing "Tempo" VCSpeedDial gains an absolute-value input = K2 (tap stays on R8C4) |
+| K3 | **Gobo** — truss gobo wheel (open · 7 gobos · shake · cycle) | Level, truss ch6. Truss looks stop writing ch6 |
+| K4 | Gobo Spin | Level, all heads ch7 |
+| K5 | Prism | Level, all heads ch8 |
+| K6 | Zoom | Level, all heads ch14 |
+| K7 | **UV Wash** | Playback on `UV Full` (pars ch7 255) |
+| K8 | **Warm Wash** | Playback on `Warm Full` (pars white ch5 255 + amber ch6 255) |
+
+Consequences: truss beam-only looks (Gobo Beam/Cycle/Shake/Wide, Doors Gobo, Door Gobo) are removed — the knob does that job on top of any colour look; Ceiling Gobo Gold/Blue become **Ceiling Gold/Blue** (colour + position only); Gold Pulse and Beam Punch drop their gobo. The floor pair keeps look-driven gobos (Banner Gobo, Banner Swirl) — K3 is truss-only. Focus and Move Speed stay as dashboard (OSC) Level sliders; no MIDI twin.
+
+### Roadmap artifact
+
+Gains an **operator guide**: per page, the 8×8 grid as it will look, what each row is for, and the MiniLab strip — so the page-to-page flow of the night reads off one screen.

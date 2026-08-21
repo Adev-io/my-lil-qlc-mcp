@@ -196,9 +196,10 @@ describe("party generator — looks", () => {
       // otherwise both heads hold home (no safe doorway aim exists).
       const pan10 = chVal(fv(look, 10), 0), tilt10 = chVal(fv(look, 10), 2);
       const pan11 = chVal(fv(look, 11), 0), tilt11 = chVal(fv(look, 11), 2);
-      // Both heads have valid pan/tilt; either light the door or both stay home
+      // Near head (fx10) leaves its ceiling home for the door. Pan happens to match home (both
+      // are straight downstage from the tower), so it is the TILT that must drop.
       expect(pan10).not.toBeNull();
-      expect(tilt10).not.toBeNull();
+      expect(tilt10, "near head tilts off the ceiling onto the doorway").not.toBe(homeLTilt);
       expect(pan11).not.toBeNull();
       expect(tilt11).not.toBeNull();
       // Far head (fx11) always stays home (cannot reach door safely)

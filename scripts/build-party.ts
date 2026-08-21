@@ -236,6 +236,7 @@ function addChaser(name: string, stepNames: string[], hold: number, fade = 0, di
 // Every box is guarded: centre + 16 perimeter points must pass panTiltSafe from that head.
 function addEfx(name: string, f: Fixture, algorithm: string, centre: Vec3, widthDmx: number, heightDmx: number,
                 durationMs: number, startOffsetDeg = 0, rotationDeg = 0): number {
+  if (rotationDeg !== 0) throw new Error(`EFX "${name}": rotation is not guarded (perimeter sampling assumes an axis-aligned box)`);
   const side = f.id === trussHeads[0].id ? "L" : "R";
   const h = HEAD_XYZ[side];
   const [pan, tilt] = aim(side, centre.x, centre.y, centre.z);
@@ -340,7 +341,13 @@ function trussPos(which: "home" | "speaker", f: Fixture, computed: [number, numb
 }
 function floorPos(f: Fixture): [number, number] {
   const m = PMH[floorKey(f)]?.banner;
-  if (m && m.pan !== undefined && m.tilt !== undefined) return [m.pan, m.tilt];
+  if (m && m.pan !== undefined && m.tilt !== undefined) {
+    // Captured floor positions must aim upward at the banner (tilt above horizontal from floor level ~1ft).
+    // Tilt centre depression is 37.5°, tilt range is 270°, so 1 DMX = 270/255 ≈ 1.06°.
+    // Horizontal = centre (128) - (37.5° / (270°/255)) ≈ 128 - 35.7 ≈ 92.3 → tilt must be < ~93.
+    if (m.tilt >= 93) throw new Error(`movingHeadSettings.${floorKey(f)}.banner tilt ${m.tilt} points at or below horizontal from floor level`);
+    return [m.pan, m.tilt];
+  }
   return aimBanner(f.id === floorHeads[0].id ? "L" : "R", BANNER.centerX, BANNER.centerHeightFt);
 }
 
@@ -524,22 +531,14 @@ const doorAim = (i: number): [number, number] => {
     ? aim(side, DOORS.x, DOORS.y, DOOR_Z)
     : homeAim(i);
 };
-// Both truss heads put a beam on the doors for arrivals and the grand entrance. Only built when
-// rig.doors exists, so a rig without a measured doorway simply has no door look rather than a
-// pad that aims somewhere invented. The floor pair stays on the banner throughout.
+// Door Spot: both truss heads point at the doorway for arrivals and the grand entrance.
+// Only built when rig.doors exists, so a rig without a measured doorway simply has no door look.
 if (DOORS) {
   addScene("Door Spot", [
     ...wallDim(BLUE, 0.35),
     ...trussHeads.map((f, i) => {
       const [p, t] = doorAim(i);
       return { id: f.id, pairs: [0, p, 2, t, 5, HEAD_COLOR.white, 10, 255, 11, SHUTTER_OPEN, ...BEAM_CLEAR] };
-    }),
-  ], 400, 400);
-  addScene("Door Gobo", [
-    ...wallDim(GOLD, 0.3),
-    ...trussHeads.map((f, i) => {
-      const [p, t] = doorAim(i);
-      return { id: f.id, pairs: [0, p, 2, t, 5, HEAD_COLOR.orange, 6, GOBO.slot(2), 10, 255, 11, SHUTTER_OPEN, 13, 0] };
     }),
   ], 400, 400);
 }
@@ -558,26 +557,20 @@ addHeadEfx("Diamond",             "Diamond", CEIL, 18, 12, 5000);
 // the wall edge is rising toward the ceiling, not sweeping across the room at head height.
 addHeadEfx("Banner Wave", "Line", { xFromTower: HEAD_SEP / 2 + BANNER.centerX, y: WALL_Y, z: BANNER.centerHeightFt + BANNER.heightFt / 4 }, 10, 0, 6000);
 
-// Static ceiling/banner looks for the truss pair. Position + beam; wall colour rides along.
-addScene("Ceiling Gobo Gold", [...wall(GOLD), ...trussHeads.map((f, i) => { const [p, t] = homeAim(i);
-  return { id: f.id, pairs: [0, p, 2, t, 5, HEAD_COLOR.orange, 6, GOBO.slot(1), 11, SHUTTER_OPEN, 13, 0] }; })]);
-addScene("Ceiling Gobo Blue", [...wall(BLUE), ...trussHeads.map((f, i) => { const [p, t] = homeAim(i);
-  return { id: f.id, pairs: [0, p, 2, t, 5, HEAD_COLOR.cyan, 6, GOBO.slot(3), 11, SHUTTER_OPEN, 13, 0] }; })]);
+// Static ceiling/banner looks for the truss pair. Position + colour only; the MiniLab Gobo Spin knob owns ch6.
+addScene("Ceiling Gold", [...wall(GOLD), ...trussHeads.map((f, i) => { const [p, t] = homeAim(i);
+  return { id: f.id, pairs: [0, p, 2, t, 5, HEAD_COLOR.orange, 11, SHUTTER_OPEN, ...BEAM_CLEAR] }; })]);
+addScene("Ceiling Blue", [...wall(BLUE), ...trussHeads.map((f, i) => { const [p, t] = homeAim(i);
+  return { id: f.id, pairs: [0, p, 2, t, 5, HEAD_COLOR.cyan, 11, SHUTTER_OPEN, ...BEAM_CLEAR] }; })]);
 addScene("Banner Beams", [...wallDim(GOLD, 0.3), ...trussHeads.map((f, i) => {
   const [p, t] = aim(i === 0 ? "L" : "R", BANNER.centerX, WALL_Y, BANNER.centerHeightFt);
   return { id: f.id, pairs: [0, p, 2, t, 5, HEAD_COLOR.white, 10, 255, 11, SHUTTER_OPEN, ...BEAM_CLEAR] }; })], 300, 300);
 
-// --- beam looks: gobo wheel, gobo rotation, prism -----------------------------
-// Colour looks clear these (BEAM_CLEAR); the ones below deliberately texture the beam. Gobos only
-// read as gobos where a beam lands on something — the truss pair on the dance floor and the walls,
-// the floor pair on the banner — so that is where they are used.
-addScene("Doors Gobo",   [...wallDim(BLUE, 0.5), ...trussBeam(HEAD_COLOR.cyan, GOBO.slot(0))], 300, 300);
+// --- banner beam looks: the floor pair projects a gobo onto the banner -----------
+// Banner texture only; truss gobo is now a MiniLab knob (Gobo Spin). Colour looks clear
+// the beam (BEAM_CLEAR); the floor pair below deliberately textures the banner.
 addScene("Banner Gobo",  [...wallDim(GOLD, 0.3), ...floorBeam(220, HEAD_COLOR.orange, GOBO.slot(2))], 300, 300);
 addScene("Banner Swirl", [...wallDim(UVC, 0.4), ...floorBeam(220, HEAD_COLOR.magenta, GOBO.slot(4))], 300, 300);
-addScene("Gobo Beam",    [...wall(GOLD), ...trussBeam(HEAD_COLOR.orange, GOBO.slot(1))]);
-addScene("Gobo Cycle",   [...wall(BLUE), ...trussBeam(HEAD_COLOR.cyan, GOBO.cycleSlow)]);
-addScene("Gobo Shake",   [...wall(UVC), ...trussBeam(HEAD_COLOR.magenta, GOBO.shake)]);
-addScene("Gobo Wide",    [...wall(GOLD), ...trussBeam(HEAD_COLOR.orange, GOBO.slot(3))]);
 
 // --- more static looks per part of the night ---------------------------------
 addScene("All Gold",  [...wall(GOLD), ...trussColor(HEAD_COLOR.orange), ...floorVal(255, HEAD_COLOR.orange)]);
@@ -598,16 +591,15 @@ addScene("SBD S3", [...wallDim(GOLD, 0.6), ...trussColor(HEAD_COLOR.orange)], 60
 addScene("SBD S4", [...wall(GOLD), ...trussColor(HEAD_COLOR.orange)], 600, 600);
 addChaser("Slow Build", ["SBD S1", "SBD S2", "SBD S3", "SBD S4"], 1400, 600);
 
-// Gold Pulse — hora. Full gold punching against a dark beat, gobo spinning throughout so the
-// heads keep moving while the wall blinks.
-addScene("GPL S1", [...wall(GOLD), ...trussBeam(HEAD_COLOR.orange, GOBO.slot(1))], 0, 0);
-addScene("GPL S2", [...wall(OFF6), ...trussBeam(HEAD_COLOR.orange, GOBO.slot(1))], 0, 0);
+// Gold Pulse — hora. Full gold punching against a dark beat. Gobo is now a MiniLab knob.
+addScene("GPL S1", [...wall(GOLD), ...trussColor(HEAD_COLOR.orange)], 0, 0);
+addScene("GPL S2", [...wall(OFF6), ...trussColor(HEAD_COLOR.orange)], 0, 0);
 addChaser("Gold Pulse", ["GPL S1", "GPL S2"], 400);
 
-// Beam Punch — party. The gobo and prism hold while colour and wheel jump on the beat.
-addScene("BPN S1", [...wall(GOLD), ...trussBeam(HEAD_COLOR.orange, GOBO.slot(5))], 0, 0);
-addScene("BPN S2", [...wall(BLUE), ...trussBeam(HEAD_COLOR.cyan, GOBO.slot(5))], 0, 0);
-addScene("BPN S3", [...wall(UVC), ...trussBeam(HEAD_COLOR.magenta, GOBO.slot(5))], 0, 0);
+// Beam Punch — party. Colour and wheel jump on the beat. Gobo is now a MiniLab knob.
+addScene("BPN S1", [...wall(GOLD), ...trussColor(HEAD_COLOR.orange)], 0, 0);
+addScene("BPN S2", [...wall(BLUE), ...trussColor(HEAD_COLOR.cyan)], 0, 0);
+addScene("BPN S3", [...wall(UVC), ...trussColor(HEAD_COLOR.magenta)], 0, 0);
 addChaser("Beam Punch", ["BPN S1", "BPN S2", "BPN S3"], 300);
 
 // --- audio fallback + beat pulse ---------------------------------------------
@@ -663,71 +655,117 @@ const LED = { gold: 18, blue: 82, uv: 90, white: 6, cyan: 74, red: 10, green: 42
 interface PageLook { cap: string; fn: string; row: number; col: number; led: number; bg: number[]; action?: string; }
 const PAGES: { name: string; blurb: string; looks: PageLook[] }[] = [
   { name: "INTRO", blurb: "doors, build, grand entrance", looks: [
-    { cap: "Doors",        fn: "Doors Blue",   row: 0, col: 0, led: LED.blue,  bg: [40, 80, 220] },
-    { cap: "Build",        fn: "Build Chase",  row: 0, col: 1, led: LED.amber, bg: [200, 140, 40] },
-    // No punctuation in captions: the caption becomes the OSC path, and "Entrance!" shipped a
-    // literal "!" in "/entrance!_r1c3" — legal but a trap for anything driving the show by path.
-    { cap: "Entrance",     fn: "Entrance",     row: 0, col: 2, led: LED.gold,  bg: [255, 180, 0] },
-    { cap: "Banner Blast", fn: "Banner Blast", row: 0, col: 3, led: LED.uv,    bg: [150, 80, 255] },
-    { cap: "Slow Build",   fn: "Slow Build",   row: 1, col: 0, led: LED.blue,  bg: [60, 90, 200] },
-    { cap: "Doors Gobo",   fn: "Doors Gobo",   row: 1, col: 1, led: LED.cyan,  bg: [0, 160, 210] },
-    { cap: "Banner Gobo",  fn: "Banner Gobo",  row: 1, col: 2, led: LED.gold,  bg: [230, 170, 60] },
-    // Only when rig.doors is measured — no doorway, no door pads.
-    ...(DOORS ? [
-      { cap: "Door Spot", fn: "Door Spot", row: 1, col: 3, led: LED.white, bg: [245, 245, 235] },
-      { cap: "Door Gobo", fn: "Door Gobo", row: 1, col: 4, led: LED.gold,  bg: [255, 190, 70] },
-    ] : []),
+    // Row 0: static colour looks
+    { cap: "Doors",     fn: "Doors Blue",   row: 0, col: 0, led: LED.blue,  bg: [40, 80, 220] },
+    { cap: "Gold Wall", fn: "Gold Wall",    row: 0, col: 1, led: LED.gold,  bg: [255, 170, 0] },
+    { cap: "Blue Wall", fn: "Blue Wall",    row: 0, col: 2, led: LED.blue,  bg: [0, 60, 255] },
+    { cap: "Gold Blue", fn: "Gold Blue Alt", row: 0, col: 3, led: LED.amber, bg: [220, 130, 60] },
+    { cap: "Warm White", fn: "Warm White",   row: 0, col: 4, led: LED.white, bg: [255, 230, 200] },
+    { cap: "UV Accent",  fn: "UV Accent",    row: 0, col: 5, led: LED.uv,    bg: [120, 60, 220] },
+    // Row 1: chases/builds
+    { cap: "Build",       fn: "Build Chase", row: 1, col: 0, led: LED.amber, bg: [200, 140, 40] },
+    { cap: "Slow Build",  fn: "Slow Build",  row: 1, col: 1, led: LED.blue,  bg: [60, 90, 200] },
+    // Row 2: head motion
+    { cap: "Ceiling Circle", fn: "Ceiling Circle", row: 2, col: 0, led: LED.cyan, bg: [0, 190, 220] },
+    { cap: "Figure 8",       fn: "Figure 8",       row: 2, col: 1, led: LED.cyan, bg: [0, 160, 200] },
+    // Row 3: banner looks
+    { cap: "Banner Soft",  fn: "Banner Soft",  row: 3, col: 0, led: LED.uv,    bg: [170, 120, 255] },
+    { cap: "Banner Blast", fn: "Banner Blast", row: 3, col: 1, led: LED.uv,    bg: [150, 80, 255] },
+    { cap: "Banner Gobo",  fn: "Banner Gobo",  row: 3, col: 2, led: LED.gold,  bg: [230, 170, 60] },
+    // Row 4: specials + positions
+    ...(DOORS ? [{ cap: "Door Spot", fn: "Door Spot", row: 4, col: 0, led: LED.white, bg: [245, 245, 235] }] : []),
+    { cap: "Entrance",   fn: "Entrance",   row: 4, col: 1, led: LED.gold,  bg: [255, 180, 0] },
+    { cap: "Truss Home", fn: "Truss Home", row: 4, col: 2, led: LED.white, bg: [245, 245, 235] },
   ]},
   { name: "DINNER", blurb: "static ambient, zero motion", looks: [
+    // Row 0: static colour looks
     { cap: "Gold Wall",   fn: "Gold Wall",     row: 0, col: 0, led: LED.gold,  bg: [255, 170, 0] },
     { cap: "Blue Wall",   fn: "Blue Wall",     row: 0, col: 1, led: LED.blue,  bg: [0, 60, 255] },
     { cap: "Gold Blue",   fn: "Gold Blue Alt", row: 0, col: 2, led: LED.amber, bg: [220, 130, 60] },
     { cap: "Soft Amber",  fn: "Soft Amber",    row: 0, col: 3, led: LED.amber, bg: [255, 120, 30] },
     { cap: "Warm White",  fn: "Warm White",    row: 0, col: 4, led: LED.white, bg: [255, 230, 200] },
     { cap: "UV Accent",   fn: "UV Accent",     row: 0, col: 5, led: LED.uv,    bg: [120, 60, 220] },
-    { cap: "Banner Soft", fn: "Banner Soft",   row: 0, col: 6, led: LED.uv,    bg: [170, 120, 255] },
-    { cap: "Candle",      fn: "Candle",        row: 1, col: 0, led: LED.amber, bg: [230, 150, 70] },
-    { cap: "Blue Low",    fn: "Blue Low",      row: 1, col: 1, led: LED.blue,  bg: [30, 60, 170] },
-    { cap: "Half Warm",   fn: "Half Warm",     row: 1, col: 2, led: LED.white, bg: [230, 210, 180] },
-    { cap: "Banner Swirl", fn: "Banner Swirl", row: 1, col: 3, led: LED.uv,    bg: [190, 120, 255] },
+    { cap: "Blue Low",    fn: "Blue Low",      row: 0, col: 6, led: LED.blue,  bg: [30, 60, 170] },
+    { cap: "Half Warm",   fn: "Half Warm",     row: 0, col: 7, led: LED.white, bg: [230, 210, 180] },
+    // Row 1: chases/builds
+    { cap: "Candle", fn: "Candle", row: 1, col: 0, led: LED.amber, bg: [230, 150, 70] },
+    // Row 3: banner looks
+    { cap: "Banner Soft",  fn: "Banner Soft",  row: 3, col: 0, led: LED.uv,    bg: [170, 120, 255] },
+    { cap: "Banner Swirl", fn: "Banner Swirl", row: 3, col: 1, led: LED.uv,    bg: [190, 120, 255] },
+    { cap: "Banner Bright", fn: "Banner Bright", row: 3, col: 2, led: LED.gold, bg: [255, 190, 60] },
+    // Row 4: specials + positions
+    { cap: "Truss Home", fn: "Truss Home",   row: 4, col: 0, led: LED.white, bg: [245, 245, 235] },
+    { cap: "Speaker",    fn: "Speaker Light", row: 4, col: 1, led: LED.white, bg: [240, 240, 240] },
   ]},
   { name: "SPEECHES", blurb: "calm, banner featured", looks: [
-    { cap: "Banner Bright", fn: "Banner Bright", row: 0, col: 0, led: LED.gold,  bg: [255, 190, 60] },
-    { cap: "Wall Low",      fn: "Wall Low Gold", row: 0, col: 1, led: LED.amber, bg: [180, 120, 40] },
-    { cap: "Speaker",       fn: "Speaker Light", row: 0, col: 2, led: LED.white, bg: [240, 240, 240] },
-    { cap: "Banner Only",   fn: "Banner Only",   row: 0, col: 3, led: LED.uv,    bg: [150, 100, 255] },
-    { cap: "House Bright",  fn: "House Bright",  row: 0, col: 4, led: LED.white, bg: [255, 255, 255] },
-    { cap: "Warm Low",      fn: "Half Warm",     row: 1, col: 0, led: LED.white, bg: [220, 200, 170] },
-    { cap: "Banner Spin",   fn: "Banner Swirl",  row: 1, col: 1, led: LED.uv,    bg: [180, 110, 240] },
-    { cap: "Banner Beams",  fn: "Banner Beams",  row: 1, col: 2, led: LED.white, bg: [240, 235, 220] },
+    // Row 0: static colour looks
+    { cap: "Wall Low",      fn: "Wall Low Gold", row: 0, col: 0, led: LED.amber, bg: [180, 120, 40] },
+    { cap: "Warm Low",      fn: "Half Warm",     row: 0, col: 1, led: LED.white, bg: [220, 200, 170] },
+    { cap: "Warm White",    fn: "Warm White",    row: 0, col: 2, led: LED.white, bg: [255, 230, 200] },
+    { cap: "House Bright",  fn: "House Bright",  row: 0, col: 3, led: LED.white, bg: [255, 255, 255] },
+    // Row 2: head motion
+    { cap: "Banner Wave", fn: "Banner Wave", row: 2, col: 0, led: LED.uv, bg: [170, 110, 255] },
+    // Row 3: banner looks
+    { cap: "Banner Bright", fn: "Banner Bright", row: 3, col: 0, led: LED.gold,  bg: [255, 190, 60] },
+    { cap: "Banner Only",   fn: "Banner Only",   row: 3, col: 1, led: LED.uv,    bg: [150, 100, 255] },
+    { cap: "Banner Beams",  fn: "Banner Beams",  row: 3, col: 2, led: LED.white, bg: [240, 235, 220] },
+    { cap: "Banner Spin",   fn: "Banner Swirl",  row: 3, col: 3, led: LED.uv,    bg: [180, 110, 240] },
+    // Row 4: specials + positions
+    { cap: "Speaker",    fn: "Speaker Light", row: 4, col: 0, led: LED.white, bg: [240, 240, 240] },
+    { cap: "Truss Home", fn: "Truss Home",    row: 4, col: 1, led: LED.white, bg: [245, 245, 235] },
   ]},
   { name: "HORA", blurb: "lift the chairs", looks: [
+    // Row 0: static colour looks
     { cap: "Gold Blue Full", fn: "Gold Blue Full", row: 0, col: 0, led: LED.gold,  bg: [255, 170, 30] },
-    { cap: "Fast Chase",     fn: "Fast Gold Blue", row: 0, col: 2, led: LED.amber, bg: [230, 150, 50] },
-    { cap: "White Burst",    fn: "White Burst",    row: 0, col: 3, led: LED.white, bg: [255, 255, 255], action: "Flash" },
-    { cap: "All Gold",       fn: "All Gold",       row: 1, col: 0, led: LED.gold,  bg: [255, 185, 40] },
-    { cap: "Gold Pulse",     fn: "Gold Pulse",     row: 1, col: 1, led: LED.amber, bg: [255, 140, 20] },
-    { cap: "Gobo Beam",      fn: "Gobo Beam",      row: 1, col: 2, led: LED.gold,  bg: [235, 165, 55] },
-    { cap: "Ceiling Circle", fn: "Ceiling Circle",    row: 2, col: 0, led: LED.cyan, bg: [0, 190, 220] },
-    { cap: "Figure 8",       fn: "Figure 8",          row: 2, col: 1, led: LED.cyan, bg: [0, 160, 200] },
-    { cap: "Diamond",        fn: "Diamond",           row: 2, col: 2, led: LED.cyan, bg: [0, 130, 180] },
-    { cap: "Ceiling Gold",   fn: "Ceiling Gobo Gold", row: 2, col: 3, led: LED.gold, bg: [240, 170, 50] },
+    { cap: "All Gold",       fn: "All Gold",       row: 0, col: 1, led: LED.gold,  bg: [255, 185, 40] },
+    { cap: "Gold Wall",      fn: "Gold Wall",      row: 0, col: 2, led: LED.gold,  bg: [255, 170, 0] },
+    { cap: "Ceiling Gold",   fn: "Ceiling Gold",   row: 0, col: 3, led: LED.gold,  bg: [240, 170, 50] },
+    { cap: "Ceiling Blue",   fn: "Ceiling Blue",   row: 0, col: 4, led: LED.blue,  bg: [40, 100, 255] },
+    // Row 1: chases/builds
+    { cap: "Fast Chase",  fn: "Fast Gold Blue", row: 1, col: 0, led: LED.amber, bg: [230, 150, 50] },
+    { cap: "Gold Pulse",  fn: "Gold Pulse",     row: 1, col: 1, led: LED.amber, bg: [255, 140, 20] },
+    { cap: "GB Chase",    fn: "Chase Gold Blue", row: 1, col: 2, led: LED.gold,  bg: [255, 160, 20] },
+    // Row 2: head motion
+    { cap: "Ceiling Circle", fn: "Ceiling Circle", row: 2, col: 0, led: LED.cyan, bg: [0, 190, 220] },
+    { cap: "Figure 8",       fn: "Figure 8",       row: 2, col: 1, led: LED.cyan, bg: [0, 160, 200] },
+    { cap: "Diamond",        fn: "Diamond",        row: 2, col: 2, led: LED.cyan, bg: [0, 130, 180] },
+    { cap: "Ceiling Line",   fn: "Ceiling Line",   row: 2, col: 3, led: LED.cyan, bg: [0, 170, 210] },
+    // Row 3: banner looks
+    { cap: "Banner Bright", fn: "Banner Bright", row: 3, col: 0, led: LED.gold, bg: [255, 190, 60] },
+    { cap: "Banner Blast",  fn: "Banner Blast",  row: 3, col: 1, led: LED.uv,   bg: [150, 80, 255] },
+    // Row 4: specials + positions
+    { cap: "White Burst", fn: "White Burst", row: 4, col: 0, led: LED.white, bg: [255, 255, 255], action: "Flash" },
+    { cap: "Truss Home",  fn: "Truss Home",  row: 4, col: 1, led: LED.white, bg: [245, 245, 235] },
   ]},
   { name: "PARTY", blurb: "the dance floor", looks: [
-    { cap: "GB Chase",     fn: "Chase Gold Blue", row: 0, col: 0, led: LED.gold,    bg: [255, 160, 20] },
-    { cap: "Blue UV",      fn: "Chase Blue UV",   row: 0, col: 1, led: LED.blue,    bg: [70, 60, 255] },
-    { cap: "Gold UV",      fn: "Chase Gold UV",   row: 0, col: 2, led: LED.uv,      bg: [200, 120, 255] },
-    { cap: "Rainbow",      fn: "Rainbow Chase",   row: 0, col: 3, led: LED.green,   bg: [0, 220, 100] },
-    { cap: "Rainbow Fast", fn: "Rainbow Fast",    row: 0, col: 4, led: LED.magenta, bg: [255, 0, 180] },
-    { cap: "UV Black",     fn: "UV Blacklight",   row: 0, col: 5, led: LED.uv,      bg: [110, 40, 255] },
-    { cap: "Gobo Cycle",   fn: "Gobo Cycle",      row: 1, col: 3, led: LED.blue,    bg: [40, 120, 255] },
-    { cap: "Gobo Shake",   fn: "Gobo Shake",      row: 1, col: 4, led: LED.uv,      bg: [170, 70, 255] },
-    { cap: "Gobo Wide",    fn: "Gobo Wide",       row: 1, col: 5, led: LED.gold,    bg: [255, 175, 45] },
-    { cap: "Beam Punch",   fn: "Beam Punch",      row: 1, col: 6, led: LED.magenta, bg: [255, 40, 170] },
+    // Row 0: static colour looks
+    { cap: "UV Black",      fn: "UV Blacklight",   row: 0, col: 0, led: LED.uv,      bg: [110, 40, 255] },
+    { cap: "Gold Blue Full", fn: "Gold Blue Full", row: 0, col: 1, led: LED.gold,    bg: [255, 170, 30] },
+    { cap: "UV Accent",     fn: "UV Accent",       row: 0, col: 2, led: LED.uv,      bg: [120, 60, 220] },
+    { cap: "Ceiling Gold",  fn: "Ceiling Gold",    row: 0, col: 3, led: LED.gold,    bg: [240, 170, 50] },
+    { cap: "Ceiling Blue",  fn: "Ceiling Blue",    row: 0, col: 4, led: LED.blue,    bg: [40, 100, 255] },
+    // Row 1: chases/builds
+    { cap: "GB Chase",       fn: "Chase Gold Blue", row: 1, col: 0, led: LED.gold,    bg: [255, 160, 20] },
+    { cap: "Blue UV",        fn: "Chase Blue UV",   row: 1, col: 1, led: LED.blue,    bg: [70, 60, 255] },
+    { cap: "Gold UV",        fn: "Chase Gold UV",   row: 1, col: 2, led: LED.uv,      bg: [200, 120, 255] },
+    { cap: "Rainbow",        fn: "Rainbow Chase",   row: 1, col: 3, led: LED.green,   bg: [0, 220, 100] },
+    { cap: "Rainbow Fast",   fn: "Rainbow Fast",    row: 1, col: 4, led: LED.magenta, bg: [255, 0, 180] },
+    { cap: "Beam Punch",     fn: "Beam Punch",      row: 1, col: 5, led: LED.magenta, bg: [255, 40, 170] },
+    { cap: "Gold Pulse",     fn: "Gold Pulse",      row: 1, col: 6, led: LED.amber,   bg: [255, 140, 20] },
+    // Row 2: head motion
     { cap: "Ceiling Circle Fast", fn: "Ceiling Circle Fast", row: 2, col: 0, led: LED.cyan, bg: [0, 200, 230] },
     { cap: "Ceiling Line",        fn: "Ceiling Line",        row: 2, col: 1, led: LED.cyan, bg: [0, 170, 210] },
-    { cap: "Banner Wave",         fn: "Banner Wave",         row: 2, col: 2, led: LED.uv,   bg: [170, 110, 255] },
-    { cap: "Ceiling Blue",        fn: "Ceiling Gobo Blue",   row: 2, col: 3, led: LED.blue, bg: [40, 100, 255] },
+    { cap: "Diamond",             fn: "Diamond",             row: 2, col: 2, led: LED.cyan, bg: [0, 130, 180] },
+    { cap: "Figure 8",            fn: "Figure 8",            row: 2, col: 3, led: LED.cyan, bg: [0, 160, 200] },
+    { cap: "Banner Wave",         fn: "Banner Wave",         row: 2, col: 4, led: LED.uv,   bg: [170, 110, 255] },
+    // Row 3: banner looks
+    { cap: "Banner Blast", fn: "Banner Blast", row: 3, col: 0, led: LED.uv,   bg: [150, 80, 255] },
+    { cap: "Banner Swirl", fn: "Banner Swirl", row: 3, col: 1, led: LED.uv,   bg: [190, 120, 255] },
+    { cap: "Banner Gobo",  fn: "Banner Gobo",  row: 3, col: 2, led: LED.gold, bg: [230, 170, 60] },
+    // Row 4: specials + positions
+    { cap: "White Burst", fn: "White Burst", row: 4, col: 0, led: LED.white, bg: [255, 255, 255], action: "Flash" },
+    { cap: "Entrance",    fn: "Entrance",    row: 4, col: 1, led: LED.gold,  bg: [255, 180, 0] },
+    { cap: "Truss Home",  fn: "Truss Home",  row: 4, col: 2, led: LED.white, bg: [245, 245, 235] },
   ]},
 ];
 

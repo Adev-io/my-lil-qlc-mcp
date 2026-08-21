@@ -92,12 +92,12 @@ describe("party generator — looks", () => {
       expect(raw).toContain(`Name="${fn}"`);
   });
 
-  it("builds the dynamics: dim presets, strobes, chases, positions, sound fallback (floor sweeps + Truss Sound removed)", () => {
+  it("builds the dynamics: dim presets, strobes, chases, positions, sound fallback", () => {
     for (const fn of ["Dim 25", "Dim 50", "Dim 75", "Dim Full", "Strobe Burst", "Sync Strobe",
       "Chase Gold Blue", "Chase Blue UV", "Chase Gold UV", "Rainbow Chase", "Rainbow Fast",
       "UV Blacklight", "Par Sound Mode", "Beat Pulse",
-      "Fast Gold Blue", "White Burst", "Gold Blue Full", "Entrance", "Build Chase",
-      "Truss Home", "Speaker Light", "Banner Home"])
+      "Fast Gold Blue", "White Burst", "Gold Blue Full", "Entrance", "Build Chase", "Slow Build",
+      "Truss Home", "Speaker Light", "Banner Home", "Gold Pulse", "Beam Punch", "Candle"])
       expect(raw).toContain(`Name="${fn}"`);
   });
 
@@ -185,41 +185,38 @@ describe("party generator — looks", () => {
       }
   });
 
-  it("beam looks use real gobo bands from the 375Z definition", () => {
+  it("banner beam looks texture the floor pair only (truss gobo is a MiniLab knob now)", () => {
     // ch6: 8-63 = the seven gobos, 64-119 = the same gobos shaking, 128-189 = cycle gobos.
     const goboOk = (v: number) => (v >= 8 && v <= 119) || (v >= 128 && v <= 189);
-    for (const look of ["Gobo Beam", "Gobo Cycle", "Gobo Shake", "Gobo Wide"]) {
-      const g = chVal(fv(look, 10), 6);
-      expect(g, `${look} gobo`).not.toBeNull();
-      expect(goboOk(g!), `${look} gobo ${g} outside the fixture's usable bands`).toBe(true);
-    }
     // The floor pair textures the banner, and never gets a movement macro.
-    expect(chVal(fv("Banner Gobo", 12), 6), "Banner Gobo floor gobo").toBeGreaterThan(0);
-    expect(chVal(fv("Banner Gobo", 12), 13), "Banner Gobo floor macro").toBe(0);
+    for (const look of ["Banner Gobo", "Banner Swirl"]) {
+      expect(chVal(fv(look, 12), 6), `${look} floor gobo`).toBeGreaterThan(0);
+      const g = chVal(fv(look, 12), 6);
+      expect(goboOk(g!), `${look} gobo ${g} outside the fixture's usable bands`).toBe(true);
+      expect(chVal(fv(look, 12), 13), `${look} floor macro`).toBe(0);
+    }
   });
 
-  it("the door looks put the reachable truss head on the doorway, the other at home, never the floor pair", () => {
+  it("the Door Spot look puts the reachable truss head on the doorway, the other at home, never the floor pair", () => {
     const homeL = chVal(fv("Truss Home", 10), 0), homeLTilt = chVal(fv("Truss Home", 10), 2);
     const homeR = chVal(fv("Truss Home", 11), 0), homeRTilt = chVal(fv("Truss Home", 11), 2);
-    for (const look of ["Door Spot", "Door Gobo"]) {
-      // The far tower (fx11 at x=15) cannot reach a house-left door (x=-15) without crossing
-      // the floor at ~8 ft where it needs 11 ft. If geometry allows, the left tower lights the door;
-      // otherwise both heads hold home (no safe doorway aim exists).
-      const pan10 = chVal(fv(look, 10), 0), tilt10 = chVal(fv(look, 10), 2);
-      const pan11 = chVal(fv(look, 11), 0), tilt11 = chVal(fv(look, 11), 2);
-      // Near head (fx10) leaves its ceiling home for the door. Pan happens to match home (both
-      // are straight downstage from the tower), so it is the TILT that must drop.
-      expect(pan10).not.toBeNull();
-      expect(tilt10, "near head tilts off the ceiling onto the doorway").not.toBe(homeLTilt);
-      expect(pan11).not.toBeNull();
-      expect(tilt11).not.toBeNull();
-      // Far head (fx11) always stays home (cannot reach door safely)
-      expect(pan11, "far head holds home").toBe(homeR);
-      expect(tilt11).toBe(homeRTilt);
-      expect(chVal(fv(look, 10), 10), `${look} fx10 dimmer`).toBe(255);
-      expect(chVal(fv(look, 11), 10), `${look} fx11 dimmer`).toBe(255);
-      expect(sceneXml(look)).not.toContain('<FixtureVal ID="12">');
-    }
+    // The far tower (fx11 at x=15) cannot reach a house-left door (x=-15) without crossing
+    // the floor at ~8 ft where it needs 11 ft. If geometry allows, the left tower lights the door;
+    // otherwise both heads hold home (no safe doorway aim exists).
+    const pan10 = chVal(fv("Door Spot", 10), 0), tilt10 = chVal(fv("Door Spot", 10), 2);
+    const pan11 = chVal(fv("Door Spot", 11), 0), tilt11 = chVal(fv("Door Spot", 11), 2);
+    // Near head (fx10) leaves its ceiling home for the door. Pan happens to match home (both
+    // are straight downstage from the tower), so it is the TILT that must drop.
+    expect(pan10).not.toBeNull();
+    expect(tilt10, "near head tilts off the ceiling onto the doorway").not.toBe(homeLTilt);
+    expect(pan11).not.toBeNull();
+    expect(tilt11).not.toBeNull();
+    // Far head (fx11) always stays home (cannot reach door safely)
+    expect(pan11, "far head holds home").toBe(homeR);
+    expect(tilt11).toBe(homeRTilt);
+    expect(chVal(fv("Door Spot", 10), 10), "Door Spot fx10 dimmer").toBe(255);
+    expect(chVal(fv("Door Spot", 11), 10), "Door Spot fx11 dimmer").toBe(255);
+    expect(sceneXml("Door Spot")).not.toContain('<FixtureVal ID="12">');
   });
 
   it("THE RULE: every truss pan/tilt in every scene passes the beam guard", () => {
@@ -286,8 +283,8 @@ describe("party VC — 5 pages, shared rows, faders, tempo, audio", () => {
   });
 
   it("places each page's looks on their page", () => {
-    for (const n of ["Doors R1C1", "Entrance R1C3", "Gold Wall R1C1", "Banner Bright R1C1",
-      "Gold Blue Full R1C1", "GB Chase R1C1"])
+    for (const n of ["Doors R1C1", "Gold Wall R1C2", "Entrance R5C2",
+      "Gold Blue Full R1C1", "GB Chase R2C1"])
       expect(names).toContain(n);
   });
 
@@ -466,6 +463,47 @@ describe("party generator — Launchpad LED map", () => {
   }
 });
 
+describe("party generator — Launchpad grammar", () => {
+  const ROW_KIND = ["static", "chase", "motion", "banner", "special"] as const;
+  const kindOf = (fn: string, raw: string): typeof ROW_KIND[number] | "other" => {
+    const t = raw.match(new RegExp(`<Function ID="\\d+" Type="(\\w+)" Name="${fn}">`))?.[1];
+    if (t === "Collection") return "motion";
+    if (t === "Chaser") return "chase";
+    if (/^Banner /.test(fn)) return "banner";
+    if (/^(Door Spot|Entrance|Speaker Light|Truss Home|White Burst)$/.test(fn)) return "special";
+    return t === "Scene" ? "static" : "other";
+  };
+
+  it("every pad on rows 0-4 sits in the row its kind belongs to, on every page", () => {
+    let checked = 0;
+    for (const b of raw.matchAll(/<Button Caption="([^"]*) R([0-4])C\d+"[^]*?<Function ID="(\d+)"\/>/g)) {
+      const fnName = raw.match(new RegExp(`<Function ID="${b[3]}" Type="\\w+" Name="([^"]*)">`))?.[1] || "";
+      const kind = kindOf(fnName, raw);
+      const row = Number(b[2]) - 1; // display is 1-indexed, map to 0-indexed row
+      expect(kind, `${b[1]} -> ${fnName}`).not.toBe("other");
+      expect(ROW_KIND[row], `${b[1]} (${fnName}) is on row ${row}`).toBe(kind);
+      checked++;
+    }
+    expect(checked).toBeGreaterThan(60);
+  });
+
+  it("every look has a pad: no orphan scene, chaser or collection", () => {
+    const onPad = new Set([...raw.matchAll(/<Button Caption="[^"]*" ID="\d+"[^]*?<Function ID="(\d+)"\/>/g)].map((m) => m[1]));
+    const orphanOk = (n: string) => /^[A-Z]{3} S\d+$/.test(n)                          // chase steps
+      || /^(Pars [LR]|Truss|Banner|UV|Warm) Full$/.test(n)                              // fader-backing scenes
+      || /^(Blink On|Blink Off|Beat Pulse)$/.test(n)
+      || / [LR]$/.test(n) && /Type="EFX"/.test(raw.match(new RegExp(`<Function ID="\\d+" Type="\\w+" Name="${n}">`))?.[0] || ""); // EFX halves live inside Collections
+    for (const f of raw.matchAll(/<Function ID="(\d+)" Type="(Scene|Chaser|Collection)" Name="([^"]*)">/g))
+      if (!orphanOk(f[3])) expect(onPad.has(f[1]), `"${f[3]}" (${f[2]}) has no button`).toBe(true);
+  });
+
+  it("no scene writes a truss gobo (ch6 != 0 on fx10/11): the MiniLab knob owns it", () => {
+    for (const sc of raw.matchAll(/Type="Scene" Name="([^"]*)"[^]*?<\/Function>/g))
+      for (const f of sc[0].matchAll(/<FixtureVal ID="(10|11)">([^<]*)</g))
+        expect(chVal(f[2], 6) ?? 0, `${sc[1]} fx${f[1]} ch6`).toBe(0);
+  });
+});
+
 describe("party generator — 3D monitor layout", () => {
   let mon: any;
   beforeAll(() => {
@@ -547,10 +585,10 @@ describe("party generator — EFX motion", () => {
       }
   });
 
-  it("places the motion pads on row 3 of HORA and PARTY and the statics exist", () => {
+  it("places the motion pads on row 2 and the ceiling static looks exist", () => {
     for (const cap of ["Ceiling Circle", "Figure 8", "Ceiling Line", "Diamond", "Banner Wave", "Ceiling Circle Fast"])
       expect(baseNames, cap).toContain(cap);
-    for (const fn of ["Ceiling Gobo Gold", "Ceiling Gobo Blue", "Banner Beams"]) expect(raw).toContain(`Name="${fn}"`);
-    expect(names.filter((n) => /R3C\d$/.test(n)).length).toBeGreaterThanOrEqual(8);
+    for (const fn of ["Ceiling Gold", "Ceiling Blue", "Banner Beams"]) expect(raw).toContain(`Name="${fn}"`);
+    expect(names.filter((n) => /R2C\d$/.test(n)).length).toBeGreaterThanOrEqual(8);
   });
 });

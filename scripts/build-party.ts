@@ -1439,12 +1439,15 @@ hands the pars to their internal mic. Tap tempo still drives every chase.
 
 ${pageSections}
 Pads glow at ~30% in their look colour when idle and jump to 100% while running. To the right of the
-grid: the **Heads Zoom** fader and the **Tempo** dial.
+grid: the four group-intensity faders (Pars L / Pars R / Truss / Banner), the **Tempo** and **Fade**
+dials, and the **MINILAB** strip (Gobo, Gobo Spin, Prism, Zoom, UV Wash, Warm Wash).
 
-> **Why only one fader.** A QLC+ Level slider does not blend with scenes — it owns its channels and
-> forces its value out. Dim / UV / strobe faders therefore fought the pads and won, pinning the rig
-> dark. Brightness is the R7 pad row; **continuous master dimming is the Grand Master** (top-left of
-> the console). Zoom is the only channel no look touches, so it is the only safe fader.
+> **Why the faders are shaped this way.** A QLC+ Level slider does not blend with scenes — it owns
+> its channels and forces its value out. Dim / UV / strobe Level faders therefore fought the pads and
+> won, pinning the rig dark. So: brightness is the R7 pad row plus four **Playback** group faders
+> (they push a group up; the Grand Master pulls everything down); the MiniLab knobs are Level only on
+> channels no look writes (truss gobo, gobo spin, prism, zoom); the UV and Warm washes are Playback
+> and blend in on top of any look.
 
 ## Look index — every pad (locate / update)
 

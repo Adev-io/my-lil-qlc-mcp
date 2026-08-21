@@ -883,7 +883,7 @@ function sliderXml(id: number, caption: string, x: number, chans: { fixture: num
       <BackgroundImage>None</BackgroundImage>
       <Font>Default</Font>
      </Appearance>
-     <WindowState Visible="True" X="${x}" Y="16" Width="60" Height="320"/>
+     <WindowState Visible="True" X="${x}" Y="16" Width="60" Height="${SLIDER_H}"/>
      <SliderMode ValueDisplayStyle="Exact" ClickAndGoType="None" Monitor="false">Level</SliderMode>
      <Level LowLimit="0" HighLimit="255" Value="${value}">
 ${channels}
@@ -906,7 +906,7 @@ function playbackSliderXml(id: number, caption: string, x: number, funcId: numbe
       <BackgroundImage>None</BackgroundImage>
       <Font>Default</Font>
      </Appearance>
-     <WindowState Visible="True" X="${x}" Y="16" Width="60" Height="320"/>
+     <WindowState Visible="True" X="${x}" Y="16" Width="60" Height="${SLIDER_H}"/>
      <SliderMode ValueDisplayStyle="Percentage" ClickAndGoType="None" Monitor="false">Playback</SliderMode>
      <Level LowLimit="0" HighLimit="255" Value="0"/>
      <Playback>
@@ -1073,15 +1073,21 @@ const ML = (rig as any).controller2 as { inputUid: string; inputLine: string; cc
 const NOT_FADED = /^([A-Z]{3} S\d+|Blink O(n|ff)|Beat Pulse|.* Full|Dim \d+|Strobe Burst|Panic White|Banner O(n|ff)|Par Sound Mode)$/;
 const fadeFuncIds = funcs.filter((f) => f.type === "Scene" && !NOT_FADED.test(f.name)).map((f) => f.id);
 
+// Console geometry — the show laptop is 1536x960; QLC+ chrome leaves ~1500x820 for the console.
+// Every top-level frame below must fit that box and none may overlap (frames are opaque).
+const SLIDER_H = 220;                       // was 320: the MINILAB strip has to fit under the grid
+const DIAL_Y = 16 + SLIDER_H + 12;          // dials sit under the sliders inside FADERS
+const RIGHT_X = 805;                        // right-hand column, clear of the 800-wide Pages grid
+
 const allFaders = groupFaderDefs.length + faderDefs.length;
 const fadersInner = [
   ...groupFaderDefs.map((d, i) => playbackSliderXml(d.id, d.caption, 12 + i * 72, funcIdByName.get(d.fn)!, oscInput(d.caption))),
   ...faderDefs.map((d, i) => sliderXml(d.id, d.caption, 12 + (groupFaderDefs.length + i) * 72, d.chans, d.value, oscInput(d.caption))),
-  speedDialXml(920, "Tempo", 12, 348, TAP_PAD, tempoFuncIds, 500, ML ? { cc: ML.cc.k2, min: 100, max: 5000 } : null),
-  speedDialXml(921, "Fade", 204, 348, null, fadeFuncIds, 400, ML ? { cc: ML.cc.k1, min: 0, max: 4000 } : null, "fade"),
-  ...(AUDIO_TRIGGERS ? [audioTriggersXml(930, "Audio", 204, 348, null, funcIdByName.get("Beat Pulse")!)] : []),
+  speedDialXml(920, "Tempo", 12, DIAL_Y, TAP_PAD, tempoFuncIds, 500, ML ? { cc: ML.cc.k2, min: 100, max: 5000 } : null),
+  speedDialXml(921, "Fade", 204, DIAL_Y, null, fadeFuncIds, 400, ML ? { cc: ML.cc.k1, min: 0, max: 4000 } : null, "fade"),
+  ...(AUDIO_TRIGGERS ? [audioTriggersXml(930, "Audio", 396, DIAL_Y, null, funcIdByName.get("Beat Pulse")!)] : []),
 ];
-const fadersFrame = frame("Frame", "FADERS", 9, 805, 8, 12 + allFaders * 72, 520, fadersInner);
+const fadersFrame = frame("Frame", "FADERS", 9, RIGHT_X, 8, 12 + allFaders * 72, DIAL_Y + 120 + 12, fadersInner);
 
 // HEAD SETTINGS — dashboard/MCP buttons, off the Launchpad grid. Truss positions are mutually
 // exclusive (SoloFrame); the banner pair overlays whatever position is active.
@@ -1107,8 +1113,8 @@ const headBtnXml = (defs: { id: number; caption: string; fn: string }[]) => defs
       <Action>Toggle</Action>
       <Input Universe="0" Channel="${crc16(oscPath(b.caption))}"/>
     </Button>`);
-const headPosFrame = frame("SoloFrame", "TRUSS POSITION", 8, 805, 540, 156, 28 + headPosDefs.length * 44, headBtnXml(headPosDefs));
-const headBeamFrame = frame("Frame", "BANNER", 7, 968, 540, 156, 28 + headBeamDefs.length * 44, headBtnXml(headBeamDefs));
+const headPosFrame = frame("SoloFrame", "TRUSS POSITION", 8, RIGHT_X, 400, 156, 28 + headPosDefs.length * 44, headBtnXml(headPosDefs));
+const headBeamFrame = frame("Frame", "BANNER", 7, RIGHT_X + 163, 400, 156, 28 + headBeamDefs.length * 44, headBtnXml(headBeamDefs));
 
 // MINILAB FRAME — Arturia MiniLab 3 on universe 2. Faders 1-4 are Playback twins of the OSC
 // group-intensity faders. Knobs 3-8: Level knobs for beam channels (gobo, gobo spin, prism, zoom)
@@ -1129,7 +1135,7 @@ const miniInner = ML ? [
   playbackSliderXml(938, "UV Wash",   12 + 8 * 72, funcIdByName.get("UV Full")!, midiInput(ML.cc.k7)),
   playbackSliderXml(939, "Warm Wash", 12 + 9 * 72, funcIdByName.get("Warm Full")!, midiInput(ML.cc.k8)),
 ] : [];
-const miniFrame = ML ? frame("Frame", "MINILAB", 11, 805, 680, 12 + 10 * 72, 360, miniInner) : "";
+const miniFrame = ML ? frame("Frame", "MINILAB", 11, 0, 470, 12 + 10 * 72, SLIDER_H + 40, miniInner) : "";
 
 // Frames are sized to the tight bounding box of their buttons. Per page the three frames are
 // non-overlapping row bands (rows 0-1 / 6 / 7) — QLC+ frames are opaque, so overlap hides pads.

@@ -666,3 +666,52 @@ describe("party generator — EFX motion", () => {
     expect(names.filter((n) => /R2C\d$/.test(n)).length).toBeGreaterThanOrEqual(8);
   });
 });
+
+describe("party generator — console fits the show laptop", () => {
+  const CANVAS = { w: 1500, h: 820 };
+  const topFrames = () => {
+    const root = raw.match(/<VirtualConsole>\s*<Frame Caption="">[^]*?<\/VirtualConsole>/)![0];
+    const out: { name: string; x: number; y: number; w: number; h: number }[] = [];
+    for (const m of root.matchAll(/<(?:Solo)?Frame Caption="(Pages|FADERS|MINILAB|TRUSS POSITION|BANNER)" ID="\d+">[^]*?<WindowState Visible="True" X="(\d+)" Y="(\d+)" Width="(\d+)" Height="(\d+)"\/>/g))
+      out.push({ name: m[1], x: +m[2], y: +m[3], w: +m[4], h: +m[5] });
+    return out;
+  };
+  it("every top-level frame sits inside 1500x820", () => {
+    const fr = topFrames();
+    expect(fr.map((f) => f.name).sort()).toEqual(["BANNER", "FADERS", "MINILAB", "Pages", "TRUSS POSITION"]);
+    for (const f of fr) {
+      expect(f.x + f.w, `${f.name} right edge`).toBeLessThanOrEqual(CANVAS.w);
+      expect(f.y + f.h, `${f.name} bottom edge`).toBeLessThanOrEqual(CANVAS.h);
+    }
+  });
+  it("no two top-level frames overlap (QLC+ frames are opaque)", () => {
+    const fr = topFrames();
+    for (let i = 0; i < fr.length; i++) for (let j = i + 1; j < fr.length; j++) {
+      const a = fr[i], b = fr[j];
+      const apart = a.x + a.w <= b.x || b.x + b.w <= a.x || a.y + a.h <= b.y || b.y + b.h <= a.y;
+      expect(apart, `${a.name} overlaps ${b.name}`).toBe(true);
+    }
+  });
+  it("every slider and dial fits inside its frame", () => {
+    for (const name of ["FADERS", "MINILAB"]) {
+      const fx = raw.match(new RegExp(`<Frame Caption="${name}" ID="\\d+">[^]*?<WindowState Visible="True" X="\\d+" Y="\\d+" Width="(\\d+)" Height="(\\d+)"\\/>([^]*?)\\n   </Frame>`))!;
+      expect(fx, `${name} frame`).toBeTruthy();
+      const fw = +fx[1], fh = +fx[2], body = fx[3];
+      let n = 0;
+      for (const w of body.matchAll(/<(Slider|SpeedDial) Caption="([^"]*)"[^]*?<WindowState Visible="True" X="(\d+)" Y="(\d+)" Width="(\d+)" Height="(\d+)"\/>/g)) {
+        n++;
+        expect(+w[3] + +w[5], `${name}/${w[2]} right`).toBeLessThanOrEqual(fw);
+        expect(+w[4] + +w[6], `${name}/${w[2]} bottom`).toBeLessThanOrEqual(fh);
+      }
+      expect(n, `${name} widgets found`).toBeGreaterThan(5);
+    }
+  });
+  it("OSC and MIDI twin buttons share one geometry so they render as one pad", () => {
+    const byCaption = new Map<string, string[]>();
+    for (const b of raw.matchAll(/<Button Caption="([^"]* R\dC\d)" ID="\d+"[^]*?<WindowState Visible="True" X="(\d+)" Y="(\d+)" Width="(\d+)" Height="(\d+)"\/>/g))
+      byCaption.set(b[1], [...(byCaption.get(b[1]) ?? []), `${b[2]},${b[3]},${b[4]},${b[5]}`]);
+    let pairs = 0;
+    for (const [cap, geos] of byCaption) if (geos.length > 1) { pairs++; expect(new Set(geos).size, cap).toBe(1); }
+    expect(pairs).toBeGreaterThan(50);
+  });
+});

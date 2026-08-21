@@ -5,7 +5,7 @@
     # Just screenshot the current QLC+ window
     ./scripts/qlc-window.ps1
 
-    # Send a key chord (e.g. Ctrl+F12 to open DevTools) then screenshot
+    # Send a key chord (e.g. Ctrl+F12 = QLC+ Design/Operate toggle) then screenshot
     ./scripts/qlc-window.ps1 -Keys "^{F12}"
 
     # Click a screen point (X,Y) then screenshot
@@ -46,7 +46,8 @@ if (-not $p) {
 }
 
 # Restore the window (SW_RESTORE = 9) and bring it to foreground
-[QWin]::ShowWindow($p.MainWindowHandle, 9) | Out-Null
+[QWin]::ShowWindow($p.MainWindowHandle, 3) | Out-Null   # 3 = SW_MAXIMIZE (9/restore would un-maximise a maximised console)
+[System.Windows.Forms.SendKeys]::SendWait('%')   # Alt tap: SetForegroundWindow is refused unless the caller just had focus
 [QWin]::SetForegroundWindow($p.MainWindowHandle) | Out-Null
 Start-Sleep -Milliseconds $SettleMs
 

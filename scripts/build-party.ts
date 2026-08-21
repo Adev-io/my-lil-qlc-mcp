@@ -1185,7 +1185,10 @@ ${headPosFrame}
 ${headBeamFrame}
  </Frame>
  <Properties>
-  <Size Width="1190" Height="820"/>
+  <!-- Console size = the 1536x960 laptop's viewport (window minus toolbar and Grand Master strip).
+       QLC+ CENTRES a console smaller than the viewport, which pushed the right-hand column off
+       screen; a console the size of the viewport pins (0,0) top-left with no scrollbars. -->
+  <Size Width="1480" Height="860"/>
   <GrandMaster ChannelMode="Intensity" ValueMode="Reduce" SliderMode="Normal"/>
  </Properties>
 </VirtualConsole>`;

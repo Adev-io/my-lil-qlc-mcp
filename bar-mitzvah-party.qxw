@@ -5465,7 +5465,7 @@
      <BackgroundImage>None</BackgroundImage>
      <Font>Default</Font>
     </Appearance>
-    <WindowState Visible="True" X="805" Y="8" Width="444" Height="520"/>
+    <WindowState Visible="True" X="805" Y="8" Width="444" Height="380"/>
     <AllowChildren>True</AllowChildren>
     <AllowResize>True</AllowResize>
     <ShowHeader>False</ShowHeader>
@@ -5480,7 +5480,7 @@
       <BackgroundImage>None</BackgroundImage>
       <Font>Default</Font>
      </Appearance>
-     <WindowState Visible="True" X="12" Y="16" Width="60" Height="320"/>
+     <WindowState Visible="True" X="12" Y="16" Width="60" Height="220"/>
      <SliderMode ValueDisplayStyle="Percentage" ClickAndGoType="None" Monitor="false">Playback</SliderMode>
      <Level LowLimit="0" HighLimit="255" Value="0"/>
      <Playback>
@@ -5496,7 +5496,7 @@
       <BackgroundImage>None</BackgroundImage>
       <Font>Default</Font>
      </Appearance>
-     <WindowState Visible="True" X="84" Y="16" Width="60" Height="320"/>
+     <WindowState Visible="True" X="84" Y="16" Width="60" Height="220"/>
      <SliderMode ValueDisplayStyle="Percentage" ClickAndGoType="None" Monitor="false">Playback</SliderMode>
      <Level LowLimit="0" HighLimit="255" Value="0"/>
      <Playback>
@@ -5512,7 +5512,7 @@
       <BackgroundImage>None</BackgroundImage>
       <Font>Default</Font>
      </Appearance>
-     <WindowState Visible="True" X="156" Y="16" Width="60" Height="320"/>
+     <WindowState Visible="True" X="156" Y="16" Width="60" Height="220"/>
      <SliderMode ValueDisplayStyle="Percentage" ClickAndGoType="None" Monitor="false">Playback</SliderMode>
      <Level LowLimit="0" HighLimit="255" Value="0"/>
      <Playback>
@@ -5528,7 +5528,7 @@
       <BackgroundImage>None</BackgroundImage>
       <Font>Default</Font>
      </Appearance>
-     <WindowState Visible="True" X="228" Y="16" Width="60" Height="320"/>
+     <WindowState Visible="True" X="228" Y="16" Width="60" Height="220"/>
      <SliderMode ValueDisplayStyle="Percentage" ClickAndGoType="None" Monitor="false">Playback</SliderMode>
      <Level LowLimit="0" HighLimit="255" Value="0"/>
      <Playback>
@@ -5544,7 +5544,7 @@
       <BackgroundImage>None</BackgroundImage>
       <Font>Default</Font>
      </Appearance>
-     <WindowState Visible="True" X="300" Y="16" Width="60" Height="320"/>
+     <WindowState Visible="True" X="300" Y="16" Width="60" Height="220"/>
      <SliderMode ValueDisplayStyle="Exact" ClickAndGoType="None" Monitor="false">Level</SliderMode>
      <Level LowLimit="0" HighLimit="255" Value="128">
      <Channel Fixture="10">9</Channel>
@@ -5565,7 +5565,7 @@
       <BackgroundImage>None</BackgroundImage>
       <Font>Default</Font>
      </Appearance>
-     <WindowState Visible="True" X="372" Y="16" Width="60" Height="320"/>
+     <WindowState Visible="True" X="372" Y="16" Width="60" Height="220"/>
      <SliderMode ValueDisplayStyle="Exact" ClickAndGoType="None" Monitor="false">Level</SliderMode>
      <Level LowLimit="0" HighLimit="255" Value="0">
      <Channel Fixture="10">4</Channel>
@@ -5586,7 +5586,7 @@
       <BackgroundImage>None</BackgroundImage>
       <Font>Default</Font>
      </Appearance>
-     <WindowState Visible="True" X="12" Y="348" Width="180" Height="120"/>
+     <WindowState Visible="True" X="12" Y="248" Width="180" Height="120"/>
      <AbsoluteValue Minimum="100" Maximum="5000">
       <Input Universe="2" Channel="71"/>
      </AbsoluteValue>
@@ -5613,7 +5613,7 @@
       <BackgroundImage>None</BackgroundImage>
       <Font>Default</Font>
      </Appearance>
-     <WindowState Visible="True" X="204" Y="348" Width="180" Height="120"/>
+     <WindowState Visible="True" X="204" Y="248" Width="180" Height="120"/>
      <AbsoluteValue Minimum="0" Maximum="4000">
       <Input Universe="2" Channel="74"/>
      </AbsoluteValue>
@@ -5657,7 +5657,7 @@
      <BackgroundImage>None</BackgroundImage>
      <Font>Default</Font>
     </Appearance>
-    <WindowState Visible="True" X="805" Y="680" Width="732" Height="360"/>
+    <WindowState Visible="True" X="0" Y="470" Width="732" Height="260"/>
     <AllowChildren>True</AllowChildren>
     <AllowResize>True</AllowResize>
     <ShowHeader>False</ShowHeader>
@@ -5672,7 +5672,7 @@
       <BackgroundImage>None</BackgroundImage>
       <Font>Default</Font>
      </Appearance>
-     <WindowState Visible="True" X="12" Y="16" Width="60" Height="320"/>
+     <WindowState Visible="True" X="12" Y="16" Width="60" Height="220"/>
      <SliderMode ValueDisplayStyle="Percentage" ClickAndGoType="None" Monitor="false">Playback</SliderMode>
      <Level LowLimit="0" HighLimit="255" Value="0"/>
      <Playback>
@@ -5688,7 +5688,7 @@
       <BackgroundImage>None</BackgroundImage>
       <Font>Default</Font>
      </Appearance>
-     <WindowState Visible="True" X="84" Y="16" Width="60" Height="320"/>
+     <WindowState Visible="True" X="84" Y="16" Width="60" Height="220"/>
      <SliderMode ValueDisplayStyle="Percentage" ClickAndGoType="None" Monitor="false">Playback</SliderMode>
      <Level LowLimit="0" HighLimit="255" Value="0"/>
      <Playback>
@@ -5704,7 +5704,7 @@
       <BackgroundImage>None</BackgroundImage>
       <Font>Default</Font>
      </Appearance>
-     <WindowState Visible="True" X="156" Y="16" Width="60" Height="320"/>
+     <WindowState Visible="True" X="156" Y="16" Width="60" Height="220"/>
      <SliderMode ValueDisplayStyle="Percentage" ClickAndGoType="None" Monitor="false">Playback</SliderMode>
      <Level LowLimit="0" HighLimit="255" Value="0"/>
      <Playback>
@@ -5720,7 +5720,7 @@
       <BackgroundImage>None</BackgroundImage>
       <Font>Default</Font>
      </Appearance>
-     <WindowState Visible="True" X="228" Y="16" Width="60" Height="320"/>
+     <WindowState Visible="True" X="228" Y="16" Width="60" Height="220"/>
      <SliderMode ValueDisplayStyle="Percentage" ClickAndGoType="None" Monitor="false">Playback</SliderMode>
      <Level LowLimit="0" HighLimit="255" Value="0"/>
      <Playback>
@@ -5736,7 +5736,7 @@
       <BackgroundImage>None</BackgroundImage>
       <Font>Default</Font>
      </Appearance>
-     <WindowState Visible="True" X="300" Y="16" Width="60" Height="320"/>
+     <WindowState Visible="True" X="300" Y="16" Width="60" Height="220"/>
      <SliderMode ValueDisplayStyle="Exact" ClickAndGoType="None" Monitor="false">Level</SliderMode>
      <Level LowLimit="0" HighLimit="255" Value="0">
      <Channel Fixture="10">6</Channel>
@@ -5755,7 +5755,7 @@
       <BackgroundImage>None</BackgroundImage>
       <Font>Default</Font>
      </Appearance>
-     <WindowState Visible="True" X="372" Y="16" Width="60" Height="320"/>
+     <WindowState Visible="True" X="372" Y="16" Width="60" Height="220"/>
      <SliderMode ValueDisplayStyle="Exact" ClickAndGoType="None" Monitor="false">Level</SliderMode>
      <Level LowLimit="0" HighLimit="255" Value="0">
      <Channel Fixture="10">7</Channel>
@@ -5776,7 +5776,7 @@
       <BackgroundImage>None</BackgroundImage>
       <Font>Default</Font>
      </Appearance>
-     <WindowState Visible="True" X="444" Y="16" Width="60" Height="320"/>
+     <WindowState Visible="True" X="444" Y="16" Width="60" Height="220"/>
      <SliderMode ValueDisplayStyle="Exact" ClickAndGoType="None" Monitor="false">Level</SliderMode>
      <Level LowLimit="0" HighLimit="255" Value="0">
      <Channel Fixture="10">8</Channel>
@@ -5797,7 +5797,7 @@
       <BackgroundImage>None</BackgroundImage>
       <Font>Default</Font>
      </Appearance>
-     <WindowState Visible="True" X="516" Y="16" Width="60" Height="320"/>
+     <WindowState Visible="True" X="516" Y="16" Width="60" Height="220"/>
      <SliderMode ValueDisplayStyle="Exact" ClickAndGoType="None" Monitor="false">Level</SliderMode>
      <Level LowLimit="0" HighLimit="255" Value="128">
      <Channel Fixture="10">14</Channel>
@@ -5818,7 +5818,7 @@
       <BackgroundImage>None</BackgroundImage>
       <Font>Default</Font>
      </Appearance>
-     <WindowState Visible="True" X="588" Y="16" Width="60" Height="320"/>
+     <WindowState Visible="True" X="588" Y="16" Width="60" Height="220"/>
      <SliderMode ValueDisplayStyle="Percentage" ClickAndGoType="None" Monitor="false">Playback</SliderMode>
      <Level LowLimit="0" HighLimit="255" Value="0"/>
      <Playback>
@@ -5834,7 +5834,7 @@
       <BackgroundImage>None</BackgroundImage>
       <Font>Default</Font>
      </Appearance>
-     <WindowState Visible="True" X="660" Y="16" Width="60" Height="320"/>
+     <WindowState Visible="True" X="660" Y="16" Width="60" Height="220"/>
      <SliderMode ValueDisplayStyle="Percentage" ClickAndGoType="None" Monitor="false">Playback</SliderMode>
      <Level LowLimit="0" HighLimit="255" Value="0"/>
      <Playback>
@@ -5851,7 +5851,7 @@
      <BackgroundImage>None</BackgroundImage>
      <Font>Default</Font>
     </Appearance>
-    <WindowState Visible="True" X="805" Y="540" Width="156" Height="116"/>
+    <WindowState Visible="True" X="805" Y="400" Width="156" Height="116"/>
     <AllowChildren>True</AllowChildren>
     <AllowResize>True</AllowResize>
     <ShowHeader>False</ShowHeader>
@@ -5893,7 +5893,7 @@
      <BackgroundImage>None</BackgroundImage>
      <Font>Default</Font>
     </Appearance>
-    <WindowState Visible="True" X="968" Y="540" Width="156" Height="116"/>
+    <WindowState Visible="True" X="968" Y="400" Width="156" Height="116"/>
     <AllowChildren>True</AllowChildren>
     <AllowResize>True</AllowResize>
     <ShowHeader>False</ShowHeader>
@@ -5929,7 +5929,10 @@
    </Frame>
  </Frame>
  <Properties>
-  <Size Width="1190" Height="820"/>
+  <!-- Console size = the 1536x960 laptop's viewport (window minus toolbar and Grand Master strip).
+       QLC+ CENTRES a console smaller than the viewport, which pushed the right-hand column off
+       screen; a console the size of the viewport pins (0,0) top-left with no scrollbars. -->
+  <Size Width="1480" Height="860"/>
   <GrandMaster ChannelMode="Intensity" ValueMode="Reduce" SliderMode="Normal"/>
  </Properties>
 </VirtualConsole>

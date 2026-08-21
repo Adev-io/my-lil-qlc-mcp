@@ -224,6 +224,23 @@ if (Get-Process qlcplus -ErrorAction SilentlyContinue) {
   } else {
     Write-Host '  [!] cover-floor step skipped (node or floor script missing)' -ForegroundColor DarkGray
   }
+  # HIGH-DPI (seen 2026-08-21): the show laptop runs Windows at 125%, and QLC+ 4 is not DPI-aware,
+  # so Windows bitmap-scales it and the 1500x820 console only gets ~1200x650 of real screen — the
+  # MiniLab strip and the last fader ended up off-screen. Per-user compatibility flag, idempotent,
+  # reversible (delete the value). Then maximise the window once it exists.
+  $layers = 'HKCU:\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers'
+  try {
+    if (-not (Test-Path $layers)) { New-Item -Path $layers -Force | Out-Null }
+    if ((Get-ItemProperty -Path $layers -Name $qlc -ErrorAction SilentlyContinue).$qlc -ne '~ HIGHDPIAWARE') {
+      Set-ItemProperty -Path $layers -Name $qlc -Value '~ HIGHDPIAWARE'
+      Write-Host '  -> QLC+ marked high-DPI aware (console renders 1:1 on the 125% laptop)' -ForegroundColor DarkGray
+    }
+  } catch { Write-Host "  [!] could not set the DPI flag (continuing): $($_.Exception.Message)" -ForegroundColor Yellow }
+  # Qt would re-apply its own 125% scaling the moment the process is DPI-aware, which puts us back
+  # where we started. Pin it to 1:1 for this process only (inherited env, nothing global).
+  $env:QT_ENABLE_HIGHDPI_SCALING = '0'
+  $env:QT_AUTO_SCREEN_SCALE_FACTOR = '0'
+  $env:QT_SCALE_FACTOR = '1'
   Write-Host '  -> launching QLC+ (Operate) ...' -ForegroundColor Green
   Start-Process $qlc -ArgumentList '--open', $show, '--operate'
 } else {
@@ -257,6 +274,25 @@ $monOk = Wait-Url "$monUrl/status"
 
 if ($monOk) { Start-Process $monUrl }  else { Write-Host '  [!] 3D monitor did not answer'  -ForegroundColor Yellow }
 if ($mcpOk) { Start-Process $dashUrl } else { Write-Host '  [!] MCP/dashboard did not answer' -ForegroundColor Yellow }
+
+# 4b. QLC+ in FRONT, maximised — after the browser tabs, which otherwise land on top of it. The
+#     console is the operator's screen; the dashboard and monitor are for the laptop at FOH.
+#     SetForegroundWindow is refused unless the caller just had keyboard focus, hence the Alt tap.
+if (-not ('QMax' -as [type])) {
+  Add-Type -TypeDefinition 'using System; using System.Runtime.InteropServices; public static class QMax { [DllImport("user32.dll")] public static extern bool ShowWindow(IntPtr h, int cmd); [DllImport("user32.dll")] public static extern bool SetForegroundWindow(IntPtr h); }'
+}
+Add-Type -AssemblyName System.Windows.Forms
+for ($i = 0; $i -lt 40; $i++) {
+  $qp = Get-Process qlcplus -ErrorAction SilentlyContinue | Where-Object { $_.MainWindowHandle -ne 0 } | Select-Object -First 1
+  if ($qp) {
+    Start-Sleep -Milliseconds 1500
+    [System.Windows.Forms.SendKeys]::SendWait('%')
+    [QMax]::ShowWindow($qp.MainWindowHandle, 3) | Out-Null            # 3 = SW_MAXIMIZE
+    [QMax]::SetForegroundWindow($qp.MainWindowHandle) | Out-Null
+    break
+  }
+  Start-Sleep -Milliseconds 500
+}
 
 # 5. BOOT LIT (party shows only). Party looks set colour, never brightness -- the R7 dim row owns
 #    that -- so a freshly opened show sits dark until a dim pad is pressed. Fire "Dim Full" once so

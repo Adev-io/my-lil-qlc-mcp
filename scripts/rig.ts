@@ -53,6 +53,22 @@ const FixtureGroup = z
     message: "addresses[] length must equal count",
   });
 
+const CuepixShow = z
+  .object({
+    trusses: z.array(z.array(z.number().int().min(1).max(12)).length(3)).length(4),
+    moversCalibrated: z.boolean().default(false),
+  })
+  .superRefine(({ trusses }, ctx) => {
+    const panels = trusses.flat();
+    if (new Set(panels).size !== 12 || panels.some((panel, index) => panel !== index + 1)) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["trusses"],
+        message: "trusses must contain panels 1-12 once in left-to-right order",
+      });
+    }
+  });
+
 export const RigSchema = z.object({
   $schema: z.string().optional(),
   meta: z.object({
@@ -71,6 +87,7 @@ export const RigSchema = z.object({
   }),
   performers: z.record(z.string(), Performer).optional(),
   fixtures: z.array(FixtureGroup).min(1),
+  cuepix: CuepixShow.optional(),
   controller: z
     .object({
       launchpad: z.boolean().default(false),

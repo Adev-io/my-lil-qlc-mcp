@@ -19,4 +19,32 @@ describe("Cuepix launcher", () => {
         .toBe(readFileSync(path.join(ROOT, "fixtures", name), "utf8"));
     }
   });
+
+  it("prepares a controller-disabled runtime copy without changing source", () => {
+    const runtime = mkdtempSync(path.join(os.tmpdir(), "cuepix-runtime-"));
+    const source = path.join(ROOT, "cuepix-panel-show.qxw");
+    const before = readFileSync(source, "utf8");
+    execFileSync("powershell.exe", [
+      "-NoProfile", "-File", path.join(ROOT, "start-cuepix.ps1"),
+      "-PrepareRuntimeOnly", "-DisableLaunchpad", "-RuntimeDirectory", runtime,
+    ], { cwd: ROOT, stdio: "pipe" });
+
+    const prepared = readFileSync(path.join(runtime, "cuepix-panel-show.runtime.qxw"), "utf8");
+    expect(prepared).toContain('<Universe Name="Launchpad" ID="2"');
+    expect(prepared).not.toContain('<Input Plugin="MIDI"');
+    expect(prepared).not.toContain('<Feedback Plugin="MIDI"');
+    expect(prepared).toContain('outputUni="0"');
+    expect(prepared).toContain('outputUni="1"');
+    expect(readFileSync(source, "utf8")).toBe(before);
+  });
+
+  it("starts MCP with the dedicated Cuepix widget map", () => {
+    const launcher = readFileSync(path.join(ROOT, "start-cuepix.ps1"), "utf8");
+    for (const setting of [
+      "$env:QLC_WIDGETS_FILE = $widgetMap",
+      "$env:MCP_TRANSPORT = 'http'",
+      "$env:HTTP_PORT = '8788'",
+      "$env:LAUNCHPAD_LEDS = '0'",
+    ]) expect(launcher).toContain(setting);
+  });
 });

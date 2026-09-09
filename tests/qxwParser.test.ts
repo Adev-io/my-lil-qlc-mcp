@@ -54,6 +54,12 @@ describe("QXW Parser", () => {
           <Level LowLimit="0" HighLimit="255" Value="204"/>
           <Input Universe="0" Channel="1"/>
         </Slider>
+        <SpeedDial Caption="FX Speed" ID="4">
+          <AbsoluteValue Minimum="100" Maximum="4000">
+            <Input Universe="0" Channel="64587"/>
+          </AbsoluteValue>
+          <Time>500</Time>
+        </SpeedDial>
       </SoloFrame>
     </Frame>
   </VirtualConsole>
@@ -85,6 +91,13 @@ describe("QXW Parser", () => {
         description: "Slider: MOVE (Input Universe 0, Channel 1)",
         minValue: 0,
         maxValue: 255,
+      },
+      {
+        id: "4",
+        name: "FX Speed",
+        path: "/fx_speed",
+        type: "speed",
+        description: "Speed Dial: FX Speed (Input Universe 0, Channel 64587)",
       },
     ]);
   });

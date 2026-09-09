@@ -6,6 +6,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseStringPromise } from "xml2js";
 import { loadRig, RigSchema } from "../scripts/rig.js";
+import { parseQxwFile } from "../src/qlc/qxwParser.js";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const RIG = path.join(ROOT, "rigs", "cuepix-panel.rig.json");
@@ -35,6 +36,13 @@ function chaserFixtureOrder(qxw: string, name: string): number[][] {
     if (!scene) throw new Error(`Missing step scene ${step[1]} for ${name}`);
     return fixtureChannels(scene[1]).ids;
   });
+}
+
+function buttonBlock(qxw: string, caption: string): string {
+  const escaped = caption.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const match = qxw.match(new RegExp(`<Button Caption="${escaped}"[\\s\\S]*?<\\/Button>`));
+  if (!match) throw new Error(`Missing button: ${caption}`);
+  return match[0];
 }
 
 describe("Cuepix routing workspace", () => {
@@ -130,5 +138,52 @@ describe("Cuepix routing workspace", () => {
       [0], [1], [2], [3], [4], [5], [6], [7], [8], [9], [10], [11],
       [10], [9], [8], [7], [6], [5], [4], [3], [2], [1],
     ]);
+  });
+
+  it("builds two performance pages with Launchpad and OSC twins", async () => {
+    const out = mkdtempSync(path.join(os.tmpdir(), "cuepix-console-"));
+    execSync("npx tsx scripts/build-cuepix-show.ts rigs/cuepix-panel.rig.json", {
+      cwd: ROOT,
+      env: { ...process.env, QLC_BUILD_OUT: out },
+      stdio: "pipe",
+    });
+    const qxwPath = path.join(out, "cuepix-panel-show.qxw");
+    const qxw = readFileSync(qxwPath, "utf8");
+
+    expect(qxw).toContain('<Universe Name="Launchpad" ID="2"');
+    expect(qxw).toContain('<Input Plugin="MIDI" UID="2" Line="2"/>');
+    expect(qxw).toContain('<Feedback Plugin="MIDI" UID="3" Line="3"/>');
+    expect(qxw).toContain('<Multipage PagesNum="2" CurrentPage="0"/>');
+    expect(qxw).toContain('<Input Universe="2" Channel="146"/>');
+    expect(qxw).toContain('Caption="RED P1 R1C1"');
+    expect(qxw).toContain('Caption="RAINBOW P1 R2C1"');
+    expect(qxw).toContain('Caption="PAGE P1 R8C8"');
+    expect(qxw).not.toContain('<Slider Caption="Cuepix');
+
+    for (const page of ["P1", "P2"]) {
+      const channels = [...qxw.matchAll(/<Button\b[\s\S]*?<\/Button>/g)]
+        .map((match) => match[0])
+        .filter((block) => block.includes(` ${page} R`))
+        .map((block) => block.match(/<Input Universe="2" Channel="(\d+)"/)?.[1])
+        .filter((channel): channel is string => channel !== undefined)
+        .map(Number);
+      expect(channels.length).toBeGreaterThan(0);
+      expect(new Set(channels).size).toBe(channels.length);
+    }
+
+    const lockedMover = buttonBlock(qxw, "HEAD AMBER P2 R3C1");
+    expect(lockedMover).not.toContain("<Function");
+    expect(lockedMover).not.toContain("<Input");
+
+    const mapPath = path.join(out, "config", "cuepix-widgets.json");
+    expect(existsSync(mapPath)).toBe(true);
+    const widgetMap = JSON.parse(readFileSync(mapPath, "utf8"));
+    const parsed = await parseQxwFile(qxwPath);
+    expect(parsed.errors).toEqual([]);
+    expect(widgetMap.widgets.map((widget: { name: string }) => widget.name).sort())
+      .toEqual(parsed.widgets.map((widget) => widget.name).sort());
+    expect(widgetMap.widgets.some((widget: { name: string }) => widget.name === "FX Speed")).toBe(true);
+    expect(widgetMap.widgets.some((widget: { name: string }) => widget.name.startsWith("TEST ·"))).toBe(false);
+    expect(widgetMap.widgets.some((widget: { name: string }) => widget.name.startsWith("HEAD "))).toBe(false);
   });
 });

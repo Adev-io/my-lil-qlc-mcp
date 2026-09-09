@@ -237,7 +237,7 @@ function parseSpeedDial(speedDial: any): WidgetMapping | null {
   try {
     const id = speedDial.$?.ID || "";
     const name = getWidgetName(speedDial);
-    const inputMapping = extractInputMapping(speedDial);
+    const inputMapping = extractInputMapping(speedDial.AbsoluteValue?.[0]) ?? extractInputMapping(speedDial);
 
     if (!name || !inputMapping) {
       return null;

@@ -2,6 +2,7 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { generateWidgetsJson } from "../src/qlc/qxwParser.js";
 import { loadRig } from "./rig.js";
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -28,6 +29,32 @@ type FunctionDef = Scene | Chaser;
 
 function esc(value: string): string {
   return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+const CRC_TBL = [
+  0x0000, 0x1081, 0x2102, 0x3183, 0x4204, 0x5285, 0x6306, 0x7387,
+  0x8408, 0x9489, 0xa50a, 0xb58b, 0xc60c, 0xd68d, 0xe70e, 0xf78f,
+];
+function crc16(value: string): number {
+  let crc = 0xffff;
+  for (const byte of Buffer.from(value, "utf8")) {
+    let current = byte;
+    crc = ((crc >> 4) & 0x0fff) ^ CRC_TBL[(crc ^ current) & 15];
+    current >>= 4;
+    crc = ((crc >> 4) & 0x0fff) ^ CRC_TBL[(crc ^ current) & 15];
+  }
+  return ~crc & 0xffff;
+}
+if (crc16("123456789") !== 0x906e) throw new Error("CRC-16/X-25 self-check failed");
+
+function oscPath(name: string): string {
+  return `/${name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/ /g, "_")}`;
+}
+function argb(r: number, g: number, b: number): number {
+  return ((0xff << 24) | (r << 16) | (g << 8) | b) >>> 0;
+}
+function dimOf(value: number): number {
+  return value <= 0 ? 0 : value === 6 ? 2 : value + 4;
 }
 
 const fixtures: Fixture[] = [];
@@ -74,6 +101,8 @@ const selectedPanelValues = (indexes: number[], rgb: RGB = [255, 255, 255]): Fix
   indexes.map((index) => ({ id: panels[index].id, pairs: rgbPairs(solidPixels(rgb)) }));
 const levelValues = (value: number): FixtureValue[] => panels.map((panel) => ({ id: panel.id, pairs: [76, value] }));
 const strobeValues = (value: number): FixtureValue[] => panels.map((panel) => ({ id: panel.id, pairs: [77, value] }));
+const selectedStrobeValues = (indexes: number[], value = 95): FixtureValue[] =>
+  indexes.map((index) => ({ id: panels[index].id, pairs: [77, value] }));
 const headPairs = (on: boolean, pan = 128, tilt = 128): number[] => [
   0, pan, 1, 0, 2, tilt, 3, 0, 4, 0, 5, 0, 6, 0, 7, 0, 8, 0, 9, 128,
   10, on ? 255 : 0, 11, on ? 255 : 0, 12, 0, 13, 0, 14, 128,
@@ -141,6 +170,7 @@ for (const [label, value] of [["Slow", 40], ["Medium", 64], ["Fast", 95]] as con
 }
 addScene("FX · Stop", []);
 addScene("FLASH · White", [...panelValues(solidPixels([255, 255, 255])), ...strobeValues(95)]);
+addScene("FLASH · Burst", strobeValues(95));
 
 const stepScene = (name: string, indexes: number[], rgb: RGB = [255, 255, 255], fade = 0): number =>
   addScene(`_STEP · ${name}`, selectedPanelValues(indexes, rgb), fade, fade);
@@ -159,6 +189,10 @@ groupedChaser("Center Out", centerOut);
 groupedChaser("Outside In", outsideIn);
 groupedChaser("Truss Step", trussStep);
 groupedChaser("Bounce", bounce.map((index) => [index]));
+addChaser("FX · Chase Strobe", panelOrder.map((index, step) =>
+  addScene(`_STEP · Chase Strobe ${step + 1}`, selectedStrobeValues([index]))), 0, 90);
+addChaser("FX · Wave Strobe", centerOut.map((group, step) =>
+  addScene(`_STEP · Wave Strobe ${step + 1}`, selectedStrobeValues(group))), 0, 120);
 
 const snakeSteps = Array.from({ length: 25 }, (_, pixel) => addScene(`_STEP · Snake ${pixel + 1}`, panels.map((panel) => ({
   id: panel.id,
@@ -209,11 +243,21 @@ addRoutingScene("Both 375ZX Open White", new Map(heads.map((head) => [head.id, h
 addRoutingScene("All Blackout", new Map());
 
 const outputUniverses = [...new Set(fixtures.map((fixture) => fixture.universe))].sort((a, b) => a - b);
-const universesXml = outputUniverses.map((universe) => `   <Universe Name="Lighting U${universe}" ID="${universe}">
+const controller = rig.controller ?? {
+  launchpad: false, profile: "Novation Launchpad Mini MK3",
+  inputUid: "None", inputLine: "0", outputUid: "None", outputLine: "0",
+};
+const universesXml = `${outputUniverses.map((universe) => `   <Universe Name="Lighting U${universe}" ID="${universe}">
+    <Input Plugin="OSC" UID="None" Line="0"/>
     <Output Plugin="ArtNet" UID="None" Line="0">
      <PluginParameters outputUni="${universe}" transmitMode="Standard"/>
     </Output>
-   </Universe>`).join("\n");
+    <Feedback Plugin="OSC" UID="None" Line="0"/>
+   </Universe>`).join("\n")}
+   <Universe Name="Launchpad" ID="2" Profile="${esc(controller.profile ?? "Novation Launchpad Mini MK3")}">
+    <Input Plugin="MIDI" UID="${esc(controller.inputUid)}" Line="${esc(controller.inputLine)}"/>
+    <Feedback Plugin="MIDI" UID="${esc(controller.outputUid)}" Line="${esc(controller.outputLine)}"/>
+   </Universe>`;
 const fixturesXml = fixtures.map((fixture) => `  <Fixture>
    <Manufacturer>${esc(fixture.manufacturer)}</Manufacturer>
    <Model>${esc(fixture.model)}</Model>
@@ -243,22 +287,175 @@ ${steps}
   </Function>`;
 }).join("\n");
 
-const buttonWidth = 138;
-const buttonHeight = 48;
-const columns = 8;
-const buttonsXml = routingScenes.map((scene, index) => {
-  const x = 8 + (index % columns) * (buttonWidth + 6);
-  const y = 8 + Math.floor(index / columns) * (buttonHeight + 6);
-  return `   <Button Caption="${esc(scene.name.replace("TEST · ", ""))}" ID="${100 + index}" Icon="">
-    <WindowState Visible="True" X="${x}" Y="${y}" Width="${buttonWidth}" Height="${buttonHeight}"/>
-    <Appearance>
-     <FrameStyle>None</FrameStyle><ForegroundColor>Default</ForegroundColor><BackgroundColor>Default</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font>
-    </Appearance>
-    <Function ID="${scene.id}"/><Action>Toggle</Action>
-   </Button>`;
+const functionIdByName = new Map(functions.map((fn) => [fn.name, fn.id]));
+const PAD_ROWS = [209, 199, 189, 179, 169, 159, 149, 139];
+const padChannel = (row: number, col: number): number => PAD_ROWS[row] + col;
+const LED = { red: 10, amber: 18, yellow: 26, green: 42, cyan: 50, blue: 66, purple: 90, white: 6, gray: 1 };
+
+type ButtonAction = "Toggle" | "Flash" | "Blackout";
+type ButtonSpec = {
+  label: string; row: number; col: number; page: number; frame: string;
+  fn?: string; action?: ButtonAction; led: number; bg: RGB; enabled?: boolean;
+};
+type PlacedButton = ButtonSpec & { display: string; pad: number; osc: string; oscId: number; midiId: number };
+const placed: PlacedButton[] = [];
+let widgetId = 100;
+function place(spec: ButtonSpec): void {
+  if (spec.fn && !functionIdByName.has(spec.fn)) throw new Error(`Unknown function for ${spec.label}: ${spec.fn}`);
+  const display = `${spec.label} P${spec.page + 1} R${spec.row + 1}C${spec.col + 1}`;
+  placed.push({ ...spec, enabled: spec.enabled ?? true, display, pad: padChannel(spec.row, spec.col),
+    osc: oscPath(display), oscId: widgetId++, midiId: widgetId++ });
+}
+
+const addRow = (page: number, row: number, frame: string, specs: Array<[string, string | undefined, number, RGB, ButtonAction?]>, startCol = 0): void => {
+  specs.forEach(([label, fn, led, bg, action], col) => place({ label, fn, led, bg, action, page, row, col: startCol + col, frame }));
+};
+
+addRow(0, 0, "BASE-P1", [
+  ["RED", "BASE · Red", LED.red, [210, 28, 28]], ["AMBER", "BASE · Amber", LED.amber, [235, 110, 20]],
+  ["YELLOW", "BASE · Yellow", LED.yellow, [230, 205, 30]], ["GREEN", "BASE · Green", LED.green, [35, 190, 70]],
+  ["CYAN", "BASE · Cyan", LED.cyan, [25, 175, 190]], ["BLUE", "BASE · Blue", LED.blue, [35, 85, 220]],
+  ["PURPLE", "BASE · Purple", LED.purple, [135, 55, 210]], ["WHITE", "BASE · White", LED.white, [225, 225, 220]],
+]);
+addRow(0, 1, "BASE-P1", [
+  ["RAINBOW", "BASE · Rainbow", LED.purple, [160, 70, 200]], ["R/B", "BASE · Red Blue", LED.red, [175, 45, 95]],
+  ["G/M", "BASE · Green Magenta", LED.green, [60, 165, 105]], ["CHECKER", "BASE · Checkerboard", LED.white, [170, 170, 170]],
+  ["BANDS", "BASE · Bands", LED.amber, [210, 125, 45]], ["PIXELS", "BASE · Pixels", LED.white, [190, 190, 190]],
+  ["WAVE", "BASE · Wave", LED.cyan, [35, 155, 180]], ["RANDOM", "BASE · Random", LED.purple, [115, 75, 180]],
+]);
+addRow(0, 2, "FX-P1", [
+  ["L → R", "FX · Left to Right", LED.cyan, [35, 150, 185]], ["R → L", "FX · Right to Left", LED.cyan, [35, 150, 185]],
+  ["CENTER OUT", "FX · Center Out", LED.blue, [55, 100, 190]], ["OUT IN", "FX · Outside In", LED.blue, [55, 100, 190]],
+  ["TRUSS STEP", "FX · Truss Step", LED.amber, [200, 125, 35]], ["BOUNCE", "FX · Bounce", LED.green, [55, 165, 85]],
+  ["SNAKE", "FX · Snake", LED.green, [55, 165, 85]], ["RAIN CHASE", "FX · Rainbow Chase", LED.purple, [140, 65, 190]],
+]);
+addRow(0, 3, "FX-P1", [
+  ["COLOR FADE", "FX · Color Fade", LED.purple, [130, 75, 185]], ["WHITE FADE", "FX · White Fade", LED.white, [190, 190, 190]],
+  ["BREATHE", "FX · Breathe", LED.cyan, [50, 150, 175]], ["CROSSFADE", "FX · Crossfade", LED.blue, [65, 90, 190]],
+  ["PASTEL", "FX · Pastel", LED.purple, [170, 105, 190]], ["GRADIENT", "FX · Gradient", LED.amber, [195, 115, 50]],
+]);
+addRow(0, 4, "FX-P1", [
+  ["STROBE SLOW", "FX · Strobe Slow", LED.white, [180, 180, 180]], ["STROBE MED", "FX · Strobe Medium", LED.white, [195, 195, 195]],
+  ["STROBE FAST", "FX · Strobe Fast", LED.white, [220, 220, 220]], ["CHASE STROBE", "FX · Chase Strobe", LED.white, [165, 165, 180]],
+  ["WAVE STROBE", "FX · Wave Strobe", LED.white, [165, 175, 185]], ["BURST", "FLASH · Burst", LED.white, [225, 225, 225], "Flash"],
+]);
+
+addRow(1, 0, "BASE-P2", [
+  ["RED", "BASE · Red", LED.red, [210, 28, 28]], ["AMBER", "BASE · Amber", LED.amber, [235, 110, 20]],
+  ["GREEN", "BASE · Green", LED.green, [35, 190, 70]], ["CYAN", "BASE · Cyan", LED.cyan, [25, 175, 190]],
+  ["BLUE", "BASE · Blue", LED.blue, [35, 85, 220]], ["PURPLE", "BASE · Purple", LED.purple, [135, 55, 210]],
+  ["WHITE", "BASE · White", LED.white, [225, 225, 220]], ["BLACK", undefined, LED.gray, [20, 20, 24], "Blackout"],
+]);
+addRow(1, 1, "BASE-P2", [
+  ["RAINBOW", "BASE · Rainbow", LED.purple, [160, 70, 200]], ["CHECKER", "BASE · Checkerboard", LED.white, [170, 170, 170]],
+  ["BANDS", "BASE · Bands", LED.amber, [210, 125, 45]], ["PIXELS", "BASE · Pixels", LED.white, [190, 190, 190]],
+]);
+addRow(1, 1, "FX-P2", [
+  ["L → R", "FX · Left to Right", LED.cyan, [35, 150, 185]], ["R → L", "FX · Right to Left", LED.cyan, [35, 150, 185]],
+  ["FADE", "FX · Color Fade", LED.purple, [130, 75, 185]], ["BREATHE", "FX · Breathe", LED.cyan, [50, 150, 175]],
+], 4);
+
+const moverRows = [
+  ["HEAD AMBER", "HEAD BLUE", "HEAD WHT", "HEAD PURP", "HEAD GRN", "HEAD RED", "GOBO", "PRISM"],
+  ["CENTER", "POSITION A", "POSITION B", "POSITION C", "SWEEP", "CROSS", "CIRCLE", "HEAD STOP"],
+  ["L HEAD", "R HEAD", "BOTH", "OPEN", "DIM25", "DIM50", "DIM75", "HEAD STR"],
+];
+moverRows.forEach((labels, rowIndex) => labels.forEach((label, col) => place({
+  label, row: rowIndex + 2, col, page: 1, frame: "MOVERS-P2", led: LED.gray, bg: [65, 65, 72], enabled: Boolean(rig.cuepix?.moversCalibrated),
+})));
+
+for (const page of [0, 1]) {
+  addRow(page, 6, `LEVEL-P${page + 1}`, [
+    ["25%", "LEVEL · 25%", LED.blue, [55, 80, 145]], ["50%", "LEVEL · 50%", LED.blue, [65, 100, 175]],
+    ["75%", "LEVEL · 75%", LED.cyan, [65, 145, 180]], ["FULL", "LEVEL · Full", LED.white, [205, 205, 205]],
+  ]);
+  ["SLOW", "MED", "FAST", "TAP"].forEach((label, index) => place({
+    label, row: 6, col: index + 4, page, frame: `SPEED-P${page + 1}`, led: LED.amber, bg: [185, 110, 35], enabled: false,
+  }));
+  addRow(page, 7, `UTILITY-P${page + 1}`, [
+    ["BLACK", undefined, LED.gray, [20, 20, 24], "Blackout"], ["STOP FX", "FX · Stop", LED.red, [155, 40, 45]],
+    ["WHITE", "BASE · White", LED.white, [225, 225, 220]],
+  ]);
+  place({ label: "FLASH", row: 7, col: 4, page, frame: `UTILITY-P${page + 1}`, fn: "FLASH · White", action: "Flash", led: LED.white, bg: [235, 235, 230] });
+  place({ label: "PAGE", row: 7, col: 7, page, frame: `UTILITY-P${page + 1}`, led: LED.green, bg: [45, 155, 85], enabled: false });
+}
+
+function appearance(bg: RGB, foreground = argb(0, 0, 0)): string {
+  return `<Appearance><FrameStyle>None</FrameStyle><ForegroundColor>${foreground}</ForegroundColor><BackgroundColor>${argb(...bg)}</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>`;
+}
+function buttonXml(button: PlacedButton, x: number, y: number): string {
+  const fn = button.fn ? `\n     <Function ID="${functionIdByName.get(button.fn)}"/>` : "";
+  const action = button.action ?? "Toggle";
+  const one = (id: number, input: string) => `    <Button Caption="${esc(button.display)}" ID="${id}" Icon="">
+     <WindowState Visible="True" X="${x}" Y="${y}" Width="90" Height="44"/>
+     ${appearance(button.bg, button.bg[0] < 45 && button.bg[1] < 45 && button.bg[2] < 45 ? argb(255, 255, 255) : argb(0, 0, 0))}${fn}
+     <Action>${action}</Action>${input}
+    </Button>`;
+  if (!button.enabled) return one(button.oscId, "");
+  return `${one(button.oscId, `\n     <Input Universe="0" Channel="${crc16(button.osc)}"/>`)}\n${one(button.midiId,
+    `\n     <Input Universe="2" Channel="${button.pad}" LowerValue="${dimOf(button.led)}" UpperValue="${button.led}"/>`)}`;
+}
+
+function frameXml(tag: "Frame" | "SoloFrame", name: string, id: number, page: number, buttons: PlacedButton[]): string {
+  const minRow = Math.min(...buttons.map((button) => button.row));
+  const maxRow = Math.max(...buttons.map((button) => button.row));
+  const minCol = Math.min(...buttons.map((button) => button.col));
+  const maxCol = Math.max(...buttons.map((button) => button.col));
+  const x = 8 + minCol * 96, y = 8 + minRow * 50;
+  const inner = buttons.map((button) => buttonXml(button, 4 + (button.col - minCol) * 96, 4 + (button.row - minRow) * 50)).join("\n");
+  return `   <${tag} Caption="${esc(name)}" ID="${id}" Page="${page}">
+    ${appearance([32, 34, 39])}
+    <WindowState Visible="True" X="${x}" Y="${y}" Width="${(maxCol - minCol) * 96 + 98}" Height="${(maxRow - minRow) * 50 + 52}"/>
+    <AllowChildren>True</AllowChildren><AllowResize>True</AllowResize><ShowHeader>False</ShowHeader><ShowEnableButton>False</ShowEnableButton><Collapsed>False</Collapsed><Disabled>False</Disabled>
+${inner}
+   </${tag}>`;
+}
+
+const performanceFrames: string[] = [];
+let frameId = 10;
+for (const page of [0, 1]) {
+  for (const name of [`BASE-P${page + 1}`, `FX-P${page + 1}`, `MOVERS-P${page + 1}`, `LEVEL-P${page + 1}`, `SPEED-P${page + 1}`, `UTILITY-P${page + 1}`]) {
+    const buttons = placed.filter((button) => button.page === page && button.frame === name);
+    if (buttons.length) performanceFrames.push(frameXml(name.startsWith("BASE") || name.startsWith("FX") || name.startsWith("LEVEL") ? "SoloFrame" : "Frame", name, frameId++, page, buttons));
+  }
+}
+
+const chaserIds = functions.filter((fn) => fn.type === "Chaser" && !fn.name.startsWith("TEST ·")).map((fn) => fn.id);
+const speedFunctionsXml = chaserIds.map((id) => `     <Function FadeIn="0" FadeOut="0" Duration="6">${id}</Function>`).join("\n");
+const speedDial = `   <Frame Caption="FX SPEED" ID="40">
+    ${appearance([32, 34, 39])}
+    <WindowState Visible="True" X="790" Y="8" Width="196" Height="142"/>
+    <AllowChildren>True</AllowChildren><AllowResize>True</AllowResize><ShowHeader>True</ShowHeader><ShowEnableButton>False</ShowEnableButton><Collapsed>False</Collapsed><Disabled>False</Disabled>
+    <SpeedDial Caption="FX Speed" ID="900">
+     ${appearance([52, 56, 65], argb(245, 245, 245))}
+     <WindowState Visible="True" X="8" Y="8" Width="180" Height="120"/>
+     <AbsoluteValue Minimum="100" Maximum="4000"><Input Universe="0" Channel="${crc16(oscPath("FX Speed"))}"/></AbsoluteValue>
+     <Tap><Input Universe="2" Channel="156"/></Tap><Time>500</Time>
+${speedFunctionsXml}
+    </SpeedDial>
+${[[901, 153, 1200], [902, 154, 600], [903, 155, 250]].map(([id, channel, time]) => `    <SpeedDial Caption="_Speed ${time}" ID="${id}">
+     ${appearance([32, 34, 39])}<WindowState Visible="True" X="1" Y="1" Width="1" Height="1"/>
+     <AbsoluteValue Minimum="${time}" Maximum="${time}"><Input Universe="2" Channel="${channel}"/></AbsoluteValue><Time>${time}</Time>
+${speedFunctionsXml}
+    </SpeedDial>`).join("\n")}
+   </Frame>`;
+
+const routingButtons = routingScenes.map((scene, index) => {
+  const x = 6 + (index % 8) * 118, y = 6 + Math.floor(index / 8) * 38;
+  return `    <Button Caption="${esc(scene.name)}" ID="${1000 + index}" Icon=""><WindowState Visible="True" X="${x}" Y="${y}" Width="112" Height="34"/>${appearance([70, 72, 78], argb(245, 245, 245))}<Function ID="${scene.id}"/><Action>Toggle</Action></Button>`;
 }).join("\n");
-const rows = Math.ceil(routingScenes.length / columns);
-const consoleHeight = 24 + rows * (buttonHeight + 6);
+const routingHeight = Math.ceil(routingScenes.length / 8) * 38 + 12;
+const routingFrame = `  <SoloFrame Caption="SETUP · ROUTING TESTS" ID="50">
+   ${appearance([35, 36, 41], argb(245, 245, 245))}<WindowState Visible="True" X="8" Y="430" Width="960" Height="${routingHeight}"/>
+   <AllowChildren>True</AllowChildren><AllowResize>True</AllowResize><ShowHeader>True</ShowHeader><ShowEnableButton>False</ShowEnableButton><Collapsed>True</Collapsed><Disabled>False</Disabled>
+${routingButtons}
+  </SoloFrame>`;
+
+const monitorXml = `  <Monitor DisplayMode="1" ShowLabels="1">
+   <Grid Width="7" Height="4" Depth="4" Units="0"/>
+${panels.map((panel, index) => `   <FxItem ID="${panel.id}" XPos="${600 + index * 500}" YPos="1900" ZPos="0"/>`).join("\n")}
+${heads.map((head, index) => `   <FxItem ID="${head.id}" XPos="${index === 0 ? 850 : 6350}" YPos="700" ZPos="0"/>`).join("\n")}
+  </Monitor>`;
 
 const qxw = `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE Workspace>
@@ -270,17 +467,22 @@ ${universesXml}
   </InputOutputMap>
 ${fixturesXml}
 ${functionsXml}
+${monitorXml}
  </Engine>
  <VirtualConsole>
-  <Frame Caption=""><Appearance><FrameStyle>None</FrameStyle><ForegroundColor>Default</ForegroundColor><BackgroundColor>Default</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
-   <SoloFrame Caption="ROUTING TESTS — one active button at a time" ID="10">
-    <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>Default</ForegroundColor><BackgroundColor>Default</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
-    <WindowState Visible="True" X="0" Y="0" Width="1165" Height="${consoleHeight}"/>
-    <AllowChildren>True</AllowChildren><AllowResize>True</AllowResize><ShowHeader>True</ShowHeader><ShowEnableButton>False</ShowEnableButton><Collapsed>False</Collapsed><Disabled>False</Disabled>
-${buttonsXml}
-   </SoloFrame>
+  <Frame Caption="">${appearance([25, 27, 32], argb(245, 245, 245))}
+   <Frame Caption="PAGES" ID="9">
+    ${appearance([25, 27, 32], argb(245, 245, 245))}
+    <WindowState Visible="True" X="0" Y="0" Width="782" Height="418"/>
+    <AllowChildren>True</AllowChildren><AllowResize>True</AllowResize><ShowHeader>False</ShowHeader><ShowEnableButton>False</ShowEnableButton><Collapsed>False</Collapsed><Disabled>False</Disabled>
+    <Multipage PagesNum="2" CurrentPage="0"/>
+    <Next><Input Universe="2" Channel="146"/><Key>PgDown</Key></Next><Previous><Key>PgUp</Key></Previous><PagesLoop>True</PagesLoop>
+${performanceFrames.join("\n")}
+   </Frame>
+${speedDial}
+${routingFrame}
   </Frame>
-  <Properties><Size Width="1180" Height="${consoleHeight + 20}"/><GrandMaster ChannelMode="Intensity" ValueMode="Reduce" SliderMode="Normal"/></Properties>
+  <Properties><Size Width="1000" Height="470"/><GrandMaster ChannelMode="Intensity" ValueMode="Reduce" SliderMode="Normal"/></Properties>
  </VirtualConsole>
 </Workspace>
 `;
@@ -337,7 +539,9 @@ const setupGuide = `# Cuepix + QLC+ routing setup
 This workspace maps QLC+ Universe ID 0 → Art-Net universe 0 and QLC+ Universe ID 1 → Art-Net universe 1. Some device screens label these 1 and 2. Match wire universe values, not display wording.
 `;
 
-writeFileSync(path.join(OUT, "cuepix-panel-show.qxw"), qxw, "utf8");
+const qxwPath = path.join(OUT, "cuepix-panel-show.qxw");
+writeFileSync(qxwPath, qxw, "utf8");
 writeFileSync(path.join(OUT, "CUEPIX-PATCH-CHART.md"), patchChart, "utf8");
 writeFileSync(path.join(OUT, "CUEPIX-SETUP.md"), setupGuide, "utf8");
-console.log(`Built ${path.basename(rigPath)}: ${fixtures.length} fixtures, ${routingScenes.length} routing tests, ${functions.length - routingScenes.length} performance functions, Art-Net ${outputUniverses.join(", ")}`);
+await generateWidgetsJson(qxwPath, path.join(OUT, "config", "cuepix-widgets.json"));
+console.log(`Built ${path.basename(rigPath)}: ${fixtures.length} fixtures, ${routingScenes.length} routing tests, ${functions.length - routingScenes.length} performance functions, ${placed.length} console pads, Art-Net ${outputUniverses.join(", ")}`);

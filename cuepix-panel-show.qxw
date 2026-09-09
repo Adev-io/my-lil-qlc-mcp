@@ -140,7 +140,7 @@
    <Model>Intimidator Spot 375ZX</Model>
    <Mode>15 Channel</Mode>
    <ID>12</ID>
-   <Name>375ZX 1</Name>
+   <Name>375ZX L</Name>
    <Universe>0</Universe>
    <Address>480</Address>
    <Channels>15</Channels>
@@ -150,7 +150,7 @@
    <Model>Intimidator Spot 375ZX</Model>
    <Mode>15 Channel</Mode>
    <ID>13</ID>
-   <Name>375ZX 2</Name>
+   <Name>375ZX R</Name>
    <Universe>0</Universe>
    <Address>495</Address>
    <Channels>15</Channels>
@@ -1175,7 +1175,7 @@
    <FixtureVal ID="12">0,128,1,0,2,128,3,0,4,0,5,0,6,0,7,0,8,0,9,128,10,0,11,0,12,0,13,0,14,128</FixtureVal>
    <FixtureVal ID="13">0,128,1,0,2,128,3,0,4,0,5,0,6,0,7,0,8,0,9,128,10,0,11,0,12,0,13,0,14,128</FixtureVal>
   </Function>
-  <Function ID="60" Type="Scene" Name="TEST · 375ZX 1 Open White">
+  <Function ID="60" Type="Scene" Name="TEST · 375ZX L Open White">
    <Speed FadeIn="0" FadeOut="0" Duration="0"/>
    <FixtureVal ID="0">0,0,1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0,10,0,11,0,12,0,13,0,14,0,15,0,16,0,17,0,18,0,19,0,20,0,21,0,22,0,23,0,24,0,25,0,26,0,27,0,28,0,29,0,30,0,31,0,32,0,33,0,34,0,35,0,36,0,37,0,38,0,39,0,40,0,41,0,42,0,43,0,44,0,45,0,46,0,47,0,48,0,49,0,50,0,51,0,52,0,53,0,54,0,55,0,56,0,57,0,58,0,59,0,60,0,61,0,62,0,63,0,64,0,65,0,66,0,67,0,68,0,69,0,70,0,71,0,72,0,73,0,74,0,75,0,76,0,77,0,78,101</FixtureVal>
    <FixtureVal ID="1">0,0,1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0,10,0,11,0,12,0,13,0,14,0,15,0,16,0,17,0,18,0,19,0,20,0,21,0,22,0,23,0,24,0,25,0,26,0,27,0,28,0,29,0,30,0,31,0,32,0,33,0,34,0,35,0,36,0,37,0,38,0,39,0,40,0,41,0,42,0,43,0,44,0,45,0,46,0,47,0,48,0,49,0,50,0,51,0,52,0,53,0,54,0,55,0,56,0,57,0,58,0,59,0,60,0,61,0,62,0,63,0,64,0,65,0,66,0,67,0,68,0,69,0,70,0,71,0,72,0,73,0,74,0,75,0,76,0,77,0,78,101</FixtureVal>
@@ -1192,7 +1192,7 @@
    <FixtureVal ID="12">0,128,1,0,2,128,3,0,4,0,5,0,6,0,7,0,8,0,9,128,10,255,11,255,12,0,13,0,14,128</FixtureVal>
    <FixtureVal ID="13">0,128,1,0,2,128,3,0,4,0,5,0,6,0,7,0,8,0,9,128,10,0,11,0,12,0,13,0,14,128</FixtureVal>
   </Function>
-  <Function ID="61" Type="Scene" Name="TEST · 375ZX 1 Pan Center">
+  <Function ID="61" Type="Scene" Name="TEST · 375ZX L Pan Center">
    <Speed FadeIn="0" FadeOut="0" Duration="0"/>
    <FixtureVal ID="0">0,0,1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0,10,0,11,0,12,0,13,0,14,0,15,0,16,0,17,0,18,0,19,0,20,0,21,0,22,0,23,0,24,0,25,0,26,0,27,0,28,0,29,0,30,0,31,0,32,0,33,0,34,0,35,0,36,0,37,0,38,0,39,0,40,0,41,0,42,0,43,0,44,0,45,0,46,0,47,0,48,0,49,0,50,0,51,0,52,0,53,0,54,0,55,0,56,0,57,0,58,0,59,0,60,0,61,0,62,0,63,0,64,0,65,0,66,0,67,0,68,0,69,0,70,0,71,0,72,0,73,0,74,0,75,0,76,0,77,0,78,101</FixtureVal>
    <FixtureVal ID="1">0,0,1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0,10,0,11,0,12,0,13,0,14,0,15,0,16,0,17,0,18,0,19,0,20,0,21,0,22,0,23,0,24,0,25,0,26,0,27,0,28,0,29,0,30,0,31,0,32,0,33,0,34,0,35,0,36,0,37,0,38,0,39,0,40,0,41,0,42,0,43,0,44,0,45,0,46,0,47,0,48,0,49,0,50,0,51,0,52,0,53,0,54,0,55,0,56,0,57,0,58,0,59,0,60,0,61,0,62,0,63,0,64,0,65,0,66,0,67,0,68,0,69,0,70,0,71,0,72,0,73,0,74,0,75,0,76,0,77,0,78,101</FixtureVal>
@@ -1209,7 +1209,7 @@
    <FixtureVal ID="12">0,128,1,0,2,64,3,0,4,0,5,0,6,0,7,0,8,0,9,128,10,255,11,255,12,0,13,0,14,128</FixtureVal>
    <FixtureVal ID="13">0,128,1,0,2,128,3,0,4,0,5,0,6,0,7,0,8,0,9,128,10,0,11,0,12,0,13,0,14,128</FixtureVal>
   </Function>
-  <Function ID="62" Type="Scene" Name="TEST · 375ZX 1 Tilt Center">
+  <Function ID="62" Type="Scene" Name="TEST · 375ZX L Tilt Center">
    <Speed FadeIn="0" FadeOut="0" Duration="0"/>
    <FixtureVal ID="0">0,0,1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0,10,0,11,0,12,0,13,0,14,0,15,0,16,0,17,0,18,0,19,0,20,0,21,0,22,0,23,0,24,0,25,0,26,0,27,0,28,0,29,0,30,0,31,0,32,0,33,0,34,0,35,0,36,0,37,0,38,0,39,0,40,0,41,0,42,0,43,0,44,0,45,0,46,0,47,0,48,0,49,0,50,0,51,0,52,0,53,0,54,0,55,0,56,0,57,0,58,0,59,0,60,0,61,0,62,0,63,0,64,0,65,0,66,0,67,0,68,0,69,0,70,0,71,0,72,0,73,0,74,0,75,0,76,0,77,0,78,101</FixtureVal>
    <FixtureVal ID="1">0,0,1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0,10,0,11,0,12,0,13,0,14,0,15,0,16,0,17,0,18,0,19,0,20,0,21,0,22,0,23,0,24,0,25,0,26,0,27,0,28,0,29,0,30,0,31,0,32,0,33,0,34,0,35,0,36,0,37,0,38,0,39,0,40,0,41,0,42,0,43,0,44,0,45,0,46,0,47,0,48,0,49,0,50,0,51,0,52,0,53,0,54,0,55,0,56,0,57,0,58,0,59,0,60,0,61,0,62,0,63,0,64,0,65,0,66,0,67,0,68,0,69,0,70,0,71,0,72,0,73,0,74,0,75,0,76,0,77,0,78,101</FixtureVal>
@@ -1226,7 +1226,7 @@
    <FixtureVal ID="12">0,64,1,0,2,128,3,0,4,0,5,0,6,0,7,0,8,0,9,128,10,255,11,255,12,0,13,0,14,128</FixtureVal>
    <FixtureVal ID="13">0,128,1,0,2,128,3,0,4,0,5,0,6,0,7,0,8,0,9,128,10,0,11,0,12,0,13,0,14,128</FixtureVal>
   </Function>
-  <Function ID="63" Type="Scene" Name="TEST · 375ZX 1 Blackout">
+  <Function ID="63" Type="Scene" Name="TEST · 375ZX L Blackout">
    <Speed FadeIn="0" FadeOut="0" Duration="0"/>
    <FixtureVal ID="0">0,0,1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0,10,0,11,0,12,0,13,0,14,0,15,0,16,0,17,0,18,0,19,0,20,0,21,0,22,0,23,0,24,0,25,0,26,0,27,0,28,0,29,0,30,0,31,0,32,0,33,0,34,0,35,0,36,0,37,0,38,0,39,0,40,0,41,0,42,0,43,0,44,0,45,0,46,0,47,0,48,0,49,0,50,0,51,0,52,0,53,0,54,0,55,0,56,0,57,0,58,0,59,0,60,0,61,0,62,0,63,0,64,0,65,0,66,0,67,0,68,0,69,0,70,0,71,0,72,0,73,0,74,0,75,0,76,0,77,0,78,101</FixtureVal>
    <FixtureVal ID="1">0,0,1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0,10,0,11,0,12,0,13,0,14,0,15,0,16,0,17,0,18,0,19,0,20,0,21,0,22,0,23,0,24,0,25,0,26,0,27,0,28,0,29,0,30,0,31,0,32,0,33,0,34,0,35,0,36,0,37,0,38,0,39,0,40,0,41,0,42,0,43,0,44,0,45,0,46,0,47,0,48,0,49,0,50,0,51,0,52,0,53,0,54,0,55,0,56,0,57,0,58,0,59,0,60,0,61,0,62,0,63,0,64,0,65,0,66,0,67,0,68,0,69,0,70,0,71,0,72,0,73,0,74,0,75,0,76,0,77,0,78,101</FixtureVal>
@@ -1243,7 +1243,7 @@
    <FixtureVal ID="12">0,128,1,0,2,128,3,0,4,0,5,0,6,0,7,0,8,0,9,128,10,0,11,0,12,0,13,0,14,128</FixtureVal>
    <FixtureVal ID="13">0,128,1,0,2,128,3,0,4,0,5,0,6,0,7,0,8,0,9,128,10,0,11,0,12,0,13,0,14,128</FixtureVal>
   </Function>
-  <Function ID="64" Type="Scene" Name="TEST · 375ZX 2 Open White">
+  <Function ID="64" Type="Scene" Name="TEST · 375ZX R Open White">
    <Speed FadeIn="0" FadeOut="0" Duration="0"/>
    <FixtureVal ID="0">0,0,1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0,10,0,11,0,12,0,13,0,14,0,15,0,16,0,17,0,18,0,19,0,20,0,21,0,22,0,23,0,24,0,25,0,26,0,27,0,28,0,29,0,30,0,31,0,32,0,33,0,34,0,35,0,36,0,37,0,38,0,39,0,40,0,41,0,42,0,43,0,44,0,45,0,46,0,47,0,48,0,49,0,50,0,51,0,52,0,53,0,54,0,55,0,56,0,57,0,58,0,59,0,60,0,61,0,62,0,63,0,64,0,65,0,66,0,67,0,68,0,69,0,70,0,71,0,72,0,73,0,74,0,75,0,76,0,77,0,78,101</FixtureVal>
    <FixtureVal ID="1">0,0,1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0,10,0,11,0,12,0,13,0,14,0,15,0,16,0,17,0,18,0,19,0,20,0,21,0,22,0,23,0,24,0,25,0,26,0,27,0,28,0,29,0,30,0,31,0,32,0,33,0,34,0,35,0,36,0,37,0,38,0,39,0,40,0,41,0,42,0,43,0,44,0,45,0,46,0,47,0,48,0,49,0,50,0,51,0,52,0,53,0,54,0,55,0,56,0,57,0,58,0,59,0,60,0,61,0,62,0,63,0,64,0,65,0,66,0,67,0,68,0,69,0,70,0,71,0,72,0,73,0,74,0,75,0,76,0,77,0,78,101</FixtureVal>
@@ -1260,7 +1260,7 @@
    <FixtureVal ID="12">0,128,1,0,2,128,3,0,4,0,5,0,6,0,7,0,8,0,9,128,10,0,11,0,12,0,13,0,14,128</FixtureVal>
    <FixtureVal ID="13">0,128,1,0,2,128,3,0,4,0,5,0,6,0,7,0,8,0,9,128,10,255,11,255,12,0,13,0,14,128</FixtureVal>
   </Function>
-  <Function ID="65" Type="Scene" Name="TEST · 375ZX 2 Pan Center">
+  <Function ID="65" Type="Scene" Name="TEST · 375ZX R Pan Center">
    <Speed FadeIn="0" FadeOut="0" Duration="0"/>
    <FixtureVal ID="0">0,0,1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0,10,0,11,0,12,0,13,0,14,0,15,0,16,0,17,0,18,0,19,0,20,0,21,0,22,0,23,0,24,0,25,0,26,0,27,0,28,0,29,0,30,0,31,0,32,0,33,0,34,0,35,0,36,0,37,0,38,0,39,0,40,0,41,0,42,0,43,0,44,0,45,0,46,0,47,0,48,0,49,0,50,0,51,0,52,0,53,0,54,0,55,0,56,0,57,0,58,0,59,0,60,0,61,0,62,0,63,0,64,0,65,0,66,0,67,0,68,0,69,0,70,0,71,0,72,0,73,0,74,0,75,0,76,0,77,0,78,101</FixtureVal>
    <FixtureVal ID="1">0,0,1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0,10,0,11,0,12,0,13,0,14,0,15,0,16,0,17,0,18,0,19,0,20,0,21,0,22,0,23,0,24,0,25,0,26,0,27,0,28,0,29,0,30,0,31,0,32,0,33,0,34,0,35,0,36,0,37,0,38,0,39,0,40,0,41,0,42,0,43,0,44,0,45,0,46,0,47,0,48,0,49,0,50,0,51,0,52,0,53,0,54,0,55,0,56,0,57,0,58,0,59,0,60,0,61,0,62,0,63,0,64,0,65,0,66,0,67,0,68,0,69,0,70,0,71,0,72,0,73,0,74,0,75,0,76,0,77,0,78,101</FixtureVal>
@@ -1277,7 +1277,7 @@
    <FixtureVal ID="12">0,128,1,0,2,128,3,0,4,0,5,0,6,0,7,0,8,0,9,128,10,0,11,0,12,0,13,0,14,128</FixtureVal>
    <FixtureVal ID="13">0,128,1,0,2,64,3,0,4,0,5,0,6,0,7,0,8,0,9,128,10,255,11,255,12,0,13,0,14,128</FixtureVal>
   </Function>
-  <Function ID="66" Type="Scene" Name="TEST · 375ZX 2 Tilt Center">
+  <Function ID="66" Type="Scene" Name="TEST · 375ZX R Tilt Center">
    <Speed FadeIn="0" FadeOut="0" Duration="0"/>
    <FixtureVal ID="0">0,0,1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0,10,0,11,0,12,0,13,0,14,0,15,0,16,0,17,0,18,0,19,0,20,0,21,0,22,0,23,0,24,0,25,0,26,0,27,0,28,0,29,0,30,0,31,0,32,0,33,0,34,0,35,0,36,0,37,0,38,0,39,0,40,0,41,0,42,0,43,0,44,0,45,0,46,0,47,0,48,0,49,0,50,0,51,0,52,0,53,0,54,0,55,0,56,0,57,0,58,0,59,0,60,0,61,0,62,0,63,0,64,0,65,0,66,0,67,0,68,0,69,0,70,0,71,0,72,0,73,0,74,0,75,0,76,0,77,0,78,101</FixtureVal>
    <FixtureVal ID="1">0,0,1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0,10,0,11,0,12,0,13,0,14,0,15,0,16,0,17,0,18,0,19,0,20,0,21,0,22,0,23,0,24,0,25,0,26,0,27,0,28,0,29,0,30,0,31,0,32,0,33,0,34,0,35,0,36,0,37,0,38,0,39,0,40,0,41,0,42,0,43,0,44,0,45,0,46,0,47,0,48,0,49,0,50,0,51,0,52,0,53,0,54,0,55,0,56,0,57,0,58,0,59,0,60,0,61,0,62,0,63,0,64,0,65,0,66,0,67,0,68,0,69,0,70,0,71,0,72,0,73,0,74,0,75,0,76,0,77,0,78,101</FixtureVal>
@@ -1294,7 +1294,7 @@
    <FixtureVal ID="12">0,128,1,0,2,128,3,0,4,0,5,0,6,0,7,0,8,0,9,128,10,0,11,0,12,0,13,0,14,128</FixtureVal>
    <FixtureVal ID="13">0,64,1,0,2,128,3,0,4,0,5,0,6,0,7,0,8,0,9,128,10,255,11,255,12,0,13,0,14,128</FixtureVal>
   </Function>
-  <Function ID="67" Type="Scene" Name="TEST · 375ZX 2 Blackout">
+  <Function ID="67" Type="Scene" Name="TEST · 375ZX R Blackout">
    <Speed FadeIn="0" FadeOut="0" Duration="0"/>
    <FixtureVal ID="0">0,0,1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0,10,0,11,0,12,0,13,0,14,0,15,0,16,0,17,0,18,0,19,0,20,0,21,0,22,0,23,0,24,0,25,0,26,0,27,0,28,0,29,0,30,0,31,0,32,0,33,0,34,0,35,0,36,0,37,0,38,0,39,0,40,0,41,0,42,0,43,0,44,0,45,0,46,0,47,0,48,0,49,0,50,0,51,0,52,0,53,0,54,0,55,0,56,0,57,0,58,0,59,0,60,0,61,0,62,0,63,0,64,0,65,0,66,0,67,0,68,0,69,0,70,0,71,0,72,0,73,0,74,0,75,0,76,0,77,0,78,101</FixtureVal>
    <FixtureVal ID="1">0,0,1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0,10,0,11,0,12,0,13,0,14,0,15,0,16,0,17,0,18,0,19,0,20,0,21,0,22,0,23,0,24,0,25,0,26,0,27,0,28,0,29,0,30,0,31,0,32,0,33,0,34,0,35,0,36,0,37,0,38,0,39,0,40,0,41,0,42,0,43,0,44,0,45,0,46,0,47,0,48,0,49,0,50,0,51,0,52,0,53,0,54,0,55,0,56,0,57,0,58,0,59,0,60,0,61,0,62,0,63,0,64,0,65,0,66,0,67,0,68,0,69,0,70,0,71,0,72,0,73,0,74,0,75,0,76,0,77,0,78,101</FixtureVal>
@@ -1806,56 +1806,56 @@
     </Appearance>
     <Function ID="59"/><Action>Toggle</Action>
    </Button>
-   <Button Caption="375ZX 1 Open White" ID="160" Icon="">
+   <Button Caption="375ZX L Open White" ID="160" Icon="">
     <WindowState Visible="True" X="584" Y="386" Width="138" Height="48"/>
     <Appearance>
      <FrameStyle>None</FrameStyle><ForegroundColor>Default</ForegroundColor><BackgroundColor>Default</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font>
     </Appearance>
     <Function ID="60"/><Action>Toggle</Action>
    </Button>
-   <Button Caption="375ZX 1 Pan Center" ID="161" Icon="">
+   <Button Caption="375ZX L Pan Center" ID="161" Icon="">
     <WindowState Visible="True" X="728" Y="386" Width="138" Height="48"/>
     <Appearance>
      <FrameStyle>None</FrameStyle><ForegroundColor>Default</ForegroundColor><BackgroundColor>Default</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font>
     </Appearance>
     <Function ID="61"/><Action>Toggle</Action>
    </Button>
-   <Button Caption="375ZX 1 Tilt Center" ID="162" Icon="">
+   <Button Caption="375ZX L Tilt Center" ID="162" Icon="">
     <WindowState Visible="True" X="872" Y="386" Width="138" Height="48"/>
     <Appearance>
      <FrameStyle>None</FrameStyle><ForegroundColor>Default</ForegroundColor><BackgroundColor>Default</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font>
     </Appearance>
     <Function ID="62"/><Action>Toggle</Action>
    </Button>
-   <Button Caption="375ZX 1 Blackout" ID="163" Icon="">
+   <Button Caption="375ZX L Blackout" ID="163" Icon="">
     <WindowState Visible="True" X="1016" Y="386" Width="138" Height="48"/>
     <Appearance>
      <FrameStyle>None</FrameStyle><ForegroundColor>Default</ForegroundColor><BackgroundColor>Default</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font>
     </Appearance>
     <Function ID="63"/><Action>Toggle</Action>
    </Button>
-   <Button Caption="375ZX 2 Open White" ID="164" Icon="">
+   <Button Caption="375ZX R Open White" ID="164" Icon="">
     <WindowState Visible="True" X="8" Y="440" Width="138" Height="48"/>
     <Appearance>
      <FrameStyle>None</FrameStyle><ForegroundColor>Default</ForegroundColor><BackgroundColor>Default</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font>
     </Appearance>
     <Function ID="64"/><Action>Toggle</Action>
    </Button>
-   <Button Caption="375ZX 2 Pan Center" ID="165" Icon="">
+   <Button Caption="375ZX R Pan Center" ID="165" Icon="">
     <WindowState Visible="True" X="152" Y="440" Width="138" Height="48"/>
     <Appearance>
      <FrameStyle>None</FrameStyle><ForegroundColor>Default</ForegroundColor><BackgroundColor>Default</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font>
     </Appearance>
     <Function ID="65"/><Action>Toggle</Action>
    </Button>
-   <Button Caption="375ZX 2 Tilt Center" ID="166" Icon="">
+   <Button Caption="375ZX R Tilt Center" ID="166" Icon="">
     <WindowState Visible="True" X="296" Y="440" Width="138" Height="48"/>
     <Appearance>
      <FrameStyle>None</FrameStyle><ForegroundColor>Default</ForegroundColor><BackgroundColor>Default</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font>
     </Appearance>
     <Function ID="66"/><Action>Toggle</Action>
    </Button>
-   <Button Caption="375ZX 2 Blackout" ID="167" Icon="">
+   <Button Caption="375ZX R Blackout" ID="167" Icon="">
     <WindowState Visible="True" X="440" Y="440" Width="138" Height="48"/>
     <Appearance>
      <FrameStyle>None</FrameStyle><ForegroundColor>Default</ForegroundColor><BackgroundColor>Default</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font>

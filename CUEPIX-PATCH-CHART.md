@@ -16,7 +16,7 @@ QLC+ stores addresses zero-based internally. Table shows fixture-display DMX add
 | Cuepix 10 | CUEPIX Panel | 1 | 238 | 316 | 79 |
 | Cuepix 11 | CUEPIX Panel | 1 | 317 | 395 | 79 |
 | Cuepix 12 | CUEPIX Panel | 1 | 396 | 474 | 79 |
-| 375ZX 1 | Intimidator Spot 375ZX | 0 | 481 | 495 | 15 |
-| 375ZX 2 | Intimidator Spot 375ZX | 0 | 496 | 510 | 15 |
+| 375ZX L | Intimidator Spot 375ZX | 0 | 481 | 495 | 15 |
+| 375ZX R | Intimidator Spot 375ZX | 0 | 496 | 510 | 15 |
 
 CR011R DMX output handles Universe 0 only. Universe 1 goes directly by Art-Net to Cuepix 7–12.

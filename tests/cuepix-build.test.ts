@@ -32,6 +32,8 @@ describe("Cuepix routing workspace", () => {
     expect(qxw).toContain('outputUni="0"');
     expect(qxw).toContain('outputUni="1"');
     expect(qxw).toContain('<Name>Cuepix 12</Name>');
+    expect(qxw).toContain('<Name>375ZX L</Name>');
+    expect(qxw).toContain('<Name>375ZX R</Name>');
     expect(qxw).toContain('<Address>495</Address>');
     expect(qxw).toContain('Name="TEST · Cuepix 1 Red"');
     const sceneNames = [...qxw.matchAll(/<Function[^>]*Type="Scene"[^>]*Name="([^"]+)"/g)].map((match) => match[1]);

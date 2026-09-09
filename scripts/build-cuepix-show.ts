@@ -33,9 +33,10 @@ const kindCounts = new Map<Kind, number>();
 for (const group of rig.fixtures) {
   const start = kindCounts.get(group.kind) ?? 0;
   for (let i = 0; i < group.count; i++) {
+    const suffix = group.kind === "head" && group.count === 2 ? (i === 0 ? "L" : "R") : String(start + i + 1);
     fixtures.push({
       id: fixtures.length,
-      name: `${group.namePrefix ?? group.kind} ${start + i + 1}`,
+      name: `${group.namePrefix ?? group.kind} ${suffix}`,
       manufacturer: group.manufacturer,
       model: group.model,
       mode: group.mode,

@@ -121,10 +121,13 @@ Both QLC+ Virtual Console pages mirror the Launchpad 8x8 grid. Every on-screen c
 Virtual Console contains:
 
 - one two-page multipage frame matching the Launchpad;
-- persistent Cuepix intensity, mover intensity, FX speed, strobe rate, and tap-tempo controls;
+- persistent FX SpeedDial and tap-tempo controls;
+- the QLC+ Grand Master for emergency overall level;
 - a small four-truss diagram showing fixture order and outside mover placement;
 - active-state feedback through QLC+ buttons;
 - a collapsed `SETUP / CALIBRATION` frame with individual fixture routing tests.
+
+Cuepix intensity remains on the 25/50/75/full pad row. Strobe rate remains on slow/medium/fast function pads. Mover intensity remains on Page 2 after calibration. DMX Level sliders are intentionally omitted because QLC+ Level widgets own their channels and would override lower-valued pad scenes.
 
 The routing frame is not mapped to Launchpad and is not exported as normal performance controls in `config/cuepix-widgets.json`.
 

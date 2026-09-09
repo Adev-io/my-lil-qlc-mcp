@@ -1,6 +1,6 @@
 ﻿# ============================================================
 #  QLC+ 3D Monitor — standalone local web viewer.
-#  Listens to QLC+ Art-Net Universe 0 (software only, no rig,
+#  Listens to selected QLC+ Art-Net universes (software only, no rig,
 #  no Blender) and renders the rig live in the browser.
 #  Touches none of the live MCP code path.
 # ============================================================
@@ -10,14 +10,17 @@ Set-Location $here
 
 $port = if ($env:MONITOR_PORT) { $env:MONITOR_PORT } else { '7800' }
 $url = "http://127.0.0.1:$port"
+$universes = if ($env:MONITOR_UNIVERSES) { $env:MONITOR_UNIVERSES } else { '0' }
+$fixtures = if ($env:MONITOR_FIXTURES_FILE) { $env:MONITOR_FIXTURES_FILE } else { 'fixtures.json' }
 
 Write-Host ''
 Write-Host '  QLC+ 3D Monitor' -ForegroundColor Cyan
 Write-Host "  dir : $here"
 Write-Host "  url : $url"
-Write-Host '  data: QLC+  --Art-Net U0-->  monitor/server.ts  --SSE-->  Three.js'
+Write-Host "  data: QLC+  --Art-Net U$universes-->  monitor/server.ts  --SSE-->  Three.js"
+Write-Host "  map : monitor\$fixtures"
 Write-Host ''
-Write-Host '  Make sure QLC+ is running with Art-Net output on Universe 0.'
+Write-Host "  Make sure QLC+ is running with Art-Net output on Universe $universes."
 Write-Host '  (No physical rig needed — QLC+ emits Art-Net in software.)'
 Write-Host ''
 

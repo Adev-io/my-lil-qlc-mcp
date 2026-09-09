@@ -175,6 +175,19 @@ function buildFixtures(data) {
       group.add(body, beam);
       fx.cells = cells;
       fx.beam = beam;
+    } else if (def.kind === "panel") {
+      const body = new THREE.Mesh(new THREE.BoxGeometry(2.1, 2.1, 0.16), bodyMat());
+      const cells = [];
+      for (let i = 0; i < 25; i++) {
+        const cell = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.32, 0.1), litMat());
+        cell.position.set(((i % 5) - 2) * 0.39, (2 - Math.floor(i / 5)) * 0.39, 0.13);
+        cell.userData = { group, fx };
+        group.add(cell);
+        cells.push(cell);
+        pickTargets.push(cell);
+      }
+      group.add(body);
+      fx.cells = cells;
     } else {
       // head
       const body = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.7, 1.1, 18), bodyMat());
@@ -205,8 +218,10 @@ function setBeam(mesh, rgb, opacity) {
 }
 
 // ---- per-frame DMX -> visuals ----------------------------------------------
-function applyFrame(dmx) {
+const ZERO_FRAME = new Uint8Array(512);
+function applyFrame(frames) {
   for (const fx of fixtureObjs) {
+    const dmx = frames[fx.def.universe] || ZERO_FRAME;
     const a = fx.def.address;
     const r = fx.roles;
     if (fx.kind === "par") {
@@ -226,6 +241,12 @@ function applyFrame(dmx) {
         sr += col[0]; sg += col[1]; sb += col[2];
       });
       setBeam(fx.beam, [sr / 3, sg / 3, sb / 3], dim * 0.55);
+    } else if (fx.kind === "panel") {
+      const dim = dmx[a + r.dim] / 255;
+      fx.cells.forEach((cell, i) => {
+        const [rc, gc, bc] = r.pixels[i];
+        setLit(cell, [dmx[a + rc], dmx[a + gc], dmx[a + bc]], dim);
+      });
     } else {
       const dim = dmx[a + r.dim] / 255;
       const open = dmx[a + r.shutter] >= (data?.meta?.shutterOpenMin ?? 216);
@@ -240,7 +261,7 @@ function applyFrame(dmx) {
 }
 
 // ---- DMX stream (SSE) ------------------------------------------------------
-let latest = new Uint8Array(512);
+let latest = {};
 let haveFrame = false;
 let lastChangeAt = 0;
 let es = null;
@@ -248,10 +269,21 @@ let es = null;
 function connect() {
   es = new EventSource("/stream");
   es.onmessage = (e) => {
-    const bin = atob(e.data);
-    for (let i = 0; i < 512; i++) latest[i] = i < bin.length ? bin.charCodeAt(i) : 0;
-    haveFrame = true;
-    lastChangeAt = performance.now();
+    try {
+      const payload = JSON.parse(e.data);
+      const next = {};
+      for (const [universe, encoded] of Object.entries(payload)) {
+        const bin = atob(encoded);
+        const frame = new Uint8Array(512);
+        for (let i = 0; i < Math.min(512, bin.length); i++) frame[i] = bin.charCodeAt(i);
+        next[universe] = frame;
+      }
+      latest = next;
+      haveFrame = true;
+      lastChangeAt = performance.now();
+    } catch (err) {
+      console.error("bad DMX frame", err);
+    }
   };
   // EventSource auto-reconnects on error; nothing to do but reflect state in the HUD.
 }
@@ -355,7 +387,9 @@ fetch("/fixtures.json")
     if (d.meta?.head) headCfg = { ...headCfg, ...d.meta.head };
     buildStage(d.meta.stage);
     buildFixtures(d);
-    el("fxCount").textContent = `${d.fixtures.length} (U${d.meta.universe})`;
+    const universes = d.meta.universes || [d.meta.universe || 0];
+    el("fxCount").textContent = `${d.fixtures.length} (U${universes.join(", U")})`;
+    el("universeLabel").textContent = `Art-Net U${universes.join(", U")}`;
     connect();
     loop();
   })

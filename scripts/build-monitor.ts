@@ -30,8 +30,9 @@ type Vec3 = [number, number, number];
 interface MonitorFixture {
   id: number;
   name: string;
-  kind: "par" | "bar" | "head";
-  address: number; // 0-indexed start channel in Universe 0
+  kind: "par" | "bar" | "head" | "panel";
+  universe: number;
+  address: number; // 0-indexed start channel in the fixture's universe
   channels: number;
   roles: Record<string, number | number[][]>;
   pos: Vec3; // default position (builder coords, ft) — overridable via monitor/layout.json
@@ -43,6 +44,7 @@ const ROLE_KEYS: Record<string, string[]> = {
   par: ["dim", "strobe", "r", "g", "b", "w", "a", "uv"],
   bar: ["cells", "dim"],
   head: ["pan", "tilt", "color", "gobo", "dim", "shutter", "zoom"],
+  panel: ["pixels", "dim", "strobe", "macro", "curve"],
 };
 function pickRoles(kind: string, roles: Record<string, number | number[][]> | undefined) {
   const out: Record<string, number | number[][]> = {};
@@ -55,6 +57,8 @@ function pickRoles(kind: string, roles: Record<string, number | number[][]> | un
 
 const fixtures: MonitorFixture[] = [];
 let fxId = 0;
+let panelNumber = 0;
+let panelRow = 0;
 
 for (const g of rig.fixtures) {
   if (g.kind === "par") {
@@ -69,6 +73,7 @@ for (const g of rig.fixtures) {
         id: fxId++,
         name: `Par ${i + 1}`,
         kind: "par",
+        universe: g.universe,
         address: g.addresses[i],
         channels: g.channels,
         roles: pickRoles("par", g.roles),
@@ -92,6 +97,7 @@ for (const g of rig.fixtures) {
         id: fxId++,
         name: `Bar ${i + 1}`,
         kind: "bar",
+        universe: g.universe,
         address: g.addresses[i],
         channels: g.channels,
         roles: pickRoles("bar", g.roles),
@@ -99,6 +105,25 @@ for (const g of rig.fixtures) {
         point: [round(s.point[0]), 0, round(s.point[2])],
       });
     }
+  } else if (g.kind === "panel") {
+    const prefix = g.namePrefix ?? "Panel";
+    const panelXs = Array.from({ length: g.count }, (_, i) =>
+      g.count === 1 ? 0 : -(W / 2 - 2) + (i * (W - 4)) / (g.count - 1),
+    );
+    for (let i = 0; i < g.count; i++) {
+      fixtures.push({
+        id: fxId++,
+        name: `${prefix} ${++panelNumber}`,
+        kind: "panel",
+        universe: g.universe,
+        address: g.addresses[i],
+        channels: g.channels,
+        roles: pickRoles("panel", g.roles),
+        pos: [round(panelXs[i]), D, DECK + 2.5 + panelRow * 2.2],
+        point: [0, -1, 0],
+      });
+    }
+    panelRow++;
   } else if (g.kind === "head") {
     // Heads: front trusses, spread across headSeparationFt (the classic pair lands at ±HAP/2).
     // A group whose namePrefix says "Floor" mounts on the DECK instead of the truss — the party
@@ -114,6 +139,7 @@ for (const g of rig.fixtures) {
         id: fxId++,
         name: `${prefix} ${g.count === 2 ? (i === 0 ? "L" : "R") : i + 1}`,
         kind: "head",
+        universe: g.universe,
         address: g.addresses[i],
         channels: g.channels,
         roles: pickRoles("head", g.roles),
@@ -129,6 +155,7 @@ const beam = headGroup?.beam;
 const out = {
   meta: {
     universe: rig.dmxOutput?.universe ?? 0,
+    universes: [...new Set(fixtures.map((fixture) => fixture.universe))].sort((a, b) => a - b),
     units: "ft",
     coords: "origin=front-centre floor; +X audience-right, +Y upstage, +Z up",
     stage: { width: W, depth: D, deck: DECK },
@@ -156,6 +183,7 @@ function round(n: number): number {
 // Tests (and CI) can redirect output away from the repo root.
 const OUT = process.env.QLC_BUILD_OUT ? path.resolve(process.env.QLC_BUILD_OUT) : ROOT;
 const dir = path.join(OUT, "monitor");
+const fixtureFile = path.basename(process.env.MONITOR_FIXTURES_FILE || "fixtures.json");
 await mkdir(dir, { recursive: true });
-await writeFile(path.join(dir, "fixtures.json"), JSON.stringify(out, null, 2) + "\n", "utf8");
-console.log(`Wrote monitor/fixtures.json — ${fixtures.length} fixtures (rig: ${path.basename(rigPath)}).`);
+await writeFile(path.join(dir, fixtureFile), JSON.stringify(out, null, 2) + "\n", "utf8");
+console.log(`Wrote monitor/${fixtureFile} — ${fixtures.length} fixtures (rig: ${path.basename(rigPath)}).`);

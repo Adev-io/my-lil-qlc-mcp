@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { parseArtDmx } from "../monitor/artnet";
+import { FrameStore, parseUniverseList } from "../monitor/frameState";
 import { beamDirBuilder } from "../monitor/public/aim.js";
 
 // Build a minimal, well-formed ArtDMX datagram for a given universe + data slots.
@@ -47,6 +48,28 @@ describe("parseArtDmx", () => {
   it("rejects truncated packets", () => {
     expect(parseArtDmx(artdmx(0, [1, 2, 3]).subarray(0, 17))).toBeNull(); // shorter than header
     expect(parseArtDmx(artdmx(0, [1, 2, 3, 4]).subarray(0, 20))).toBeNull(); // length claims more data
+  });
+});
+
+describe("multi-universe monitor frame state", () => {
+  it("normalizes a universe list and removes duplicates", () => {
+    expect(parseUniverseList("0, 1,1")).toEqual([0, 1]);
+    expect(() => parseUniverseList("0,nope")).toThrow(/universe/i);
+  });
+
+  it("keeps independent 512-channel frames for both universes", () => {
+    const store = new FrameStore([0, 1]);
+    store.update(0, Uint8Array.from([10, 20]));
+    store.update(1, Uint8Array.from([30, 40, 50]));
+    expect(Array.from(store.frame(0).slice(0, 3))).toEqual([10, 20, 0]);
+    expect(Array.from(store.frame(1).slice(0, 4))).toEqual([30, 40, 50, 0]);
+    expect(Object.keys(JSON.parse(store.payload()))).toEqual(["0", "1"]);
+  });
+
+  it("ignores frames outside configured universes", () => {
+    const store = new FrameStore([0, 1]);
+    expect(store.update(2, Uint8Array.from([255]))).toBe(false);
+    expect(store.lastFrameAt(2)).toBe(0);
   });
 });
 

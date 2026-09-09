@@ -1,4 +1,4 @@
-// Local 3D-monitor server: Art-Net U0 in, browser out. Standalone — touches none of
+// Local 3D-monitor server: selected Art-Net universes in, browser out. Standalone — touches none of
 // the live MCP code. Start with:  npx tsx monitor/server.ts   (or start-monitor.ps1)
 //
 //   QLC+ --Art-Net U0--> [createArtNetListener] --latest frame--> [SSE /stream] --> browser
@@ -15,43 +15,41 @@ import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createArtNetListener } from "./artnet.js";
+import { FrameStore, parseUniverseList } from "./frameState.js";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const PUBLIC = path.join(HERE, "public");
-const FIXTURES_FILE = path.join(HERE, "fixtures.json");
+const FIXTURES_FILE = path.join(HERE, path.basename(process.env.MONITOR_FIXTURES_FILE || "fixtures.json"));
 const LAYOUT_FILE = path.join(HERE, "layout.json");
 
 const PORT = Number(process.env.MONITOR_PORT) || 7800;
 const HOST = process.env.MONITOR_HOST || "127.0.0.1";
-const UNIVERSE = Number(process.env.MONITOR_UNIVERSE) || 0;
+const UNIVERSES = parseUniverseList(process.env.MONITOR_UNIVERSES ?? process.env.MONITOR_UNIVERSE);
 const ARTNET_BIND = process.env.ARTNET_BIND || "0.0.0.0";
 const FRAME_MS = 33; // ~30 fps broadcast cap
 
 // --- DMX frame state --------------------------------------------------------
-const frame = new Uint8Array(512);
+const frames = new FrameStore(UNIVERSES);
 let frameDirty = false;
 let lastSent: string | null = null;
-let lastFrameAt = 0;
 
 createArtNetListener({
-  universe: UNIVERSE,
+  universes: UNIVERSES,
   bind: ARTNET_BIND,
-  onFrame: (data) => {
-    frame.fill(0, data.length); // clear any tail beyond this packet's length
-    frame.set(data.subarray(0, 512));
+  onFrame: (data, universe) => {
+    frames.update(universe, data);
     frameDirty = true;
-    lastFrameAt = Date.now();
   },
   onError: (err) => console.error(`[artnet] ${err.message}`),
   onListening: (addr, port) =>
-    console.log(`[artnet] listening universe ${UNIVERSE} on ${addr}:${port}`),
+    console.log(`[artnet] listening universes ${UNIVERSES.join(", ")} on ${addr}:${port}`),
 });
 
 // --- SSE clients ------------------------------------------------------------
 const clients = new Set<http.ServerResponse>();
 
 function framePayload(): string {
-  return Buffer.from(frame).toString("base64");
+  return frames.payload();
 }
 
 setInterval(() => {
@@ -155,10 +153,14 @@ const server = http.createServer(async (req, res) => {
     res.writeHead(200, { "content-type": MIME[".json"] });
     res.end(
       JSON.stringify({
-        universe: UNIVERSE,
+        universe: UNIVERSES[0],
+        universes: UNIVERSES,
         clients: clients.size,
-        lastFrameAt,
-        ageMs: lastFrameAt ? Date.now() - lastFrameAt : null,
+        lastFrameAt: Object.fromEntries(UNIVERSES.map((universe) => [universe, frames.lastFrameAt(universe)])),
+        ageMs: Object.fromEntries(UNIVERSES.map((universe) => {
+          const at = frames.lastFrameAt(universe);
+          return [universe, at ? Date.now() - at : null];
+        })),
       })
     );
     return;
@@ -192,5 +194,5 @@ const server = http.createServer(async (req, res) => {
 
 server.listen(PORT, HOST, () => {
   console.log(`[monitor] 3D monitor on http://${HOST}:${PORT}`);
-  console.log(`[monitor] open that URL while QLC+ is running (Art-Net U0).`);
+  console.log(`[monitor] open that URL while QLC+ is running (Art-Net U${UNIVERSES.join(", U")}).`);
 });

@@ -47,6 +47,7 @@ export interface ArtNetListener {
 
 export interface ListenerOptions {
   universe?: number; // default 0
+  universes?: number[]; // listen to several Art-Net universes on one UDP socket
   port?: number; // default 6454
   bind?: string; // default 0.0.0.0
   onFrame: (data: Uint8Array, universe: number) => void;
@@ -56,12 +57,12 @@ export interface ListenerOptions {
 
 /** Bind a UDP socket and deliver matching-universe DMX frames to `onFrame`. */
 export function createArtNetListener(opts: ListenerOptions): ArtNetListener {
-  const universe = opts.universe ?? 0;
+  const universes = new Set(opts.universes ?? [opts.universe ?? 0]);
   const sock = dgram.createSocket({ type: "udp4", reuseAddr: true });
 
   sock.on("message", (msg) => {
     const pkt = parseArtDmx(msg);
-    if (pkt && pkt.universe === universe) opts.onFrame(pkt.data, pkt.universe);
+    if (pkt && universes.has(pkt.universe)) opts.onFrame(pkt.data, pkt.universe);
   });
   sock.on("error", (err) => opts.onError?.(err));
   sock.on("listening", () => {

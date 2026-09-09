@@ -12,11 +12,10 @@
 ## Install and open
 
 1. Close QLC+.
-2. Copy both files from `fixtures/` into `%USERPROFILE%\QLC+\Fixtures`.
-3. Start QLC+ once, then close it so fixture cache refreshes.
-4. Open `cuepix-panel-show.qxw`.
-5. In Inputs/Outputs, confirm ArtNet output enabled for QLC+ Universe 1 and 2. Plugin parameters must map to Art-Net 0 and 1.
-6. Open Virtual Console. Use only ROUTING TESTS until every fixture passes.
+2. Run `.\start-cuepix.ps1`. It installs and verifies both fixture definitions, starts the two-universe 3D monitor, then opens `cuepix-panel-show.qxw` in Operate mode.
+3. First hardware load-in only: connect the dedicated Ethernet adapter, find its name with `Get-NetAdapter`, then run elevated: `.\start-cuepix.ps1 -AdapterName 'Ethernet 2'`. Script sets `10.201.6.1/24` with no gateway.
+4. In Inputs/Outputs, confirm ArtNet output enabled for QLC+ Universe 1 and 2. Plugin parameters must map to Art-Net 0 and 1.
+5. Open Virtual Console. Use only ROUTING TESTS until every fixture passes.
 
 ## Cable order
 

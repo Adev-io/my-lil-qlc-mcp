@@ -59,6 +59,15 @@ const fixtures: MonitorFixture[] = [];
 let fxId = 0;
 let panelNumber = 0;
 let panelRow = 0;
+const cuepixPositions = new Map<number, Vec3>();
+if (rig.cuepix) {
+  const centers = Array.from({ length: 4 }, (_, index) => -HAP / 2 + (index * HAP) / 3);
+  for (let truss = 0; truss < rig.cuepix.trusses.length; truss++) {
+    rig.cuepix.trusses[truss].forEach((panel, slot) => {
+      cuepixPositions.set(panel, [round(centers[truss] + (slot - 1) * 1.2), D, HZ]);
+    });
+  }
+}
 
 for (const g of rig.fixtures) {
   if (g.kind === "par") {
@@ -111,15 +120,16 @@ for (const g of rig.fixtures) {
       g.count === 1 ? 0 : -(W / 2 - 2) + (i * (W - 4)) / (g.count - 1),
     );
     for (let i = 0; i < g.count; i++) {
+      const number = ++panelNumber;
       fixtures.push({
         id: fxId++,
-        name: `${prefix} ${++panelNumber}`,
+        name: `${prefix} ${number}`,
         kind: "panel",
         universe: g.universe,
         address: g.addresses[i],
         channels: g.channels,
         roles: pickRoles("panel", g.roles),
-        pos: [round(panelXs[i]), D, DECK + 2.5 + panelRow * 2.2],
+        pos: cuepixPositions.get(number) ?? [round(panelXs[i]), D, DECK + 2.5 + panelRow * 2.2],
         point: [0, -1, 0],
       });
     }
@@ -143,7 +153,7 @@ for (const g of rig.fixtures) {
         address: g.addresses[i],
         channels: g.channels,
         roles: pickRoles("head", g.roles),
-        pos: [round(headXs[i]), 0, isFloor ? 0.5 : HZ],
+        pos: [round(headXs[i]), rig.cuepix ? D : 0, isFloor ? 0.5 : HZ],
       });
     }
   }

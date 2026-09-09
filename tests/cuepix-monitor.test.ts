@@ -26,6 +26,13 @@ describe("Cuepix 3D monitor fixture map", () => {
       Array.from({ length: 12 }, (_, index) => `Cuepix ${index + 1}`),
     );
     expect(panels.every((fixture: any) => fixture.roles.pixels.length === 25)).toBe(true);
+    const centers = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [9, 10, 11]].map((ids) =>
+      ids.reduce((sum, id) => sum + panels[id].pos[0], 0) / ids.length,
+    );
+    expect(centers).toEqual([-6, -2, 2, 6]);
+    expect(panels.every((fixture: any) => fixture.pos[1] === 10 && fixture.pos[2] === 8)).toBe(true);
+    const heads = map.fixtures.filter((fixture: any) => fixture.kind === "head");
+    expect(heads.map((fixture: any) => fixture.pos)).toEqual([[-6, 10, 8], [6, 10, 8]]);
   });
 
   it("ships a renderer and launcher that select fixture universes", () => {

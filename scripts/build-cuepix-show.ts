@@ -2,7 +2,7 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { generateWidgetsJson } from "../src/qlc/qxwParser.js";
+import { parseQxwFile } from "../src/qlc/qxwParser.js";
 import { loadRig } from "./rig.js";
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -500,48 +500,77 @@ ${patchRows}
 
 CR011R DMX output handles Universe 0 only. Universe 1 goes directly by Art-Net to Cuepix 7–12.
 `;
-const setupGuide = `# Cuepix + QLC+ routing setup
+const setupGuide = `# Cuepix + QLC+ show setup
 
-## Network
+## Rig and physical order
 
-- Lighting LAN only. Disable Wi-Fi sharing/bridging on lighting NIC.
-- Computer lighting NIC: static \`10.201.6.1\`, mask \`255.255.255.0\`, no gateway.
-- Pknight CR011R: \`10.201.6.100\`, Art-Net Universe 0 to DMX output.
-- Cuepix 1–6: Art-Net Universe 0. Cuepix 7–12: Art-Net Universe 1.
-- All Cuepix panels: 79-channel mode; addresses from CUEPIX-PATCH-CHART.md.
-- 375ZX fixtures: 15-channel mode; DMX addresses 481 and 496.
+- Truss 1: Cuepix 1-3, left to right.
+- Truss 2: Cuepix 4-6, left to right.
+- Truss 3: Cuepix 7-9, left to right.
+- Truss 4: Cuepix 10-12, left to right.
+- 375ZX L mounts on outside-left truss. 375ZX R mounts on outside-right truss.
+- All Cuepix panels use 79-channel mode. Both 375ZX fixtures use 15-channel mode.
+- Keep production mover controls locked until physical mover calibration is recorded and the show is regenerated.
 
-## Install and open
+## Lighting LAN
 
-1. Close QLC+.
-2. Copy both files from \`fixtures/\` into \`%USERPROFILE%\\QLC+\\Fixtures\`.
-3. Start QLC+ once, then close it so fixture cache refreshes.
-4. Open \`cuepix-panel-show.qxw\`.
-5. In Inputs/Outputs, confirm ArtNet output enabled for QLC+ Universe 1 and 2. Plugin parameters must map to Art-Net 0 and 1.
-6. Open Virtual Console. Use only ROUTING TESTS until every fixture passes.
+- Use a dedicated unmanaged Ethernet switch. Connect QLC+ computer, CR011R, and all 12 Cuepix panels.
+- Computer lighting NIC: static \`10.201.6.1\`, mask \`255.255.255.0\`, no gateway. Disable sharing and bridging.
+- Pknight CR011R: \`10.201.6.100\`; Art-Net Universe 0 to its DMX output.
+- Cuepix 1-6 receive Art-Net Universe 0. Cuepix 7-12 receive Art-Net Universe 1.
+- Set panel addresses from \`CUEPIX-PATCH-CHART.md\`.
+- CR011R DMX OUT → 375ZX L at 481 → 375ZX R at 496 → DMX terminator.
+- Cuepix panels receive Ethernet directly. Do not add them to the CR011R DMX chain.
 
-## Cable order
+## First install
 
-- Ethernet switch: QLC+ computer, CR011R, all 12 Cuepix panels.
-- CR011R DMX OUT → 375ZX at address 481 → 375ZX at address 496 → DMX terminator.
-- Do not put Cuepix panels in this DMX chain; their addresses occupy Art-Net space but they receive Ethernet directly.
+1. Install QLC+ 4.14.x. Do not use QLC+ 5 for this show.
+2. Close QLC+.
+3. Run \`powershell.exe -NoProfile -File .\\start-cuepix.ps1 -InstallOnly\`.
+4. Start QLC+ once, close it, then reconnect the controller.
 
-## Test order
+## Normal launch
 
-1. Power one Cuepix only. Press its Red, Green, Blue, White, Blackout buttons.
-2. Repeat for Cuepix 1–12, one powered fixture at a time.
-3. Test each 375ZX Open White, Pan Center, Tilt Center, Blackout.
-4. Press Universe 0 Panels White, Universe 1 Panels White, Both 375ZX Open White, All Blackout.
-5. If wrong fixture responds, stop. Fix panel universe/address or DMX address before scenes.
+1. Connect the Novation Launchpad Mini MK3 before opening QLC+.
+2. Confirm Windows exposes \`MIDIIN2 (LPMiniMK3 MIDI)\` and \`MIDIOUT2 (LPMiniMK3 MIDI)\`.
+3. Run \`powershell.exe -NoProfile -File .\\start-cuepix.ps1\`.
+4. Launcher creates \`cuepix-panel-show.runtime.qxw\`, resolves current WinMM indexes, puts Launchpad in Programmer Mode, starts QLC+, MCP, and 3D monitor.
+5. MCP/dashboard: http://127.0.0.1:8788/dashboard
+6. 3D monitor: http://127.0.0.1:7800
+
+If Launchpad is absent, launcher removes MIDI routes from runtime copy. QLC+ Virtual Console and MCP remain usable. To force this mode, add \`-DisableLaunchpad\`. QLC+ MIDI feedback owns pad LEDs; \`LAUNCHPAD_LEDS\` stays \`0\`.
+
+## Virtual Console and Launchpad
+
+- Page 1: full Cuepix colors, pixel patterns, chasers, fades, strobes, burst, levels, speed, tap, blackout, stop, white flash, page switch.
+- Page 2: compact Cuepix controls plus locked 375ZX pad labels. Mover pads do nothing before calibration.
+- R7C1-R7C4: 25%, 50%, 75%, Full. R7C5-R7C7: Slow, Medium, Fast. R7C8: Tap.
+- R8C1: Blackout. R8C2: Stop FX. R8C3: White. R8C5: Flash. R8C8: Page.
+- Use visible \`FX Speed\` dial for exact speed. Use QLC+ Grand Master for overall output.
+- No Cuepix dimmer or strobe DMX Level slider exists. Such sliders would seize channels from scenes and pads.
+
+## Test gate — routing before performance
+
+1. Expand collapsed \`SETUP · ROUTING TESTS\` in Virtual Console.
+2. Power one Cuepix only. Test its Red, Green, Blue, White, and Blackout buttons.
+3. Repeat for Cuepix 1-12, one fixture at a time.
+4. Test Universe 0 Panels White, Universe 1 Panels White, then All Blackout.
+5. Test 375ZX L and R one at a time through CR011R. Keep production mover page locked.
+6. Collapse setup controls. Test grouped solids, patterns, fades, chasers, levels, strobe, stop, flash press/release, and blackout.
+7. Test Launchpad page switch and LED feedback. Compare both universes against 3D monitor.
+8. Perform mover calibration last. Stop if any wrong fixture, universe, address, direction, or unsafe aim appears.
 
 ## Art-Net numbering warning
 
-This workspace maps QLC+ Universe ID 0 → Art-Net universe 0 and QLC+ Universe ID 1 → Art-Net universe 1. Some device screens label these 1 and 2. Match wire universe values, not display wording.
+Workspace maps QLC+ Universe ID 0 → Art-Net universe 0 and QLC+ Universe ID 1 → Art-Net universe 1. Some device screens label these 1 and 2. Match wire values, not display wording.
 `;
 
 const qxwPath = path.join(OUT, "cuepix-panel-show.qxw");
 writeFileSync(qxwPath, qxw, "utf8");
 writeFileSync(path.join(OUT, "CUEPIX-PATCH-CHART.md"), patchChart, "utf8");
 writeFileSync(path.join(OUT, "CUEPIX-SETUP.md"), setupGuide, "utf8");
-await generateWidgetsJson(qxwPath, path.join(OUT, "config", "cuepix-widgets.json"));
+const parsedWidgets = await parseQxwFile(qxwPath);
+if (parsedWidgets.errors.length) throw new Error(`Widget map parse failed: ${parsedWidgets.errors.join("; ")}`);
+mkdirSync(path.join(OUT, "config"), { recursive: true });
+writeFileSync(path.join(OUT, "config", "cuepix-widgets.json"), JSON.stringify({ widgets: parsedWidgets.widgets, generated: true }, null, 2) + "\n", "utf8");
 console.log(`Built ${path.basename(rigPath)}: ${fixtures.length} fixtures, ${routingScenes.length} routing tests, ${functions.length - routingScenes.length} performance functions, ${placed.length} console pads, Art-Net ${outputUniverses.join(", ")}`);

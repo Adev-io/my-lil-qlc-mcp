@@ -92,6 +92,13 @@ describe("Cuepix routing workspace", () => {
     expect(routingSceneNames.every((name) => name.startsWith("TEST · "))).toBe(true);
     expect(existsSync(path.join(out, "CUEPIX-PATCH-CHART.md"))).toBe(true);
     expect(existsSync(path.join(out, "CUEPIX-SETUP.md"))).toBe(true);
+    const setup = readFileSync(path.join(out, "CUEPIX-SETUP.md"), "utf8");
+    for (const text of [
+      "Cuepix 1-3", "Cuepix 4-6", "Cuepix 7-9", "Cuepix 10-12",
+      "Launchpad Mini MK3", "MIDIIN2 (LPMiniMK3 MIDI)",
+      "http://127.0.0.1:8788/dashboard", "http://127.0.0.1:7800",
+      "mover calibration", "SETUP · ROUTING TESTS",
+    ]) expect(setup).toContain(text);
   });
 
   it("generates grouped Cuepix functions with isolated channel layers", () => {

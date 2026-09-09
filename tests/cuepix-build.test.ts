@@ -166,6 +166,9 @@ describe("Cuepix routing workspace", () => {
     expect(qxw).toContain('Caption="RAINBOW P1 R2C1"');
     expect(qxw).toContain('Caption="PAGE P1 R8C8"');
     expect(qxw).not.toContain('<Slider Caption="Cuepix');
+    expect(qxw).toContain('<AbsoluteValue Minimum="1199" Maximum="1200"><Input Universe="2" Channel="153"/></AbsoluteValue>');
+    expect(qxw).toContain('<AbsoluteValue Minimum="599" Maximum="600"><Input Universe="2" Channel="154"/></AbsoluteValue>');
+    expect(qxw).toContain('<AbsoluteValue Minimum="249" Maximum="250"><Input Universe="2" Channel="155"/></AbsoluteValue>');
 
     for (const page of ["P1", "P2"]) {
       const channels = [...qxw.matchAll(/<Button\b[\s\S]*?<\/Button>/g)]

@@ -433,9 +433,9 @@ const speedDial = `   <Frame Caption="FX SPEED" ID="40">
      <Tap><Input Universe="2" Channel="156"/></Tap><Time>500</Time>
 ${speedFunctionsXml}
     </SpeedDial>
-${[[901, 153, 1200], [902, 154, 600], [903, 155, 250]].map(([id, channel, time]) => `    <SpeedDial Caption="_Speed ${time}" ID="${id}">
+${[[901, 153, 1199, 1200], [902, 154, 599, 600], [903, 155, 249, 250]].map(([id, channel, minimum, maximum]) => `    <SpeedDial Caption="_Speed ${maximum}" ID="${id}">
      ${appearance([32, 34, 39])}<WindowState Visible="True" X="1" Y="1" Width="1" Height="1"/>
-     <AbsoluteValue Minimum="${time}" Maximum="${time}"><Input Universe="2" Channel="${channel}"/></AbsoluteValue><Time>${time}</Time>
+     <AbsoluteValue Minimum="${minimum}" Maximum="${maximum}"><Input Universe="2" Channel="${channel}"/></AbsoluteValue><Time>${maximum}</Time>
 ${speedFunctionsXml}
     </SpeedDial>`).join("\n")}
    </Frame>`;

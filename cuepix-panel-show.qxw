@@ -4422,7 +4422,7 @@
     </SpeedDial>
     <SpeedDial Caption="_Speed 1200" ID="901">
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4280295975</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance><WindowState Visible="True" X="1" Y="1" Width="1" Height="1"/>
-     <AbsoluteValue Minimum="1200" Maximum="1200"><Input Universe="2" Channel="153"/></AbsoluteValue><Time>1200</Time>
+     <AbsoluteValue Minimum="1199" Maximum="1200"><Input Universe="2" Channel="153"/></AbsoluteValue><Time>1200</Time>
      <Function FadeIn="0" FadeOut="0" Duration="6">38</Function>
      <Function FadeIn="0" FadeOut="0" Duration="6">51</Function>
      <Function FadeIn="0" FadeOut="0" Duration="6">58</Function>
@@ -4442,7 +4442,7 @@
     </SpeedDial>
     <SpeedDial Caption="_Speed 600" ID="902">
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4280295975</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance><WindowState Visible="True" X="1" Y="1" Width="1" Height="1"/>
-     <AbsoluteValue Minimum="600" Maximum="600"><Input Universe="2" Channel="154"/></AbsoluteValue><Time>600</Time>
+     <AbsoluteValue Minimum="599" Maximum="600"><Input Universe="2" Channel="154"/></AbsoluteValue><Time>600</Time>
      <Function FadeIn="0" FadeOut="0" Duration="6">38</Function>
      <Function FadeIn="0" FadeOut="0" Duration="6">51</Function>
      <Function FadeIn="0" FadeOut="0" Duration="6">58</Function>
@@ -4462,7 +4462,7 @@
     </SpeedDial>
     <SpeedDial Caption="_Speed 250" ID="903">
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4280295975</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance><WindowState Visible="True" X="1" Y="1" Width="1" Height="1"/>
-     <AbsoluteValue Minimum="250" Maximum="250"><Input Universe="2" Channel="155"/></AbsoluteValue><Time>250</Time>
+     <AbsoluteValue Minimum="249" Maximum="250"><Input Universe="2" Channel="155"/></AbsoluteValue><Time>250</Time>
      <Function FadeIn="0" FadeOut="0" Duration="6">38</Function>
      <Function FadeIn="0" FadeOut="0" Duration="6">51</Function>
      <Function FadeIn="0" FadeOut="0" Duration="6">58</Function>

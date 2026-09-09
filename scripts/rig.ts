@@ -25,7 +25,7 @@ const Performer = z.object({
 
 const FixtureGroup = z
   .object({
-    kind: z.enum(["par", "bar", "head"]),
+    kind: z.enum(["par", "bar", "head", "panel"]),
     namePrefix: z.string().optional(), // "Rainbow Par" -> "Rainbow Par 1..n"; defaults to the kind
     manufacturer: z.string(),
     model: z.string(),
@@ -33,6 +33,7 @@ const FixtureGroup = z
     channels: z.number().int().positive(),
     count: z.number().int().min(0),
     addresses: z.array(z.number().int().min(0).max(511)),
+    universe: z.number().int().min(0).max(32767).default(0),
     qxfFile: z.string().optional(), // custom fixture definition to install into QLC+
     roles: z.record(z.string(), z.union([z.number(), z.array(z.array(z.number()))])).optional(),
     // head-only extras (ignored for par/bar)
@@ -149,21 +150,25 @@ export type RigFixtureGroup = Rig["fixtures"][number];
 
 // DMX footprints must fit in the universe and must not overlap across fixtures.
 function checkAddresses(rig: Rig): void {
-  const spans: { name: string; start: number; end: number }[] = [];
+  const spansByUniverse = new Map<number, { name: string; start: number; end: number }[]>();
   for (const g of rig.fixtures) {
     g.addresses.forEach((a, i) => {
       const end = a + g.channels - 1;
       if (end > 511)
         throw new Error(`${g.model} #${i + 1} at address ${a} runs past channel 512 (${g.channels}ch)`);
+      const spans = spansByUniverse.get(g.universe) ?? [];
       spans.push({ name: `${g.namePrefix ?? g.kind} ${i + 1}`, start: a, end });
+      spansByUniverse.set(g.universe, spans);
     });
   }
-  spans.sort((a, b) => a.start - b.start);
-  for (let i = 1; i < spans.length; i++) {
-    if (spans[i].start <= spans[i - 1].end)
-      throw new Error(
-        `DMX overlap: "${spans[i - 1].name}" (${spans[i - 1].start}-${spans[i - 1].end}) and "${spans[i].name}" (${spans[i].start}-${spans[i].end})`,
-      );
+  for (const [universe, spans] of spansByUniverse) {
+    spans.sort((a, b) => a.start - b.start);
+    for (let i = 1; i < spans.length; i++) {
+      if (spans[i].start <= spans[i - 1].end)
+        throw new Error(
+          `DMX overlap on Universe ${universe}: "${spans[i - 1].name}" (${spans[i - 1].start}-${spans[i - 1].end}) and "${spans[i].name}" (${spans[i].start}-${spans[i].end})`,
+        );
+    }
   }
 }
 

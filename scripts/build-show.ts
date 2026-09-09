@@ -110,7 +110,7 @@ const HEAD_COLOR: Record<string, number> = {
 
 interface Fixture {
   id: number; manuf: string; model: string; mode: string; name: string;
-  address: number; channels: number; kind: "par" | "bar" | "head";
+  address: number; channels: number; kind: "par" | "bar" | "head" | "panel";
 }
 
 const fixtures: Fixture[] = [];

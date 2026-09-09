@@ -89,3 +89,32 @@ describe("rig schema — controller3 (NX Touch via ONYX sACN)", () => {
     expect(rig.controller3?.faders).toHaveLength(6);
   });
 });
+
+describe("rig schema — Cuepix multi-universe panels", () => {
+  const base = {
+    meta: { name: "Cuepix test" },
+    stage: { widthFt: 20, depthFt: 10, deckHeightFt: 0, headHeightFt: 8 },
+  };
+
+  it("accepts a panel group on Art-Net Universe 1", () => {
+    const result = RigSchema.safeParse({
+      ...base,
+      fixtures: [{
+        kind: "panel", manufacturer: "Elation", model: "CUEPIX Panel",
+        mode: "79 Channel", channels: 79, count: 1, addresses: [0], universe: 1,
+      }],
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("allows the same address on different universes", () => {
+    const result = RigSchema.safeParse({
+      ...base,
+      fixtures: [
+        { kind: "panel", manufacturer: "Elation", model: "CUEPIX Panel", mode: "79 Channel", channels: 79, count: 1, addresses: [0], universe: 0 },
+        { kind: "panel", manufacturer: "Elation", model: "CUEPIX Panel", mode: "79 Channel", channels: 79, count: 1, addresses: [0], universe: 1 },
+      ],
+    });
+    expect(result.success).toBe(true);
+  });
+});

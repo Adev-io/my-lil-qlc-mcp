@@ -11,10 +11,10 @@
     "deckHeightFt": 0,
     "headHeightFt": 8,
     "headSeparationFt": 12,
-    "notes": "Neutral monitor layout. Drag fixture positions in the 3D monitor after load-in."
+    "notes": "Four bottom-aligned Cuepix towers. Drag fixture positions in the 3D monitor after load-in."
   },
   "cuepix": {
-    "trusses": [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11, 12]],
+    "trusses": [[1, 2], [3, 4, 5, 6], [7, 8, 9, 10], [11, 12]],
     "moversCalibrated": false
   },
   "controller": {

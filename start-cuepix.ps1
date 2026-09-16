@@ -69,6 +69,12 @@ function New-CuepixRuntime {
   $midi = Get-LaunchpadIndexes
   $controllerReady = -not $DisableLaunchpad -and $midi.Input -ge 0 -and $midi.Output -ge 0
   $xml = [IO.File]::ReadAllText($runtimeShow)
+  # QLC+ ArtNet lines sort IPv4 address strings; resolve lighting Ethernet each launch.
+  [string[]]$artnetAddresses = @(Get-NetIPAddress -AddressFamily IPv4 | Select-Object -ExpandProperty IPAddress -Unique)
+  [Array]::Sort($artnetAddresses, [StringComparer]::Ordinal)
+  $artnetLine = [Array]::IndexOf($artnetAddresses, '10.201.6.1')
+  if ($artnetLine -lt 0) { throw 'Lighting Ethernet 10.201.6.1 absent; refusing an accidental Wi-Fi output.' }
+  $xml = $xml -replace '<Output Plugin="ArtNet" UID="None" Line="[^"]*">', ('<Output Plugin="ArtNet" UID="None" Line="' + $artnetLine + '">')
   $pattern = '(?s)(<Universe Name="Launchpad" ID="2"[^>]*>)(.*?)(</Universe>)'
   $match = [regex]::Match($xml, $pattern)
   if (-not $match.Success) { throw 'Runtime validation failed: Launchpad Universe 2 missing.' }
@@ -83,6 +89,9 @@ function New-CuepixRuntime {
   [IO.File]::WriteAllText($runtimeShow, $xml, [Text.UTF8Encoding]::new($false))
 
   $verified = [IO.File]::ReadAllText($runtimeShow)
+  $outputMatches = [regex]::Matches($verified, '<Output Plugin="ArtNet" UID="None" Line="' + $artnetLine + '">')
+  if ($outputMatches.Count -ne 2) { throw 'Runtime validation failed: both lighting outputs must use lighting Ethernet.' }
+  Write-Host "  Art-Net U0/U1: 10.201.6.1, QLC+ line $artnetLine" -ForegroundColor Green
   foreach ($required in @('<Workspace ', '<Universe Name="Launchpad" ID="2"', 'outputUni="0"', 'outputUni="1"')) {
     if (-not $verified.Contains($required)) { throw "Runtime validation failed: missing $required" }
   }

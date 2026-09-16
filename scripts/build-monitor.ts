@@ -64,7 +64,8 @@ if (rig.cuepix) {
   const centers = Array.from({ length: 4 }, (_, index) => -HAP / 2 + (index * HAP) / 3);
   for (let truss = 0; truss < rig.cuepix.trusses.length; truss++) {
     rig.cuepix.trusses[truss].forEach((panel, slot) => {
-      cuepixPositions.set(panel, [round(centers[truss] + (slot - 1) * 1.2), D, HZ]);
+      // ponytail: fixed 2.2 ft pitch matches the 2.1 ft rendered panel; add rig spacing only when hardware differs.
+      cuepixPositions.set(panel, [round(centers[truss]), D, round(DECK + 1.1 + slot * 2.2)]);
     });
   }
 }

@@ -48,21 +48,25 @@ function buttonBlock(qxw: string, caption: string): string {
 describe("Cuepix routing workspace", () => {
   it("loads the Cuepix patch without overlaps", () => {
     const { rig } = loadRig(RIG);
-    expect(rig.fixtures.filter((g) => g.kind === "panel")).toHaveLength(2);
-    expect(rig.fixtures.filter((g) => g.kind === "panel").map((g) => g.universe)).toEqual([0, 1]);
+    const panelGroups = rig.fixtures.filter((g) => g.kind === "panel");
+    expect(panelGroups).toHaveLength(2);
+    expect(panelGroups.map((g) => ({ universe: g.universe, addresses: g.addresses }))).toEqual([
+      { universe: 0, addresses: [0, 79, 158, 237, 316, 395] },
+      { universe: 1, addresses: [0, 79, 158, 237, 316, 395] },
+    ]);
     expect(rig.fixtures.filter((g) => g.kind === "head").flatMap((g) => g.addresses)).toEqual([480, 495]);
   });
 
   it("defines four left-to-right trusses and keeps movers locked", () => {
     const { rig } = loadRig(RIG);
-    expect((rig as any).cuepix?.trusses).toEqual([[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11, 12]]);
+    expect((rig as any).cuepix?.trusses).toEqual([[1, 2], [3, 4, 5, 6], [7, 8, 9, 10], [11, 12]]);
     expect((rig as any).cuepix?.moversCalibrated).toBe(false);
   });
 
   it("rejects duplicate Cuepix panel placement", () => {
     const raw = JSON.parse(readFileSync(RIG, "utf8"));
     raw.cuepix = {
-      trusses: [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11, 11]],
+      trusses: [[1, 2], [3, 4, 5, 6], [7, 8, 9, 10], [11, 11]],
       moversCalibrated: false,
     };
     expect(RigSchema.safeParse(raw).success).toBe(false);
@@ -92,12 +96,28 @@ describe("Cuepix routing workspace", () => {
     expect(routingSceneNames.every((name) => name.startsWith("TEST · "))).toBe(true);
     expect(existsSync(path.join(out, "CUEPIX-PATCH-CHART.md"))).toBe(true);
     expect(existsSync(path.join(out, "CUEPIX-SETUP.md"))).toBe(true);
+    const patch = readFileSync(path.join(out, "CUEPIX-PATCH-CHART.md"), "utf8");
+    for (const text of [
+      "| Cuepix 1 | CUEPIX Panel | 10.201.6.11 | 0 | 1 | 79 | 79 |",
+      "| Cuepix 6 | CUEPIX Panel | 10.201.6.16 | 0 | 396 | 474 | 79 |",
+      "| Cuepix 7 | CUEPIX Panel | 10.201.6.17 | 1 | 1 | 79 | 79 |",
+      "| Cuepix 12 | CUEPIX Panel | 10.201.6.22 | 1 | 396 | 474 | 79 |",
+      "| 375ZX L | Intimidator Spot 375ZX | — | 0 | 481 | 495 | 15 |",
+      "| 375ZX R | Intimidator Spot 375ZX | — | 0 | 496 | 510 | 15 |",
+    ]) expect(patch).toContain(text);
     const setup = readFileSync(path.join(out, "CUEPIX-SETUP.md"), "utf8");
     for (const text of [
-      "Cuepix 1-3", "Cuepix 4-6", "Cuepix 7-9", "Cuepix 10-12",
+      "Truss 1: Cuepix 1-2, bottom to top.",
+      "Truss 2: Cuepix 3-6, bottom to top.",
+      "Truss 3: Cuepix 7-10, bottom to top.",
+      "Truss 4: Cuepix 11-12, bottom to top.",
       "Launchpad Mini MK3", "MIDIIN2 (LPMiniMK3 MIDI)",
       "http://127.0.0.1:8788/dashboard", "http://127.0.0.1:7800",
       "mover calibration", "SETUP · ROUTING TESTS",
+      "Service PIN `050`", "Network Switch: `ON`", "Protocol: `ArtNet`",
+      "Maximum 4 panels per Elation rigging bar",
+      "Maximum 2 Cuepix panels power-linked at 120V",
+      "independent safety cable", "Never daisy-chain safety cables",
     ]) expect(setup).toContain(text);
   });
 
@@ -140,7 +160,7 @@ describe("Cuepix routing workspace", () => {
 
     expect(chaserFixtureOrder(qxw, "FX · Left to Right")).toEqual(expectedPanels.map((id) => [id]));
     expect(chaserFixtureOrder(qxw, "FX · Center Out")).toEqual([[5, 6], [4, 7], [3, 8], [2, 9], [1, 10], [0, 11]]);
-    expect(chaserFixtureOrder(qxw, "FX · Truss Step")).toEqual([[0, 1, 2], [3, 4, 5], [6, 7, 8], [9, 10, 11]]);
+    expect(chaserFixtureOrder(qxw, "FX · Truss Step")).toEqual([[0, 1], [2, 3, 4, 5], [6, 7, 8, 9], [10, 11]]);
     expect(chaserFixtureOrder(qxw, "FX · Bounce")).toEqual([
       [0], [1], [2], [3], [4], [5], [6], [7], [8], [9], [10], [11],
       [10], [9], [8], [7], [6], [5], [4], [3], [2], [1],
@@ -161,6 +181,8 @@ describe("Cuepix routing workspace", () => {
     expect(qxw).toContain('<Input Plugin="MIDI" UID="2" Line="2"/>');
     expect(qxw).toContain('<Feedback Plugin="MIDI" UID="3" Line="3"/>');
     expect(qxw).toContain('<Multipage PagesNum="2" CurrentPage="0"/>');
+    expect(qxw).toContain('<GrandMaster ChannelMode="All" ValueMode="Reduce" SliderMode="Normal"/>');
+    expect(qxw).not.toContain('<GrandMaster ChannelMode="Intensity"');
     expect(qxw).toContain('<Input Universe="2" Channel="146"/>');
     expect(qxw).toContain('Caption="RED P1 R1C1"');
     expect(qxw).toContain('Caption="RAINBOW P1 R2C1"');

@@ -2,10 +2,10 @@
 
 ## Rig and physical order
 
-- Truss 1: Cuepix 1-3, left to right.
-- Truss 2: Cuepix 4-6, left to right.
-- Truss 3: Cuepix 7-9, left to right.
-- Truss 4: Cuepix 10-12, left to right.
+- Truss 1: Cuepix 1-2, bottom to top.
+- Truss 2: Cuepix 3-6, bottom to top.
+- Truss 3: Cuepix 7-10, bottom to top.
+- Truss 4: Cuepix 11-12, bottom to top.
 - 375ZX L mounts on outside-left truss. 375ZX R mounts on outside-right truss.
 - All Cuepix panels use 79-channel mode. Both 375ZX fixtures use 15-channel mode.
 - Keep production mover controls locked until physical mover calibration is recorded and the show is regenerated.

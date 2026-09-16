@@ -55,7 +55,7 @@ const FixtureGroup = z
 
 const CuepixShow = z
   .object({
-    trusses: z.array(z.array(z.number().int().min(1).max(12)).length(3)).length(4),
+    trusses: z.array(z.array(z.number().int().min(1).max(12)).min(1)).length(4),
     moversCalibrated: z.boolean().default(false),
   })
   .superRefine(({ trusses }, ctx) => {

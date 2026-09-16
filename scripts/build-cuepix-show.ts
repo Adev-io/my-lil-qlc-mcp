@@ -177,7 +177,7 @@ const stepScene = (name: string, indexes: number[], rgb: RGB = [255, 255, 255], 
 const panelOrder = panels.map((_, index) => index);
 const centerOut = [[5, 6], [4, 7], [3, 8], [2, 9], [1, 10], [0, 11]];
 const outsideIn = [...centerOut].reverse();
-const trussStep = (rig.cuepix?.trusses ?? [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11, 12]])
+const trussStep = (rig.cuepix?.trusses ?? [[1, 2], [3, 4, 5, 6], [7, 8, 9, 10], [11, 12]])
   .map((group) => group.map((panel) => panel - 1));
 const bounce = [...panelOrder, ...panels.slice(1, -1).map((_, index) => panels.length - 2 - index)];
 const groupedChaser = (name: string, groups: number[][], fade = 0, hold = 250): void => {
@@ -482,7 +482,7 @@ ${performanceFrames.join("\n")}
 ${speedDial}
 ${routingFrame}
   </Frame>
-  <Properties><Size Width="1000" Height="470"/><GrandMaster ChannelMode="Intensity" ValueMode="Reduce" SliderMode="Normal"/></Properties>
+  <Properties><Size Width="1000" Height="470"/><GrandMaster ChannelMode="All" ValueMode="Reduce" SliderMode="Normal"/></Properties>
  </VirtualConsole>
 </Workspace>
 `;
@@ -500,14 +500,14 @@ ${patchRows}
 
 CR011R DMX output handles Universe 0 only. Universe 1 goes directly by Art-Net to Cuepix 7–12.
 `;
+const trussSetupLines = (rig.cuepix?.trusses ?? [])
+  .map((group, index) => `- Truss ${index + 1}: Cuepix ${group[0]}-${group[group.length - 1]}, bottom to top.`)
+  .join("\n");
 const setupGuide = `# Cuepix + QLC+ show setup
 
 ## Rig and physical order
 
-- Truss 1: Cuepix 1-3, left to right.
-- Truss 2: Cuepix 4-6, left to right.
-- Truss 3: Cuepix 7-9, left to right.
-- Truss 4: Cuepix 10-12, left to right.
+${trussSetupLines}
 - 375ZX L mounts on outside-left truss. 375ZX R mounts on outside-right truss.
 - All Cuepix panels use 79-channel mode. Both 375ZX fixtures use 15-channel mode.
 - Keep production mover controls locked until physical mover calibration is recorded and the show is regenerated.

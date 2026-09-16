@@ -114,6 +114,9 @@ describe("Cuepix routing workspace", () => {
       "Truss 3: Cuepix 5-8, bottom to top.",
       "Beam L at 317 → Beam R at 331 → 375ZX L at 345 → 375ZX R at 360",
       "Minilab3 MIDI",
+      "Maximum 4 panels per Elation rigging bar; each panel gets an independent safety cable; never daisy-chain safety cables.",
+      "Maximum 2 Cuepix panels power-linked at 120 V.",
+      "Panels: Service PIN `050`, Network Switch `ON`, Protocol `ArtNet` (per-panel menu).",
       "Launchpad Mini MK3", "MIDIIN2 (LPMiniMK3 MIDI)",
       "http://127.0.0.1:8788/dashboard", "http://127.0.0.1:7800",
       "mover calibration", "SETUP · ROUTING TESTS",
@@ -186,7 +189,11 @@ describe("Cuepix routing workspace", () => {
     expect(qxw).toContain('Caption="RED P1 R1C1"');
     expect(qxw).toContain('Caption="RAINBOW P1 R2C1"');
     expect(qxw).toContain('Caption="PAGE P1 R8C8"');
-    expect(qxw).not.toContain('<Slider Caption="Cuepix');
+    // No Level slider may own a panel channel — it would seize that channel from every scene and
+    // pad. Every <Level> channel in the show belongs to a head (fixture ids 8-11).
+    const levelChannelFixtures = [...qxw.matchAll(/<Level\b[^>]*>\s*<Channel Fixture="(\d+)">/g)].map((match) => Number(match[1]));
+    expect(levelChannelFixtures.length).toBeGreaterThan(0);
+    expect(levelChannelFixtures.every((id) => id >= 8)).toBe(true);
     expect(qxw).toContain('<AbsoluteValue Minimum="1199" Maximum="1200"><Input Universe="2" Channel="153"/></AbsoluteValue>');
     expect(qxw).toContain('<AbsoluteValue Minimum="599" Maximum="600"><Input Universe="2" Channel="154"/></AbsoluteValue>');
     expect(qxw).toContain('<AbsoluteValue Minimum="249" Maximum="250"><Input Universe="2" Channel="155"/></AbsoluteValue>');
@@ -215,18 +222,53 @@ describe("Cuepix routing workspace", () => {
     expect(qxw).toContain('<Slider Caption="Pan2BL"');
     expect(qxw).toMatch(/Name="HEAD · Home Go">[\s\S]*?<RunOrder>SingleShot<\/RunOrder>/);
 
-    // headSafety fences the MiniLab knobs: tilt is capped at 128, pan runs the full range.
+    // headSafety fences the MiniLab knobs: tilt stops at 92 (≈horizontal), pan runs the full range.
+    // Every knob ships at Value="0" so a future non-zero tiltMin cannot seize pan/tilt at load.
+    expect(qxw).toMatch(/Caption="Tilt1SL"[\s\S]*?<Level LowLimit="0" HighLimit="92" Value="0">/);
     for (const caption of ["Tilt1SL", "Tilt2BL", "Tilt3BR", "Tilt4SR"]) {
-      expect(qxw).toMatch(new RegExp(`<Slider Caption="${caption}"[\\s\\S]*?<Level LowLimit="0" HighLimit="128"`));
+      expect(qxw).toMatch(new RegExp(`<Slider Caption="${caption}"[\\s\\S]*?<Level LowLimit="0" HighLimit="92" Value="0"`));
     }
     for (const caption of ["Pan1SL", "Pan2BL", "Pan3BR", "Pan4SR"]) {
-      expect(qxw).toMatch(new RegExp(`<Slider Caption="${caption}"[\\s\\S]*?<Level LowLimit="0" HighLimit="255"`));
+      expect(qxw).toMatch(new RegExp(`<Slider Caption="${caption}"[\\s\\S]*?<Level LowLimit="0" HighLimit="255" Value="0"`));
     }
+
+    // The three MiniLab faders drive their own _FADER copies. A Playback slider at 0 STOPS its
+    // function, so sharing a function with a pad would let a parked fader kill the pad's look.
+    expect(functionBlock(qxw, "Scene", "_FADER · Beams")).toContain('<FixtureVal ID="8">9,255,10,255</FixtureVal>');
+    expect(functionBlock(qxw, "Scene", "_FADER · Spots")).toContain('<FixtureVal ID="10">10,255,11,255</FixtureVal>');
+    expect(functionBlock(qxw, "Scene", "_FADER · Panels")).toContain('<FixtureVal ID="0">76,255</FixtureVal>');
+    const faderBeamsId = qxw.match(/<Function ID="(\d+)" Type="Scene" Name="_FADER · Beams">/)![1];
+    const headBeamsId = qxw.match(/<Function ID="(\d+)" Type="Scene" Name="HEAD · Beams Full">/)![1];
+    const beamsSlider = qxw.match(/<Slider Caption="Beams"[\s\S]*?<\/Slider>/)![0];
+    expect(beamsSlider).toContain(`<Playback><Function>${faderBeamsId}</Function></Playback>`);
+    expect(beamsSlider).not.toContain(`<Playback><Function>${headBeamsId}</Function></Playback>`);
 
     // Per-model head channels: Beam L is fixture 8 (140SR, 14ch), 375ZX L is fixture 10 (15ch).
     const aimHome = functionBlock(qxw, "Scene", "_AIM · Home");
     expect(aimHome.match(/<FixtureVal ID="8">([^<]*)</)![1]).toBe("0,128,2,64,4,0,10,255");
     expect(aimHome.match(/<FixtureVal ID="10">([^<]*)</)![1]).toBe("0,128,2,64,4,0,11,255");
+    // Crowd sits ≈5° ABOVE horizontal, never in faces. Crossed pans the L heads right (148) and the
+    // R heads left (108) so the beams actually cross.
+    const aimCrowd = functionBlock(qxw, "Scene", "_AIM · Crowd");
+    expect(aimCrowd.match(/<FixtureVal ID="8">([^<]*)</)![1]).toBe("0,128,2,88,4,0,10,255");
+    expect(aimCrowd.match(/<FixtureVal ID="10">([^<]*)</)![1]).toBe("0,128,2,88,4,0,11,255");
+    const aimCrossed = functionBlock(qxw, "Scene", "_AIM · Crossed");
+    expect(aimCrossed.match(/<FixtureVal ID="8">([^<]*)</)![1]).toBe("0,148,2,80,4,0,10,255");
+    expect(aimCrossed.match(/<FixtureVal ID="9">([^<]*)</)![1]).toBe("0,108,2,80,4,0,10,255");
+    expect(aimCrossed.match(/<FixtureVal ID="10">([^<]*)</)![1]).toBe("0,148,2,80,4,0,11,255");
+    // Every pre-plot aim stays inside the headSafety tilt fence, so none of them points below
+    // horizontal, and every aim addresses a head rather than a panel.
+    const aimSceneNames = [...qxw.matchAll(/<Function[^>]*Type="Scene"[^>]*Name="(_AIM · [^"]+)"/g)].map((match) => match[1]);
+    expect(aimSceneNames).toHaveLength(4);
+    for (const name of aimSceneNames) {
+      for (const value of functionBlock(qxw, "Scene", name).matchAll(/<FixtureVal ID="(\d+)">([^<]*)</g)) {
+        expect(Number(value[1])).toBeGreaterThanOrEqual(8);
+        const pairs = value[2].split(",").map(Number);
+        const tiltIndex = pairs.findIndex((entry, index) => index % 2 === 0 && entry === 2);
+        expect(tiltIndex).toBeGreaterThanOrEqual(0);
+        expect(pairs[tiltIndex + 1]).toBeLessThanOrEqual(92);
+      }
+    }
     expect(functionBlock(qxw, "Scene", "HEAD · Beams Full")).toContain('<FixtureVal ID="8">9,255,10,255</FixtureVal>');
     expect(functionBlock(qxw, "Scene", "HEAD · Spots Full")).toContain('<FixtureVal ID="10">10,255,11,255</FixtureVal>');
     const headRed = functionBlock(qxw, "Scene", "HEAD · Red");
@@ -241,10 +283,11 @@ describe("Cuepix routing workspace", () => {
     const widgetMap = JSON.parse(readFileSync(mapPath, "utf8"));
     const parsed = await parseQxwFile(qxwPath);
     expect(parsed.errors).toEqual([]);
-    expect(widgetMap.widgets.map((widget: { name: string }) => widget.name).sort())
-      .toEqual(parsed.widgets.map((widget) => widget.name).sort());
     expect(widgetMap.widgets.some((widget: { name: string }) => widget.name === "FX Speed")).toBe(true);
     expect(widgetMap.widgets.some((widget: { name: string }) => widget.name.startsWith("TEST ·"))).toBe(false);
-    expect(widgetMap.widgets.some((widget: { name: string }) => widget.name.startsWith("HEAD "))).toBe(false);
+    // The MiniLab knobs and faders live on input universe 3, so they carry no OSC path and must
+    // never reach the dashboard's widget map.
+    expect(widgetMap.widgets.some((widget: { name: string }) => /^(Tilt|Pan)\d/.test(widget.name))).toBe(false);
+    expect(widgetMap.widgets.some((widget: { name: string }) => ["Panels", "Beams", "Spots"].includes(widget.name))).toBe(false);
   });
 });

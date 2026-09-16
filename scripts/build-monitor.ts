@@ -60,12 +60,14 @@ let fxId = 0;
 let panelNumber = 0;
 let panelRow = 0;
 const cuepixPositions = new Map<number, Vec3>();
+const trussCenters = Array.from({ length: 4 }, (_, index) => -HAP / 2 + (index * HAP) / 3);
+const trussTop: number[] = [DECK, DECK, DECK, DECK]; // top of each panel stack (ft), for heads above
 if (rig.cuepix) {
-  const centers = Array.from({ length: 4 }, (_, index) => -HAP / 2 + (index * HAP) / 3);
   for (let truss = 0; truss < rig.cuepix.trusses.length; truss++) {
     rig.cuepix.trusses[truss].forEach((panel, slot) => {
       // ponytail: fixed 2.2 ft pitch matches the 2.1 ft rendered panel; add rig spacing only when hardware differs.
-      cuepixPositions.set(panel, [round(centers[truss]), D, round(DECK + 1.1 + slot * 2.2)]);
+      cuepixPositions.set(panel, [round(trussCenters[truss]), D, round(DECK + 1.1 + slot * 2.2)]);
+      trussTop[truss] = round(DECK + 1.1 + (slot + 1) * 2.2);
     });
   }
 }
@@ -142,9 +144,13 @@ for (const g of rig.fixtures) {
     // they share the truss X and differ only in height.
     const prefix = g.namePrefix ?? "Head";
     const isFloor = /floor/i.test(prefix);
+    // Cuepix rig: "Beam" heads sit ABOVE the two inside towers; every other head pair takes the
+    // outside trusses. Other rigs: spread across headSeparationFt (a pair lands at ±HAP/2).
+    const cuepixSlots = rig.cuepix ? (/beam/i.test(prefix) ? [1, 2] : [0, 3]) : null;
     const headXs = Array.from({ length: g.count }, (_, i) =>
-      g.count === 1 ? 0 : -HAP / 2 + (i * HAP) / (g.count - 1),
+      cuepixSlots ? trussCenters[cuepixSlots[i]] : g.count === 1 ? 0 : -HAP / 2 + (i * HAP) / (g.count - 1),
     );
+    const headZ = (i: number) => (cuepixSlots ? (/beam/i.test(prefix) ? trussTop[cuepixSlots[i]] : HZ) : isFloor ? 0.5 : HZ);
     for (let i = 0; i < g.count; i++) {
       fixtures.push({
         id: fxId++,
@@ -154,12 +160,14 @@ for (const g of rig.fixtures) {
         address: g.addresses[i],
         channels: g.channels,
         roles: pickRoles("head", g.roles),
-        pos: [round(headXs[i]), rig.cuepix ? D : 0, isFloor ? 0.5 : HZ],
+        pos: [round(headXs[i]), rig.cuepix ? D : 0, round(headZ(i))],
       });
     }
   }
 }
 
+// shutterOpenMin comes from the first head group (Beam, 248 on the Cuepix rig) — both the Beam
+// and the 375ZX open at shutterOpen 255, so the renderer's "open" test holds for either model.
 const headGroup = rig.fixtures.find((g) => g.kind === "head");
 const beam = headGroup?.beam;
 

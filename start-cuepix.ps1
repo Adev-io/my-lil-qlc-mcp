@@ -4,10 +4,12 @@ param(
   [switch]$PrepareRuntimeOnly,
   [string]$RuntimeDirectory = (Join-Path $env:TEMP 'A_Development\Cuepix'),
   [switch]$DisableLaunchpad,
+  [switch]$DisableMiniLab,
   [string]$FixtureDirectory = (Join-Path $env:USERPROFILE 'QLC+\Fixtures'),
   [string]$AdapterName,
   [switch]$NoMonitor,
-  [switch]$NoMcp
+  [switch]$NoMcp,
+  [switch]$ArtNetLoopback
 )
 
 $ErrorActionPreference = 'Stop'
@@ -30,7 +32,7 @@ function Get-Sha256([string]$Path) {
 }
 
 function Get-LaunchpadIndexes {
-  if ($DisableLaunchpad) { return [pscustomobject]@{ Input = -1; Output = -1 } }
+  if ($DisableLaunchpad) { return [pscustomobject]@{ Input = -1; Output = -1; MiniLab = -1 } }
   if (-not ('CuepixMidiIndex' -as [type])) {
     Add-Type -TypeDefinition @"
 using System;
@@ -52,6 +54,7 @@ public static class CuepixMidiIndex {
   return [pscustomobject]@{
     Input = [CuepixMidiIndex]::Input('MIDIIN2 (LPMiniMK3 MIDI)')
     Output = [CuepixMidiIndex]::Output('MIDIOUT2 (LPMiniMK3 MIDI)')
+    MiniLab = [CuepixMidiIndex]::Input('Minilab3 MIDI')
   }
 }
 
@@ -72,8 +75,10 @@ function New-CuepixRuntime {
   # QLC+ ArtNet lines sort IPv4 address strings; resolve lighting Ethernet each launch.
   [string[]]$artnetAddresses = @(Get-NetIPAddress -AddressFamily IPv4 | Select-Object -ExpandProperty IPAddress -Unique)
   [Array]::Sort($artnetAddresses, [StringComparer]::Ordinal)
-  $artnetLine = [Array]::IndexOf($artnetAddresses, '10.201.6.1')
+  $artnetTarget = if ($ArtNetLoopback) { '127.0.0.1' } else { '10.201.6.1' }
+  $artnetLine = [Array]::IndexOf($artnetAddresses, $artnetTarget)
   if ($artnetLine -lt 0) { throw 'Lighting Ethernet 10.201.6.1 absent; refusing an accidental Wi-Fi output.' }
+  if ($ArtNetLoopback) { Write-Host '  [!] ART-NET ON LOOPBACK (-ArtNetLoopback): 3D monitor only, NO packets reach the rig. Never use this on site.' -ForegroundColor Yellow }
   $xml = $xml -replace '<Output Plugin="ArtNet" UID="None" Line="[^"]*">', ('<Output Plugin="ArtNet" UID="None" Line="' + $artnetLine + '">')
   $pattern = '(?s)(<Universe Name="Launchpad" ID="2"[^>]*>)(.*?)(</Universe>)'
   $match = [regex]::Match($xml, $pattern)
@@ -86,23 +91,34 @@ function New-CuepixRuntime {
     $body = $body -replace '(?m)^\s*<(Input|Feedback) Plugin="MIDI"[^>]*/>\r?\n?', ''
   }
   $xml = $xml.Substring(0, $match.Index) + $match.Groups[1].Value + $body + $match.Groups[3].Value + $xml.Substring($match.Index + $match.Length)
+
+  $mlReady = -not $DisableMiniLab -and $midi.MiniLab -ge 0
+  $mlPattern = '(?s)\s*<Universe Name="MiniLab" ID="3"[^>]*>.*?</Universe>'
+  if ($mlReady) {
+    $xml = [regex]::Replace($xml, '(?s)(<Universe Name="MiniLab" ID="3"[^>]*>.*?<Input Plugin="MIDI" UID=")[^"]*(" Line=")[^"]*(")', ('${1}' + $midi.MiniLab + '${2}' + $midi.MiniLab + '${3}'))
+  } else {
+    $xml = [regex]::Replace($xml, $mlPattern, '')
+  }
   [IO.File]::WriteAllText($runtimeShow, $xml, [Text.UTF8Encoding]::new($false))
 
   $verified = [IO.File]::ReadAllText($runtimeShow)
   $outputMatches = [regex]::Matches($verified, '<Output Plugin="ArtNet" UID="None" Line="' + $artnetLine + '">')
   if ($outputMatches.Count -ne 2) { throw 'Runtime validation failed: both lighting outputs must use lighting Ethernet.' }
-  Write-Host "  Art-Net U0/U1: 10.201.6.1, QLC+ line $artnetLine" -ForegroundColor Green
+  Write-Host "  Art-Net U0/U1: $artnetTarget, QLC+ line $artnetLine" -ForegroundColor Green
   foreach ($required in @('<Workspace ', '<Universe Name="Launchpad" ID="2"', 'outputUni="0"', 'outputUni="1"')) {
     if (-not $verified.Contains($required)) { throw "Runtime validation failed: missing $required" }
   }
-  if (-not $controllerReady -and $verified.Contains('<Input Plugin="MIDI"')) { throw 'Runtime validation failed: stale MIDI input remained active.' }
-  return [pscustomobject]@{ Path = $runtimeShow; ControllerReady = $controllerReady; Input = $midi.Input; Output = $midi.Output }
+  if (-not $controllerReady -and [regex]::IsMatch($verified, '<Input Plugin="MIDI"[^>]*/>')) { throw 'Runtime validation failed: stale MIDI input remained active.' }
+  if (-not $mlReady -and $verified.Contains('<Universe Name="MiniLab"')) { throw 'Runtime validation failed: stale MiniLab universe remained.' }
+  if ($mlReady -and -not $verified.Contains('<Input Plugin="MIDI" UID="' + $midi.MiniLab + '" Line="' + $midi.MiniLab + '">')) { throw 'Runtime validation failed: MiniLab universe not bound to live index.' }
+  return [pscustomobject]@{ Path = $runtimeShow; ControllerReady = $controllerReady; Input = $midi.Input; Output = $midi.Output; MiniLab = $midi.MiniLab; MiniLabReady = $mlReady }
 }
 
 if ($PrepareRuntimeOnly) {
   $prepared = New-CuepixRuntime
   Write-Host "  runtime prepared: $($prepared.Path)" -ForegroundColor Green
   Write-Host $(if ($prepared.ControllerReady) { "  Launchpad ready: in=$($prepared.Input) out=$($prepared.Output)" } else { '  Launchpad disabled or absent: MIDI routes removed' }) -ForegroundColor DarkGray
+  Write-Host $(if ($prepared.MiniLabReady) { "  MiniLab ready: in=$($prepared.MiniLab)" } else { '  MiniLab absent/disabled: knobs and faders unbound this launch (plug it in, straight into the laptop, and relaunch)' }) -ForegroundColor DarkGray
   return
 }
 
@@ -140,6 +156,7 @@ if ($runtime.ControllerReady) {
 } else {
   Write-Host '  Launchpad absent/disabled. Runtime MIDI routes removed; VC and MCP remain available.' -ForegroundColor Yellow
 }
+if ($runtime.MiniLabReady) { Write-Host "  MiniLab ready: in=$($runtime.MiniLab)" -ForegroundColor Green } else { Write-Host '  MiniLab absent/disabled: knobs and faders unbound this launch (plug it in, straight into the laptop, and relaunch)' -ForegroundColor Yellow }
 
 $qlc = @(
   $env:QLC_EXE,

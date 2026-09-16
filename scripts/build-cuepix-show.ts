@@ -117,7 +117,11 @@ const headPairs = (fixture: Fixture, s: HeadState): number[] => {
   const on = s.on ?? false;
   const pairs: number[] = [];
   for (let ch = 0; ch < fixture.channels; ch++) pairs.push(ch, 0);
-  const set = (ch: number | null, v: number) => { if (ch !== null) pairs[ch * 2 + 1] = v; };
+  const set = (ch: number | null, v: number) => {
+    if (ch === null) return;
+    if (ch >= fixture.channels) throw new Error(`${fixture.name}: channel ${ch} outside ${fixture.channels}-ch mode`);
+    pairs[ch * 2 + 1] = v;
+  };
   set(r.pan, s.pan ?? 128); set(r.tilt, s.tilt ?? 128); set(r.focus, 128); set(r.zoom, 128);
   set(r.color, s.color ?? 0);
   set(r.dim, s.dim ?? (on ? 255 : 0)); set(r.shutter, s.shutter ?? (on ? 255 : 0));
@@ -276,8 +280,8 @@ addRoutingScene("All Blackout", new Map());
 // HEADS — page 2. Colour pads (solo), one-shot aim pads, dim groups (solo), shutter.
 // Aims are SingleShot chasers: a running Toggle scene rewrites pan/tilt every tick and swallows
 // the MiniLab knobs (memory: qlc-toggle-scene-beats-level-slider). Positions come from
-// rig.movingHeadSettings[<head key>][<name>] once plotted; until then pan 128 / tilt 64, the same
-// safe values the routing test "Pan Center" sends. headSafety (by DMX address) fences every aim.
+// rig.movingHeadSettings[<head key>][<name>] once plotted; until then AIM_DEFAULT below, which keeps
+// every pre-plot aim at or above horizontal. headSafety (by DMX address) fences every aim.
 // ---------------------------------------------------------------------------
 const beams = heads.filter(isBeam);
 const spots = heads.filter((head) => !isBeam(head));
@@ -299,10 +303,16 @@ const fenced = (head: Fixture, pan: number, tilt: number): [number, number] => {
   if (!f) return [pan, tilt];
   return [Math.min(f.panMax, Math.max(f.panMin, pan)), Math.min(f.tiltMax, Math.max(f.tiltMin, tilt))];
 };
-const AIM_DEFAULT: Record<string, [number, number]> = { home: [128, 64], centre: [128, 80], crowd: [128, 100], crossed: [128, 80] };
+// Pre-plot defaults. tilt = 128 + (depression° - 37.5) × 255/270, so a HIGHER tilt aims further
+// DOWN: 64 ≈ 30° up, 80 ≈ 13° up, 88 ≈ 5° up, 92 ≈ horizontal. Nothing here goes below horizontal,
+// so no beam lands in a face before the real aims are plotted. "Crossed" pans the L heads right and
+// the R heads left so the beams actually cross over the floor.
+const AIM_DEFAULT = (head: Fixture): Record<string, [number, number]> => ({
+  home: [128, 64], centre: [128, 80], crowd: [128, 88], crossed: [head.name.endsWith("L") ? 148 : 108, 80],
+});
 const aimOf = (head: Fixture, which: string): [number, number] => {
   const m = PMH[headKey(head)]?.[which];
-  const [pan, tilt] = m ? [m.pan, m.tilt] : AIM_DEFAULT[which];
+  const [pan, tilt] = m ? [m.pan, m.tilt] : AIM_DEFAULT(head)[which];
   return fenced(head, pan, tilt);
 };
 const AIMS = ["home", "centre", "crowd", "crossed"] as const;
@@ -316,6 +326,12 @@ addScene("HEAD · Spots Full", spots.map((head) => ({ id: head.id, pairs: headPa
 addScene("HEAD · All Full", heads.map((head) => ({ id: head.id, pairs: headPartial(head, { dim: 255, shutter: 255 }) })));
 addScene("HEAD · Open", heads.map((head) => ({ id: head.id, pairs: headPartial(head, { shutter: 255 }) })));
 addScene("HEAD · Strobe", heads.map((head) => ({ id: head.id, pairs: headPartial(head, { shutter: 90 }) })));
+// The MiniLab faders get their OWN copies of these looks. A Playback slider at 0 stops its function,
+// so pointing a fader at a function a pad also fires would let the fader kill the pad's look.
+// Leading "_" keeps them off the pads, exactly like _AIM/_STEP.
+addScene("_FADER · Panels", levelValues(255));
+addScene("_FADER · Beams", beams.map((head) => ({ id: head.id, pairs: headPartial(head, { dim: 255, shutter: 255 }) })));
+addScene("_FADER · Spots", spots.map((head) => ({ id: head.id, pairs: headPartial(head, { dim: 255, shutter: 255 }) })));
 
 const outputUniverses = [...new Set(fixtures.map((fixture) => fixture.universe))].sort((a, b) => a - b);
 const controller = rig.controller ?? {
@@ -537,8 +553,13 @@ const routingButtons = routingScenes.map((scene, index) => {
   return `    <Button Caption="${esc(scene.name)}" ID="${1000 + index}" Icon=""><WindowState Visible="True" X="${x}" Y="${y}" Width="112" Height="34"/>${appearance([70, 72, 78], argb(245, 245, 245))}<Function ID="${scene.id}"/><Action>Toggle</Action></Button>`;
 }).join("\n");
 const routingHeight = Math.ceil(routingScenes.length / 8) * 38 + 12;
+// MINILAB sits directly under the pad pages so the knobs and faders are on screen without
+// scrolling on the 1300x773 show laptop; the routing tests (collapsed, setup-only) go below it and
+// may run off-screen when expanded.
+const MINILAB_Y = 430 + 8, MINILAB_HEIGHT = 190;
+const ROUTING_Y = 430 + MINILAB_HEIGHT + 16;
 const routingFrame = `  <SoloFrame Caption="SETUP · ROUTING TESTS" ID="50">
-   ${appearance([35, 36, 41], argb(245, 245, 245))}<WindowState Visible="True" X="8" Y="430" Width="960" Height="${routingHeight}"/>
+   ${appearance([35, 36, 41], argb(245, 245, 245))}<WindowState Visible="True" X="8" Y="${ROUTING_Y}" Width="960" Height="${routingHeight}"/>
    <AllowChildren>True</AllowChildren><AllowResize>True</AllowResize><ShowHeader>True</ShowHeader><ShowEnableButton>False</ShowEnableButton><Collapsed>True</Collapsed><Disabled>False</Disabled>
 ${routingButtons}
   </SoloFrame>`;
@@ -555,7 +576,7 @@ function levelSliderXml(id: number, caption: string, x: number, y: number, fixtu
      ${appearance([52, 56, 65], argb(245, 245, 245))}
      <WindowState Visible="True" X="${x}" Y="${y}" Width="60" Height="150"/>
      <SliderMode ValueDisplayStyle="Exact" ClickAndGoType="None" Monitor="false">Level</SliderMode>
-     <Level LowLimit="${lo}" HighLimit="${hi}" Value="${lo}">
+     <Level LowLimit="${lo}" HighLimit="${hi}" Value="0">
       <Channel Fixture="${fixture.id}">${ch}</Channel>
      </Level>
      <Playback><Function>4294967295</Function></Playback>
@@ -577,12 +598,12 @@ const tagOf = (head: Fixture): string => (isBeam(head) ? "B" : "S") + head.name.
 const minilabSliders = ML ? [
   ...knobHeads.map((head, i) => { const f = SAFETY[String(head.address)]; return levelSliderXml(950 + i, `Tilt${i + 1}${tagOf(head)}`, 8 + i * 64, 8, head, headRoles(head).tilt, f?.tiltMin ?? 0, f?.tiltMax ?? 255, knobCcs[0][i]); }),
   ...knobHeads.map((head, i) => { const f = SAFETY[String(head.address)]; return levelSliderXml(954 + i, `Pan${i + 1}${tagOf(head)}`, 8 + (4 + i) * 64, 8, head, headRoles(head).pan, f?.panMin ?? 0, f?.panMax ?? 255, knobCcs[1][i]); }),
-  playbackSliderXml(958, "Panels", 8 + 8 * 64, 8, "LEVEL · Full", ML.cc.f1),
-  playbackSliderXml(959, "Beams", 8 + 9 * 64, 8, "HEAD · Beams Full", ML.cc.f2),
-  playbackSliderXml(960, "Spots", 8 + 10 * 64, 8, "HEAD · Spots Full", ML.cc.f3),
+  playbackSliderXml(958, "Panels", 8 + 8 * 64, 8, "_FADER · Panels", ML.cc.f1),
+  playbackSliderXml(959, "Beams", 8 + 9 * 64, 8, "_FADER · Beams", ML.cc.f2),
+  playbackSliderXml(960, "Spots", 8 + 10 * 64, 8, "_FADER · Spots", ML.cc.f3),
 ] : [];
 const minilabFrame = ML ? `  <Frame Caption="MINILAB" ID="60">
-   ${appearance([35, 36, 41], argb(245, 245, 245))}<WindowState Visible="True" X="8" Y="${430 + routingHeight + 8}" Width="${16 + 11 * 64}" Height="190"/>
+   ${appearance([35, 36, 41], argb(245, 245, 245))}<WindowState Visible="True" X="8" Y="${MINILAB_Y}" Width="${16 + 11 * 64}" Height="${MINILAB_HEIGHT}"/>
    <AllowChildren>True</AllowChildren><AllowResize>True</AllowResize><ShowHeader>True</ShowHeader><ShowEnableButton>False</ShowEnableButton><Collapsed>False</Collapsed><Disabled>False</Disabled>
 ${minilabSliders.join("\n")}
   </Frame>` : "";
@@ -616,10 +637,10 @@ ${monitorXml}
 ${performanceFrames.join("\n")}
    </Frame>
 ${speedDial}
-${routingFrame}
 ${minilabFrame}
+${routingFrame}
   </Frame>
-  <Properties><Size Width="1000" Height="${430 + routingHeight + 210}"/><GrandMaster ChannelMode="All" ValueMode="Reduce" SliderMode="Normal"/></Properties>
+  <Properties><Size Width="1000" Height="${ROUTING_Y + routingHeight + 12}"/><GrandMaster ChannelMode="All" ValueMode="Reduce" SliderMode="Normal"/></Properties>
  </VirtualConsole>
 </Workspace>
 `;
@@ -654,7 +675,9 @@ ${trussSetupLines}
 - Beam L / Beam R (Intimidator Beam 140SR, 14-channel mode) mount above trusses 2 and 3.
 - 375ZX L / 375ZX R (15-channel mode) mount on the outside 4 ft trusses 1 and 4.
 - All Cuepix panels use 79-channel mode (the units report 75; addressing is unaffected).
-- Mover pads are live from the first launch with safe upright defaults; capture real aims on plot night, then regenerate.
+- Maximum 4 panels per Elation rigging bar; each panel gets an independent safety cable; never daisy-chain safety cables.
+- Maximum 2 Cuepix panels power-linked at 120 V.
+- Mover pads are live from the first launch with pre-plot defaults, all at or above horizontal; capture real aims on plot night, then regenerate.
 
 ## Lighting LAN
 
@@ -662,6 +685,7 @@ ${trussSetupLines}
 - Computer lighting NIC: static \`10.201.6.1\`, mask \`255.255.255.0\`, no gateway. Disable sharing and bridging.
 - Pknight CR011R: \`10.201.6.100\`; Art-Net Universe 0 to its DMX output.
 - ${panelsByUniverse}
+- Panels: Service PIN \`050\`, Network Switch \`ON\`, Protocol \`ArtNet\` (per-panel menu).
 - Set panel addresses from \`CUEPIX-PATCH-CHART.md\`.
 - CR011R DMX OUT → ${dmxChain} → DMX terminator.
 - Cuepix panels receive Ethernet directly. Do not add them to the CR011R DMX chain.

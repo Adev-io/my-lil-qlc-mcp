@@ -99,10 +99,10 @@
     }
   ],
   "headSafety": {
-    "316": { "panMin": 0, "panMax": 255, "tiltMin": 0, "tiltMax": 128 },
-    "330": { "panMin": 0, "panMax": 255, "tiltMin": 0, "tiltMax": 128 },
-    "344": { "panMin": 0, "panMax": 255, "tiltMin": 0, "tiltMax": 128 },
-    "359": { "panMin": 0, "panMax": 255, "tiltMin": 0, "tiltMax": 128 }
+    "316": { "panMin": 0, "panMax": 255, "tiltMin": 0, "tiltMax": 92 },
+    "330": { "panMin": 0, "panMax": 255, "tiltMin": 0, "tiltMax": 92 },
+    "344": { "panMin": 0, "panMax": 255, "tiltMin": 0, "tiltMax": 92 },
+    "359": { "panMin": 0, "panMax": 255, "tiltMin": 0, "tiltMax": 92 }
   },
   "dmxOutput": {
     "plugin": "ArtNet",

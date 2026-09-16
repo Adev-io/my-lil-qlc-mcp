@@ -55,17 +55,15 @@ const FixtureGroup = z
 
 const CuepixShow = z
   .object({
-    trusses: z.array(z.array(z.number().int().min(1).max(12)).min(1)).length(4),
+    // Four trusses left to right; each lists its panel numbers bottom to top. An outer truss
+    // may be empty (2026-09-19: the 4 ft trusses carry a head and no panels).
+    trusses: z.array(z.array(z.number().int().min(1).max(64))).length(4),
     moversCalibrated: z.boolean().default(false),
   })
   .superRefine(({ trusses }, ctx) => {
-    const panels = trusses.flat();
-    if (new Set(panels).size !== 12 || panels.some((panel, index) => panel !== index + 1)) {
-      ctx.addIssue({
-        code: "custom",
-        path: ["trusses"],
-        message: "trusses must contain panels 1-12 once in left-to-right order",
-      });
+    const panels = [...trusses.flat()].sort((a, b) => a - b);
+    if (panels.length === 0 || panels.some((panel, index) => panel !== index + 1)) {
+      ctx.addIssue({ code: "custom", path: ["trusses"], message: "trusses must contain panels 1..N exactly once" });
     }
   });
 

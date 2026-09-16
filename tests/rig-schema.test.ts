@@ -118,3 +118,15 @@ describe("rig schema — Cuepix multi-universe panels", () => {
     expect(result.success).toBe(true);
   });
 });
+
+describe("rig schema — cuepix trusses", () => {
+  const cuepix = JSON.parse(readFileSync(path.join(ROOT, "rigs", "cuepix-panel.rig.json"), "utf8"));
+  it("accepts eight panels on the two inside trusses with empty outer trusses", () => {
+    const r = RigSchema.safeParse({ ...cuepix, cuepix: { trusses: [[], [1, 2, 3, 4], [5, 6, 7, 8], []], moversCalibrated: false } });
+    expect(r.success).toBe(true);
+  });
+  it("rejects a panel listed twice or a gap in the numbering", () => {
+    expect(RigSchema.safeParse({ ...cuepix, cuepix: { trusses: [[], [1, 2, 3, 4], [5, 6, 7, 7], []] } }).success).toBe(false);
+    expect(RigSchema.safeParse({ ...cuepix, cuepix: { trusses: [[], [1, 2, 3, 4], [5, 6, 7, 9], []] } }).success).toBe(false);
+  });
+});

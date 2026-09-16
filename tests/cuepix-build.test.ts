@@ -51,22 +51,21 @@ describe("Cuepix routing workspace", () => {
     const panelGroups = rig.fixtures.filter((g) => g.kind === "panel");
     expect(panelGroups).toHaveLength(2);
     expect(panelGroups.map((g) => ({ universe: g.universe, addresses: g.addresses }))).toEqual([
-      { universe: 0, addresses: [0, 79, 158, 237, 316, 395] },
-      { universe: 1, addresses: [0, 79, 158, 237, 316, 395] },
+      { universe: 0, addresses: [0, 79, 158, 237] },
+      { universe: 1, addresses: [0, 79, 158, 237] },
     ]);
-    expect(rig.fixtures.filter((g) => g.kind === "head").flatMap((g) => g.addresses)).toEqual([480, 495]);
+    expect(rig.fixtures.filter((g) => g.kind === "head").flatMap((g) => g.addresses)).toEqual([316, 330, 344, 359]);
   });
 
-  it("defines four left-to-right trusses and keeps movers locked", () => {
+  it("defines four left-to-right trusses", () => {
     const { rig } = loadRig(RIG);
-    expect((rig as any).cuepix?.trusses).toEqual([[1, 2], [3, 4, 5, 6], [7, 8, 9, 10], [11, 12]]);
-    expect((rig as any).cuepix?.moversCalibrated).toBe(false);
+    expect((rig as any).cuepix?.trusses).toEqual([[], [1, 2, 3, 4], [5, 6, 7, 8], []]);
   });
 
   it("rejects duplicate Cuepix panel placement", () => {
     const raw = JSON.parse(readFileSync(RIG, "utf8"));
     raw.cuepix = {
-      trusses: [[1, 2], [3, 4, 5, 6], [7, 8, 9, 10], [11, 11]],
+      trusses: [[], [1, 2, 3, 4], [5, 6, 7, 7], []],
       moversCalibrated: false,
     };
     expect(RigSchema.safeParse(raw).success).toBe(false);
@@ -81,43 +80,43 @@ describe("Cuepix routing workspace", () => {
     });
     const qxw = readFileSync(path.join(out, "cuepix-panel-show.qxw"), "utf8");
     await expect(parseStringPromise(qxw)).resolves.toBeTruthy();
-    expect((qxw.match(/<Fixture>/g) ?? [])).toHaveLength(14);
+    expect((qxw.match(/<Fixture>/g) ?? [])).toHaveLength(12);
     expect(qxw).toContain('<Output Plugin="ArtNet" UID="None" Line="0">');
     expect(qxw).toContain('outputUni="0"');
     expect(qxw).toContain('outputUni="1"');
-    expect(qxw).toContain('<Name>Cuepix 12</Name>');
+    expect(qxw).toContain('<Name>Cuepix 8</Name>');
+    expect(qxw).toContain('<Name>Beam L</Name>');
+    expect(qxw).toContain('<Name>Beam R</Name>');
     expect(qxw).toContain('<Name>375ZX L</Name>');
     expect(qxw).toContain('<Name>375ZX R</Name>');
-    expect(qxw).toContain('<Address>495</Address>');
+    expect(qxw).toContain('<Address>359</Address>');
     expect(qxw).toContain('Name="TEST · Cuepix 1 Red"');
     const sceneNames = [...qxw.matchAll(/<Function[^>]*Type="Scene"[^>]*Name="([^"]+)"/g)].map((match) => match[1]);
     const routingSceneNames = sceneNames.filter((name) => name.startsWith("TEST · "));
-    expect(routingSceneNames).toHaveLength(72);
+    expect(routingSceneNames).toHaveLength(60);
     expect(routingSceneNames.every((name) => name.startsWith("TEST · "))).toBe(true);
     expect(existsSync(path.join(out, "CUEPIX-PATCH-CHART.md"))).toBe(true);
     expect(existsSync(path.join(out, "CUEPIX-SETUP.md"))).toBe(true);
     const patch = readFileSync(path.join(out, "CUEPIX-PATCH-CHART.md"), "utf8");
     for (const text of [
-      "| Cuepix 1 | CUEPIX Panel | 10.201.6.11 | 0 | 1 | 79 | 79 |",
-      "| Cuepix 6 | CUEPIX Panel | 10.201.6.16 | 0 | 396 | 474 | 79 |",
-      "| Cuepix 7 | CUEPIX Panel | 10.201.6.17 | 1 | 1 | 79 | 79 |",
-      "| Cuepix 12 | CUEPIX Panel | 10.201.6.22 | 1 | 396 | 474 | 79 |",
-      "| 375ZX L | Intimidator Spot 375ZX | — | 0 | 481 | 495 | 15 |",
-      "| 375ZX R | Intimidator Spot 375ZX | — | 0 | 496 | 510 | 15 |",
+      "| Cuepix 1 | CUEPIX Panel | 0 | 1 | 79 | 79 |",
+      "| Cuepix 4 | CUEPIX Panel | 0 | 238 | 316 | 79 |",
+      "| Cuepix 5 | CUEPIX Panel | 1 | 1 | 79 | 79 |",
+      "| Cuepix 8 | CUEPIX Panel | 1 | 238 | 316 | 79 |",
+      "| Beam L | Intimidator Beam 140SR V2 | 0 | 317 | 330 | 14 |",
+      "| Beam R | Intimidator Beam 140SR V2 | 0 | 331 | 344 | 14 |",
+      "| 375ZX L | Intimidator Spot 375ZX | 0 | 345 | 359 | 15 |",
+      "| 375ZX R | Intimidator Spot 375ZX | 0 | 360 | 374 | 15 |",
     ]) expect(patch).toContain(text);
     const setup = readFileSync(path.join(out, "CUEPIX-SETUP.md"), "utf8");
     for (const text of [
-      "Truss 1: Cuepix 1-2, bottom to top.",
-      "Truss 2: Cuepix 3-6, bottom to top.",
-      "Truss 3: Cuepix 7-10, bottom to top.",
-      "Truss 4: Cuepix 11-12, bottom to top.",
+      "Truss 2: Cuepix 1-4, bottom to top.",
+      "Truss 3: Cuepix 5-8, bottom to top.",
+      "Beam L at 317 → Beam R at 331 → 375ZX L at 345 → 375ZX R at 360",
+      "Minilab3 MIDI",
       "Launchpad Mini MK3", "MIDIIN2 (LPMiniMK3 MIDI)",
       "http://127.0.0.1:8788/dashboard", "http://127.0.0.1:7800",
       "mover calibration", "SETUP · ROUTING TESTS",
-      "Service PIN `050`", "Network Switch: `ON`", "Protocol: `ArtNet`",
-      "Maximum 4 panels per Elation rigging bar",
-      "Maximum 2 Cuepix panels power-linked at 120V",
-      "independent safety cable", "Never daisy-chain safety cables",
     ]) expect(setup).toContain(text);
   });
 
@@ -142,7 +141,7 @@ describe("Cuepix routing workspace", () => {
     ]));
     expect(sceneNames.some((name) => name === "Cuepix 1 Red")).toBe(false);
 
-    const expectedPanels = Array.from({ length: 12 }, (_, index) => index);
+    const expectedPanels = Array.from({ length: 8 }, (_, index) => index);
     for (const name of sceneNames.filter((name) => name.startsWith("BASE · "))) {
       expect(fixtureChannels(functionBlock(qxw, "Scene", name)).ids).toEqual(expectedPanels);
     }
@@ -159,11 +158,11 @@ describe("Cuepix routing workspace", () => {
     expect(strobe.channels).toEqual([77]);
 
     expect(chaserFixtureOrder(qxw, "FX · Left to Right")).toEqual(expectedPanels.map((id) => [id]));
-    expect(chaserFixtureOrder(qxw, "FX · Center Out")).toEqual([[5, 6], [4, 7], [3, 8], [2, 9], [1, 10], [0, 11]]);
-    expect(chaserFixtureOrder(qxw, "FX · Truss Step")).toEqual([[0, 1], [2, 3, 4, 5], [6, 7, 8, 9], [10, 11]]);
+    expect(chaserFixtureOrder(qxw, "FX · Center Out")).toEqual([[3, 4], [2, 5], [1, 6], [0, 7]]);
+    expect(chaserFixtureOrder(qxw, "FX · Truss Step")).toEqual([[0, 1, 2, 3], [4, 5, 6, 7]]);
     expect(chaserFixtureOrder(qxw, "FX · Bounce")).toEqual([
-      [0], [1], [2], [3], [4], [5], [6], [7], [8], [9], [10], [11],
-      [10], [9], [8], [7], [6], [5], [4], [3], [2], [1],
+      [0], [1], [2], [3], [4], [5], [6], [7],
+      [6], [5], [4], [3], [2], [1],
     ]);
   });
 
@@ -203,9 +202,39 @@ describe("Cuepix routing workspace", () => {
       expect(new Set(channels).size).toBe(channels.length);
     }
 
-    const lockedMover = buttonBlock(qxw, "HEAD AMBER P2 R3C1");
-    expect(lockedMover).not.toContain("<Function");
-    expect(lockedMover).not.toContain("<Input");
+    // Enabled pads are emitted as an OSC twin + a Launchpad twin; buttonBlock() returns the first.
+    const homePad = buttonBlock(qxw, "HOME P2 R4C1");
+    expect(homePad).toContain("<Function");
+    expect(homePad).toContain('<Input Universe="0"');
+    const homeTwins = [...qxw.matchAll(/<Button Caption="HOME P2 R4C1"[\s\S]*?<\/Button>/g)].map((match) => match[0]);
+    expect(homeTwins).toHaveLength(2);
+    expect(homeTwins.every((twin) => twin.includes("<Function"))).toBe(true);
+    expect(homeTwins.some((twin) => twin.includes('<Input Universe="2"'))).toBe(true);
+    expect(qxw).toContain('<Universe Name="MiniLab" ID="3">');
+    expect(qxw).toContain('<Slider Caption="Tilt1SL"');
+    expect(qxw).toContain('<Slider Caption="Pan2BL"');
+    expect(qxw).toMatch(/Name="HEAD · Home Go">[\s\S]*?<RunOrder>SingleShot<\/RunOrder>/);
+
+    // headSafety fences the MiniLab knobs: tilt is capped at 128, pan runs the full range.
+    for (const caption of ["Tilt1SL", "Tilt2BL", "Tilt3BR", "Tilt4SR"]) {
+      expect(qxw).toMatch(new RegExp(`<Slider Caption="${caption}"[\\s\\S]*?<Level LowLimit="0" HighLimit="128"`));
+    }
+    for (const caption of ["Pan1SL", "Pan2BL", "Pan3BR", "Pan4SR"]) {
+      expect(qxw).toMatch(new RegExp(`<Slider Caption="${caption}"[\\s\\S]*?<Level LowLimit="0" HighLimit="255"`));
+    }
+
+    // Per-model head channels: Beam L is fixture 8 (140SR, 14ch), 375ZX L is fixture 10 (15ch).
+    const aimHome = functionBlock(qxw, "Scene", "_AIM · Home");
+    expect(aimHome.match(/<FixtureVal ID="8">([^<]*)</)![1]).toBe("0,128,2,64,4,0,10,255");
+    expect(aimHome.match(/<FixtureVal ID="10">([^<]*)</)![1]).toBe("0,128,2,64,4,0,11,255");
+    expect(functionBlock(qxw, "Scene", "HEAD · Beams Full")).toContain('<FixtureVal ID="8">9,255,10,255</FixtureVal>');
+    expect(functionBlock(qxw, "Scene", "HEAD · Spots Full")).toContain('<FixtureVal ID="10">10,255,11,255</FixtureVal>');
+    const headRed = functionBlock(qxw, "Scene", "HEAD · Red");
+    expect(headRed).toContain('<FixtureVal ID="8">5,5,10,255</FixtureVal>');
+    expect(headRed).toContain('<FixtureVal ID="10">5,11,11,255</FixtureVal>');
+    const headStrobe = functionBlock(qxw, "Scene", "HEAD · Strobe");
+    expect(headStrobe).toContain('<FixtureVal ID="8">10,90</FixtureVal>');
+    expect(headStrobe).toContain('<FixtureVal ID="10">11,90</FixtureVal>');
 
     const mapPath = path.join(out, "config", "cuepix-widgets.json");
     expect(existsSync(mapPath)).toBe(true);

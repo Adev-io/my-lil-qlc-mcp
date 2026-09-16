@@ -24,7 +24,7 @@ type Fixture = {
 };
 type FixtureValue = { id: number; pairs: number[] };
 type Scene = { id: number; type: "Scene"; name: string; values: FixtureValue[]; fadeIn: number; fadeOut: number };
-type Chaser = { id: number; type: "Chaser"; name: string; steps: number[]; fade: number; hold: number };
+type Chaser = { id: number; type: "Chaser"; name: string; steps: number[]; fade: number; hold: number; runOrder: "Loop" | "SingleShot" };
 type FunctionDef = Scene | Chaser;
 
 function esc(value: string): string {
@@ -103,13 +103,40 @@ const levelValues = (value: number): FixtureValue[] => panels.map((panel) => ({ 
 const strobeValues = (value: number): FixtureValue[] => panels.map((panel) => ({ id: panel.id, pairs: [77, value] }));
 const selectedStrobeValues = (indexes: number[], value = 95): FixtureValue[] =>
   indexes.map((index) => ({ id: panels[index].id, pairs: [77, value] }));
-const headPairs = (on: boolean, pan = 128, tilt = 128): number[] => [
-  0, pan, 1, 0, 2, tilt, 3, 0, 4, 0, 5, 0, 6, 0, 7, 0, 8, 0, 9, 128,
-  10, on ? 255 : 0, 11, on ? 255 : 0, 12, 0, 13, 0, 14, 128,
-];
+// Two head models. Channels differ, so every head value goes through its own builder:
+//   375ZX 15ch: 0 pan 2 tilt 4 speed 5 colour 6 gobo 7 rot 8 prism 9 focus 10 dim 11 shutter 13 macro 14 zoom
+//   140SR 14ch: 0 pan 2 tilt 4 speed 5 colour 6 gobo 7 prism 8 focus 9 dim 10 shutter 11 frost 12 fn 13 macro
+type HeadState = { on?: boolean; pan?: number; tilt?: number; color?: number; dim?: number; shutter?: number };
+const isBeam = (fixture: Fixture): boolean => /140SR/i.test(fixture.model);
+const headRoles = (fixture: Fixture) => (isBeam(fixture)
+  ? { pan: 0, tilt: 2, speed: 4, color: 5, gobo: 6, prism: 7, focus: 8, dim: 9, shutter: 10, macro: 13, zoom: null }
+  : { pan: 0, tilt: 2, speed: 4, color: 5, gobo: 6, prism: 8, focus: 9, dim: 10, shutter: 11, macro: 13, zoom: 14 });
+// Full state for the routing tests (every channel written, so a stale value cannot survive).
+const headPairs = (fixture: Fixture, s: HeadState): number[] => {
+  const r = headRoles(fixture);
+  const on = s.on ?? false;
+  const pairs: number[] = [];
+  for (let ch = 0; ch < fixture.channels; ch++) pairs.push(ch, 0);
+  const set = (ch: number | null, v: number) => { if (ch !== null) pairs[ch * 2 + 1] = v; };
+  set(r.pan, s.pan ?? 128); set(r.tilt, s.tilt ?? 128); set(r.focus, 128); set(r.zoom, 128);
+  set(r.color, s.color ?? 0);
+  set(r.dim, s.dim ?? (on ? 255 : 0)); set(r.shutter, s.shutter ?? (on ? 255 : 0));
+  return pairs;
+};
+// Partial state for the performance pads: only the channels named, so colour, aim and dim layer.
+const headPartial = (fixture: Fixture, s: HeadState): number[] => {
+  const r = headRoles(fixture);
+  const pairs: number[] = [];
+  if (s.pan !== undefined) pairs.push(r.pan, s.pan);
+  if (s.tilt !== undefined) pairs.push(r.tilt, s.tilt, r.speed, 0);
+  if (s.color !== undefined) pairs.push(r.color, s.color);
+  if (s.dim !== undefined) pairs.push(r.dim, s.dim);
+  if (s.shutter !== undefined) pairs.push(r.shutter, s.shutter);
+  return pairs;
+};
 const off = (fixture: Fixture): FixtureValue => ({
   id: fixture.id,
-  pairs: fixture.kind === "panel" ? panelPairs([0, 0, 0]) : headPairs(false),
+  pairs: fixture.kind === "panel" ? panelPairs([0, 0, 0]) : headPairs(fixture, { on: false }),
 });
 
 const functions: FunctionDef[] = [];
@@ -119,9 +146,9 @@ function addScene(name: string, values: FixtureValue[], fadeIn = 0, fadeOut = 0)
   functions.push({ id, type: "Scene", name, values, fadeIn, fadeOut });
   return id;
 }
-function addChaser(name: string, steps: number[], fade: number, hold: number): number {
+function addChaser(name: string, steps: number[], fade: number, hold: number, runOrder: "Loop" | "SingleShot" = "Loop"): number {
   const id = functions.length;
-  functions.push({ id, type: "Chaser", name, steps, fade, hold });
+  functions.push({ id, type: "Chaser", name, steps, fade, hold, runOrder });
   return id;
 }
 function addRoutingScene(name: string, active: Map<number, number[]>): void {
@@ -175,9 +202,11 @@ addScene("FLASH · Burst", strobeValues(95));
 const stepScene = (name: string, indexes: number[], rgb: RGB = [255, 255, 255], fade = 0): number =>
   addScene(`_STEP · ${name}`, selectedPanelValues(indexes, rgb), fade, fade);
 const panelOrder = panels.map((_, index) => index);
-const centerOut = [[5, 6], [4, 7], [3, 8], [2, 9], [1, 10], [0, 11]];
+const half = Math.floor(panels.length / 2);
+const centerOut = Array.from({ length: half }, (_, k) => [half - 1 - k, half + k]);
 const outsideIn = [...centerOut].reverse();
-const trussStep = (rig.cuepix?.trusses ?? [[1, 2], [3, 4, 5, 6], [7, 8, 9, 10], [11, 12]])
+const trussStep = (rig.cuepix?.trusses ?? [panelOrder.map((i) => i + 1)])
+  .filter((group) => group.length)
   .map((group) => group.map((panel) => panel - 1));
 const bounce = [...panelOrder, ...panels.slice(1, -1).map((_, index) => panels.length - 2 - index)];
 const groupedChaser = (name: string, groups: number[][], fade = 0, hold = 250): void => {
@@ -227,20 +256,66 @@ const colors: [string, RGB][] = [
 for (const panel of panels) {
   for (const [label, rgb] of colors) addRoutingScene(`${panel.name} ${label}`, new Map([[panel.id, panelPairs(rgb)]]));
 }
+const outputUniversesOf = (list: Fixture[]): number[] => [...new Set(list.map((fixture) => fixture.universe))].sort((a, b) => a - b);
 for (const head of heads) {
-  addRoutingScene(`${head.name} Open White`, new Map([[head.id, headPairs(true)]]));
-  addRoutingScene(`${head.name} Pan Center`, new Map([[head.id, headPairs(true, 128, 64)]]));
-  addRoutingScene(`${head.name} Tilt Center`, new Map([[head.id, headPairs(true, 64, 128)]]));
-  addRoutingScene(`${head.name} Blackout`, new Map([[head.id, headPairs(false)]]));
+  addRoutingScene(`${head.name} Open White`, new Map([[head.id, headPairs(head, { on: true })]]));
+  addRoutingScene(`${head.name} Pan Center`, new Map([[head.id, headPairs(head, { on: true, pan: 128, tilt: 64 })]]));
+  addRoutingScene(`${head.name} Tilt Center`, new Map([[head.id, headPairs(head, { on: true, pan: 64, tilt: 128 })]]));
+  addRoutingScene(`${head.name} Blackout`, new Map([[head.id, headPairs(head, { on: false })]]));
 }
-for (const universe of [0, 1]) {
+for (const universe of outputUniversesOf(panels)) {
   addRoutingScene(
     `Universe ${universe} Panels White`,
     new Map(panels.filter((panel) => panel.universe === universe).map((panel) => [panel.id, panelPairs([255, 255, 255])])),
   );
 }
-addRoutingScene("Both 375ZX Open White", new Map(heads.map((head) => [head.id, headPairs(true)])));
+addRoutingScene("All Heads Open White", new Map(heads.map((head) => [head.id, headPairs(head, { on: true })])));
 addRoutingScene("All Blackout", new Map());
+
+// ---------------------------------------------------------------------------
+// HEADS — page 2. Colour pads (solo), one-shot aim pads, dim groups (solo), shutter.
+// Aims are SingleShot chasers: a running Toggle scene rewrites pan/tilt every tick and swallows
+// the MiniLab knobs (memory: qlc-toggle-scene-beats-level-slider). Positions come from
+// rig.movingHeadSettings[<head key>][<name>] once plotted; until then pan 128 / tilt 64, the same
+// safe values the routing test "Pan Center" sends. headSafety (by DMX address) fences every aim.
+// ---------------------------------------------------------------------------
+const beams = heads.filter(isBeam);
+const spots = heads.filter((head) => !isBeam(head));
+const HEAD_COLOURS = ["red", "amber", "yellow", "green", "blue", "cyan", "magenta", "white"] as const;
+const wheelOf = (head: Fixture, name: string): number => {
+  const group = rig.fixtures.find((g) => g.kind === "head" && head.name.startsWith(`${g.namePrefix} `));
+  const v = group?.colorWheel?.[name];
+  if (v === undefined) throw new Error(`${head.name}: no colorWheel entry for ${name} in the rig`);
+  return v;
+};
+for (const name of HEAD_COLOURS) {
+  addScene(`HEAD · ${name[0].toUpperCase() + name.slice(1)}`, heads.map((head) => ({ id: head.id, pairs: headPartial(head, { color: wheelOf(head, name), shutter: 255 }) })));
+}
+const PMH: Record<string, Record<string, { pan: number; tilt: number } | null>> = (rig as any).movingHeadSettings ?? {};
+const SAFETY: Record<string, { panMin: number; panMax: number; tiltMin: number; tiltMax: number }> = (rig as any).headSafety ?? {};
+const headKey = (head: Fixture): string => head.name.replace(/\s+/g, "").replace(/^(\w)/, (c) => c.toLowerCase()); // "Beam L" -> "beamL", "375ZX R" -> "375ZXR"
+const fenced = (head: Fixture, pan: number, tilt: number): [number, number] => {
+  const f = SAFETY[String(head.address)];
+  if (!f) return [pan, tilt];
+  return [Math.min(f.panMax, Math.max(f.panMin, pan)), Math.min(f.tiltMax, Math.max(f.tiltMin, tilt))];
+};
+const AIM_DEFAULT: Record<string, [number, number]> = { home: [128, 64], centre: [128, 80], crowd: [128, 100], crossed: [128, 80] };
+const aimOf = (head: Fixture, which: string): [number, number] => {
+  const m = PMH[headKey(head)]?.[which];
+  const [pan, tilt] = m ? [m.pan, m.tilt] : AIM_DEFAULT[which];
+  return fenced(head, pan, tilt);
+};
+const AIMS = ["home", "centre", "crowd", "crossed"] as const;
+for (const which of AIMS) {
+  const label = which[0].toUpperCase() + which.slice(1);
+  const scene = addScene(`_AIM · ${label}`, heads.map((head) => { const [pan, tilt] = aimOf(head, which); return { id: head.id, pairs: headPartial(head, { pan, tilt, shutter: 255 }) }; }), 400, 400);
+  addChaser(`HEAD · ${label} Go`, [scene], 400, 400, "SingleShot");
+}
+addScene("HEAD · Beams Full", beams.map((head) => ({ id: head.id, pairs: headPartial(head, { dim: 255, shutter: 255 }) })));
+addScene("HEAD · Spots Full", spots.map((head) => ({ id: head.id, pairs: headPartial(head, { dim: 255, shutter: 255 }) })));
+addScene("HEAD · All Full", heads.map((head) => ({ id: head.id, pairs: headPartial(head, { dim: 255, shutter: 255 }) })));
+addScene("HEAD · Open", heads.map((head) => ({ id: head.id, pairs: headPartial(head, { shutter: 255 }) })));
+addScene("HEAD · Strobe", heads.map((head) => ({ id: head.id, pairs: headPartial(head, { shutter: 90 }) })));
 
 const outputUniverses = [...new Set(fixtures.map((fixture) => fixture.universe))].sort((a, b) => a - b);
 const controller = rig.controller ?? {
@@ -258,6 +333,13 @@ const universesXml = `${outputUniverses.map((universe) => `   <Universe Name="Li
     <Input Plugin="MIDI" UID="${esc(controller.inputUid)}" Line="${esc(controller.inputLine)}"/>
     <Feedback Plugin="MIDI" UID="${esc(controller.outputUid)}" Line="${esc(controller.outputLine)}"/>
    </Universe>`;
+const ML = rig.controller2;
+const minilabUniverseXml = ML ? `
+   <Universe Name="MiniLab" ID="3">
+    <Input Plugin="MIDI" UID="${esc(ML.inputUid)}" Line="${esc(ML.inputLine)}">
+     <PluginParameters midichannel="16"/>
+    </Input>
+   </Universe>` : "";
 const fixturesXml = fixtures.map((fixture) => `  <Fixture>
    <Manufacturer>${esc(fixture.manufacturer)}</Manufacturer>
    <Model>${esc(fixture.model)}</Model>
@@ -281,7 +363,7 @@ ${fn.values.map((value) => `   <FixtureVal ID="${value.id}">${value.pairs.join("
   return `  <Function ID="${fn.id}" Type="Chaser" Name="${esc(fn.name)}">
    <Speed FadeIn="${fn.fade}" FadeOut="${fn.fade}" Duration="${fn.hold}"/>
    <Direction>Forward</Direction>
-   <RunOrder>Loop</RunOrder>
+   <RunOrder>${fn.runOrder}</RunOrder>
    <SpeedModes FadeIn="Common" FadeOut="Common" Duration="Common"/>
 ${steps}
   </Function>`;
@@ -355,14 +437,24 @@ addRow(1, 1, "FX-P2", [
   ["FADE", "FX · Color Fade", LED.purple, [130, 75, 185]], ["BREATHE", "FX · Breathe", LED.cyan, [50, 150, 175]],
 ], 4);
 
-const moverRows = [
-  ["HEAD AMBER", "HEAD BLUE", "HEAD WHT", "HEAD PURP", "HEAD GRN", "HEAD RED", "GOBO", "PRISM"],
-  ["CENTER", "POSITION A", "POSITION B", "POSITION C", "SWEEP", "CROSS", "CIRCLE", "HEAD STOP"],
-  ["L HEAD", "R HEAD", "BOTH", "OPEN", "DIM25", "DIM50", "DIM75", "HEAD STR"],
-];
-moverRows.forEach((labels, rowIndex) => labels.forEach((label, col) => place({
-  label, row: rowIndex + 2, col, page: 1, frame: "MOVERS-P2", led: LED.gray, bg: [65, 65, 72], enabled: Boolean(rig.cuepix?.moversCalibrated),
-})));
+// Page 2 rows 3-5: colours (solo), aims (one-shot), dims (solo) + shutter utilities.
+addRow(1, 2, "HEADCOL-P2", [
+  ["HD RED", "HEAD · Red", LED.red, [200, 30, 30]], ["HD AMBER", "HEAD · Amber", LED.amber, [225, 120, 25]],
+  ["HD YELLOW", "HEAD · Yellow", LED.yellow, [225, 205, 35]], ["HD GREEN", "HEAD · Green", LED.green, [40, 185, 75]],
+  ["HD BLUE", "HEAD · Blue", LED.blue, [40, 90, 215]], ["HD CYAN", "HEAD · Cyan", LED.cyan, [30, 170, 190]],
+  ["HD MAGENTA", "HEAD · Magenta", LED.purple, [190, 50, 190]], ["HD WHITE", "HEAD · White", LED.white, [225, 225, 220]],
+]);
+addRow(1, 3, "HEADAIM-P2", [
+  ["HOME", "HEAD · Home Go", LED.gray, [90, 90, 100]], ["CENTRE", "HEAD · Centre Go", LED.gray, [90, 90, 100]],
+  ["CROWD", "HEAD · Crowd Go", LED.gray, [90, 90, 100]], ["CROSSED", "HEAD · Crossed Go", LED.gray, [90, 90, 100]],
+]);
+addRow(1, 4, "HEADDIM-P2", [
+  ["BEAMS", "HEAD · Beams Full", LED.white, [160, 160, 170]], ["SPOTS", "HEAD · Spots Full", LED.white, [160, 160, 170]],
+  ["ALL HEADS", "HEAD · All Full", LED.white, [200, 200, 205]],
+]);
+addRow(1, 4, "HEADUTIL-P2", [
+  ["HD OPEN", "HEAD · Open", LED.green, [50, 150, 80]], ["HD STROBE", "HEAD · Strobe", LED.white, [225, 225, 225], "Flash"],
+], 4);
 
 for (const page of [0, 1]) {
   addRow(page, 6, `LEVEL-P${page + 1}`, [
@@ -414,13 +506,13 @@ ${inner}
 const performanceFrames: string[] = [];
 let frameId = 10;
 for (const page of [0, 1]) {
-  for (const name of [`BASE-P${page + 1}`, `FX-P${page + 1}`, `MOVERS-P${page + 1}`, `LEVEL-P${page + 1}`, `SPEED-P${page + 1}`, `UTILITY-P${page + 1}`]) {
+  for (const name of [`BASE-P${page + 1}`, `FX-P${page + 1}`, `HEADCOL-P${page + 1}`, `HEADAIM-P${page + 1}`, `HEADDIM-P${page + 1}`, `HEADUTIL-P${page + 1}`, `LEVEL-P${page + 1}`, `SPEED-P${page + 1}`, `UTILITY-P${page + 1}`]) {
     const buttons = placed.filter((button) => button.page === page && button.frame === name);
-    if (buttons.length) performanceFrames.push(frameXml(name.startsWith("BASE") || name.startsWith("FX") || name.startsWith("LEVEL") ? "SoloFrame" : "Frame", name, frameId++, page, buttons));
+    if (buttons.length) performanceFrames.push(frameXml(/^(BASE|FX|HEADCOL|HEADDIM|LEVEL)/.test(name) ? "SoloFrame" : "Frame", name, frameId++, page, buttons));
   }
 }
 
-const chaserIds = functions.filter((fn) => fn.type === "Chaser" && !fn.name.startsWith("TEST ·")).map((fn) => fn.id);
+const chaserIds = functions.filter((fn) => fn.type === "Chaser" && !fn.name.startsWith("TEST ·") && !fn.name.startsWith("HEAD ·")).map((fn) => fn.id);
 const speedFunctionsXml = chaserIds.map((id) => `     <Function FadeIn="0" FadeOut="0" Duration="6">${id}</Function>`).join("\n");
 const speedDial = `   <Frame Caption="FX SPEED" ID="40">
     ${appearance([32, 34, 39])}
@@ -451,6 +543,50 @@ const routingFrame = `  <SoloFrame Caption="SETUP · ROUTING TESTS" ID="50">
 ${routingButtons}
   </SoloFrame>`;
 
+// MINILAB — universe 3. TOP row K1-K4 = TILT of light 1-4, BOTTOM row K5-K8 = PAN, house-left
+// to house-right along the truss line. Level mode is right HERE and only here: a knob owns its
+// pan/tilt channel and every aim pad is a one-shot, so the knob always has the last word.
+// Fenced by rig.headSafety (by DMX address). F1-F3 = Playback faders (intensity of a running
+// scene, never a Level slider on a panel channel).
+const knobHeads = [spots[0], beams[0], beams[1], spots[1]].filter(Boolean);
+const midiIn = (cc: number) => `<Input Universe="3" Channel="${cc}"/>`;
+function levelSliderXml(id: number, caption: string, x: number, y: number, fixture: Fixture, ch: number, lo: number, hi: number, cc: number): string {
+  return `    <Slider Caption="${esc(caption)}" ID="${id}" WidgetStyle="Slider" InvertedAppearance="false">
+     ${appearance([52, 56, 65], argb(245, 245, 245))}
+     <WindowState Visible="True" X="${x}" Y="${y}" Width="60" Height="150"/>
+     <SliderMode ValueDisplayStyle="Exact" ClickAndGoType="None" Monitor="false">Level</SliderMode>
+     <Level LowLimit="${lo}" HighLimit="${hi}" Value="${lo}">
+      <Channel Fixture="${fixture.id}">${ch}</Channel>
+     </Level>
+     <Playback><Function>4294967295</Function></Playback>
+     ${midiIn(cc)}
+    </Slider>`;
+}
+function playbackSliderXml(id: number, caption: string, x: number, y: number, fn: string, cc: number): string {
+  return `    <Slider Caption="${esc(caption)}" ID="${id}" WidgetStyle="Slider" InvertedAppearance="false">
+     ${appearance([52, 56, 65], argb(245, 245, 245))}
+     <WindowState Visible="True" X="${x}" Y="${y}" Width="60" Height="150"/>
+     <SliderMode ValueDisplayStyle="Percentage" ClickAndGoType="None" Monitor="false">Playback</SliderMode>
+     <Level LowLimit="0" HighLimit="255" Value="0"/>
+     <Playback><Function>${functionIdByName.get(fn)}</Function></Playback>
+     ${midiIn(cc)}
+    </Slider>`;
+}
+const knobCcs = ML ? [[ML.cc.k1, ML.cc.k2, ML.cc.k3, ML.cc.k4], [ML.cc.k5, ML.cc.k6, ML.cc.k7, ML.cc.k8]] : [[], []];
+const tagOf = (head: Fixture): string => (isBeam(head) ? "B" : "S") + head.name.slice(-1);   // SL, BL, BR, SR
+const minilabSliders = ML ? [
+  ...knobHeads.map((head, i) => { const f = SAFETY[String(head.address)]; return levelSliderXml(950 + i, `Tilt${i + 1}${tagOf(head)}`, 8 + i * 64, 8, head, headRoles(head).tilt, f?.tiltMin ?? 0, f?.tiltMax ?? 255, knobCcs[0][i]); }),
+  ...knobHeads.map((head, i) => { const f = SAFETY[String(head.address)]; return levelSliderXml(954 + i, `Pan${i + 1}${tagOf(head)}`, 8 + (4 + i) * 64, 8, head, headRoles(head).pan, f?.panMin ?? 0, f?.panMax ?? 255, knobCcs[1][i]); }),
+  playbackSliderXml(958, "Panels", 8 + 8 * 64, 8, "LEVEL · Full", ML.cc.f1),
+  playbackSliderXml(959, "Beams", 8 + 9 * 64, 8, "HEAD · Beams Full", ML.cc.f2),
+  playbackSliderXml(960, "Spots", 8 + 10 * 64, 8, "HEAD · Spots Full", ML.cc.f3),
+] : [];
+const minilabFrame = ML ? `  <Frame Caption="MINILAB" ID="60">
+   ${appearance([35, 36, 41], argb(245, 245, 245))}<WindowState Visible="True" X="8" Y="${430 + routingHeight + 8}" Width="${16 + 11 * 64}" Height="190"/>
+   <AllowChildren>True</AllowChildren><AllowResize>True</AllowResize><ShowHeader>True</ShowHeader><ShowEnableButton>False</ShowEnableButton><Collapsed>False</Collapsed><Disabled>False</Disabled>
+${minilabSliders.join("\n")}
+  </Frame>` : "";
+
 const monitorXml = `  <Monitor DisplayMode="1" ShowLabels="1">
    <Grid Width="7" Height="4" Depth="4" Units="0"/>
 ${panels.map((panel, index) => `   <FxItem ID="${panel.id}" XPos="${600 + index * 500}" YPos="1900" ZPos="0"/>`).join("\n")}
@@ -463,7 +599,7 @@ const qxw = `<?xml version="1.0" encoding="UTF-8"?>
  <Creator><Name>Q Light Controller Plus</Name><Version>4.14.4</Version><Author>A_Development</Author></Creator>
  <Engine>
   <InputOutputMap><BeatGenerator BeatType="Disabled" BPM="0"/>
-${universesXml}
+${universesXml}${minilabUniverseXml}
   </InputOutputMap>
 ${fixturesXml}
 ${functionsXml}
@@ -481,12 +617,17 @@ ${performanceFrames.join("\n")}
    </Frame>
 ${speedDial}
 ${routingFrame}
+${minilabFrame}
   </Frame>
-  <Properties><Size Width="1000" Height="470"/><GrandMaster ChannelMode="All" ValueMode="Reduce" SliderMode="Normal"/></Properties>
+  <Properties><Size Width="1000" Height="${430 + routingHeight + 210}"/><GrandMaster ChannelMode="All" ValueMode="Reduce" SliderMode="Normal"/></Properties>
  </VirtualConsole>
 </Workspace>
 `;
 
+const dmxChain = heads.map((head) => `${head.name} at ${head.address + 1}`).join(" → ");
+const panelsByUniverse = outputUniversesOf(panels)
+  .map((u) => `Cuepix ${panels.filter((p) => p.universe === u).map((p) => p.name.split(" ")[1]).join(", ")} receive Art-Net Universe ${u}.`)
+  .join("\n- ");
 const patchRows = fixtures.map((fixture) =>
   `| ${fixture.name} | ${fixture.model} | ${fixture.universe} | ${fixture.address + 1} | ${fixture.address + fixture.channels} | ${fixture.channels} |`,
 ).join("\n");
@@ -498,28 +639,31 @@ QLC+ stores addresses zero-based internally. Table shows fixture-display DMX add
 |---|---|---:|---:|---:|---:|
 ${patchRows}
 
-CR011R DMX output handles Universe 0 only. Universe 1 goes directly by Art-Net to Cuepix 7–12.
+CR011R DMX output handles Universe 0 only: ${dmxChain}. Universe 1 goes directly by Art-Net to the panels listed above.
 `;
 const trussSetupLines = (rig.cuepix?.trusses ?? [])
-  .map((group, index) => `- Truss ${index + 1}: Cuepix ${group[0]}-${group[group.length - 1]}, bottom to top.`)
+  .map((group, index) => ({ group, index }))
+  .filter(({ group }) => group.length)
+  .map(({ group, index }) => `- Truss ${index + 1}: Cuepix ${group[0]}-${group[group.length - 1]}, bottom to top.`)
   .join("\n");
 const setupGuide = `# Cuepix + QLC+ show setup
 
 ## Rig and physical order
 
 ${trussSetupLines}
-- 375ZX L mounts on outside-left truss. 375ZX R mounts on outside-right truss.
-- All Cuepix panels use 79-channel mode. Both 375ZX fixtures use 15-channel mode.
-- Keep production mover controls locked until physical mover calibration is recorded and the show is regenerated.
+- Beam L / Beam R (Intimidator Beam 140SR, 14-channel mode) mount above trusses 2 and 3.
+- 375ZX L / 375ZX R (15-channel mode) mount on the outside 4 ft trusses 1 and 4.
+- All Cuepix panels use 79-channel mode (the units report 75; addressing is unaffected).
+- Mover pads are live from the first launch with safe upright defaults; capture real aims on plot night, then regenerate.
 
 ## Lighting LAN
 
-- Use a dedicated unmanaged Ethernet switch. Connect QLC+ computer, CR011R, and all 12 Cuepix panels.
+- Use a dedicated unmanaged Ethernet switch. Connect QLC+ computer, CR011R, and all ${panels.length} Cuepix panels.
 - Computer lighting NIC: static \`10.201.6.1\`, mask \`255.255.255.0\`, no gateway. Disable sharing and bridging.
 - Pknight CR011R: \`10.201.6.100\`; Art-Net Universe 0 to its DMX output.
-- Cuepix 1-6 receive Art-Net Universe 0. Cuepix 7-12 receive Art-Net Universe 1.
+- ${panelsByUniverse}
 - Set panel addresses from \`CUEPIX-PATCH-CHART.md\`.
-- CR011R DMX OUT → 375ZX L at 481 → 375ZX R at 496 → DMX terminator.
+- CR011R DMX OUT → ${dmxChain} → DMX terminator.
 - Cuepix panels receive Ethernet directly. Do not add them to the CR011R DMX chain.
 
 ## First install
@@ -543,19 +687,23 @@ If Launchpad is absent, launcher removes MIDI routes from runtime copy. QLC+ Vir
 ## Virtual Console and Launchpad
 
 - Page 1: full Cuepix colors, pixel patterns, chasers, fades, strobes, burst, levels, speed, tap, blackout, stop, white flash, page switch.
-- Page 2: compact Cuepix controls plus locked 375ZX pad labels. Mover pads do nothing before calibration.
+- Page 2: compact Cuepix controls plus the HEAD rows — colours R3, aims R4 (one-shot), dim groups and shutter R5.
 - R7C1-R7C4: 25%, 50%, 75%, Full. R7C5-R7C7: Slow, Medium, Fast. R7C8: Tap.
 - R8C1: Blackout. R8C2: Stop FX. R8C3: White. R8C5: Flash. R8C8: Page.
 - Use visible \`FX Speed\` dial for exact speed. Use QLC+ Grand Master for overall output.
 - No Cuepix dimmer or strobe DMX Level slider exists. Such sliders would seize channels from scenes and pads.
 
+### MiniLab 3
+
+K1-K4 tilt, K5-K8 pan of ${[spots[0], beams[0], beams[1], spots[1]].filter(Boolean).map((head) => head.name).join(" · ")}; F1 panels, F2 beams, F3 spots. Port \`${ML?.portName ?? "—"}\`; the launcher binds it at start.
+
 ## Test gate — routing before performance
 
 1. Expand collapsed \`SETUP · ROUTING TESTS\` in Virtual Console.
 2. Power one Cuepix only. Test its Red, Green, Blue, White, and Blackout buttons.
-3. Repeat for Cuepix 1-12, one fixture at a time.
+3. Repeat for Cuepix 1-${panels.length}, one fixture at a time.
 4. Test Universe 0 Panels White, Universe 1 Panels White, then All Blackout.
-5. Test 375ZX L and R one at a time through CR011R. Keep production mover page locked.
+5. Test ${heads.slice(0, -1).map((head) => head.name).join(", ")} and ${heads[heads.length - 1]?.name} one at a time through CR011R.
 6. Collapse setup controls. Test grouped solids, patterns, fades, chasers, levels, strobe, stop, flash press/release, and blackout.
 7. Test Launchpad page switch and LED feedback. Compare both universes against 3D monitor.
 8. Perform mover calibration last. Stop if any wrong fixture, universe, address, direction, or unsafe aim appears.
@@ -573,4 +721,4 @@ const parsedWidgets = await parseQxwFile(qxwPath);
 if (parsedWidgets.errors.length) throw new Error(`Widget map parse failed: ${parsedWidgets.errors.join("; ")}`);
 mkdirSync(path.join(OUT, "config"), { recursive: true });
 writeFileSync(path.join(OUT, "config", "cuepix-widgets.json"), JSON.stringify({ widgets: parsedWidgets.widgets, generated: true }, null, 2) + "\n", "utf8");
-console.log(`Built ${path.basename(rigPath)}: ${fixtures.length} fixtures, ${routingScenes.length} routing tests, ${functions.length - routingScenes.length} performance functions, ${placed.length} console pads, Art-Net ${outputUniverses.join(", ")}`);
+console.log(`Built ${path.basename(rigPath)}: ${fixtures.length} fixtures, ${routingScenes.length} routing tests, ${functions.length - routingScenes.length} performance functions, ${placed.length} console pads, Art-Net ${outputUniverses.join(", ")}, ${heads.length} heads, MiniLab ${ML ? "on" : "off"}`);

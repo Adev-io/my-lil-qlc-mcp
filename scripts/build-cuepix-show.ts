@@ -309,6 +309,9 @@ const fenced = (head: Fixture, pan: number, tilt: number): [number, number] => {
 // the R heads left so the beams actually cross over the floor.
 const AIM_DEFAULT = (head: Fixture): Record<string, [number, number]> => ({
   home: [128, 64], centre: [128, 80], crowd: [128, 88], crossed: [head.name.endsWith("L") ? 148 : 108, 80],
+  // floor = dance-floor centre for FLOOR · Figure 8. Default aims straight ahead, just under the 92
+  // fence (~7° up). Plot the real centre day-of via movingHeadSettings[key].floor.
+  floor: [128, 82],
 });
 const aimOf = (head: Fixture, which: string): [number, number] => {
   const m = PMH[headKey(head)]?.[which];
@@ -332,6 +335,27 @@ addScene("HEAD · Strobe", heads.map((head) => ({ id: head.id, pairs: headPartia
 addScene("_FADER · Panels", levelValues(255));
 addScene("_FADER · Beams", beams.map((head) => ({ id: head.id, pairs: headPartial(head, { dim: 255, shutter: 255 }) })));
 addScene("_FADER · Spots", spots.map((head) => ({ id: head.id, pairs: headPartial(head, { dim: 255, shutter: 255 }) })));
+
+// ---------------------------------------------------------------------------
+// FLOOR — dance-floor looks (page 2 row 5).
+// FLOOR · Full: whole panel floor lit (pixels white + master dimmer full) in one scene.
+// FLOOR · Figure 8: the four heads trace interlocking figure-8s (lemniscate: pan = sinθ, tilt = sin2θ)
+// centred on the "floor" aim, phase-offset a quarter-loop apart so they weave with each other.
+// headSafety fences every step, so pre-plot every beam stays at/above horizontal (tiltMax 92). Day of:
+// plot movingHeadSettings[key].floor and raise tiltMax to drop the pattern onto the floor. Amplitudes
+// below are tunable at plot time; FLOOR · Figure 8 also rides the shared FX Speed dial.
+// ---------------------------------------------------------------------------
+addScene("FLOOR · Full", panels.map((panel) => ({ id: panel.id, pairs: [...rgbPairs(solidPixels([255, 255, 255])), 76, 255] })));
+const FIG8_STEPS = 24, FIG8_FADE = 180, PAN_AMP = 24, TILT_AMP = 9;
+const FIG8_PHASE: Record<string, number> = { "Beam L": 0, "375ZX L": Math.PI / 2, "Beam R": Math.PI, "375ZX R": 3 * Math.PI / 2 };
+const fig8Steps = Array.from({ length: FIG8_STEPS }, (_, i) =>
+  addScene(`_STEP · Figure8 ${i + 1}`, heads.map((head) => {
+    const [panC, tiltC] = aimOf(head, "floor");
+    const th = (2 * Math.PI * i) / FIG8_STEPS + (FIG8_PHASE[head.name] ?? 0);
+    const [pan, tilt] = fenced(head, Math.round(panC + PAN_AMP * Math.sin(th)), Math.round(tiltC + TILT_AMP * Math.sin(2 * th)));
+    return { id: head.id, pairs: headPartial(head, { pan, tilt, dim: 255, shutter: 255 }) };
+  }), FIG8_FADE, FIG8_FADE));
+addChaser("FLOOR · Figure 8", fig8Steps, FIG8_FADE, 0, "Loop");
 
 const outputUniverses = [...new Set(fixtures.map((fixture) => fixture.universe))].sort((a, b) => a - b);
 const controller = rig.controller ?? {
@@ -471,6 +495,10 @@ addRow(1, 4, "HEADDIM-P2", [
 addRow(1, 4, "HEADUTIL-P2", [
   ["HD OPEN", "HEAD · Open", LED.green, [50, 150, 80]], ["HD STROBE", "HEAD · Strobe", LED.white, [225, 225, 225], "Flash"],
 ], 4);
+// FLOOR bank — dance-floor looks. Row 5 (cols 2-7 free for the next scene).
+addRow(1, 5, "FLOOR-P2", [
+  ["FLOOR FULL", "FLOOR · Full", LED.white, [205, 205, 205]], ["FIGURE 8", "FLOOR · Figure 8", LED.cyan, [35, 150, 185]],
+]);
 
 for (const page of [0, 1]) {
   addRow(page, 6, `LEVEL-P${page + 1}`, [
@@ -522,7 +550,7 @@ ${inner}
 const performanceFrames: string[] = [];
 let frameId = 10;
 for (const page of [0, 1]) {
-  for (const name of [`BASE-P${page + 1}`, `FX-P${page + 1}`, `HEADCOL-P${page + 1}`, `HEADAIM-P${page + 1}`, `HEADDIM-P${page + 1}`, `HEADUTIL-P${page + 1}`, `LEVEL-P${page + 1}`, `SPEED-P${page + 1}`, `UTILITY-P${page + 1}`]) {
+  for (const name of [`BASE-P${page + 1}`, `FX-P${page + 1}`, `HEADCOL-P${page + 1}`, `HEADAIM-P${page + 1}`, `HEADDIM-P${page + 1}`, `HEADUTIL-P${page + 1}`, `FLOOR-P${page + 1}`, `LEVEL-P${page + 1}`, `SPEED-P${page + 1}`, `UTILITY-P${page + 1}`]) {
     const buttons = placed.filter((button) => button.page === page && button.frame === name);
     if (buttons.length) performanceFrames.push(frameXml(/^(BASE|FX|HEADCOL|HEADDIM|LEVEL)/.test(name) ? "SoloFrame" : "Frame", name, frameId++, page, buttons));
   }

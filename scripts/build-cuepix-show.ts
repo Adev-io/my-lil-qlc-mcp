@@ -357,6 +357,51 @@ const fig8Steps = Array.from({ length: FIG8_STEPS }, (_, i) =>
   }), FIG8_FADE, FIG8_FADE));
 addChaser("FLOOR · Figure 8", fig8Steps, FIG8_FADE, 0, "Loop");
 
+// ---------------------------------------------------------------------------
+// CEILING — aerial mover looks for the big gym. Movers aim UP (tilt < 92), so these need NO plotting:
+// the fence already keeps every beam at/above horizontal, and up is the ceiling. Beams read across
+// the room. Colour is left unset so a HEAD colour pad layers on top. Pan spreads are keyed by head
+// name in truss-line order (Beam L | 375ZX L | 375ZX R | Beam R). CEIL · Sweep/Circle ride the FX
+// Speed dial. All values fenced by headSafety.
+// ---------------------------------------------------------------------------
+const CEIL_TILT = 50;                        // ~40 deg above horizontal — up onto the ceiling
+const ceilLook = (name: string, panOf: Record<string, number>): void => {
+  addScene(name, heads.map((head) => {
+    const [pan, tilt] = fenced(head, panOf[head.name] ?? 128, CEIL_TILT);
+    return { id: head.id, pairs: headPartial(head, { pan, tilt, dim: 255, shutter: 255 }) };
+  }));
+};
+ceilLook("CEIL · Fan", { "Beam L": 70, "375ZX L": 110, "375ZX R": 146, "Beam R": 186 });   // beams spread wide across the ceiling
+ceilLook("CEIL · Cross", { "Beam L": 168, "375ZX L": 150, "375ZX R": 106, "Beam R": 88 });  // L throw right, R throw left -> cross overhead
+// Sweep: all four pan together across the ceiling (triangle wave), tilt held up.
+const SWEEP_STEPS = 16, SWEEP_FADE = 200, SWEEP_LO = 64, SWEEP_HI = 192;
+const triangle = (i: number, n: number): number => { const p = i / n; return p < 0.5 ? p * 2 : 2 - p * 2; };
+const ceilSweep = Array.from({ length: SWEEP_STEPS }, (_, i) =>
+  addScene(`_STEP · Ceil Sweep ${i + 1}`, heads.map((head) => {
+    const [pan, tilt] = fenced(head, Math.round(SWEEP_LO + (SWEEP_HI - SWEEP_LO) * triangle(i, SWEEP_STEPS)), CEIL_TILT);
+    return { id: head.id, pairs: headPartial(head, { pan, tilt, dim: 255, shutter: 255 }) };
+  }), SWEEP_FADE, SWEEP_FADE));
+addChaser("CEIL · Sweep", ceilSweep, SWEEP_FADE, 0, "Loop");
+// Circle/windmill: four beams evenly spaced on a circle overhead, rotating together.
+const CIRC_STEPS = 24, CIRC_FADE = 150, CIRC_PAN_R = 30, CIRC_TILT_R = 18;
+const CIRC_PHASE: Record<string, number> = { "Beam L": 0, "375ZX L": Math.PI / 2, "375ZX R": Math.PI, "Beam R": 3 * Math.PI / 2 };
+const ceilCircle = Array.from({ length: CIRC_STEPS }, (_, i) =>
+  addScene(`_STEP · Ceil Circle ${i + 1}`, heads.map((head) => {
+    const th = (2 * Math.PI * i) / CIRC_STEPS + (CIRC_PHASE[head.name] ?? 0);
+    const [pan, tilt] = fenced(head, Math.round(128 + CIRC_PAN_R * Math.cos(th)), Math.round(CEIL_TILT + CIRC_TILT_R * Math.sin(th)));
+    return { id: head.id, pairs: headPartial(head, { pan, tilt, dim: 255, shutter: 255 }) };
+  }), CIRC_FADE, CIRC_FADE));
+addChaser("CEIL · Circle", ceilCircle, CIRC_FADE, 0, "Loop");
+// FLOOR sweep: movers pan across the floor together, centred on the floor aim (plot day-of).
+const FSWEEP_STEPS = 16, FSWEEP_FADE = 200, FSWEEP_AMP = 28;
+const floorSweep = Array.from({ length: FSWEEP_STEPS }, (_, i) =>
+  addScene(`_STEP · Floor Sweep ${i + 1}`, heads.map((head) => {
+    const [panC, tiltC] = aimOf(head, "floor");
+    const [pan, tilt] = fenced(head, Math.round(panC + FSWEEP_AMP * Math.sin((2 * Math.PI * i) / FSWEEP_STEPS)), tiltC);
+    return { id: head.id, pairs: headPartial(head, { pan, tilt, dim: 255, shutter: 255 }) };
+  }), FSWEEP_FADE, FSWEEP_FADE));
+addChaser("FLOOR · Sweep", floorSweep, FSWEEP_FADE, 0, "Loop");
+
 const outputUniverses = [...new Set(fixtures.map((fixture) => fixture.universe))].sort((a, b) => a - b);
 const controller = rig.controller ?? {
   launchpad: false, profile: "Novation Launchpad Mini MK3",
@@ -495,10 +540,16 @@ addRow(1, 4, "HEADDIM-P2", [
 addRow(1, 4, "HEADUTIL-P2", [
   ["HD OPEN", "HEAD · Open", LED.green, [50, 150, 80]], ["HD STROBE", "HEAD · Strobe", LED.white, [225, 225, 225], "Flash"],
 ], 4);
-// FLOOR bank — dance-floor looks. Row 5 (cols 2-7 free for the next scene).
+// Row 5 — the mover looks for the big gym. FLOOR (down, plot day-of) on cols 1-3, CEILING (up,
+// works pre-plot) on cols 4-7.
 addRow(1, 5, "FLOOR-P2", [
   ["FLOOR FULL", "FLOOR · Full", LED.white, [205, 205, 205]], ["FIGURE 8", "FLOOR · Figure 8", LED.cyan, [35, 150, 185]],
+  ["FLR SWEEP", "FLOOR · Sweep", LED.cyan, [35, 150, 185]],
 ]);
+addRow(1, 5, "CEIL-P2", [
+  ["CEIL FAN", "CEIL · Fan", LED.blue, [60, 90, 200]], ["CEIL CROSS", "CEIL · Cross", LED.blue, [60, 90, 200]],
+  ["CEIL SWEEP", "CEIL · Sweep", LED.blue, [60, 90, 200]], ["CEIL CIRCLE", "CEIL · Circle", LED.blue, [60, 90, 200]],
+], 3);
 
 for (const page of [0, 1]) {
   addRow(page, 6, `LEVEL-P${page + 1}`, [
@@ -550,7 +601,7 @@ ${inner}
 const performanceFrames: string[] = [];
 let frameId = 10;
 for (const page of [0, 1]) {
-  for (const name of [`BASE-P${page + 1}`, `FX-P${page + 1}`, `HEADCOL-P${page + 1}`, `HEADAIM-P${page + 1}`, `HEADDIM-P${page + 1}`, `HEADUTIL-P${page + 1}`, `FLOOR-P${page + 1}`, `LEVEL-P${page + 1}`, `SPEED-P${page + 1}`, `UTILITY-P${page + 1}`]) {
+  for (const name of [`BASE-P${page + 1}`, `FX-P${page + 1}`, `HEADCOL-P${page + 1}`, `HEADAIM-P${page + 1}`, `HEADDIM-P${page + 1}`, `HEADUTIL-P${page + 1}`, `FLOOR-P${page + 1}`, `CEIL-P${page + 1}`, `LEVEL-P${page + 1}`, `SPEED-P${page + 1}`, `UTILITY-P${page + 1}`]) {
     const buttons = placed.filter((button) => button.page === page && button.frame === name);
     if (buttons.length) performanceFrames.push(frameXml(/^(BASE|FX|HEADCOL|HEADDIM|LEVEL)/.test(name) ? "SoloFrame" : "Frame", name, frameId++, page, buttons));
   }

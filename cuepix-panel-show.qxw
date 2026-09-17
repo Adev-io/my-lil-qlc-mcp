@@ -2754,6 +2754,486 @@
    <Step Number="22" FadeIn="180" Hold="0" FadeOut="180">257</Step>
    <Step Number="23" FadeIn="180" Hold="0" FadeOut="180">258</Step>
   </Function>
+  <Function ID="260" Type="Scene" Name="CEIL · Fan">
+   <Speed FadeIn="0" FadeOut="0" Duration="0"/>
+   <FixtureVal ID="8">0,70,2,50,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,186,2,50,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,110,2,50,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,146,2,50,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="261" Type="Scene" Name="CEIL · Cross">
+   <Speed FadeIn="0" FadeOut="0" Duration="0"/>
+   <FixtureVal ID="8">0,168,2,50,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,88,2,50,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,150,2,50,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,106,2,50,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="262" Type="Scene" Name="_STEP · Ceil Sweep 1">
+   <Speed FadeIn="200" FadeOut="200" Duration="0"/>
+   <FixtureVal ID="8">0,64,2,50,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,64,2,50,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,64,2,50,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,64,2,50,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="263" Type="Scene" Name="_STEP · Ceil Sweep 2">
+   <Speed FadeIn="200" FadeOut="200" Duration="0"/>
+   <FixtureVal ID="8">0,80,2,50,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,80,2,50,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,80,2,50,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,80,2,50,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="264" Type="Scene" Name="_STEP · Ceil Sweep 3">
+   <Speed FadeIn="200" FadeOut="200" Duration="0"/>
+   <FixtureVal ID="8">0,96,2,50,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,96,2,50,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,96,2,50,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,96,2,50,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="265" Type="Scene" Name="_STEP · Ceil Sweep 4">
+   <Speed FadeIn="200" FadeOut="200" Duration="0"/>
+   <FixtureVal ID="8">0,112,2,50,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,112,2,50,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,112,2,50,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,112,2,50,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="266" Type="Scene" Name="_STEP · Ceil Sweep 5">
+   <Speed FadeIn="200" FadeOut="200" Duration="0"/>
+   <FixtureVal ID="8">0,128,2,50,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,128,2,50,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,128,2,50,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,128,2,50,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="267" Type="Scene" Name="_STEP · Ceil Sweep 6">
+   <Speed FadeIn="200" FadeOut="200" Duration="0"/>
+   <FixtureVal ID="8">0,144,2,50,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,144,2,50,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,144,2,50,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,144,2,50,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="268" Type="Scene" Name="_STEP · Ceil Sweep 7">
+   <Speed FadeIn="200" FadeOut="200" Duration="0"/>
+   <FixtureVal ID="8">0,160,2,50,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,160,2,50,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,160,2,50,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,160,2,50,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="269" Type="Scene" Name="_STEP · Ceil Sweep 8">
+   <Speed FadeIn="200" FadeOut="200" Duration="0"/>
+   <FixtureVal ID="8">0,176,2,50,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,176,2,50,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,176,2,50,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,176,2,50,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="270" Type="Scene" Name="_STEP · Ceil Sweep 9">
+   <Speed FadeIn="200" FadeOut="200" Duration="0"/>
+   <FixtureVal ID="8">0,192,2,50,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,192,2,50,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,192,2,50,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,192,2,50,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="271" Type="Scene" Name="_STEP · Ceil Sweep 10">
+   <Speed FadeIn="200" FadeOut="200" Duration="0"/>
+   <FixtureVal ID="8">0,176,2,50,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,176,2,50,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,176,2,50,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,176,2,50,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="272" Type="Scene" Name="_STEP · Ceil Sweep 11">
+   <Speed FadeIn="200" FadeOut="200" Duration="0"/>
+   <FixtureVal ID="8">0,160,2,50,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,160,2,50,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,160,2,50,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,160,2,50,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="273" Type="Scene" Name="_STEP · Ceil Sweep 12">
+   <Speed FadeIn="200" FadeOut="200" Duration="0"/>
+   <FixtureVal ID="8">0,144,2,50,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,144,2,50,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,144,2,50,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,144,2,50,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="274" Type="Scene" Name="_STEP · Ceil Sweep 13">
+   <Speed FadeIn="200" FadeOut="200" Duration="0"/>
+   <FixtureVal ID="8">0,128,2,50,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,128,2,50,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,128,2,50,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,128,2,50,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="275" Type="Scene" Name="_STEP · Ceil Sweep 14">
+   <Speed FadeIn="200" FadeOut="200" Duration="0"/>
+   <FixtureVal ID="8">0,112,2,50,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,112,2,50,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,112,2,50,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,112,2,50,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="276" Type="Scene" Name="_STEP · Ceil Sweep 15">
+   <Speed FadeIn="200" FadeOut="200" Duration="0"/>
+   <FixtureVal ID="8">0,96,2,50,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,96,2,50,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,96,2,50,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,96,2,50,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="277" Type="Scene" Name="_STEP · Ceil Sweep 16">
+   <Speed FadeIn="200" FadeOut="200" Duration="0"/>
+   <FixtureVal ID="8">0,80,2,50,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,80,2,50,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,80,2,50,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,80,2,50,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="278" Type="Chaser" Name="CEIL · Sweep">
+   <Speed FadeIn="200" FadeOut="200" Duration="0"/>
+   <Direction>Forward</Direction>
+   <RunOrder>Loop</RunOrder>
+   <SpeedModes FadeIn="Common" FadeOut="Common" Duration="Common"/>
+   <Step Number="0" FadeIn="200" Hold="0" FadeOut="200">262</Step>
+   <Step Number="1" FadeIn="200" Hold="0" FadeOut="200">263</Step>
+   <Step Number="2" FadeIn="200" Hold="0" FadeOut="200">264</Step>
+   <Step Number="3" FadeIn="200" Hold="0" FadeOut="200">265</Step>
+   <Step Number="4" FadeIn="200" Hold="0" FadeOut="200">266</Step>
+   <Step Number="5" FadeIn="200" Hold="0" FadeOut="200">267</Step>
+   <Step Number="6" FadeIn="200" Hold="0" FadeOut="200">268</Step>
+   <Step Number="7" FadeIn="200" Hold="0" FadeOut="200">269</Step>
+   <Step Number="8" FadeIn="200" Hold="0" FadeOut="200">270</Step>
+   <Step Number="9" FadeIn="200" Hold="0" FadeOut="200">271</Step>
+   <Step Number="10" FadeIn="200" Hold="0" FadeOut="200">272</Step>
+   <Step Number="11" FadeIn="200" Hold="0" FadeOut="200">273</Step>
+   <Step Number="12" FadeIn="200" Hold="0" FadeOut="200">274</Step>
+   <Step Number="13" FadeIn="200" Hold="0" FadeOut="200">275</Step>
+   <Step Number="14" FadeIn="200" Hold="0" FadeOut="200">276</Step>
+   <Step Number="15" FadeIn="200" Hold="0" FadeOut="200">277</Step>
+  </Function>
+  <Function ID="279" Type="Scene" Name="_STEP · Ceil Circle 1">
+   <Speed FadeIn="150" FadeOut="150" Duration="0"/>
+   <FixtureVal ID="8">0,158,2,50,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,128,2,32,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,128,2,68,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,98,2,50,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="280" Type="Scene" Name="_STEP · Ceil Circle 2">
+   <Speed FadeIn="150" FadeOut="150" Duration="0"/>
+   <FixtureVal ID="8">0,157,2,55,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,136,2,33,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,120,2,67,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,99,2,45,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="281" Type="Scene" Name="_STEP · Ceil Circle 3">
+   <Speed FadeIn="150" FadeOut="150" Duration="0"/>
+   <FixtureVal ID="8">0,154,2,59,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,143,2,34,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,113,2,66,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,102,2,41,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="282" Type="Scene" Name="_STEP · Ceil Circle 4">
+   <Speed FadeIn="150" FadeOut="150" Duration="0"/>
+   <FixtureVal ID="8">0,149,2,63,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,149,2,37,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,107,2,63,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,107,2,37,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="283" Type="Scene" Name="_STEP · Ceil Circle 5">
+   <Speed FadeIn="150" FadeOut="150" Duration="0"/>
+   <FixtureVal ID="8">0,143,2,66,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,154,2,41,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,102,2,59,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,113,2,34,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="284" Type="Scene" Name="_STEP · Ceil Circle 6">
+   <Speed FadeIn="150" FadeOut="150" Duration="0"/>
+   <FixtureVal ID="8">0,136,2,67,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,157,2,45,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,99,2,55,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,120,2,33,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="285" Type="Scene" Name="_STEP · Ceil Circle 7">
+   <Speed FadeIn="150" FadeOut="150" Duration="0"/>
+   <FixtureVal ID="8">0,128,2,68,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,158,2,50,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,98,2,50,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,128,2,32,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="286" Type="Scene" Name="_STEP · Ceil Circle 8">
+   <Speed FadeIn="150" FadeOut="150" Duration="0"/>
+   <FixtureVal ID="8">0,120,2,67,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,157,2,55,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,99,2,45,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,136,2,33,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="287" Type="Scene" Name="_STEP · Ceil Circle 9">
+   <Speed FadeIn="150" FadeOut="150" Duration="0"/>
+   <FixtureVal ID="8">0,113,2,66,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,154,2,59,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,102,2,41,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,143,2,34,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="288" Type="Scene" Name="_STEP · Ceil Circle 10">
+   <Speed FadeIn="150" FadeOut="150" Duration="0"/>
+   <FixtureVal ID="8">0,107,2,63,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,149,2,63,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,107,2,37,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,149,2,37,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="289" Type="Scene" Name="_STEP · Ceil Circle 11">
+   <Speed FadeIn="150" FadeOut="150" Duration="0"/>
+   <FixtureVal ID="8">0,102,2,59,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,143,2,66,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,113,2,34,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,154,2,41,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="290" Type="Scene" Name="_STEP · Ceil Circle 12">
+   <Speed FadeIn="150" FadeOut="150" Duration="0"/>
+   <FixtureVal ID="8">0,99,2,55,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,136,2,67,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,120,2,33,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,157,2,45,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="291" Type="Scene" Name="_STEP · Ceil Circle 13">
+   <Speed FadeIn="150" FadeOut="150" Duration="0"/>
+   <FixtureVal ID="8">0,98,2,50,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,128,2,68,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,128,2,32,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,158,2,50,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="292" Type="Scene" Name="_STEP · Ceil Circle 14">
+   <Speed FadeIn="150" FadeOut="150" Duration="0"/>
+   <FixtureVal ID="8">0,99,2,45,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,120,2,67,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,136,2,33,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,157,2,55,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="293" Type="Scene" Name="_STEP · Ceil Circle 15">
+   <Speed FadeIn="150" FadeOut="150" Duration="0"/>
+   <FixtureVal ID="8">0,102,2,41,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,113,2,66,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,143,2,34,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,154,2,59,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="294" Type="Scene" Name="_STEP · Ceil Circle 16">
+   <Speed FadeIn="150" FadeOut="150" Duration="0"/>
+   <FixtureVal ID="8">0,107,2,37,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,107,2,63,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,149,2,37,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,149,2,63,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="295" Type="Scene" Name="_STEP · Ceil Circle 17">
+   <Speed FadeIn="150" FadeOut="150" Duration="0"/>
+   <FixtureVal ID="8">0,113,2,34,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,102,2,59,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,154,2,41,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,143,2,66,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="296" Type="Scene" Name="_STEP · Ceil Circle 18">
+   <Speed FadeIn="150" FadeOut="150" Duration="0"/>
+   <FixtureVal ID="8">0,120,2,33,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,99,2,55,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,157,2,45,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,136,2,67,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="297" Type="Scene" Name="_STEP · Ceil Circle 19">
+   <Speed FadeIn="150" FadeOut="150" Duration="0"/>
+   <FixtureVal ID="8">0,128,2,32,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,98,2,50,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,158,2,50,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,128,2,68,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="298" Type="Scene" Name="_STEP · Ceil Circle 20">
+   <Speed FadeIn="150" FadeOut="150" Duration="0"/>
+   <FixtureVal ID="8">0,136,2,33,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,99,2,45,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,157,2,55,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,120,2,67,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="299" Type="Scene" Name="_STEP · Ceil Circle 21">
+   <Speed FadeIn="150" FadeOut="150" Duration="0"/>
+   <FixtureVal ID="8">0,143,2,34,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,102,2,41,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,154,2,59,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,113,2,66,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="300" Type="Scene" Name="_STEP · Ceil Circle 22">
+   <Speed FadeIn="150" FadeOut="150" Duration="0"/>
+   <FixtureVal ID="8">0,149,2,37,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,107,2,37,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,149,2,63,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,107,2,63,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="301" Type="Scene" Name="_STEP · Ceil Circle 23">
+   <Speed FadeIn="150" FadeOut="150" Duration="0"/>
+   <FixtureVal ID="8">0,154,2,41,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,113,2,34,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,143,2,66,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,102,2,59,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="302" Type="Scene" Name="_STEP · Ceil Circle 24">
+   <Speed FadeIn="150" FadeOut="150" Duration="0"/>
+   <FixtureVal ID="8">0,157,2,45,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,120,2,33,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,136,2,67,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,99,2,55,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="303" Type="Chaser" Name="CEIL · Circle">
+   <Speed FadeIn="150" FadeOut="150" Duration="0"/>
+   <Direction>Forward</Direction>
+   <RunOrder>Loop</RunOrder>
+   <SpeedModes FadeIn="Common" FadeOut="Common" Duration="Common"/>
+   <Step Number="0" FadeIn="150" Hold="0" FadeOut="150">279</Step>
+   <Step Number="1" FadeIn="150" Hold="0" FadeOut="150">280</Step>
+   <Step Number="2" FadeIn="150" Hold="0" FadeOut="150">281</Step>
+   <Step Number="3" FadeIn="150" Hold="0" FadeOut="150">282</Step>
+   <Step Number="4" FadeIn="150" Hold="0" FadeOut="150">283</Step>
+   <Step Number="5" FadeIn="150" Hold="0" FadeOut="150">284</Step>
+   <Step Number="6" FadeIn="150" Hold="0" FadeOut="150">285</Step>
+   <Step Number="7" FadeIn="150" Hold="0" FadeOut="150">286</Step>
+   <Step Number="8" FadeIn="150" Hold="0" FadeOut="150">287</Step>
+   <Step Number="9" FadeIn="150" Hold="0" FadeOut="150">288</Step>
+   <Step Number="10" FadeIn="150" Hold="0" FadeOut="150">289</Step>
+   <Step Number="11" FadeIn="150" Hold="0" FadeOut="150">290</Step>
+   <Step Number="12" FadeIn="150" Hold="0" FadeOut="150">291</Step>
+   <Step Number="13" FadeIn="150" Hold="0" FadeOut="150">292</Step>
+   <Step Number="14" FadeIn="150" Hold="0" FadeOut="150">293</Step>
+   <Step Number="15" FadeIn="150" Hold="0" FadeOut="150">294</Step>
+   <Step Number="16" FadeIn="150" Hold="0" FadeOut="150">295</Step>
+   <Step Number="17" FadeIn="150" Hold="0" FadeOut="150">296</Step>
+   <Step Number="18" FadeIn="150" Hold="0" FadeOut="150">297</Step>
+   <Step Number="19" FadeIn="150" Hold="0" FadeOut="150">298</Step>
+   <Step Number="20" FadeIn="150" Hold="0" FadeOut="150">299</Step>
+   <Step Number="21" FadeIn="150" Hold="0" FadeOut="150">300</Step>
+   <Step Number="22" FadeIn="150" Hold="0" FadeOut="150">301</Step>
+   <Step Number="23" FadeIn="150" Hold="0" FadeOut="150">302</Step>
+  </Function>
+  <Function ID="304" Type="Scene" Name="_STEP · Floor Sweep 1">
+   <Speed FadeIn="200" FadeOut="200" Duration="0"/>
+   <FixtureVal ID="8">0,128,2,82,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,128,2,82,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,128,2,82,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,128,2,82,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="305" Type="Scene" Name="_STEP · Floor Sweep 2">
+   <Speed FadeIn="200" FadeOut="200" Duration="0"/>
+   <FixtureVal ID="8">0,139,2,82,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,139,2,82,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,139,2,82,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,139,2,82,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="306" Type="Scene" Name="_STEP · Floor Sweep 3">
+   <Speed FadeIn="200" FadeOut="200" Duration="0"/>
+   <FixtureVal ID="8">0,148,2,82,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,148,2,82,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,148,2,82,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,148,2,82,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="307" Type="Scene" Name="_STEP · Floor Sweep 4">
+   <Speed FadeIn="200" FadeOut="200" Duration="0"/>
+   <FixtureVal ID="8">0,154,2,82,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,154,2,82,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,154,2,82,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,154,2,82,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="308" Type="Scene" Name="_STEP · Floor Sweep 5">
+   <Speed FadeIn="200" FadeOut="200" Duration="0"/>
+   <FixtureVal ID="8">0,156,2,82,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,156,2,82,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,156,2,82,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,156,2,82,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="309" Type="Scene" Name="_STEP · Floor Sweep 6">
+   <Speed FadeIn="200" FadeOut="200" Duration="0"/>
+   <FixtureVal ID="8">0,154,2,82,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,154,2,82,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,154,2,82,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,154,2,82,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="310" Type="Scene" Name="_STEP · Floor Sweep 7">
+   <Speed FadeIn="200" FadeOut="200" Duration="0"/>
+   <FixtureVal ID="8">0,148,2,82,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,148,2,82,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,148,2,82,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,148,2,82,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="311" Type="Scene" Name="_STEP · Floor Sweep 8">
+   <Speed FadeIn="200" FadeOut="200" Duration="0"/>
+   <FixtureVal ID="8">0,139,2,82,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,139,2,82,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,139,2,82,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,139,2,82,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="312" Type="Scene" Name="_STEP · Floor Sweep 9">
+   <Speed FadeIn="200" FadeOut="200" Duration="0"/>
+   <FixtureVal ID="8">0,128,2,82,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,128,2,82,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,128,2,82,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,128,2,82,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="313" Type="Scene" Name="_STEP · Floor Sweep 10">
+   <Speed FadeIn="200" FadeOut="200" Duration="0"/>
+   <FixtureVal ID="8">0,117,2,82,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,117,2,82,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,117,2,82,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,117,2,82,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="314" Type="Scene" Name="_STEP · Floor Sweep 11">
+   <Speed FadeIn="200" FadeOut="200" Duration="0"/>
+   <FixtureVal ID="8">0,108,2,82,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,108,2,82,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,108,2,82,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,108,2,82,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="315" Type="Scene" Name="_STEP · Floor Sweep 12">
+   <Speed FadeIn="200" FadeOut="200" Duration="0"/>
+   <FixtureVal ID="8">0,102,2,82,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,102,2,82,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,102,2,82,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,102,2,82,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="316" Type="Scene" Name="_STEP · Floor Sweep 13">
+   <Speed FadeIn="200" FadeOut="200" Duration="0"/>
+   <FixtureVal ID="8">0,100,2,82,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,100,2,82,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,100,2,82,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,100,2,82,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="317" Type="Scene" Name="_STEP · Floor Sweep 14">
+   <Speed FadeIn="200" FadeOut="200" Duration="0"/>
+   <FixtureVal ID="8">0,102,2,82,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,102,2,82,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,102,2,82,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,102,2,82,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="318" Type="Scene" Name="_STEP · Floor Sweep 15">
+   <Speed FadeIn="200" FadeOut="200" Duration="0"/>
+   <FixtureVal ID="8">0,108,2,82,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,108,2,82,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,108,2,82,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,108,2,82,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="319" Type="Scene" Name="_STEP · Floor Sweep 16">
+   <Speed FadeIn="200" FadeOut="200" Duration="0"/>
+   <FixtureVal ID="8">0,117,2,82,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="9">0,117,2,82,4,0,9,255,10,255</FixtureVal>
+   <FixtureVal ID="10">0,117,2,82,4,0,10,255,11,255</FixtureVal>
+   <FixtureVal ID="11">0,117,2,82,4,0,10,255,11,255</FixtureVal>
+  </Function>
+  <Function ID="320" Type="Chaser" Name="FLOOR · Sweep">
+   <Speed FadeIn="200" FadeOut="200" Duration="0"/>
+   <Direction>Forward</Direction>
+   <RunOrder>Loop</RunOrder>
+   <SpeedModes FadeIn="Common" FadeOut="Common" Duration="Common"/>
+   <Step Number="0" FadeIn="200" Hold="0" FadeOut="200">304</Step>
+   <Step Number="1" FadeIn="200" Hold="0" FadeOut="200">305</Step>
+   <Step Number="2" FadeIn="200" Hold="0" FadeOut="200">306</Step>
+   <Step Number="3" FadeIn="200" Hold="0" FadeOut="200">307</Step>
+   <Step Number="4" FadeIn="200" Hold="0" FadeOut="200">308</Step>
+   <Step Number="5" FadeIn="200" Hold="0" FadeOut="200">309</Step>
+   <Step Number="6" FadeIn="200" Hold="0" FadeOut="200">310</Step>
+   <Step Number="7" FadeIn="200" Hold="0" FadeOut="200">311</Step>
+   <Step Number="8" FadeIn="200" Hold="0" FadeOut="200">312</Step>
+   <Step Number="9" FadeIn="200" Hold="0" FadeOut="200">313</Step>
+   <Step Number="10" FadeIn="200" Hold="0" FadeOut="200">314</Step>
+   <Step Number="11" FadeIn="200" Hold="0" FadeOut="200">315</Step>
+   <Step Number="12" FadeIn="200" Hold="0" FadeOut="200">316</Step>
+   <Step Number="13" FadeIn="200" Hold="0" FadeOut="200">317</Step>
+   <Step Number="14" FadeIn="200" Hold="0" FadeOut="200">318</Step>
+   <Step Number="15" FadeIn="200" Hold="0" FadeOut="200">319</Step>
+  </Function>
   <Monitor DisplayMode="1" ShowLabels="1">
    <Grid Width="7" Height="4" Depth="4" Units="0"/>
    <FxItem ID="0" XPos="600" YPos="1900" ZPos="0"/>
@@ -3296,56 +3776,56 @@
     <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4280295975</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
     <WindowState Visible="True" X="8" Y="308" Width="386" Height="52"/>
     <AllowChildren>True</AllowChildren><AllowResize>True</AllowResize><ShowHeader>False</ShowHeader><ShowEnableButton>False</ShowEnableButton><Collapsed>False</Collapsed><Disabled>False</Disabled>
-    <Button Caption="25% P1 R7C1" ID="242" Icon="">
+    <Button Caption="25% P1 R7C1" ID="252" Icon="">
      <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4281815185</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="16"/>
      <Action>Toggle</Action>
      <Input Universe="0" Channel="55351"/>
     </Button>
-    <Button Caption="25% P1 R7C1" ID="243" Icon="">
+    <Button Caption="25% P1 R7C1" ID="253" Icon="">
      <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4281815185</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="16"/>
      <Action>Toggle</Action>
      <Input Universe="2" Channel="149" LowerValue="70" UpperValue="66"/>
     </Button>
-    <Button Caption="50% P1 R7C2" ID="244" Icon="">
+    <Button Caption="50% P1 R7C2" ID="254" Icon="">
      <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4282475695</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="17"/>
      <Action>Toggle</Action>
      <Input Universe="0" Channel="55025"/>
     </Button>
-    <Button Caption="50% P1 R7C2" ID="245" Icon="">
+    <Button Caption="50% P1 R7C2" ID="255" Icon="">
      <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4282475695</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="17"/>
      <Action>Toggle</Action>
      <Input Universe="2" Channel="150" LowerValue="70" UpperValue="66"/>
     </Button>
-    <Button Caption="75% P1 R7C3" ID="246" Icon="">
+    <Button Caption="75% P1 R7C3" ID="256" Icon="">
      <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4282487220</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="18"/>
      <Action>Toggle</Action>
      <Input Universe="0" Channel="61665"/>
     </Button>
-    <Button Caption="75% P1 R7C3" ID="247" Icon="">
+    <Button Caption="75% P1 R7C3" ID="257" Icon="">
      <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4282487220</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="18"/>
      <Action>Toggle</Action>
      <Input Universe="2" Channel="151" LowerValue="54" UpperValue="50"/>
     </Button>
-    <Button Caption="FULL P1 R7C4" ID="248" Icon="">
+    <Button Caption="FULL P1 R7C4" ID="258" Icon="">
      <WindowState Visible="True" X="292" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4291677645</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="19"/>
      <Action>Toggle</Action>
      <Input Universe="0" Channel="1901"/>
     </Button>
-    <Button Caption="FULL P1 R7C4" ID="249" Icon="">
+    <Button Caption="FULL P1 R7C4" ID="259" Icon="">
      <WindowState Visible="True" X="292" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4291677645</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="19"/>
@@ -3357,22 +3837,22 @@
     <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4280295975</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
     <WindowState Visible="True" X="392" Y="308" Width="386" Height="52"/>
     <AllowChildren>True</AllowChildren><AllowResize>True</AllowResize><ShowHeader>False</ShowHeader><ShowEnableButton>False</ShowEnableButton><Collapsed>False</Collapsed><Disabled>False</Disabled>
-    <Button Caption="SLOW P1 R7C5" ID="250" Icon="">
+    <Button Caption="SLOW P1 R7C5" ID="260" Icon="">
      <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4290342435</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Action>Toggle</Action>
     </Button>
-    <Button Caption="MED P1 R7C6" ID="252" Icon="">
+    <Button Caption="MED P1 R7C6" ID="262" Icon="">
      <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4290342435</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Action>Toggle</Action>
     </Button>
-    <Button Caption="FAST P1 R7C7" ID="254" Icon="">
+    <Button Caption="FAST P1 R7C7" ID="264" Icon="">
      <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4290342435</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Action>Toggle</Action>
     </Button>
-    <Button Caption="TAP P1 R7C8" ID="256" Icon="">
+    <Button Caption="TAP P1 R7C8" ID="266" Icon="">
      <WindowState Visible="True" X="292" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4290342435</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Action>Toggle</Action>
@@ -3382,61 +3862,61 @@
     <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4280295975</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
     <WindowState Visible="True" X="8" Y="358" Width="770" Height="52"/>
     <AllowChildren>True</AllowChildren><AllowResize>True</AllowResize><ShowHeader>False</ShowHeader><ShowEnableButton>False</ShowEnableButton><Collapsed>False</Collapsed><Disabled>False</Disabled>
-    <Button Caption="BLACK P1 R8C1" ID="258" Icon="">
+    <Button Caption="BLACK P1 R8C1" ID="268" Icon="">
      <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4294967295</ForegroundColor><BackgroundColor>4279505944</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Action>Blackout</Action>
      <Input Universe="0" Channel="30852"/>
     </Button>
-    <Button Caption="BLACK P1 R8C1" ID="259" Icon="">
+    <Button Caption="BLACK P1 R8C1" ID="269" Icon="">
      <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4294967295</ForegroundColor><BackgroundColor>4279505944</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Action>Blackout</Action>
      <Input Universe="2" Channel="139" LowerValue="5" UpperValue="1"/>
     </Button>
-    <Button Caption="STOP FX P1 R8C2" ID="260" Icon="">
+    <Button Caption="STOP FX P1 R8C2" ID="270" Icon="">
      <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4288358445</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="23"/>
      <Action>Toggle</Action>
      <Input Universe="0" Channel="64327"/>
     </Button>
-    <Button Caption="STOP FX P1 R8C2" ID="261" Icon="">
+    <Button Caption="STOP FX P1 R8C2" ID="271" Icon="">
      <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4288358445</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="23"/>
      <Action>Toggle</Action>
      <Input Universe="2" Channel="140" LowerValue="14" UpperValue="10"/>
     </Button>
-    <Button Caption="WHITE P1 R8C3" ID="262" Icon="">
+    <Button Caption="WHITE P1 R8C3" ID="272" Icon="">
      <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4292993500</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="7"/>
      <Action>Toggle</Action>
      <Input Universe="0" Channel="26353"/>
     </Button>
-    <Button Caption="WHITE P1 R8C3" ID="263" Icon="">
+    <Button Caption="WHITE P1 R8C3" ID="273" Icon="">
      <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4292993500</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="7"/>
      <Action>Toggle</Action>
      <Input Universe="2" Channel="141" LowerValue="2" UpperValue="6"/>
     </Button>
-    <Button Caption="FLASH P1 R8C5" ID="264" Icon="">
+    <Button Caption="FLASH P1 R8C5" ID="274" Icon="">
      <WindowState Visible="True" X="388" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4293651430</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="24"/>
      <Action>Flash</Action>
      <Input Universe="0" Channel="11329"/>
     </Button>
-    <Button Caption="FLASH P1 R8C5" ID="265" Icon="">
+    <Button Caption="FLASH P1 R8C5" ID="275" Icon="">
      <WindowState Visible="True" X="388" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4293651430</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="24"/>
      <Action>Flash</Action>
      <Input Universe="2" Channel="143" LowerValue="2" UpperValue="6"/>
     </Button>
-    <Button Caption="PAGE P1 R8C8" ID="266" Icon="">
+    <Button Caption="PAGE P1 R8C8" ID="276" Icon="">
      <WindowState Visible="True" X="676" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4281178965</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Action>Toggle</Action>
@@ -3934,7 +4414,7 @@
    </Frame>
    <Frame Caption="FLOOR-P2" ID="21" Page="1">
     <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4280295975</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
-    <WindowState Visible="True" X="8" Y="258" Width="194" Height="52"/>
+    <WindowState Visible="True" X="8" Y="258" Width="290" Height="52"/>
     <AllowChildren>True</AllowChildren><AllowResize>True</AllowResize><ShowHeader>False</ShowHeader><ShowEnableButton>False</ShowEnableButton><Collapsed>False</Collapsed><Disabled>False</Disabled>
     <Button Caption="FLOOR FULL P2 R6C1" ID="238" Icon="">
      <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
@@ -3964,61 +4444,136 @@
      <Action>Toggle</Action>
      <Input Universe="2" Channel="160" LowerValue="54" UpperValue="50"/>
     </Button>
+    <Button Caption="FLR SWEEP P2 R6C3" ID="242" Icon="">
+     <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
+     <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4280522425</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
+     <Function ID="320"/>
+     <Action>Toggle</Action>
+     <Input Universe="0" Channel="8308"/>
+    </Button>
+    <Button Caption="FLR SWEEP P2 R6C3" ID="243" Icon="">
+     <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
+     <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4280522425</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
+     <Function ID="320"/>
+     <Action>Toggle</Action>
+     <Input Universe="2" Channel="161" LowerValue="54" UpperValue="50"/>
+    </Button>
    </Frame>
-   <SoloFrame Caption="LEVEL-P2" ID="22" Page="1">
+   <Frame Caption="CEIL-P2" ID="22" Page="1">
+    <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4280295975</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
+    <WindowState Visible="True" X="296" Y="258" Width="386" Height="52"/>
+    <AllowChildren>True</AllowChildren><AllowResize>True</AllowResize><ShowHeader>False</ShowHeader><ShowEnableButton>False</ShowEnableButton><Collapsed>False</Collapsed><Disabled>False</Disabled>
+    <Button Caption="CEIL FAN P2 R6C4" ID="244" Icon="">
+     <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
+     <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4282145480</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
+     <Function ID="260"/>
+     <Action>Toggle</Action>
+     <Input Universe="0" Channel="3270"/>
+    </Button>
+    <Button Caption="CEIL FAN P2 R6C4" ID="245" Icon="">
+     <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
+     <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4282145480</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
+     <Function ID="260"/>
+     <Action>Toggle</Action>
+     <Input Universe="2" Channel="162" LowerValue="70" UpperValue="66"/>
+    </Button>
+    <Button Caption="CEIL CROSS P2 R6C5" ID="246" Icon="">
+     <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
+     <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4282145480</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
+     <Function ID="261"/>
+     <Action>Toggle</Action>
+     <Input Universe="0" Channel="36596"/>
+    </Button>
+    <Button Caption="CEIL CROSS P2 R6C5" ID="247" Icon="">
+     <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
+     <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4282145480</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
+     <Function ID="261"/>
+     <Action>Toggle</Action>
+     <Input Universe="2" Channel="163" LowerValue="70" UpperValue="66"/>
+    </Button>
+    <Button Caption="CEIL SWEEP P2 R6C6" ID="248" Icon="">
+     <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
+     <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4282145480</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
+     <Function ID="278"/>
+     <Action>Toggle</Action>
+     <Input Universe="0" Channel="40339"/>
+    </Button>
+    <Button Caption="CEIL SWEEP P2 R6C6" ID="249" Icon="">
+     <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
+     <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4282145480</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
+     <Function ID="278"/>
+     <Action>Toggle</Action>
+     <Input Universe="2" Channel="164" LowerValue="70" UpperValue="66"/>
+    </Button>
+    <Button Caption="CEIL CIRCLE P2 R6C7" ID="250" Icon="">
+     <WindowState Visible="True" X="292" Y="4" Width="90" Height="44"/>
+     <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4282145480</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
+     <Function ID="303"/>
+     <Action>Toggle</Action>
+     <Input Universe="0" Channel="57"/>
+    </Button>
+    <Button Caption="CEIL CIRCLE P2 R6C7" ID="251" Icon="">
+     <WindowState Visible="True" X="292" Y="4" Width="90" Height="44"/>
+     <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4282145480</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
+     <Function ID="303"/>
+     <Action>Toggle</Action>
+     <Input Universe="2" Channel="165" LowerValue="70" UpperValue="66"/>
+    </Button>
+   </Frame>
+   <SoloFrame Caption="LEVEL-P2" ID="23" Page="1">
     <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4280295975</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
     <WindowState Visible="True" X="8" Y="308" Width="386" Height="52"/>
     <AllowChildren>True</AllowChildren><AllowResize>True</AllowResize><ShowHeader>False</ShowHeader><ShowEnableButton>False</ShowEnableButton><Collapsed>False</Collapsed><Disabled>False</Disabled>
-    <Button Caption="25% P2 R7C1" ID="268" Icon="">
+    <Button Caption="25% P2 R7C1" ID="278" Icon="">
      <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4281815185</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="16"/>
      <Action>Toggle</Action>
      <Input Universe="0" Channel="54346"/>
     </Button>
-    <Button Caption="25% P2 R7C1" ID="269" Icon="">
+    <Button Caption="25% P2 R7C1" ID="279" Icon="">
      <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4281815185</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="16"/>
      <Action>Toggle</Action>
      <Input Universe="2" Channel="149" LowerValue="70" UpperValue="66"/>
     </Button>
-    <Button Caption="50% P2 R7C2" ID="270" Icon="">
+    <Button Caption="50% P2 R7C2" ID="280" Icon="">
      <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4282475695</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="17"/>
      <Action>Toggle</Action>
      <Input Universe="0" Channel="55948"/>
     </Button>
-    <Button Caption="50% P2 R7C2" ID="271" Icon="">
+    <Button Caption="50% P2 R7C2" ID="281" Icon="">
      <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4282475695</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="17"/>
      <Action>Toggle</Action>
      <Input Universe="2" Channel="150" LowerValue="70" UpperValue="66"/>
     </Button>
-    <Button Caption="75% P2 R7C3" ID="272" Icon="">
+    <Button Caption="75% P2 R7C3" ID="282" Icon="">
      <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4282487220</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="18"/>
      <Action>Toggle</Action>
      <Input Universe="0" Channel="64668"/>
     </Button>
-    <Button Caption="75% P2 R7C3" ID="273" Icon="">
+    <Button Caption="75% P2 R7C3" ID="283" Icon="">
      <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4282487220</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="18"/>
      <Action>Toggle</Action>
      <Input Universe="2" Channel="151" LowerValue="54" UpperValue="50"/>
     </Button>
-    <Button Caption="FULL P2 R7C4" ID="274" Icon="">
+    <Button Caption="FULL P2 R7C4" ID="284" Icon="">
      <WindowState Visible="True" X="292" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4291677645</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="19"/>
      <Action>Toggle</Action>
      <Input Universe="0" Channel="2832"/>
     </Button>
-    <Button Caption="FULL P2 R7C4" ID="275" Icon="">
+    <Button Caption="FULL P2 R7C4" ID="285" Icon="">
      <WindowState Visible="True" X="292" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4291677645</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="19"/>
@@ -4026,90 +4581,90 @@
      <Input Universe="2" Channel="152" LowerValue="2" UpperValue="6"/>
     </Button>
    </SoloFrame>
-   <Frame Caption="SPEED-P2" ID="23" Page="1">
+   <Frame Caption="SPEED-P2" ID="24" Page="1">
     <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4280295975</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
     <WindowState Visible="True" X="392" Y="308" Width="386" Height="52"/>
     <AllowChildren>True</AllowChildren><AllowResize>True</AllowResize><ShowHeader>False</ShowHeader><ShowEnableButton>False</ShowEnableButton><Collapsed>False</Collapsed><Disabled>False</Disabled>
-    <Button Caption="SLOW P2 R7C5" ID="276" Icon="">
+    <Button Caption="SLOW P2 R7C5" ID="286" Icon="">
      <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4290342435</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Action>Toggle</Action>
     </Button>
-    <Button Caption="MED P2 R7C6" ID="278" Icon="">
+    <Button Caption="MED P2 R7C6" ID="288" Icon="">
      <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4290342435</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Action>Toggle</Action>
     </Button>
-    <Button Caption="FAST P2 R7C7" ID="280" Icon="">
+    <Button Caption="FAST P2 R7C7" ID="290" Icon="">
      <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4290342435</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Action>Toggle</Action>
     </Button>
-    <Button Caption="TAP P2 R7C8" ID="282" Icon="">
+    <Button Caption="TAP P2 R7C8" ID="292" Icon="">
      <WindowState Visible="True" X="292" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4290342435</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Action>Toggle</Action>
     </Button>
    </Frame>
-   <Frame Caption="UTILITY-P2" ID="24" Page="1">
+   <Frame Caption="UTILITY-P2" ID="25" Page="1">
     <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4280295975</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
     <WindowState Visible="True" X="8" Y="358" Width="770" Height="52"/>
     <AllowChildren>True</AllowChildren><AllowResize>True</AllowResize><ShowHeader>False</ShowHeader><ShowEnableButton>False</ShowEnableButton><Collapsed>False</Collapsed><Disabled>False</Disabled>
-    <Button Caption="BLACK P2 R8C1" ID="284" Icon="">
+    <Button Caption="BLACK P2 R8C1" ID="294" Icon="">
      <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4294967295</ForegroundColor><BackgroundColor>4279505944</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Action>Blackout</Action>
      <Input Universe="0" Channel="29945"/>
     </Button>
-    <Button Caption="BLACK P2 R8C1" ID="285" Icon="">
+    <Button Caption="BLACK P2 R8C1" ID="295" Icon="">
      <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4294967295</ForegroundColor><BackgroundColor>4279505944</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Action>Blackout</Action>
      <Input Universe="2" Channel="139" LowerValue="5" UpperValue="1"/>
     </Button>
-    <Button Caption="STOP FX P2 R8C2" ID="286" Icon="">
+    <Button Caption="STOP FX P2 R8C2" ID="296" Icon="">
      <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4288358445</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="23"/>
      <Action>Toggle</Action>
      <Input Universe="0" Channel="63290"/>
     </Button>
-    <Button Caption="STOP FX P2 R8C2" ID="287" Icon="">
+    <Button Caption="STOP FX P2 R8C2" ID="297" Icon="">
      <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4288358445</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="23"/>
      <Action>Toggle</Action>
      <Input Universe="2" Channel="140" LowerValue="14" UpperValue="10"/>
     </Button>
-    <Button Caption="WHITE P2 R8C3" ID="288" Icon="">
+    <Button Caption="WHITE P2 R8C3" ID="298" Icon="">
      <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4292993500</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="7"/>
      <Action>Toggle</Action>
      <Input Universe="0" Channel="27276"/>
     </Button>
-    <Button Caption="WHITE P2 R8C3" ID="289" Icon="">
+    <Button Caption="WHITE P2 R8C3" ID="299" Icon="">
      <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4292993500</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="7"/>
      <Action>Toggle</Action>
      <Input Universe="2" Channel="141" LowerValue="2" UpperValue="6"/>
     </Button>
-    <Button Caption="FLASH P2 R8C5" ID="290" Icon="">
+    <Button Caption="FLASH P2 R8C5" ID="300" Icon="">
      <WindowState Visible="True" X="388" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4293651430</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="24"/>
      <Action>Flash</Action>
      <Input Universe="0" Channel="8252"/>
     </Button>
-    <Button Caption="FLASH P2 R8C5" ID="291" Icon="">
+    <Button Caption="FLASH P2 R8C5" ID="301" Icon="">
      <WindowState Visible="True" X="388" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4293651430</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="24"/>
      <Action>Flash</Action>
      <Input Universe="2" Channel="143" LowerValue="2" UpperValue="6"/>
     </Button>
-    <Button Caption="PAGE P2 R8C8" ID="292" Icon="">
+    <Button Caption="PAGE P2 R8C8" ID="302" Icon="">
      <WindowState Visible="True" X="676" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4281178965</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Action>Toggle</Action>
@@ -4142,6 +4697,9 @@
      <Function FadeIn="0" FadeOut="0" Duration="6">145</Function>
      <Function FadeIn="0" FadeOut="0" Duration="6">149</Function>
      <Function FadeIn="0" FadeOut="0" Duration="6">259</Function>
+     <Function FadeIn="0" FadeOut="0" Duration="6">278</Function>
+     <Function FadeIn="0" FadeOut="0" Duration="6">303</Function>
+     <Function FadeIn="0" FadeOut="0" Duration="6">320</Function>
     </SpeedDial>
     <SpeedDial Caption="_Speed 1200" ID="901">
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4280295975</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance><WindowState Visible="True" X="1" Y="1" Width="1" Height="1"/>
@@ -4163,6 +4721,9 @@
      <Function FadeIn="0" FadeOut="0" Duration="6">145</Function>
      <Function FadeIn="0" FadeOut="0" Duration="6">149</Function>
      <Function FadeIn="0" FadeOut="0" Duration="6">259</Function>
+     <Function FadeIn="0" FadeOut="0" Duration="6">278</Function>
+     <Function FadeIn="0" FadeOut="0" Duration="6">303</Function>
+     <Function FadeIn="0" FadeOut="0" Duration="6">320</Function>
     </SpeedDial>
     <SpeedDial Caption="_Speed 600" ID="902">
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4280295975</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance><WindowState Visible="True" X="1" Y="1" Width="1" Height="1"/>
@@ -4184,6 +4745,9 @@
      <Function FadeIn="0" FadeOut="0" Duration="6">145</Function>
      <Function FadeIn="0" FadeOut="0" Duration="6">149</Function>
      <Function FadeIn="0" FadeOut="0" Duration="6">259</Function>
+     <Function FadeIn="0" FadeOut="0" Duration="6">278</Function>
+     <Function FadeIn="0" FadeOut="0" Duration="6">303</Function>
+     <Function FadeIn="0" FadeOut="0" Duration="6">320</Function>
     </SpeedDial>
     <SpeedDial Caption="_Speed 250" ID="903">
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4280295975</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance><WindowState Visible="True" X="1" Y="1" Width="1" Height="1"/>
@@ -4205,6 +4769,9 @@
      <Function FadeIn="0" FadeOut="0" Duration="6">145</Function>
      <Function FadeIn="0" FadeOut="0" Duration="6">149</Function>
      <Function FadeIn="0" FadeOut="0" Duration="6">259</Function>
+     <Function FadeIn="0" FadeOut="0" Duration="6">278</Function>
+     <Function FadeIn="0" FadeOut="0" Duration="6">303</Function>
+     <Function FadeIn="0" FadeOut="0" Duration="6">320</Function>
     </SpeedDial>
    </Frame>
   <Frame Caption="MINILAB" ID="60">

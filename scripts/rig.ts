@@ -59,6 +59,9 @@ const CuepixShow = z
     // may be empty (2026-09-19 homecoming: panels on the outer trusses, the inner two carry a Beam and no panels).
     trusses: z.array(z.array(z.number().int().min(1).max(64))).length(4),
     moversCalibrated: z.boolean().default(false),
+    // Top of every panel stack, ft off the floor (2026-09-22 Huntley: stacks hung from the top of
+    // 10 ft towers). Absent = stacks stand on the deck. 3D monitor only; the show ignores height.
+    stackTopFt: z.number().positive().optional(),
   })
   .superRefine(({ trusses }, ctx) => {
     const panels = [...trusses.flat()].sort((a, b) => a - b);
@@ -101,6 +104,9 @@ export const RigSchema = z.object({
     .object({
       model: z.string(),
       portName: z.string(),            // winmm device name the launcher resolves by
+      // true = emit the pan/tilt Level knobs for plotting a new room. Missing from the schema until
+      // 2026-09-22, so zod stripped it and the knobs could never come back. Rebuild with it off for the show.
+      plotMode: z.boolean().optional(),
       inputUid: z.string(),
       inputLine: z.string(),
       cc: z.object({

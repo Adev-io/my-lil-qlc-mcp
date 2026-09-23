@@ -66,8 +66,11 @@ if (rig.cuepix) {
   for (let truss = 0; truss < rig.cuepix.trusses.length; truss++) {
     rig.cuepix.trusses[truss].forEach((panel, slot) => {
       // ponytail: fixed 2.2 ft pitch matches the 2.1 ft rendered panel; add rig spacing only when hardware differs.
-      cuepixPositions.set(panel, [round(trussCenters[truss]), D, round(DECK + 1.1 + slot * 2.2)]);
-      trussTop[truss] = round(DECK + 1.1 + (slot + 1) * 2.2);
+      // stackTopFt hangs the stack from a fixed top (towers); otherwise it stands on the deck.
+      const top = rig.cuepix!.stackTopFt ?? DECK + rig.cuepix!.trusses[truss].length * 2.2;
+      const fromTop = rig.cuepix!.trusses[truss].length - 1 - slot;
+      cuepixPositions.set(panel, [round(trussCenters[truss]), D, round(top - 1.1 - fromTop * 2.2)]);
+      trussTop[truss] = round(top);
     });
   }
 }

@@ -36,8 +36,12 @@ describe("Cuepix launcher", () => {
     expect(prepared).not.toContain('<Input Plugin="MIDI"');
     expect(prepared).not.toContain('<Feedback Plugin="MIDI"');
     expect(prepared).not.toContain('<Universe Name="MiniLab"');
-    expect(prepared).toContain('outputUni="0"');
-    expect(prepared).toContain('outputUni="1"');
+    // Universes follow the generated show (8 panels = U0+U1, Huntley's 4 = U0 only), each on the
+    // lighting line the launcher resolved.
+    const universes = [...new Set([...before.matchAll(/outputUni="(\d+)"/g)].map((m) => m[1]))];
+    expect(universes).toContain("0");
+    for (const u of universes) expect(prepared).toContain(`outputUni="${u}"`);
+    expect(new Set([...prepared.matchAll(/<Output Plugin="ArtNet" UID="None" Line="(\d+)">/g)].map((m) => m[1])).size).toBe(1);
     expect(readFileSync(source, "utf8")).toBe(before);
   });
 

@@ -15,6 +15,10 @@ param(
 $ErrorActionPreference = 'Stop'
 $projectDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $sourceShow = Join-Path $projectDir 'cuepix-panel-show.qxw'
+# Art-Net universes come from the generated show, not a fixed 0/1: an 8-panel rig drives U0+U1,
+# the 4-panel Huntley rig only U0. The monitor inherits the list through MONITOR_UNIVERSES.
+[int[]]$showUniverses = if (Test-Path -LiteralPath $sourceShow) { @([regex]::Matches([IO.File]::ReadAllText($sourceShow), 'outputUni="(\d+)"') | ForEach-Object { [int]$_.Groups[1].Value } | Sort-Object -Unique) } else { @() }
+$env:MONITOR_UNIVERSES = $showUniverses -join ','
 $widgetMap = Join-Path $projectDir 'config\cuepix-widgets.json'
 $fixtureSource = Join-Path $projectDir 'fixtures'
 $fixtureNames = @(
@@ -103,9 +107,9 @@ function New-CuepixRuntime {
 
   $verified = [IO.File]::ReadAllText($runtimeShow)
   $outputMatches = [regex]::Matches($verified, '<Output Plugin="ArtNet" UID="None" Line="' + $artnetLine + '">')
-  if ($outputMatches.Count -ne 2) { throw 'Runtime validation failed: both lighting outputs must use lighting Ethernet.' }
-  Write-Host "  Art-Net U0/U1: $artnetTarget, QLC+ line $artnetLine" -ForegroundColor Green
-  foreach ($required in @('<Workspace ', '<Universe Name="Launchpad" ID="2"', 'outputUni="0"', 'outputUni="1"')) {
+  if ($showUniverses.Count -lt 1 -or $outputMatches.Count -ne $showUniverses.Count) { throw 'Runtime validation failed: every lighting output must use lighting Ethernet.' }
+  Write-Host "  Art-Net U$($showUniverses -join '/U'): $artnetTarget, QLC+ line $artnetLine" -ForegroundColor Green
+  foreach ($required in @('<Workspace ', '<Universe Name="Launchpad" ID="2"') + @($showUniverses | ForEach-Object { "outputUni=`"$_`"" })) {
     if (-not $verified.Contains($required)) { throw "Runtime validation failed: missing $required" }
   }
   if (-not $controllerReady -and [regex]::IsMatch($verified, '<Input Plugin="MIDI"[^>]*/>')) { throw 'Runtime validation failed: stale MIDI input remained active.' }
@@ -277,12 +281,12 @@ if (-not $NoMonitor) {
   $monitorReady = Wait-Url 'http://127.0.0.1:7800/status'
   if ($monitorReady) {
     $status = Invoke-RestMethod 'http://127.0.0.1:7800/status' -TimeoutSec 2
-    $monitorReady = @($status.universes) -contains 0 -and @($status.universes) -contains 1
-    $monitorLive = $null -ne $status.ageMs.'0' -and $null -ne $status.ageMs.'1'
+    $monitorReady = @($showUniverses | Where-Object { @($status.universes) -notcontains $_ }).Count -eq 0
+    $monitorLive = @($showUniverses | Where-Object { $null -eq $status.ageMs."$_" }).Count -eq 0
   }
 }
 
-if (-not $monitorReady) { throw '3D monitor failed readiness check or lacks Universes 0 and 1.' }
+if (-not $monitorReady) { throw "3D monitor failed readiness check or lacks Universes $($showUniverses -join ', ')." }
 if ($lightingIp -and $monitorLive -and ($NoMcp -or $mcpReady)) {
   Write-Host '  READY — QLC+, Art-Net 0/1, monitor, and requested services active.' -ForegroundColor Green
 } else {

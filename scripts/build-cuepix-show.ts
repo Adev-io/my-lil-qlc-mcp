@@ -982,7 +982,7 @@ QLC+ stores addresses zero-based internally. Table shows fixture-display DMX add
 |---|---|---:|---:|---:|---:|
 ${patchRows}
 
-CR011R DMX output handles Universe 0 only: ${dmxChain}. Universe 1 goes directly by Art-Net to the panels listed above.
+CR011R DMX output handles Universe 0 only: ${dmxChain}. ${outputUniversesOf(panels).length > 1 ? "Universe 1 goes directly by Art-Net to the panels listed above." : "The panels take Universe 0 directly by Art-Net."}
 `;
 const trussSetupLines = (rig.cuepix?.trusses ?? [])
   .map((group, index) => ({ group, index }))
@@ -1043,14 +1043,14 @@ If Launchpad is absent, launcher removes MIDI routes from runtime copy. QLC+ Vir
 
 ### MiniLab 3
 
-K1-K4 tilt, K5-K8 pan of ${[spots[0], beams[0], beams[1], spots[1]].filter(Boolean).map((head) => head.name).join(" · ")}; F1 panels, F2 beams, F3 spots. Port \`${ML?.portName ?? "—"}\`; the launcher binds it at start.
+F1-F4 = dimmers of ${knobHeads.map((head) => head.name).join(" · ")} — raise all four before doors. ${PLOT_MODE ? "PLOT MODE: K1-K4 tilt, K5-K8 pan of the same heads. Plot, write the captures into the rig, set controller2.plotMode false and regenerate before the show." : "Pan/tilt knobs are off (show mode)."} Port \`${ML?.portName ?? "—"}\`; the launcher binds it at start.
 
 ## Test gate — routing before performance
 
 1. Expand collapsed \`SETUP · ROUTING TESTS\` in Virtual Console.
 2. Power one Cuepix only. Test its Red, Green, Blue, White, and Blackout buttons.
 3. Repeat for Cuepix 1-${panels.length}, one fixture at a time.
-4. Test Universe 0 Panels White, Universe 1 Panels White, then All Blackout.
+4. Test ${outputUniversesOf(panels).map((u) => `Universe ${u} Panels White`).join(", ")}, then All Blackout.
 5. Test ${heads.slice(0, -1).map((head) => head.name).join(", ")} and ${heads[heads.length - 1]?.name} one at a time through CR011R.
 6. Collapse setup controls. Test grouped solids, patterns, fades, chasers, levels, strobe, stop, flash press/release, and blackout.
 7. Test Launchpad page switch and LED feedback. Compare both universes against 3D monitor.
@@ -1058,7 +1058,7 @@ K1-K4 tilt, K5-K8 pan of ${[spots[0], beams[0], beams[1], spots[1]].filter(Boole
 
 ## Art-Net numbering warning
 
-Workspace maps QLC+ Universe ID 0 → Art-Net universe 0 and QLC+ Universe ID 1 → Art-Net universe 1. Some device screens label these 1 and 2. Match wire values, not display wording.
+Workspace maps ${outputUniverses.map((u) => `QLC+ Universe ID ${u} → Art-Net universe ${u}`).join(" and ")}. Some device screens label these 1 and 2. Match wire values, not display wording.
 `;
 
 const qxwPath = path.join(OUT, "cuepix-panel-show.qxw");

@@ -62,6 +62,8 @@ const CuepixShow = z
     // Top of every panel stack, ft off the floor (2026-09-22 Huntley: stacks hung from the top of
     // 10 ft towers). Absent = stacks stand on the deck. 3D monitor only; the show ignores height.
     stackTopFt: z.number().positive().optional(),
+    // Where pixel 1 sits on a panel as hung (load-in check: BASE · Bands). Drives the pixel grid.
+    pixelOrigin: z.enum(["top-left", "top-right", "bottom-left", "bottom-right"]).optional(),
   })
   .superRefine(({ trusses }, ctx) => {
     const panels = [...trusses.flat()].sort((a, b) => a - b);

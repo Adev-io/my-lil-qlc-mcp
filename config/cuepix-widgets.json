@@ -260,501 +260,557 @@
       "description": "Button: FLOOR FULL P1 R5C7 (Input Universe 0, Channel 19103)"
     },
     {
-      "id": "334",
+      "id": "174",
+      "name": "FIRE P1 R5C8",
+      "path": "/fire_p1_r5c8",
+      "type": "button",
+      "description": "Button: FIRE P1 R5C8 (Input Universe 0, Channel 35485)"
+    },
+    {
+      "id": "176",
+      "name": "FILL DRAIN P1 R6C1",
+      "path": "/fill_drain_p1_r6c1",
+      "type": "button",
+      "description": "Button: FILL DRAIN P1 R6C1 (Input Universe 0, Channel 57662)"
+    },
+    {
+      "id": "178",
+      "name": "RAIN P1 R6C2",
+      "path": "/rain_p1_r6c2",
+      "type": "button",
+      "description": "Button: RAIN P1 R6C2 (Input Universe 0, Channel 120)"
+    },
+    {
+      "id": "180",
+      "name": "TWINKLE P1 R6C3",
+      "path": "/twinkle_p1_r6c3",
+      "type": "button",
+      "description": "Button: TWINKLE P1 R6C3 (Input Universe 0, Channel 33408)"
+    },
+    {
+      "id": "182",
+      "name": "PLASMA P1 R6C4",
+      "path": "/plasma_p1_r6c4",
+      "type": "button",
+      "description": "Button: PLASMA P1 R6C4 (Input Universe 0, Channel 18688)"
+    },
+    {
+      "id": "184",
+      "name": "GAP SWEEP P1 R6C5",
+      "path": "/gap_sweep_p1_r6c5",
+      "type": "button",
+      "description": "Button: GAP SWEEP P1 R6C5 (Input Universe 0, Channel 16338)"
+    },
+    {
+      "id": "186",
+      "name": "V COMET P1 R6C6",
+      "path": "/v_comet_p1_r6c6",
+      "type": "button",
+      "description": "Button: V COMET P1 R6C6 (Input Universe 0, Channel 44754)"
+    },
+    {
+      "id": "188",
+      "name": "CHEVRONS P1 R6C7",
+      "path": "/chevrons_p1_r6c7",
+      "type": "button",
+      "description": "Button: CHEVRONS P1 R6C7 (Input Universe 0, Channel 29735)"
+    },
+    {
+      "id": "190",
+      "name": "APEX PULSE P1 R6C8",
+      "path": "/apex_pulse_p1_r6c8",
+      "type": "button",
+      "description": "Button: APEX PULSE P1 R6C8 (Input Universe 0, Channel 31005)"
+    },
+    {
+      "id": "350",
       "name": "25% P1 R7C1",
       "path": "/25%_p1_r7c1",
       "type": "button",
       "description": "Button: 25% P1 R7C1 (Input Universe 0, Channel 55351)"
     },
     {
-      "id": "336",
+      "id": "352",
       "name": "50% P1 R7C2",
       "path": "/50%_p1_r7c2",
       "type": "button",
       "description": "Button: 50% P1 R7C2 (Input Universe 0, Channel 55025)"
     },
     {
-      "id": "338",
+      "id": "354",
       "name": "75% P1 R7C3",
       "path": "/75%_p1_r7c3",
       "type": "button",
       "description": "Button: 75% P1 R7C3 (Input Universe 0, Channel 61665)"
     },
     {
-      "id": "340",
+      "id": "356",
       "name": "FULL P1 R7C4",
       "path": "/full_p1_r7c4",
       "type": "button",
       "description": "Button: FULL P1 R7C4 (Input Universe 0, Channel 1901)"
     },
     {
-      "id": "174",
+      "id": "192",
       "name": "RED P2 R1C1",
       "path": "/red_p2_r1c1",
       "type": "button",
       "description": "Button: RED P2 R1C1 (Input Universe 0, Channel 59169)"
     },
     {
-      "id": "176",
+      "id": "194",
       "name": "AMBER P2 R1C2",
       "path": "/amber_p2_r1c2",
       "type": "button",
       "description": "Button: AMBER P2 R1C2 (Input Universe 0, Channel 35356)"
     },
     {
-      "id": "178",
+      "id": "196",
       "name": "GREEN P2 R1C3",
       "path": "/green_p2_r1c3",
       "type": "button",
       "description": "Button: GREEN P2 R1C3 (Input Universe 0, Channel 1162)"
     },
     {
-      "id": "180",
+      "id": "198",
       "name": "CYAN P2 R1C4",
       "path": "/cyan_p2_r1c4",
       "type": "button",
       "description": "Button: CYAN P2 R1C4 (Input Universe 0, Channel 53629)"
     },
     {
-      "id": "182",
+      "id": "200",
       "name": "BLUE P2 R1C5",
       "path": "/blue_p2_r1c5",
       "type": "button",
       "description": "Button: BLUE P2 R1C5 (Input Universe 0, Channel 62499)"
     },
     {
-      "id": "184",
+      "id": "202",
       "name": "PURPLE P2 R1C6",
       "path": "/purple_p2_r1c6",
       "type": "button",
       "description": "Button: PURPLE P2 R1C6 (Input Universe 0, Channel 59192)"
     },
     {
-      "id": "186",
+      "id": "204",
       "name": "WHITE P2 R1C7",
       "path": "/white_p2_r1c7",
       "type": "button",
       "description": "Button: WHITE P2 R1C7 (Input Universe 0, Channel 45238)"
     },
     {
-      "id": "188",
+      "id": "206",
       "name": "BLACK P2 R1C8",
       "path": "/black_p2_r1c8",
       "type": "button",
       "description": "Button: BLACK P2 R1C8 (Input Universe 0, Channel 29990)"
     },
     {
-      "id": "190",
+      "id": "208",
       "name": "RAINBOW P2 R2C1",
       "path": "/rainbow_p2_r2c1",
       "type": "button",
       "description": "Button: RAINBOW P2 R2C1 (Input Universe 0, Channel 22501)"
     },
     {
-      "id": "192",
+      "id": "210",
       "name": "CHECKER P2 R2C2",
       "path": "/checker_p2_r2c2",
       "type": "button",
       "description": "Button: CHECKER P2 R2C2 (Input Universe 0, Channel 1390)"
     },
     {
-      "id": "194",
+      "id": "212",
       "name": "BANDS P2 R2C3",
       "path": "/bands_p2_r2c3",
       "type": "button",
       "description": "Button: BANDS P2 R2C3 (Input Universe 0, Channel 63161)"
     },
     {
-      "id": "196",
+      "id": "214",
       "name": "PIXELS P2 R2C4",
       "path": "/pixels_p2_r2c4",
       "type": "button",
       "description": "Button: PIXELS P2 R2C4 (Input Universe 0, Channel 25375)"
     },
     {
-      "id": "198",
+      "id": "216",
       "name": "L → R P2 R2C5",
       "path": "/l_→_r_p2_r2c5",
       "type": "button",
       "description": "Button: L → R P2 R2C5 (Input Universe 0, Channel 13619)"
     },
     {
-      "id": "200",
+      "id": "218",
       "name": "R → L P2 R2C6",
       "path": "/r_→_l_p2_r2c6",
       "type": "button",
       "description": "Button: R → L P2 R2C6 (Input Universe 0, Channel 26770)"
     },
     {
-      "id": "202",
+      "id": "220",
       "name": "FADE P2 R2C7",
       "path": "/fade_p2_r2c7",
       "type": "button",
       "description": "Button: FADE P2 R2C7 (Input Universe 0, Channel 29752)"
     },
     {
-      "id": "204",
+      "id": "222",
       "name": "BREATHE P2 R2C8",
       "path": "/breathe_p2_r2c8",
       "type": "button",
       "description": "Button: BREATHE P2 R2C8 (Input Universe 0, Channel 43560)"
     },
     {
-      "id": "206",
+      "id": "224",
       "name": "HD RED P2 R3C1",
       "path": "/hd_red_p2_r3c1",
       "type": "button",
       "description": "Button: HD RED P2 R3C1 (Input Universe 0, Channel 16984)"
     },
     {
-      "id": "208",
+      "id": "226",
       "name": "HD AMBER P2 R3C2",
       "path": "/hd_amber_p2_r3c2",
       "type": "button",
       "description": "Button: HD AMBER P2 R3C2 (Input Universe 0, Channel 64599)"
     },
     {
-      "id": "210",
+      "id": "228",
       "name": "HD YELLOW P2 R3C3",
       "path": "/hd_yellow_p2_r3c3",
       "type": "button",
       "description": "Button: HD YELLOW P2 R3C3 (Input Universe 0, Channel 37095)"
     },
     {
-      "id": "212",
+      "id": "230",
       "name": "HD GREEN P2 R3C4",
       "path": "/hd_green_p2_r3c4",
       "type": "button",
       "description": "Button: HD GREEN P2 R3C4 (Input Universe 0, Channel 1662)"
     },
     {
-      "id": "214",
+      "id": "232",
       "name": "HD BLUE P2 R3C5",
       "path": "/hd_blue_p2_r3c5",
       "type": "button",
       "description": "Button: HD BLUE P2 R3C5 (Input Universe 0, Channel 38414)"
     },
     {
-      "id": "216",
+      "id": "234",
       "name": "HD CYAN P2 R3C6",
       "path": "/hd_cyan_p2_r3c6",
       "type": "button",
       "description": "Button: HD CYAN P2 R3C6 (Input Universe 0, Channel 36930)"
     },
     {
-      "id": "218",
+      "id": "236",
       "name": "HD MAGENTA P2 R3C7",
       "path": "/hd_magenta_p2_r3c7",
       "type": "button",
       "description": "Button: HD MAGENTA P2 R3C7 (Input Universe 0, Channel 587)"
     },
     {
-      "id": "220",
+      "id": "238",
       "name": "HD WHITE P2 R3C8",
       "path": "/hd_white_p2_r3c8",
       "type": "button",
       "description": "Button: HD WHITE P2 R3C8 (Input Universe 0, Channel 15882)"
     },
     {
-      "id": "364",
+      "id": "380",
       "name": "25% P2 R7C1",
       "path": "/25%_p2_r7c1",
       "type": "button",
       "description": "Button: 25% P2 R7C1 (Input Universe 0, Channel 54346)"
     },
     {
-      "id": "366",
+      "id": "382",
       "name": "50% P2 R7C2",
       "path": "/50%_p2_r7c2",
       "type": "button",
       "description": "Button: 50% P2 R7C2 (Input Universe 0, Channel 55948)"
     },
     {
-      "id": "368",
+      "id": "384",
       "name": "75% P2 R7C3",
       "path": "/75%_p2_r7c3",
       "type": "button",
       "description": "Button: 75% P2 R7C3 (Input Universe 0, Channel 64668)"
     },
     {
-      "id": "370",
+      "id": "386",
       "name": "FULL P2 R7C4",
       "path": "/full_p2_r7c4",
       "type": "button",
       "description": "Button: FULL P2 R7C4 (Input Universe 0, Channel 2832)"
     },
     {
-      "id": "238",
+      "id": "256",
       "name": "HD RED P3 R5C1",
       "path": "/hd_red_p3_r5c1",
       "type": "button",
       "description": "Button: HD RED P3 R5C1 (Input Universe 0, Channel 37034)"
     },
     {
-      "id": "240",
+      "id": "258",
       "name": "HD AMBER P3 R5C2",
       "path": "/hd_amber_p3_r5c2",
       "type": "button",
       "description": "Button: HD AMBER P3 R5C2 (Input Universe 0, Channel 11941)"
     },
     {
-      "id": "242",
+      "id": "260",
       "name": "HD YELLOW P3 R5C3",
       "path": "/hd_yellow_p3_r5c3",
       "type": "button",
       "description": "Button: HD YELLOW P3 R5C3 (Input Universe 0, Channel 16917)"
     },
     {
-      "id": "244",
+      "id": "262",
       "name": "HD GREEN P3 R5C4",
       "path": "/hd_green_p3_r5c4",
       "type": "button",
       "description": "Button: HD GREEN P3 R5C4 (Input Universe 0, Channel 54412)"
     },
     {
-      "id": "246",
+      "id": "264",
       "name": "HD BLUE P3 R5C5",
       "path": "/hd_blue_p3_r5c5",
       "type": "button",
       "description": "Button: HD BLUE P3 R5C5 (Input Universe 0, Channel 17660)"
     },
     {
-      "id": "248",
+      "id": "266",
       "name": "HD CYAN P3 R5C6",
       "path": "/hd_cyan_p3_r5c6",
       "type": "button",
       "description": "Button: HD CYAN P3 R5C6 (Input Universe 0, Channel 17072)"
     },
     {
-      "id": "250",
+      "id": "268",
       "name": "HD MAGENTA P3 R5C7",
       "path": "/hd_magenta_p3_r5c7",
       "type": "button",
       "description": "Button: HD MAGENTA P3 R5C7 (Input Universe 0, Channel 53433)"
     },
     {
-      "id": "252",
+      "id": "270",
       "name": "HD WHITE P3 R5C8",
       "path": "/hd_white_p3_r5c8",
       "type": "button",
       "description": "Button: HD WHITE P3 R5C8 (Input Universe 0, Channel 60664)"
     },
     {
-      "id": "270",
+      "id": "272",
       "name": "FIGURE 8 P3 R1C1",
       "path": "/figure_8_p3_r1c1",
       "type": "button",
       "description": "Button: FIGURE 8 P3 R1C1 (Input Universe 0, Channel 33503)"
     },
     {
-      "id": "272",
-      "name": "FLR SWEEP P3 R1C2",
-      "path": "/flr_sweep_p3_r1c2",
-      "type": "button",
-      "description": "Button: FLR SWEEP P3 R1C2 (Input Universe 0, Channel 47571)"
-    },
-    {
       "id": "274",
-      "name": "FLR WAVE P3 R1C3",
-      "path": "/flr_wave_p3_r1c3",
+      "name": "FLR WAVE P3 R1C2",
+      "path": "/flr_wave_p3_r1c2",
       "type": "button",
-      "description": "Button: FLR WAVE P3 R1C3 (Input Universe 0, Channel 10912)"
+      "description": "Button: FLR WAVE P3 R1C2 (Input Universe 0, Channel 15145)"
     },
     {
       "id": "276",
-      "name": "FLR CIRCLE P3 R1C4",
-      "path": "/flr_circle_p3_r1c4",
+      "name": "FLR CIRCLE P3 R1C3",
+      "path": "/flr_circle_p3_r1c3",
       "type": "button",
-      "description": "Button: FLR CIRCLE P3 R1C4 (Input Universe 0, Channel 22328)"
+      "description": "Button: FLR CIRCLE P3 R1C3 (Input Universe 0, Channel 9095)"
     },
     {
       "id": "278",
-      "name": "FLR SCISSOR P3 R1C5",
-      "path": "/flr_scissor_p3_r1c5",
+      "name": "FLR SCISSOR P3 R1C4",
+      "path": "/flr_scissor_p3_r1c4",
       "type": "button",
-      "description": "Button: FLR SCISSOR P3 R1C5 (Input Universe 0, Channel 2271)"
+      "description": "Button: FLR SCISSOR P3 R1C4 (Input Universe 0, Channel 6486)"
     },
     {
       "id": "280",
-      "name": "FLR BALLYHOO P3 R1C6",
-      "path": "/flr_ballyhoo_p3_r1c6",
+      "name": "FLR BALLYHOO P3 R1C5",
+      "path": "/flr_ballyhoo_p3_r1c5",
       "type": "button",
-      "description": "Button: FLR BALLYHOO P3 R1C6 (Input Universe 0, Channel 4235)"
+      "description": "Button: FLR BALLYHOO P3 R1C5 (Input Universe 0, Channel 8720)"
     },
     {
       "id": "282",
-      "name": "FLR X P3 R1C7",
-      "path": "/flr_x_p3_r1c7",
+      "name": "FLR ZIGZAG P3 R1C6",
+      "path": "/flr_zigzag_p3_r1c6",
       "type": "button",
-      "description": "Button: FLR X P3 R1C7 (Input Universe 0, Channel 40569)"
+      "description": "Button: FLR ZIGZAG P3 R1C6 (Input Universe 0, Channel 20633)"
     },
     {
       "id": "284",
-      "name": "FLR ZIGZAG P3 R1C8",
-      "path": "/flr_zigzag_p3_r1c8",
+      "name": "FLR CHASE P3 R1C7",
+      "path": "/flr_chase_p3_r1c7",
       "type": "button",
-      "description": "Button: FLR ZIGZAG P3 R1C8 (Input Universe 0, Channel 47591)"
+      "description": "Button: FLR CHASE P3 R1C7 (Input Universe 0, Channel 49243)"
     },
     {
       "id": "286",
-      "name": "FLR CHASE P3 R2C1",
-      "path": "/flr_chase_p3_r2c1",
+      "name": "FLR SPIRAL P3 R1C8",
+      "path": "/flr_spiral_p3_r1c8",
       "type": "button",
-      "description": "Button: FLR CHASE P3 R2C1 (Input Universe 0, Channel 18953)"
+      "description": "Button: FLR SPIRAL P3 R1C8 (Input Universe 0, Channel 16957)"
     },
     {
       "id": "288",
-      "name": "FLR SPIRAL P3 R2C2",
-      "path": "/flr_spiral_p3_r2c2",
+      "name": "FLR SCATTER P3 R2C1",
+      "path": "/flr_scatter_p3_r2c1",
       "type": "button",
-      "description": "Button: FLR SPIRAL P3 R2C2 (Input Universe 0, Channel 515)"
+      "description": "Button: FLR SCATTER P3 R2C1 (Input Universe 0, Channel 40942)"
     },
     {
       "id": "290",
-      "name": "FLR SCATTER P3 R2C3",
-      "path": "/flr_scatter_p3_r2c3",
+      "name": "FLR BURST P3 R2C2",
+      "path": "/flr_burst_p3_r2c2",
       "type": "button",
-      "description": "Button: FLR SCATTER P3 R2C3 (Input Universe 0, Channel 48380)"
+      "description": "Button: FLR BURST P3 R2C2 (Input Universe 0, Channel 57271)"
     },
     {
       "id": "292",
-      "name": "FLR BURST P3 R2C4",
-      "path": "/flr_burst_p3_r2c4",
+      "name": "FLR CORNERS P3 R2C3",
+      "path": "/flr_corners_p3_r2c3",
       "type": "button",
-      "description": "Button: FLR BURST P3 R2C4 (Input Universe 0, Channel 47745)"
+      "description": "Button: FLR CORNERS P3 R2C3 (Input Universe 0, Channel 13540)"
     },
     {
       "id": "294",
-      "name": "FLR CORNERS P3 R2C5",
-      "path": "/flr_corners_p3_r2c5",
+      "name": "ROOM SWEEP P3 R2C4",
+      "path": "/room_sweep_p3_r2c4",
       "type": "button",
-      "description": "Button: FLR CORNERS P3 R2C5 (Input Universe 0, Channel 20946)"
+      "description": "Button: ROOM SWEEP P3 R2C4 (Input Universe 0, Channel 956)"
     },
     {
       "id": "296",
-      "name": "ROOM SWEEP P3 R2C6",
-      "path": "/room_sweep_p3_r2c6",
+      "name": "ARC P3 R2C5",
+      "path": "/arc_p3_r2c5",
       "type": "button",
-      "description": "Button: ROOM SWEEP P3 R2C6 (Input Universe 0, Channel 8366)"
+      "description": "Button: ARC P3 R2C5 (Input Universe 0, Channel 15097)"
     },
     {
       "id": "298",
-      "name": "ARC P3 R2C7",
-      "path": "/arc_p3_r2c7",
+      "name": "X SWEEP P3 R2C6",
+      "path": "/x_sweep_p3_r2c6",
       "type": "button",
-      "description": "Button: ARC P3 R2C7 (Input Universe 0, Channel 6635)"
+      "description": "Button: X SWEEP P3 R2C6 (Input Universe 0, Channel 60113)"
     },
     {
       "id": "300",
-      "name": "X SWEEP P3 R2C8",
-      "path": "/x_sweep_p3_r2c8",
+      "name": "FLIP P3 R2C7",
+      "path": "/flip_p3_r2c7",
       "type": "button",
-      "description": "Button: X SWEEP P3 R2C8 (Input Universe 0, Channel 943)"
+      "description": "Button: FLIP P3 R2C7 (Input Universe 0, Channel 48995)"
     },
     {
       "id": "302",
-      "name": "FLIP P3 R3C1",
-      "path": "/flip_p3_r3c1",
+      "name": "PERIMETER P3 R2C8",
+      "path": "/perimeter_p3_r2c8",
       "type": "button",
-      "description": "Button: FLIP P3 R3C1 (Input Universe 0, Channel 32905)"
+      "description": "Button: PERIMETER P3 R2C8 (Input Universe 0, Channel 61668)"
     },
     {
       "id": "304",
-      "name": "PERIMETER P3 R3C2",
-      "path": "/perimeter_p3_r3c2",
+      "name": "DIVE P3 R3C1",
+      "path": "/dive_p3_r3c1",
       "type": "button",
-      "description": "Button: PERIMETER P3 R3C2 (Input Universe 0, Channel 1378)"
+      "description": "Button: DIVE P3 R3C1 (Input Universe 0, Channel 31732)"
     },
     {
       "id": "306",
-      "name": "DIVE P3 R3C3",
-      "path": "/dive_p3_r3c3",
+      "name": "ROOM CIRCLE P3 R3C2",
+      "path": "/room_circle_p3_r3c2",
       "type": "button",
-      "description": "Button: DIVE P3 R3C3 (Input Universe 0, Channel 22758)"
+      "description": "Button: ROOM CIRCLE P3 R3C2 (Input Universe 0, Channel 28128)"
     },
     {
       "id": "308",
-      "name": "ROOM CIRCLE P3 R3C4",
-      "path": "/room_circle_p3_r3c4",
+      "name": "RISE FALL P3 R3C3",
+      "path": "/rise_fall_p3_r3c3",
       "type": "button",
-      "description": "Button: ROOM CIRCLE P3 R3C4 (Input Universe 0, Channel 2262)"
+      "description": "Button: RISE FALL P3 R3C3 (Input Universe 0, Channel 24745)"
     },
     {
       "id": "310",
-      "name": "RISE FALL P3 R3C5",
-      "path": "/rise_fall_p3_r3c5",
+      "name": "TILT WAVE P3 R3C4",
+      "path": "/tilt_wave_p3_r3c4",
       "type": "button",
-      "description": "Button: RISE FALL P3 R3C5 (Input Universe 0, Channel 1439)"
+      "description": "Button: TILT WAVE P3 R3C4 (Input Universe 0, Channel 40663)"
     },
     {
       "id": "312",
-      "name": "TILT WAVE P3 R3C6",
-      "path": "/tilt_wave_p3_r3c6",
+      "name": "BALLYHOO P3 R3C5",
+      "path": "/ballyhoo_p3_r3c5",
       "type": "button",
-      "description": "Button: TILT WAVE P3 R3C6 (Input Universe 0, Channel 48581)"
+      "description": "Button: BALLYHOO P3 R3C5 (Input Universe 0, Channel 41605)"
     },
     {
       "id": "314",
-      "name": "BALLYHOO P3 R3C7",
-      "path": "/ballyhoo_p3_r3c7",
+      "name": "LOOK SEQ P3 R3C6",
+      "path": "/look_seq_p3_r3c6",
       "type": "button",
-      "description": "Button: BALLYHOO P3 R3C7 (Input Universe 0, Channel 33175)"
+      "description": "Button: LOOK SEQ P3 R3C6 (Input Universe 0, Channel 33900)"
     },
     {
       "id": "316",
-      "name": "LOOK SEQ P3 R3C8",
-      "path": "/look_seq_p3_r3c8",
+      "name": "CEIL FAN P3 R3C7",
+      "path": "/ceil_fan_p3_r3c7",
       "type": "button",
-      "description": "Button: LOOK SEQ P3 R3C8 (Input Universe 0, Channel 27922)"
+      "description": "Button: CEIL FAN P3 R3C7 (Input Universe 0, Channel 971)"
     },
     {
       "id": "318",
-      "name": "CEIL FAN P3 R4C1",
-      "path": "/ceil_fan_p3_r4c1",
+      "name": "CEIL CROSS P3 R3C8",
+      "path": "/ceil_cross_p3_r3c8",
       "type": "button",
-      "description": "Button: CEIL FAN P3 R4C1 (Input Universe 0, Channel 60152)"
+      "description": "Button: CEIL CROSS P3 R3C8 (Input Universe 0, Channel 26759)"
     },
     {
       "id": "320",
-      "name": "CEIL CROSS P3 R4C2",
-      "path": "/ceil_cross_p3_r4c2",
+      "name": "CEIL CIRCLE P3 R4C1",
+      "path": "/ceil_circle_p3_r4c1",
       "type": "button",
-      "description": "Button: CEIL CROSS P3 R4C2 (Input Universe 0, Channel 19416)"
+      "description": "Button: CEIL CIRCLE P3 R4C1 (Input Universe 0, Channel 54428)"
     },
     {
       "id": "322",
-      "name": "CEIL SWEEP P3 R4C3",
-      "path": "/ceil_sweep_p3_r4c3",
+      "name": "WAVE P3 R4C2",
+      "path": "/wave_p3_r4c2",
       "type": "button",
-      "description": "Button: CEIL SWEEP P3 R4C3 (Input Universe 0, Channel 31661)"
+      "description": "Button: WAVE P3 R4C2 (Input Universe 0, Channel 60406)"
     },
     {
       "id": "324",
-      "name": "CEIL CIRCLE P3 R4C4",
-      "path": "/ceil_circle_p3_r4c4",
+      "name": "SCISSOR P3 R4C3",
+      "path": "/scissor_p3_r4c3",
       "type": "button",
-      "description": "Button: CEIL CIRCLE P3 R4C4 (Input Universe 0, Channel 33585)"
+      "description": "Button: SCISSOR P3 R4C3 (Input Universe 0, Channel 55840)"
     },
     {
       "id": "326",
-      "name": "WAVE P3 R4C5",
-      "path": "/wave_p3_r4c5",
+      "name": "FAN CHASE P3 R4C4",
+      "path": "/fan_chase_p3_r4c4",
       "type": "button",
-      "description": "Button: WAVE P3 R4C5 (Input Universe 0, Channel 40777)"
+      "description": "Button: FAN CHASE P3 R4C4 (Input Universe 0, Channel 59108)"
     },
     {
       "id": "328",
-      "name": "SCISSOR P3 R4C6",
-      "path": "/scissor_p3_r4c6",
+      "name": "HIT FLOOR P3 R4C5",
+      "path": "/hit_floor_p3_r4c5",
       "type": "button",
-      "description": "Button: SCISSOR P3 R4C6 (Input Universe 0, Channel 36237)"
+      "description": "Button: HIT FLOOR P3 R4C5 (Input Universe 0, Channel 26130)"
     },
     {
       "id": "330",
-      "name": "FAN CHASE P3 R4C7",
-      "path": "/fan_chase_p3_r4c7",
+      "name": "HIT UP P3 R4C6",
+      "path": "/hit_up_p3_r4c6",
       "type": "button",
-      "description": "Button: FAN CHASE P3 R4C7 (Input Universe 0, Channel 54399)"
+      "description": "Button: HIT UP P3 R4C6 (Input Universe 0, Channel 25037)"
     },
     {
       "id": "332",
@@ -764,266 +820,266 @@
       "description": "Button: HOLD P3 R4C8 (Input Universe 0, Channel 15893)"
     },
     {
-      "id": "394",
+      "id": "334",
+      "name": "GOBO OPEN P3 R6C1",
+      "path": "/gobo_open_p3_r6c1",
+      "type": "button",
+      "description": "Button: GOBO OPEN P3 R6C1 (Input Universe 0, Channel 37735)"
+    },
+    {
+      "id": "336",
+      "name": "GOBO A P3 R6C2",
+      "path": "/gobo_a_p3_r6c2",
+      "type": "button",
+      "description": "Button: GOBO A P3 R6C2 (Input Universe 0, Channel 48698)"
+    },
+    {
+      "id": "338",
+      "name": "GOBO B P3 R6C3",
+      "path": "/gobo_b_p3_r6c3",
+      "type": "button",
+      "description": "Button: GOBO B P3 R6C3 (Input Universe 0, Channel 31156)"
+    },
+    {
+      "id": "410",
       "name": "25% P3 R7C1",
       "path": "/25%_p3_r7c1",
       "type": "button",
       "description": "Button: 25% P3 R7C1 (Input Universe 0, Channel 53345)"
     },
     {
-      "id": "396",
+      "id": "412",
       "name": "50% P3 R7C2",
       "path": "/50%_p3_r7c2",
       "type": "button",
       "description": "Button: 50% P3 R7C2 (Input Universe 0, Channel 56999)"
     },
     {
-      "id": "398",
+      "id": "414",
       "name": "75% P3 R7C3",
       "path": "/75%_p3_r7c3",
       "type": "button",
       "description": "Button: 75% P3 R7C3 (Input Universe 0, Channel 63671)"
     },
     {
-      "id": "400",
+      "id": "416",
       "name": "FULL P3 R7C4",
       "path": "/full_p3_r7c4",
       "type": "button",
       "description": "Button: FULL P3 R7C4 (Input Universe 0, Channel 3899)"
     },
     {
-      "id": "350",
+      "id": "366",
       "name": "BLACK P1 R8C1",
       "path": "/black_p1_r8c1",
       "type": "button",
       "description": "Button: BLACK P1 R8C1 (Input Universe 0, Channel 30852)"
     },
     {
-      "id": "352",
+      "id": "368",
       "name": "STOP FX P1 R8C2",
       "path": "/stop_fx_p1_r8c2",
       "type": "button",
       "description": "Button: STOP FX P1 R8C2 (Input Universe 0, Channel 64327)"
     },
     {
-      "id": "354",
+      "id": "370",
       "name": "WHITE P1 R8C3",
       "path": "/white_p1_r8c3",
       "type": "button",
       "description": "Button: WHITE P1 R8C3 (Input Universe 0, Channel 26353)"
     },
     {
-      "id": "356",
+      "id": "372",
       "name": "FLASH P1 R8C5",
       "path": "/flash_p1_r8c5",
       "type": "button",
       "description": "Button: FLASH P1 R8C5 (Input Universe 0, Channel 11329)"
     },
     {
-      "id": "358",
+      "id": "374",
       "name": "RESET P1 R8C6",
       "path": "/reset_p1_r8c6",
       "type": "button",
       "description": "Button: RESET P1 R8C6 (Input Universe 0, Channel 33371)"
     },
     {
-      "id": "360",
+      "id": "376",
       "name": "PANIC P1 R8C7",
       "path": "/panic_p1_r8c7",
       "type": "button",
       "description": "Button: PANIC P1 R8C7 (Input Universe 0, Channel 37910)"
     },
     {
-      "id": "222",
+      "id": "240",
       "name": "HOME P2 R6C1",
       "path": "/home_p2_r6c1",
       "type": "button",
       "description": "Button: HOME P2 R6C1 (Input Universe 0, Channel 29597)"
     },
     {
-      "id": "224",
+      "id": "242",
       "name": "CENTRE P2 R6C2",
       "path": "/centre_p2_r6c2",
       "type": "button",
       "description": "Button: CENTRE P2 R6C2 (Input Universe 0, Channel 13726)"
     },
     {
-      "id": "226",
+      "id": "244",
       "name": "CROWD P2 R6C3",
       "path": "/crowd_p2_r6c3",
       "type": "button",
       "description": "Button: CROWD P2 R6C3 (Input Universe 0, Channel 59295)"
     },
     {
-      "id": "228",
+      "id": "246",
       "name": "CROSSED P2 R6C4",
       "path": "/crossed_p2_r6c4",
       "type": "button",
       "description": "Button: CROSSED P2 R6C4 (Input Universe 0, Channel 25303)"
     },
     {
-      "id": "230",
+      "id": "248",
       "name": "BM OPEN P2 R6C5",
       "path": "/bm_open_p2_r6c5",
       "type": "button",
       "description": "Button: BM OPEN P2 R6C5 (Input Universe 0, Channel 40438)"
     },
     {
-      "id": "232",
+      "id": "250",
       "name": "SP OPEN P2 R6C6",
       "path": "/sp_open_p2_r6c6",
       "type": "button",
       "description": "Button: SP OPEN P2 R6C6 (Input Universe 0, Channel 61764)"
     },
     {
-      "id": "234",
+      "id": "252",
       "name": "HD OPEN P2 R6C7",
       "path": "/hd_open_p2_r6c7",
       "type": "button",
       "description": "Button: HD OPEN P2 R6C7 (Input Universe 0, Channel 61003)"
     },
     {
-      "id": "236",
+      "id": "254",
       "name": "HD STROBE P2 R6C8",
       "path": "/hd_strobe_p2_r6c8",
       "type": "button",
       "description": "Button: HD STROBE P2 R6C8 (Input Universe 0, Channel 11765)"
     },
     {
-      "id": "380",
+      "id": "396",
       "name": "BLACK P2 R8C1",
       "path": "/black_p2_r8c1",
       "type": "button",
       "description": "Button: BLACK P2 R8C1 (Input Universe 0, Channel 29945)"
     },
     {
-      "id": "382",
+      "id": "398",
       "name": "STOP FX P2 R8C2",
       "path": "/stop_fx_p2_r8c2",
       "type": "button",
       "description": "Button: STOP FX P2 R8C2 (Input Universe 0, Channel 63290)"
     },
     {
-      "id": "384",
+      "id": "400",
       "name": "WHITE P2 R8C3",
       "path": "/white_p2_r8c3",
       "type": "button",
       "description": "Button: WHITE P2 R8C3 (Input Universe 0, Channel 27276)"
     },
     {
-      "id": "386",
+      "id": "402",
       "name": "FLASH P2 R8C5",
       "path": "/flash_p2_r8c5",
       "type": "button",
       "description": "Button: FLASH P2 R8C5 (Input Universe 0, Channel 8252)"
     },
     {
-      "id": "388",
+      "id": "404",
       "name": "RESET P2 R8C6",
       "path": "/reset_p2_r8c6",
       "type": "button",
       "description": "Button: RESET P2 R8C6 (Input Universe 0, Channel 36390)"
     },
     {
-      "id": "390",
+      "id": "406",
       "name": "PANIC P2 R8C7",
       "path": "/panic_p2_r8c7",
       "type": "button",
       "description": "Button: PANIC P2 R8C7 (Input Universe 0, Channel 39019)"
     },
     {
-      "id": "254",
-      "name": "HOME P3 R6C1",
-      "path": "/home_p3_r6c1",
-      "type": "button",
-      "description": "Button: HOME P3 R6C1 (Input Universe 0, Channel 30646)"
-    },
-    {
-      "id": "256",
-      "name": "CENTRE P3 R6C2",
-      "path": "/centre_p3_r6c2",
-      "type": "button",
-      "description": "Button: CENTRE P3 R6C2 (Input Universe 0, Channel 12725)"
-    },
-    {
-      "id": "258",
-      "name": "CROWD P3 R6C3",
-      "path": "/crowd_p3_r6c3",
-      "type": "button",
-      "description": "Button: CROWD P3 R6C3 (Input Universe 0, Channel 58292)"
-    },
-    {
-      "id": "260",
-      "name": "CROSSED P3 R6C4",
-      "path": "/crossed_p3_r6c4",
-      "type": "button",
-      "description": "Button: CROSSED P3 R6C4 (Input Universe 0, Channel 26364)"
-    },
-    {
-      "id": "262",
+      "id": "342",
       "name": "BM OPEN P3 R6C5",
       "path": "/bm_open_p3_r6c5",
       "type": "button",
       "description": "Button: BM OPEN P3 R6C5 (Input Universe 0, Channel 39389)"
     },
     {
-      "id": "264",
+      "id": "344",
       "name": "SP OPEN P3 R6C6",
       "path": "/sp_open_p3_r6c6",
       "type": "button",
       "description": "Button: SP OPEN P3 R6C6 (Input Universe 0, Channel 62831)"
     },
     {
-      "id": "266",
+      "id": "346",
       "name": "HD OPEN P3 R6C7",
       "path": "/hd_open_p3_r6c7",
       "type": "button",
       "description": "Button: HD OPEN P3 R6C7 (Input Universe 0, Channel 60000)"
     },
     {
-      "id": "268",
+      "id": "348",
       "name": "HD STROBE P3 R6C8",
       "path": "/hd_strobe_p3_r6c8",
       "type": "button",
       "description": "Button: HD STROBE P3 R6C8 (Input Universe 0, Channel 10718)"
     },
     {
-      "id": "410",
+      "id": "340",
+      "name": "PRISM P3 R6C4",
+      "path": "/prism_p3_r6c4",
+      "type": "button",
+      "description": "Button: PRISM P3 R6C4 (Input Universe 0, Channel 46320)"
+    },
+    {
+      "id": "426",
       "name": "BLACK P3 R8C1",
       "path": "/black_p3_r8c1",
       "type": "button",
       "description": "Button: BLACK P3 R8C1 (Input Universe 0, Channel 28882)"
     },
     {
-      "id": "412",
+      "id": "428",
       "name": "STOP FX P3 R8C2",
       "path": "/stop_fx_p3_r8c2",
       "type": "button",
       "description": "Button: STOP FX P3 R8C2 (Input Universe 0, Channel 62225)"
     },
     {
-      "id": "414",
+      "id": "430",
       "name": "WHITE P3 R8C3",
       "path": "/white_p3_r8c3",
       "type": "button",
       "description": "Button: WHITE P3 R8C3 (Input Universe 0, Channel 28327)"
     },
     {
-      "id": "416",
+      "id": "432",
       "name": "FLASH P3 R8C5",
       "path": "/flash_p3_r8c5",
       "type": "button",
       "description": "Button: FLASH P3 R8C5 (Input Universe 0, Channel 9239)"
     },
     {
-      "id": "418",
+      "id": "434",
       "name": "RESET P3 R8C6",
       "path": "/reset_p3_r8c6",
       "type": "button",
       "description": "Button: RESET P3 R8C6 (Input Universe 0, Channel 35341)"
     },
     {
-      "id": "420",
+      "id": "436",
       "name": "PANIC P3 R8C7",
       "path": "/panic_p3_r8c7",
       "type": "button",
@@ -1035,6 +1091,13 @@
       "path": "/fx_speed",
       "type": "speed",
       "description": "Speed Dial: FX Speed (Input Universe 0, Channel 64587)"
+    },
+    {
+      "id": "904",
+      "name": "Mover Speed",
+      "path": "/mover_speed",
+      "type": "speed",
+      "description": "Speed Dial: Mover Speed (Input Universe 0, Channel 3586)"
     }
   ],
   "generated": true

@@ -44,8 +44,9 @@ If Launchpad is absent, launcher removes MIDI routes from runtime copy. QLC+ Vir
 
 - Page 1: full Cuepix colors, pixel patterns, chasers, fades, strobes, burst, levels, speed, tap, blackout, stop, white flash, page switch.
 - Page 2: compact Cuepix controls plus the HEAD rows — colours R3, aims + shutter R6.
-- Page 3: MOVERS. R1 floor looks, R2 floor FX + room sweeps, R3 floor-to-ceiling room looks, R4 ceiling looks + HOLD (one solo frame: one look at a time). R5 head colours, R6 aims + shutter.
-- Page 1 R5C7: FLOOR FULL (whole panel floor white).
+- Page 3: MOVERS. R1-R4 = 28 mover looks + HOLD at R4C8 (one solo frame: one look at a time; floor, then room, then ceiling). R5 head colours. R4C5-C6 HIT FLOOR/HIT UP (stops the look and snaps every beam to one spot until the next look). R6 layers that never stop the look: C1-C3 GOBO OPEN/A/B, C4 PRISM, C5 BM OPEN, C6 SP OPEN, C7 HD OPEN, C8 HD STROBE.
+- Page 1 R6: pixel effects (FILL DRAIN, RAIN, TWINKLE, PLASMA, GAP SWEEP, V COMET, CHEVRONS, APEX PULSE) + R5C8 FIRE, in the panel FX solo frame. Two speed dials: FX Speed (panels, TAP) and Mover Speed (movers).
+- Page 1 R5C7: FLOOR FULL (whole panel floor white). Load-in: fire BANDS and set cuepix.pixelOrigin if band 1 is not the top row.
 - R7C1-R7C4: 25%, 50%, 75%, Full. R7C5-R7C7: Slow, Medium, Fast. R7C8: Tap.
 - R8C1: Blackout. R8C2: Stop FX. R8C3: White. R8C5: Flash. R8C8: Page.
 - Use visible `FX Speed` dial for exact speed. Use QLC+ Grand Master for overall output.

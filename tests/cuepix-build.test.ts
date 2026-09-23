@@ -59,7 +59,7 @@ describe("Cuepix routing workspace", () => {
 
   it("defines four left-to-right trusses", () => {
     const { rig } = loadRig(RIG);
-    expect((rig as any).cuepix?.trusses).toEqual([[], [1, 2, 3, 4], [5, 6, 7, 8], []]);
+    expect((rig as any).cuepix?.trusses).toEqual([[1, 2, 3, 4], [], [], [5, 6, 7, 8]]);
   });
 
   it("rejects duplicate Cuepix panel placement", () => {
@@ -93,7 +93,10 @@ describe("Cuepix routing workspace", () => {
     expect(qxw).toContain('Name="TEST · Cuepix 1 Red"');
     const sceneNames = [...qxw.matchAll(/<Function[^>]*Type="Scene"[^>]*Name="([^"]+)"/g)].map((match) => match[1]);
     const routingSceneNames = sceneNames.filter((name) => name.startsWith("TEST · "));
-    expect(routingSceneNames).toHaveLength(60);
+    // 64 = 48 panel colour tests + 4 heads x 4 (open white, pan centre, pan edge, tilt up, blackout
+    // minus the shared pair) + the two all-fixture tests. Pan Edges/Tilt Up replaced Tilt Center when
+    // the venue plot landed, so a head is proven on pan AND tilt inside its fence.
+    expect(routingSceneNames).toHaveLength(64);
     expect(routingSceneNames.every((name) => name.startsWith("TEST · "))).toBe(true);
     expect(existsSync(path.join(out, "CUEPIX-PATCH-CHART.md"))).toBe(true);
     expect(existsSync(path.join(out, "CUEPIX-SETUP.md"))).toBe(true);
@@ -110,8 +113,8 @@ describe("Cuepix routing workspace", () => {
     ]) expect(patch).toContain(text);
     const setup = readFileSync(path.join(out, "CUEPIX-SETUP.md"), "utf8");
     for (const text of [
-      "Truss 2: Cuepix 1-4, bottom to top.",
-      "Truss 3: Cuepix 5-8, bottom to top.",
+      "Truss 1: Cuepix 1-4, bottom to top.",
+      "Truss 4: Cuepix 5-8, bottom to top.",
       "Beam L at 317 → Beam R at 331 → 375ZX L at 345 → 375ZX R at 360",
       "Minilab3 MIDI",
       "Maximum 4 panels per Elation rigging bar; each panel gets an independent safety cable; never daisy-chain safety cables.",
@@ -169,7 +172,7 @@ describe("Cuepix routing workspace", () => {
     ]);
   });
 
-  it("builds two performance pages with Launchpad and OSC twins", async () => {
+  it("builds three performance pages with Launchpad and OSC twins", async () => {
     const out = mkdtempSync(path.join(os.tmpdir(), "cuepix-console-"));
     execSync("npx tsx scripts/build-cuepix-show.ts rigs/cuepix-panel.rig.json", {
       cwd: ROOT,
@@ -182,7 +185,7 @@ describe("Cuepix routing workspace", () => {
     expect(qxw).toContain('<Universe Name="Launchpad" ID="2"');
     expect(qxw).toContain('<Input Plugin="MIDI" UID="2" Line="2"/>');
     expect(qxw).toContain('<Feedback Plugin="MIDI" UID="3" Line="3"/>');
-    expect(qxw).toContain('<Multipage PagesNum="2" CurrentPage="0"/>');
+    expect(qxw).toContain('<Multipage PagesNum="3" CurrentPage="0"/>');
     expect(qxw).toContain('<GrandMaster ChannelMode="All" ValueMode="Reduce" SliderMode="Normal"/>');
     expect(qxw).not.toContain('<GrandMaster ChannelMode="Intensity"');
     expect(qxw).toContain('<Input Universe="2" Channel="146"/>');
@@ -198,7 +201,7 @@ describe("Cuepix routing workspace", () => {
     expect(qxw).toContain('<AbsoluteValue Minimum="599" Maximum="600"><Input Universe="2" Channel="154"/></AbsoluteValue>');
     expect(qxw).toContain('<AbsoluteValue Minimum="249" Maximum="250"><Input Universe="2" Channel="155"/></AbsoluteValue>');
 
-    for (const page of ["P1", "P2"]) {
+    for (const page of ["P1", "P2", "P3"]) {
       const channels = [...qxw.matchAll(/<Button\b[\s\S]*?<\/Button>/g)]
         .map((match) => match[0])
         .filter((block) => block.includes(` ${page} R`))
@@ -210,67 +213,80 @@ describe("Cuepix routing workspace", () => {
     }
 
     // Enabled pads are emitted as an OSC twin + a Launchpad twin; buttonBlock() returns the first.
-    const homePad = buttonBlock(qxw, "HOME P2 R4C1");
+    const homePad = buttonBlock(qxw, "HOME P2 R6C1");
     expect(homePad).toContain("<Function");
     expect(homePad).toContain('<Input Universe="0"');
-    const homeTwins = [...qxw.matchAll(/<Button Caption="HOME P2 R4C1"[\s\S]*?<\/Button>/g)].map((match) => match[0]);
+    const homeTwins = [...qxw.matchAll(/<Button Caption="HOME P2 R6C1"[\s\S]*?<\/Button>/g)].map((match) => match[0]);
     expect(homeTwins).toHaveLength(2);
     expect(homeTwins.every((twin) => twin.includes("<Function"))).toBe(true);
     expect(homeTwins.some((twin) => twin.includes('<Input Universe="2"'))).toBe(true);
     expect(qxw).toContain('<Universe Name="MiniLab" ID="3">');
-    expect(qxw).toContain('<Slider Caption="Tilt1SL"');
-    expect(qxw).toContain('<Slider Caption="Pan2BL"');
     expect(qxw).toMatch(/Name="HEAD · Home Go">[\s\S]*?<RunOrder>SingleShot<\/RunOrder>/);
 
-    // headSafety fences the MiniLab knobs: tilt stops at 92 (≈horizontal), pan runs the full range.
-    // Every knob ships at Value="0" so a future non-zero tiltMin cannot seize pan/tilt at load.
-    expect(qxw).toMatch(/Caption="Tilt1SL"[\s\S]*?<Level LowLimit="0" HighLimit="92" Value="0">/);
-    for (const caption of ["Tilt1SL", "Tilt2BL", "Tilt3BR", "Tilt4SR"]) {
-      expect(qxw).toMatch(new RegExp(`<Slider Caption="${caption}"[\\s\\S]*?<Level LowLimit="0" HighLimit="92" Value="0"`));
+    // Faders 1-4 are the four movers' dimmers, house-left to house-right, in Level mode so the
+    // operator owns every head's brightness outright. NO look may write a dimmer: a mover that goes
+    // dark must be a fader that is down, never a look that decided to cut it.
+    const dimFaders: Array<[string, string, number]> = [
+      ["Dim1SL", "10", 10], ["Dim2BL", "8", 9], ["Dim3BR", "9", 9], ["Dim4SR", "11", 10],
+    ];
+    for (const [caption, fixtureId, channel] of dimFaders) {
+      expect(qxw).toMatch(new RegExp(`<Slider Caption="${caption}"[\\s\\S]*?>Level</SliderMode>[\\s\\S]*?<Level LowLimit="0" HighLimit="255" Value="0">\\s*<Channel Fixture="${fixtureId}">${channel}</Channel>`));
     }
-    for (const caption of ["Pan1SL", "Pan2BL", "Pan3BR", "Pan4SR"]) {
-      expect(qxw).toMatch(new RegExp(`<Slider Caption="${caption}"[\\s\\S]*?<Level LowLimit="0" HighLimit="255" Value="0"`));
-    }
-
-    // The three MiniLab faders drive their own _FADER copies. A Playback slider at 0 STOPS its
-    // function, so sharing a function with a pad would let a parked fader kill the pad's look.
-    expect(functionBlock(qxw, "Scene", "_FADER · Beams")).toContain('<FixtureVal ID="8">9,255,10,255</FixtureVal>');
-    expect(functionBlock(qxw, "Scene", "_FADER · Spots")).toContain('<FixtureVal ID="10">10,255,11,255</FixtureVal>');
-    expect(functionBlock(qxw, "Scene", "_FADER · Panels")).toContain('<FixtureVal ID="0">76,255</FixtureVal>');
-    const faderBeamsId = qxw.match(/<Function ID="(\d+)" Type="Scene" Name="_FADER · Beams">/)![1];
-    const headBeamsId = qxw.match(/<Function ID="(\d+)" Type="Scene" Name="HEAD · Beams Full">/)![1];
-    const beamsSlider = qxw.match(/<Slider Caption="Beams"[\s\S]*?<\/Slider>/)![0];
-    expect(beamsSlider).toContain(`<Playback><Function>${faderBeamsId}</Function></Playback>`);
-    expect(beamsSlider).not.toContain(`<Playback><Function>${headBeamsId}</Function></Playback>`);
-
-    // Per-model head channels: Beam L is fixture 8 (140SR, 14ch), 375ZX L is fixture 10 (15ch).
-    const aimHome = functionBlock(qxw, "Scene", "_AIM · Home");
-    expect(aimHome.match(/<FixtureVal ID="8">([^<]*)</)![1]).toBe("0,128,2,64,4,0,10,255");
-    expect(aimHome.match(/<FixtureVal ID="10">([^<]*)</)![1]).toBe("0,128,2,64,4,0,11,255");
-    // Crowd sits ≈5° ABOVE horizontal, never in faces. Crossed pans the L heads right (148) and the
-    // R heads left (108) so the beams actually cross.
-    const aimCrowd = functionBlock(qxw, "Scene", "_AIM · Crowd");
-    expect(aimCrowd.match(/<FixtureVal ID="8">([^<]*)</)![1]).toBe("0,128,2,88,4,0,10,255");
-    expect(aimCrowd.match(/<FixtureVal ID="10">([^<]*)</)![1]).toBe("0,128,2,88,4,0,11,255");
-    const aimCrossed = functionBlock(qxw, "Scene", "_AIM · Crossed");
-    expect(aimCrossed.match(/<FixtureVal ID="8">([^<]*)</)![1]).toBe("0,148,2,80,4,0,10,255");
-    expect(aimCrossed.match(/<FixtureVal ID="9">([^<]*)</)![1]).toBe("0,108,2,80,4,0,10,255");
-    expect(aimCrossed.match(/<FixtureVal ID="10">([^<]*)</)![1]).toBe("0,148,2,80,4,0,11,255");
-    // Every pre-plot aim stays inside the headSafety tilt fence, so none of them points below
-    // horizontal, and every aim addresses a head rather than a panel.
-    const aimSceneNames = [...qxw.matchAll(/<Function[^>]*Type="Scene"[^>]*Name="(_AIM · [^"]+)"/g)].map((match) => match[1]);
-    expect(aimSceneNames).toHaveLength(4);
-    for (const name of aimSceneNames) {
-      for (const value of functionBlock(qxw, "Scene", name).matchAll(/<FixtureVal ID="(\d+)">([^<]*)</g)) {
-        expect(Number(value[1])).toBeGreaterThanOrEqual(8);
+    // The pan/tilt knobs only exist in plot mode. Left on during a show, a Level slider holds its
+    // channel for good and freezes the head mid-look (found live 2026-09-19).
+    expect(qxw).not.toContain('<Slider Caption="Tilt1SL"');
+    expect(qxw).not.toContain('<Slider Caption="Pan2BL"');
+    for (const stepScene of qxw.matchAll(/<Function[^>]*Type="Scene"[^>]*Name="_STEP · [^"]+">([\s\S]*?)<\/Function>/g)) {
+      for (const value of stepScene[1].matchAll(/<FixtureVal ID="(\d+)">([^<]*)</g)) {
+        if (Number(value[1]) < 8) continue;                     // panels have no dimmer channel here
         const pairs = value[2].split(",").map(Number);
-        const tiltIndex = pairs.findIndex((entry, index) => index % 2 === 0 && entry === 2);
-        expect(tiltIndex).toBeGreaterThanOrEqual(0);
-        expect(pairs[tiltIndex + 1]).toBeLessThanOrEqual(92);
+        const dimChannel = value[1] === "8" || value[1] === "9" ? 9 : 10;
+        expect(pairs.some((entry, index) => index % 2 === 0 && entry === dimChannel)).toBe(false);
       }
     }
-    expect(functionBlock(qxw, "Scene", "HEAD · Beams Full")).toContain('<FixtureVal ID="8">9,255,10,255</FixtureVal>');
-    expect(functionBlock(qxw, "Scene", "HEAD · Spots Full")).toContain('<FixtureVal ID="10">10,255,11,255</FixtureVal>');
+
+    // The MiniLab's four faders became the movers' dimmers on 2026-09-19, so the old grouped
+    // Playback faders (Panels/Beams/Spots) are gone. The _FADER scenes stay in the workspace as
+    // spares; nothing must point a fader at them again without re-reading why Level replaced them.
+    expect(qxw).not.toContain('<Slider Caption="Beams"');
+    expect(qxw).not.toContain('<Slider Caption="Spots"');
+    expect(qxw).not.toContain('<Slider Caption="Panels"');
+
+    // Per-model head channels: Beam L is fixture 8 (140SR, 14ch), 375ZX L is fixture 10 (15ch).
+    // Aims are no longer guesses: they come from the plot walked at the venue on 2026-09-19 and
+    // stored in rig.movingHeadSettings. Assert against the rig, not against literals, so the next
+    // re-plot moves the show and this test together instead of leaving one lying about the other.
+    const rigJson = JSON.parse(readFileSync(RIG, "utf8"));
+    const plottedAims = rigJson.movingHeadSettings as Record<string, Record<string, { pan: number; tilt: number }>>;
+    const fenceByAddress = rigJson.headSafety as Record<string, { panMin: number; panMax: number; tiltMin: number; tiltMax: number }>;
+    const headOfFixture: Array<[string, string, number]> = [
+      ["8", "beamL", 316], ["9", "beamR", 330], ["10", "375ZXL", 344], ["11", "375ZXR", 359],
+    ];
+    const valueAt = (block: string, fixtureId: string, channel: number): number => {
+      const pairs = block.match(new RegExp(`<FixtureVal ID="${fixtureId}">([^<]*)<`))![1].split(",").map(Number);
+      const index = pairs.findIndex((entry, position) => position % 2 === 0 && entry === channel);
+      expect(index).toBeGreaterThanOrEqual(0);
+      return pairs[index + 1];
+    };
+    for (const [label, key] of [["Home", "home"], ["Centre", "centre"], ["Crowd", "crowd"], ["Crossed", "crossed"]]) {
+      const block = functionBlock(qxw, "Scene", `_AIM · ${label}`);
+      for (const [fixtureId, rigKey, address] of headOfFixture) {
+        const fence = fenceByAddress[String(address)];
+        const pan = valueAt(block, fixtureId, 0), tilt = valueAt(block, fixtureId, 2);
+        expect(pan).toBe(plottedAims[rigKey][key].pan);
+        expect(tilt).toBe(plottedAims[rigKey][key].tilt);
+        // ...and the plot itself sits inside the fence, so no aim can escape the walked box.
+        expect(pan).toBeGreaterThanOrEqual(fence.panMin);
+        expect(pan).toBeLessThanOrEqual(fence.panMax);
+        expect(tilt).toBeGreaterThanOrEqual(fence.tiltMin);
+        expect(tilt).toBeLessThanOrEqual(fence.tiltMax);
+      }
+    }
+    const aimSceneNames = [...qxw.matchAll(/<Function[^>]*Type="Scene"[^>]*Name="(_AIM · [^"]+)"/g)].map((match) => match[1]);
+    expect(aimSceneNames).toHaveLength(4);
+    // Shutter only — the dimmer is the fader's, so these pads open the beam and nothing else.
+    expect(functionBlock(qxw, "Scene", "HEAD · Beams Full")).toContain('<FixtureVal ID="8">10,255</FixtureVal>');
+    expect(functionBlock(qxw, "Scene", "HEAD · Spots Full")).toContain('<FixtureVal ID="10">11,255</FixtureVal>');
     const headRed = functionBlock(qxw, "Scene", "HEAD · Red");
     expect(headRed).toContain('<FixtureVal ID="8">5,5,10,255</FixtureVal>');
     expect(headRed).toContain('<FixtureVal ID="10">5,11,11,255</FixtureVal>');
@@ -289,5 +305,66 @@ describe("Cuepix routing workspace", () => {
     // never reach the dashboard's widget map.
     expect(widgetMap.widgets.some((widget: { name: string }) => /^(Tilt|Pan)\d/.test(widget.name))).toBe(false);
     expect(widgetMap.widgets.some((widget: { name: string }) => ["Panels", "Beams", "Spots"].includes(widget.name))).toBe(false);
+  });
+
+  // 2026-09-19 review: of fifteen mover looks only two ever put a beam on the dance floor, and
+  // FIGURE 8 still used pre-plot DMX amplitudes, so the fence flattened it into a jerk. Movers now
+  // own page 3 in ONE solo frame (a look on another page would fight it for pan/tilt).
+  it("gives the movers a page where most looks work the dance floor", () => {
+    const out = mkdtempSync(path.join(os.tmpdir(), "cuepix-movers-"));
+    execSync("npx tsx scripts/build-cuepix-show.ts rigs/cuepix-panel.rig.json", {
+      cwd: ROOT, env: { ...process.env, QLC_BUILD_OUT: out }, stdio: "pipe",
+    });
+    const qxw = readFileSync(path.join(out, "cuepix-panel-show.qxw"), "utf8");
+    const rigJson = JSON.parse(readFileSync(RIG, "utf8"));
+    const plot = rigJson.headPlot as Record<string, { tiltFloor: number }>;
+    const fence = rigJson.headSafety as Record<string, { panMin: number; panMax: number; tiltMin: number; tiltMax: number }>;
+    const heads: Array<[string, string, number]> = [["8", "beamL", 316], ["9", "beamR", 330], ["10", "375ZXL", 344], ["11", "375ZXR", 359]];
+    expect(qxw).toContain('<Multipage PagesNum="3" CurrentPage="0"/>');
+    // The schema used to strip headPlot, so the show silently fell back to pre-plot mapping.
+    expect((loadRig(RIG).rig as any).headPlot).toEqual(rigJson.headPlot);
+
+    const moveFrame = qxw.match(/<SoloFrame Caption="MOVE-P3"[\s\S]*?<\/SoloFrame>/)?.[0] ?? "";
+    const moveFnIds = [...new Set([...moveFrame.matchAll(/<Function ID="(\d+)"\/>/g)].map((match) => match[1]))];
+    expect(moveFnIds.length).toBeGreaterThanOrEqual(30);
+    // No mover look may sit on a pad anywhere else, or two frames would drive the heads at once.
+    for (const block of qxw.replace(moveFrame, "").match(/<Button\b[\s\S]*?<\/Button>/g) ?? []) {
+      const id = block.match(/<Function ID="(\d+)"\/>/)?.[1];
+      if (id) expect(moveFnIds).not.toContain(id);
+    }
+
+    // Per chaser: the (pan, tilt) of each head at every step.
+    const stepsOf = (id: string): Array<Record<string, [number, number]>> => {
+      const chaser = qxw.match(new RegExp(`<Function ID="${id}" Type="Chaser"[^>]*>([\\s\\S]*?)<\\/Function>`));
+      if (!chaser) return [];
+      return [...chaser[1].matchAll(/<Step[^>]*>(\d+)<\/Step>/g)].map((step) => {
+        const scene = qxw.match(new RegExp(`<Function ID="${step[1]}" Type="Scene"[^>]*>([\\s\\S]*?)<\\/Function>`))![1];
+        const aims: Record<string, [number, number]> = {};
+        for (const [fixtureId] of heads) {
+          const pairs = scene.match(new RegExp(`<FixtureVal ID="${fixtureId}">([^<]*)<`))?.[1].split(",").map(Number) ?? [];
+          const at = (ch: number) => pairs[pairs.findIndex((entry, i) => i % 2 === 0 && entry === ch) + 1];
+          aims[fixtureId] = [at(0), at(2)];
+        }
+        return aims;
+      });
+    };
+    const chasers = moveFnIds.map(stepsOf).filter((steps) => steps.length > 1);
+    // "On the floor" = at or below the plotted dance-floor tilt (+2 steps of slack).
+    const onFloor = (steps: Array<Record<string, [number, number]>>): boolean =>
+      steps.filter((aims) => heads.filter(([id, key]) => aims[id][1] <= plot[key].tiltFloor + 2).length >= 2).length >= steps.length / 3;
+    expect(chasers.filter(onFloor).length).toBeGreaterThanOrEqual(14);
+    // Every step of every mover look stays in the plotted fence.
+    for (const steps of chasers) for (const aims of steps) for (const [id, , address] of heads) {
+      const f = fence[String(address)];
+      expect(aims[id][0]).toBeGreaterThanOrEqual(f.panMin); expect(aims[id][0]).toBeLessThanOrEqual(f.panMax);
+      expect(aims[id][1]).toBeGreaterThanOrEqual(f.tiltMin); expect(aims[id][1]).toBeLessThanOrEqual(f.tiltMax);
+    }
+    // FIGURE 8 must actually trace: no head parked on a fence edge for more than a quarter of the loop.
+    const fig8 = stepsOf(qxw.match(/<Function ID="(\d+)" Type="Chaser" Name="FLOOR · Figure 8"/)![1]);
+    for (const [id, , address] of heads) {
+      const f = fence[String(address)];
+      const pinned = fig8.filter((aims) => [f.panMin, f.panMax].includes(aims[id][0])).length;
+      expect(pinned).toBeLessThanOrEqual(fig8.length / 4);
+    }
   });
 });

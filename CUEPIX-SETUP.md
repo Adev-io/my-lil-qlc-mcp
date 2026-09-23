@@ -2,10 +2,10 @@
 
 ## Rig and physical order
 
-- Truss 2: Cuepix 1-4, bottom to top.
-- Truss 3: Cuepix 5-8, bottom to top.
-- Beam L / Beam R (Intimidator Beam 140SR, 14-channel mode) mount above trusses 2 and 3.
-- 375ZX L / 375ZX R (15-channel mode) mount on the outside 4 ft trusses 1 and 4.
+- Truss 1: Cuepix 1-4, bottom to top.
+- Truss 4: Cuepix 5-8, bottom to top.
+- Beam L / Beam R (Intimidator Beam 140SR, 14-channel mode) mount on the inside 8 ft trusses 2 and 3.
+- 375ZX L / 375ZX R (15-channel mode) mount on the outside 4 ft trusses 1 and 4, with the Cuepix stacks.
 - All Cuepix panels use 79-channel mode (the units report 75; addressing is unaffected).
 - Maximum 4 panels per Elation rigging bar; each panel gets an independent safety cable; never daisy-chain safety cables.
 - Maximum 2 Cuepix panels power-linked at 120 V.
@@ -44,7 +44,9 @@ If Launchpad is absent, launcher removes MIDI routes from runtime copy. QLC+ Vir
 ## Virtual Console and Launchpad
 
 - Page 1: full Cuepix colors, pixel patterns, chasers, fades, strobes, burst, levels, speed, tap, blackout, stop, white flash, page switch.
-- Page 2: compact Cuepix controls plus the HEAD rows — colours R3, aims R4 (one-shot), dim groups and shutter R5.
+- Page 2: compact Cuepix controls plus the HEAD rows — colours R3, aims + shutter R6.
+- Page 3: MOVERS. R1 floor looks, R2 floor FX + room sweeps, R3 floor-to-ceiling room looks, R4 ceiling looks + HOLD (one solo frame: one look at a time). R5 head colours, R6 aims + shutter.
+- Page 1 R5C7: FLOOR FULL (whole panel floor white).
 - R7C1-R7C4: 25%, 50%, 75%, Full. R7C5-R7C7: Slow, Medium, Fast. R7C8: Tap.
 - R8C1: Blackout. R8C2: Stop FX. R8C3: White. R8C5: Flash. R8C8: Page.
 - Use visible `FX Speed` dial for exact speed. Use QLC+ Grand Master for overall output.

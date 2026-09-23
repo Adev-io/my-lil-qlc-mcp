@@ -22,3 +22,6 @@ resources
 .superpowers/
 # session execution notes (machine-specific paths) — design specs DO ship
 docs/superpowers/plans/
+
+# timestamped backups (file.ext.YYYYMMDD-HHMMSS.bak)
+*.[0-9]*.bak

@@ -11,10 +11,10 @@
     "deckHeightFt": 0,
     "headHeightFt": 8,
     "headSeparationFt": 18,
-    "notes": "Trusses left to right: 4ft, 8ft, 8ft, 4ft; truss centres at x = -9, -3, +3, +9 (headSeparationFt 18 = outer centre to outer centre; the monitor spreads four trusses across it). Panels 1-4 on truss 2, 5-8 on truss 3, bottom to top. Drag positions in the 3D monitor after load-in."
+    "notes": "Trusses left to right: 4ft, 8ft, 8ft, 4ft; truss centres at x = -9, -3, +3, +9 (headSeparationFt 18 = outer centre to outer centre; the monitor spreads four trusses across it). Panels 1-4 on truss 1, 5-8 on truss 4 (the outside trusses, with the 375ZX), bottom to top; Beams on the inside trusses 2 and 3. Drag positions in the 3D monitor after load-in."
   },
   "cuepix": {
-    "trusses": [[], [1, 2, 3, 4], [5, 6, 7, 8], []],
+    "trusses": [[1, 2, 3, 4], [], [], [5, 6, 7, 8]],
     "moversCalibrated": false
   },
   "controller": {
@@ -99,10 +99,41 @@
     }
   ],
   "headSafety": {
-    "316": { "panMin": 0, "panMax": 255, "tiltMin": 0, "tiltMax": 92 },
-    "330": { "panMin": 0, "panMax": 255, "tiltMin": 0, "tiltMax": 92 },
-    "344": { "panMin": 0, "panMax": 255, "tiltMin": 0, "tiltMax": 92 },
-    "359": { "panMin": 0, "panMax": 255, "tiltMin": 0, "tiltMax": 92 }
+    "_note": "Plotted live 2026-09-19 at the venue (see plot-2026-09-19.log). Keys are 0-based DMX addresses. Pan = union of the room edges and the floor box; tilt = plotted low..high. HIGHER tilt aims HIGHER on this rig. 375ZX L tiltMin is 15, not its captured 0, to keep beams off faces.",
+    "316": { "panMin": 158, "panMax": 188, "tiltMin": 12, "tiltMax": 73 },
+    "330": { "panMin": 158, "panMax": 180, "tiltMin": 17, "tiltMax": 67 },
+    "344": { "panMin": 116, "panMax": 148, "tiltMin": 15, "tiltMax": 70 },
+    "359": { "panMin": 112, "panMax": 142, "tiltMin": 7, "tiltMax": 69 }
+  },
+  "headPlot": {
+    "_note": "Dance-floor box per head, plotted 2026-09-19. panLeft/panRight are the floor's house-left and house-right edges as that head sees them, so pan direction per head is implicit (the 375ZX pair count up toward house-left, Beam L counts up toward house-right, Beam R down). Looks are written in room coordinates and mapped through here.",
+    "375ZXL": { "panLeft": 148, "panRight": 124, "tiltFloor": 25, "tiltRear": 23, "tiltHigh": 70 },
+    "beamL": { "panLeft": 158, "panRight": 180, "tiltFloor": 25, "tiltRear": 27, "tiltHigh": 73 },
+    "beamR": { "panLeft": 180, "panRight": 158, "tiltFloor": 24, "tiltRear": 27, "tiltHigh": 67 },
+    "375ZXR": { "panLeft": 138, "panRight": 114, "tiltFloor": 25, "tiltRear": 22, "tiltHigh": 69 }
+  },
+  "movingHeadSettings": {
+    "_note": "Aims plotted live 2026-09-19. centre = dance-floor centre; crossed = each head thrown at the opposite edge of the floor.",
+    "375ZXL": {
+      "home": { "pan": 136, "tilt": 54 }, "centre": { "pan": 134, "tilt": 25 },
+      "crowd": { "pan": 136, "tilt": 16 }, "crossed": { "pan": 124, "tilt": 25 },
+      "floor": { "pan": 134, "tilt": 25 }
+    },
+    "beamL": {
+      "home": { "pan": 174, "tilt": 52 }, "centre": { "pan": 170, "tilt": 25 },
+      "crowd": { "pan": 174, "tilt": 25 }, "crossed": { "pan": 180, "tilt": 25 },
+      "floor": { "pan": 170, "tilt": 25 }
+    },
+    "beamR": {
+      "home": { "pan": 162, "tilt": 51 }, "centre": { "pan": 170, "tilt": 24 },
+      "crowd": { "pan": 162, "tilt": 25 }, "crossed": { "pan": 180, "tilt": 24 },
+      "floor": { "pan": 170, "tilt": 24 }
+    },
+    "375ZXR": {
+      "home": { "pan": 134, "tilt": 49 }, "centre": { "pan": 126, "tilt": 25 },
+      "crowd": { "pan": 132, "tilt": 24 }, "crossed": { "pan": 138, "tilt": 25 },
+      "floor": { "pan": 126, "tilt": 25 }
+    }
   },
   "dmxOutput": {
     "plugin": "ArtNet",

@@ -1,0 +1,454 @@
+{
+  "$schema": "../schemas/rig.schema.json",
+  "meta": {
+    "name": "Huntley HS Homecoming",
+    "description": "Huntley High School homecoming: 4 Cuepix panels, 2 stacked on each inside 10ft tower (tops at 10ft), a Beam 140SR on top of each tower, a Spot 375ZX on each outside 8ft truss. The rig reads as an upside-down V: 10ft centre, 8ft outsides. Same heads and DMX chain as 2026-09-19.",
+    "author": "A_Development"
+  },
+  "stage": {
+    "widthFt": 24,
+    "depthFt": 10,
+    "deckHeightFt": 0,
+    "headHeightFt": 8,
+    "headSeparationFt": 18,
+    "notes": "Trusses left to right: 8ft, 10ft, 10ft, 8ft; centres at x = -9, -3, +3, +9 (headSeparationFt 18 = outer centre to outer centre). Panels 1-2 on truss 2 bottom to top, panels 4 (bottom) and 3 (top) on truss 3, so panel order 1-2-3-4 walks up the left tower, across the tops, and down the right tower: L-to-R chases trace the V, Center Out lights the two tops then the two bottoms. Beams on top of the 10ft towers, 375ZX on the 8ft outer trusses. Drag positions in the 3D monitor after load-in."
+  },
+  "cuepix": {
+    "trusses": [
+      [],
+      [
+        1,
+        2
+      ],
+      [
+        4,
+        3
+      ],
+      []
+    ],
+    "moversCalibrated": false,
+    "stackTopFt": 10
+  },
+  "controller": {
+    "launchpad": true,
+    "model": "Novation Launchpad Mini MK3",
+    "profile": "Novation Launchpad Mini MK3",
+    "inputUid": "2",
+    "inputLine": "2",
+    "outputUid": "3",
+    "outputLine": "3"
+  },
+  "controller2": {
+    "model": "Arturia MiniLab 3",
+    "portName": "Minilab3 MIDI",
+    "inputUid": "3",
+    "inputLine": "3",
+    "cc": {
+      "f1": 82,
+      "f2": 83,
+      "f3": 85,
+      "f4": 17,
+      "k1": 74,
+      "k2": 71,
+      "k3": 76,
+      "k4": 77,
+      "k5": 93,
+      "k6": 18,
+      "k7": 19,
+      "k8": 16
+    },
+    "plotMode": true
+  },
+  "fixtures": [
+    {
+      "kind": "panel",
+      "namePrefix": "Cuepix",
+      "manufacturer": "Elation",
+      "model": "CUEPIX Panel",
+      "mode": "79 Channel",
+      "channels": 79,
+      "count": 4,
+      "addresses": [
+        0,
+        79,
+        158,
+        237
+      ],
+      "universe": 0,
+      "qxfFile": "Elation-Cuepix-Panel-79CH.qxf",
+      "roles": {
+        "dim": 76,
+        "strobe": 77,
+        "macro": 75,
+        "curve": 78,
+        "pixels": [
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            3,
+            4,
+            5
+          ],
+          [
+            6,
+            7,
+            8
+          ],
+          [
+            9,
+            10,
+            11
+          ],
+          [
+            12,
+            13,
+            14
+          ],
+          [
+            15,
+            16,
+            17
+          ],
+          [
+            18,
+            19,
+            20
+          ],
+          [
+            21,
+            22,
+            23
+          ],
+          [
+            24,
+            25,
+            26
+          ],
+          [
+            27,
+            28,
+            29
+          ],
+          [
+            30,
+            31,
+            32
+          ],
+          [
+            33,
+            34,
+            35
+          ],
+          [
+            36,
+            37,
+            38
+          ],
+          [
+            39,
+            40,
+            41
+          ],
+          [
+            42,
+            43,
+            44
+          ],
+          [
+            45,
+            46,
+            47
+          ],
+          [
+            48,
+            49,
+            50
+          ],
+          [
+            51,
+            52,
+            53
+          ],
+          [
+            54,
+            55,
+            56
+          ],
+          [
+            57,
+            58,
+            59
+          ],
+          [
+            60,
+            61,
+            62
+          ],
+          [
+            63,
+            64,
+            65
+          ],
+          [
+            66,
+            67,
+            68
+          ],
+          [
+            69,
+            70,
+            71
+          ],
+          [
+            72,
+            73,
+            74
+          ]
+        ]
+      }
+    },
+    {
+      "kind": "head",
+      "namePrefix": "Beam",
+      "manufacturer": "Chauvet",
+      "model": "Intimidator Beam 140SR V2",
+      "mode": "14 Channel",
+      "channels": 14,
+      "count": 2,
+      "addresses": [
+        316,
+        330
+      ],
+      "universe": 0,
+      "roles": {
+        "pan": 0,
+        "tilt": 2,
+        "color": 5,
+        "gobo": 6,
+        "prism": 7,
+        "focus": 8,
+        "dim": 9,
+        "shutter": 10,
+        "frost": 11
+      },
+      "beam": {
+        "panRangeDeg": 540,
+        "tiltRangeDeg": 270,
+        "tiltCentreDeprDeg": 37.5,
+        "shutterOpen": 255,
+        "shutterOpenMin": 248
+      },
+      "colorWheel": {
+        "white": 1,
+        "red": 5,
+        "yellow": 9,
+        "blue": 13,
+        "green": 17,
+        "magenta": 37,
+        "cyan": 41,
+        "amber": 45
+      },
+      "colorWheelNote": "Stock QLC+ Chauvet-Intimidator-Beam-140SR-V2.qxf wheel: 0-3 white 4-7 red 8-11 yellow 12-15 sky blue 16-19 green 20-23 lime 36-39 magenta 40-43 cyan 44-47 warm white; 128-191 rainbow. Shutter: 0-7 closed, 16-131 strobe, 248-255 open. Verified 2026-09-16."
+    },
+    {
+      "kind": "head",
+      "namePrefix": "375ZX",
+      "manufacturer": "Chauvet",
+      "model": "Intimidator Spot 375ZX",
+      "mode": "15 Channel",
+      "channels": 15,
+      "count": 2,
+      "addresses": [
+        344,
+        359
+      ],
+      "universe": 0,
+      "qxfFile": "Chauvet-Intimidator-Spot-375ZX-15CH.qxf",
+      "roles": {
+        "pan": 0,
+        "tilt": 2,
+        "color": 5,
+        "gobo": 6,
+        "dim": 10,
+        "shutter": 11,
+        "zoom": 14
+      },
+      "beam": {
+        "panRangeDeg": 540,
+        "tiltRangeDeg": 270,
+        "tiltCentreDeprDeg": 37.5,
+        "shutterOpen": 255,
+        "shutterOpenMin": 216
+      },
+      "colorWheel": {
+        "white": 3,
+        "red": 11,
+        "yellow": 19,
+        "green": 27,
+        "blue": 35,
+        "amber": 43,
+        "cyan": 51,
+        "magenta": 59
+      }
+    }
+  ],
+  "headSafety": {
+    "316": {
+      "panMin": 128,
+      "panMax": 218,
+      "tiltMin": 2,
+      "tiltMax": 88
+    },
+    "330": {
+      "panMin": 128,
+      "panMax": 210,
+      "tiltMin": 7,
+      "tiltMax": 82
+    },
+    "344": {
+      "panMin": 86,
+      "panMax": 178,
+      "tiltMin": 5,
+      "tiltMax": 85
+    },
+    "359": {
+      "panMin": 82,
+      "panMax": 172,
+      "tiltMin": 0,
+      "tiltMax": 84
+    },
+    "_note": "PROVISIONAL for Huntley: the 2026-09-19 gym fences widened (pan +/-30, tilt min -10, tilt max +15) so the MiniLab knobs can reach the new room while plotting. Re-plot at load-in, write the real fences here, set controller2.plotMode false, regenerate."
+  },
+  "headPlot": {
+    "_note": "PROVISIONAL for Huntley: copied from the 2026-09-19 gym plot. Same heads, new room and new heights: re-plot the floor box at load-in. Dance-floor box per head, plotted 2026-09-19. panLeft/panRight are the floor's house-left and house-right edges as that head sees them, so pan direction per head is implicit (the 375ZX pair count up toward house-left, Beam L counts up toward house-right, Beam R down). Looks are written in room coordinates and mapped through here.",
+    "375ZXL": {
+      "panLeft": 148,
+      "panRight": 124,
+      "tiltFloor": 25,
+      "tiltRear": 23,
+      "tiltHigh": 70
+    },
+    "beamL": {
+      "panLeft": 158,
+      "panRight": 180,
+      "tiltFloor": 25,
+      "tiltRear": 27,
+      "tiltHigh": 73
+    },
+    "beamR": {
+      "panLeft": 180,
+      "panRight": 158,
+      "tiltFloor": 24,
+      "tiltRear": 27,
+      "tiltHigh": 67
+    },
+    "375ZXR": {
+      "panLeft": 138,
+      "panRight": 114,
+      "tiltFloor": 25,
+      "tiltRear": 22,
+      "tiltHigh": 69
+    }
+  },
+  "movingHeadSettings": {
+    "_note": "PROVISIONAL for Huntley: 2026-09-19 gym aims. Re-plot at load-in.",
+    "375ZXL": {
+      "home": {
+        "pan": 136,
+        "tilt": 54
+      },
+      "centre": {
+        "pan": 134,
+        "tilt": 25
+      },
+      "crowd": {
+        "pan": 136,
+        "tilt": 16
+      },
+      "crossed": {
+        "pan": 124,
+        "tilt": 25
+      },
+      "floor": {
+        "pan": 134,
+        "tilt": 25
+      }
+    },
+    "beamL": {
+      "home": {
+        "pan": 174,
+        "tilt": 52
+      },
+      "centre": {
+        "pan": 170,
+        "tilt": 25
+      },
+      "crowd": {
+        "pan": 174,
+        "tilt": 25
+      },
+      "crossed": {
+        "pan": 180,
+        "tilt": 25
+      },
+      "floor": {
+        "pan": 170,
+        "tilt": 25
+      }
+    },
+    "beamR": {
+      "home": {
+        "pan": 162,
+        "tilt": 51
+      },
+      "centre": {
+        "pan": 170,
+        "tilt": 24
+      },
+      "crowd": {
+        "pan": 162,
+        "tilt": 25
+      },
+      "crossed": {
+        "pan": 180,
+        "tilt": 24
+      },
+      "floor": {
+        "pan": 170,
+        "tilt": 24
+      }
+    },
+    "375ZXR": {
+      "home": {
+        "pan": 134,
+        "tilt": 49
+      },
+      "centre": {
+        "pan": 126,
+        "tilt": 25
+      },
+      "crowd": {
+        "pan": 132,
+        "tilt": 24
+      },
+      "crossed": {
+        "pan": 138,
+        "tilt": 25
+      },
+      "floor": {
+        "pan": 126,
+        "tilt": 25
+      }
+    }
+  },
+  "dmxOutput": {
+    "plugin": "ArtNet",
+    "universe": 0,
+    "transmitMode": "Standard",
+    "outputIp": null,
+    "notes": "Broadcast; CR011R is 10.201.6.100. DMX chain: CR011R OUT -> Beam L (317) -> Beam R (331) -> 375ZX L (345) -> 375ZX R (360) -> terminator."
+  }
+}

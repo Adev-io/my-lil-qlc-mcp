@@ -25,7 +25,7 @@ type Fixture = {
 type FixtureValue = { id: number; pairs: number[] };
 type Scene = { id: number; type: "Scene"; name: string; values: FixtureValue[]; fadeIn: number; fadeOut: number };
 type Chaser = { id: number; type: "Chaser"; name: string; steps: number[]; fade: number; hold: number; runOrder: "Loop" | "SingleShot" };
-type RGBMatrix = { id: number; type: "RGBMatrix"; name: string; script: string; colors: [number, number, number][]; duration: number; group: number };
+type RGBMatrix = { id: number; type: "RGBMatrix"; name: string; script: string; colors: [number, number, number][]; duration: number; group: number; direction: "Forward" | "Backward"; props: Record<string, string> };
 type FunctionDef = Scene | Chaser | RGBMatrix;
 
 function esc(value: string): string {
@@ -288,11 +288,14 @@ const cells: Cell[] = stacks.flatMap(({ t, group }) => group.flatMap((panelNo, s
   });
 }));
 const PIXEL_GROUP = 0;
-const addMatrix = (name: string, script: string, colors: RGB[], duration: number): void => {
-  functions.push({ id: functions.length, type: "RGBMatrix", name, script, colors, duration, group: PIXEL_GROUP });
+const addMatrix = (name: string, script: string, colors: RGB[], duration: number,
+  direction: "Forward" | "Backward" = "Forward", props: Record<string, string> = {}): void => {
+  functions.push({ id: functions.length, type: "RGBMatrix", name, script, colors, duration, group: PIXEL_GROUP, direction, props });
 };
 // Native effects (QLC+ RGBScripts; the names are each script's algo.name).
-addMatrix("PIX · Fill Drain", "Fill Unfill", [[60, 200, 255]], 120);
+// Vertical fills top-down, so Backward fills floor -> apex and drains from the floor up. The default
+// (Horizontal) filled column by column across the grid, whole left tower first (loopback 2026-09-22).
+addMatrix("PIX · Fill Drain", "Fill Unfill", [[60, 200, 255]], 120, "Backward", { orientation: "Vertical" });
 addMatrix("PIX · Rain", "Vertical fall", [[80, 140, 255]], 90);
 addMatrix("PIX · Twinkle", "3D Starfield", [[255, 244, 220]], 80);
 addMatrix("PIX · Plasma", "Plasma", [], 100);
@@ -650,8 +653,8 @@ addScene("HEAD · Gobo Open", heads.map((h) => gobo(h, [6, 0, 7, 0, 8, 0], [6, 0
 addScene("HEAD · Gobo A", heads.map((h) => gobo(h, [6, 12, 7, 80], [6, 13])));
 addScene("HEAD · Gobo B", heads.map((h) => gobo(h, [6, 36, 7, 80], [6, 37])));
 addScene("HEAD · Prism", heads.map((h) => gobo(h, [8, 20], [7, 30])));
-// HITS — flash pads for a drop: every beam snaps to one spot and opens. Held, a scene started after
-// the running chaser outranks it on pan/tilt; released, the look's next step takes the heads back.
+// HITS — flash pads for a drop: every beam snaps to one spot and opens (placed in the mover solo
+// frame, see the page 3 layout).
 const hitScene = (name: string, u: number, v: number): void => {
   addScene(name, heads.map((head) => { const [pan, tilt] = atUV(head, u, v); return { id: head.id, pairs: headPartial(head, { pan, tilt, shutter: 255 }) }; }));
 };
@@ -703,12 +706,13 @@ const functionsXml = functions.map((fn) => {
   if (fn.type === "RGBMatrix") {
     return `  <Function ID="${fn.id}" Type="RGBMatrix" Name="${esc(fn.name)}">
    <Speed FadeIn="0" FadeOut="0" Duration="${fn.duration}"/>
-   <Direction>Forward</Direction>
+   <Direction>${fn.direction}</Direction>
    <RunOrder>Loop</RunOrder>
    <Algorithm Type="Script">${esc(fn.script)}</Algorithm>
 ${fn.colors.map((rgb, index) => `   <Color Index="${index}">${argb(...rgb) >>> 0}</Color>`).join("\n")}
    <ControlMode>RGB</ControlMode>
    <FixtureGroup>${fn.group}</FixtureGroup>
+${Object.entries(fn.props).map(([k, v]) => `   <Property Name="${esc(k)}" Value="${esc(v)}"/>`).join("\n")}
   </Function>`;
   }
   if (fn.type === "Scene") {
@@ -783,10 +787,11 @@ addRow(0, 4, "FX-P1", [
   ["FLOOR FULL", "FLOOR · Full", LED.white, [205, 205, 205]], ["FIRE", "PIX · Fire", LED.red, [210, 70, 30]],
 ]);
 // Row 6 = pixel effects, in the same solo frame as the panel FX so one never mixes into another.
+// "GAP SWEEP", not "GAP BAR": that caption CRC16-collided with AMBER P1 R1C2 on the OSC universe.
 addRow(0, 5, "FX-P1", [
   ["FILL DRAIN", "PIX · Fill Drain", LED.cyan, [40, 150, 190]], ["RAIN", "PIX · Rain", LED.blue, [50, 90, 200]],
   ["TWINKLE", "PIX · Twinkle", LED.white, [190, 190, 200]], ["PLASMA", "PIX · Plasma", LED.purple, [150, 70, 190]],
-  ["GAP BAR", "PIX · Gap Bar", LED.white, [200, 200, 200]], ["V COMET", "PIX · V Comet", LED.purple, [120, 80, 200]],
+  ["GAP SWEEP", "PIX · Gap Bar", LED.white, [200, 200, 200]], ["V COMET", "PIX · V Comet", LED.purple, [120, 80, 200]],
   ["CHEVRONS", "PIX · Chevrons", LED.amber, [220, 120, 30]], ["APEX PULSE", "PIX · Apex Pulse", LED.purple, [190, 60, 180]],
 ]);
 
@@ -847,21 +852,24 @@ const MOVER_PADS: Array<[string, string, [number, RGB]]> = [
   ["CEIL CIRCLE", "CEIL · Circle", CL], ["WAVE", "CEIL · Wave", CL], ["SCISSOR", "CEIL · Scissor", CL], ["FAN CHASE", "CEIL · Fan Chase", CL],
 ];
 MOVER_PADS.forEach(([label, fn, [led, bg]], i) => place({ label, fn, led, bg, page: 2, row: Math.floor(i / 8), col: i % 8, frame: "MOVE-P3" }));
+// HITs sit IN the solo frame (R4C5-C6) as TOGGLE pads: a hit stops the running look and snaps every
+// beam to one spot, and they stay there until the next look is pressed. Proven on loopback
+// 2026-09-22: outside the frame, or as a Flash inside it, the running chaser kept rewriting
+// pan/tilt and the hit did nothing mid-look — only a toggle makes the solo frame stop the look.
+place({ label: "HIT FLOOR", fn: "HIT · Floor", led: LED.amber, bg: [210, 120, 30], page: 2, row: 3, col: 4, frame: "MOVE-P3" });
+place({ label: "HIT UP", fn: "HIT · Up", led: LED.amber, bg: [210, 120, 30], page: 2, row: 3, col: 5, frame: "MOVE-P3" });
 place({ label: "HOLD", fn: "MOVE · Hold", led: LED.gray, bg: [90, 90, 100], page: 2, row: 3, col: 7, frame: "MOVE-P3" });
 // Page 3 row 6: layers that sit OUT of the mover solo frame, so pressing one never stops the running
-// look. Gobo pads are solo among themselves; PRISM toggles on top; HITs are flash pads for a drop:
-// while held they outrank the running chaser on pan/tilt, on release the look carries on.
+// look. Gobo pads are solo among themselves; PRISM toggles on top.
 addRow(2, 5, "GOBO-P3", [
   ["GOBO OPEN", "HEAD · Gobo Open", LED.white, [160, 160, 170]], ["GOBO A", "HEAD · Gobo A", LED.cyan, [40, 150, 170]],
   ["GOBO B", "HEAD · Gobo B", LED.cyan, [40, 150, 170]],
 ]);
 addRow(2, 5, "PRISM-P3", [["PRISM", "HEAD · Prism", LED.purple, [140, 65, 190]]], 3);
-addRow(2, 5, "HIT-P3", [
-  ["HIT FLOOR", "HIT · Floor", LED.amber, [210, 120, 30], "Flash"], ["HIT UP", "HIT · Up", LED.amber, [210, 120, 30], "Flash"],
-], 4);
 addRow(2, 5, "HEADUTIL-P3", [
+  ["BM OPEN", "HEAD · Beams Full", LED.white, [160, 160, 170]], ["SP OPEN", "HEAD · Spots Full", LED.white, [160, 160, 170]],
   ["HD OPEN", "HEAD · Open", LED.green, [50, 150, 80]], ["HD STROBE", "HEAD · Strobe", LED.white, [225, 225, 225], "Flash"],
-], 6);
+], 4);
 
 for (const page of [0, 1, 2]) {
   addRow(page, 6, `LEVEL-P${page + 1}`, [
@@ -1165,8 +1173,8 @@ If Launchpad is absent, launcher removes MIDI routes from runtime copy. QLC+ Vir
 
 - Page 1: full Cuepix colors, pixel patterns, chasers, fades, strobes, burst, levels, speed, tap, blackout, stop, white flash, page switch.
 - Page 2: compact Cuepix controls plus the HEAD rows — colours R3, aims + shutter R6.
-- Page 3: MOVERS. R1-R4 = 28 mover looks + HOLD at R4C8 (one solo frame: one look at a time; floor, then room, then ceiling). R5 head colours. R6 layers that never stop the look: C1-C3 GOBO OPEN/A/B, C4 PRISM, C5-C6 HIT FLOOR/HIT UP (hold), C7 HD OPEN, C8 HD STROBE.
-- Page 1 R6: pixel effects (FILL DRAIN, RAIN, TWINKLE, PLASMA, GAP BAR, V COMET, CHEVRONS, APEX PULSE) + R5C8 FIRE, in the panel FX solo frame. Two speed dials: FX Speed (panels, TAP) and Mover Speed (movers).
+- Page 3: MOVERS. R1-R4 = 28 mover looks + HOLD at R4C8 (one solo frame: one look at a time; floor, then room, then ceiling). R5 head colours. R4C5-C6 HIT FLOOR/HIT UP (stops the look and snaps every beam to one spot until the next look). R6 layers that never stop the look: C1-C3 GOBO OPEN/A/B, C4 PRISM, C5 BM OPEN, C6 SP OPEN, C7 HD OPEN, C8 HD STROBE.
+- Page 1 R6: pixel effects (FILL DRAIN, RAIN, TWINKLE, PLASMA, GAP SWEEP, V COMET, CHEVRONS, APEX PULSE) + R5C8 FIRE, in the panel FX solo frame. Two speed dials: FX Speed (panels, TAP) and Mover Speed (movers).
 - Page 1 R5C7: FLOOR FULL (whole panel floor white). Load-in: fire BANDS and set cuepix.pixelOrigin if band 1 is not the top row.
 - R7C1-R7C4: 25%, 50%, 75%, Full. R7C5-R7C7: Slow, Medium, Fast. R7C8: Tap.
 - R8C1: Blackout. R8C2: Stop FX. R8C3: White. R8C5: Flash. R8C8: Page.

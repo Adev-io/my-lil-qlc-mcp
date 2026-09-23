@@ -9,231 +9,81 @@
  <Manufacturer>Elation</Manufacturer>
  <Model>CUEPIX Panel</Model>
  <Type>LED Bar (Pixels)</Type>
- <Channel Name="Red - COB Module 1">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Green - COB Module 1">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Blue - COB Module 1">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Red - COB Module 2">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Green - COB Module 2">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Blue - COB Module 2">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Red - COB Module 3">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Green - COB Module 3">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Blue - COB Module 3">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Red - COB Module 4">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Green - COB Module 4">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Blue - COB Module 4">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Red - COB Module 5">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Green - COB Module 5">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Blue - COB Module 5">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Red - COB Module 6">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Green - COB Module 6">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Blue - COB Module 6">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Red - COB Module 7">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Green - COB Module 7">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Blue - COB Module 7">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Red - COB Module 8">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Green - COB Module 8">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Blue - COB Module 8">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Red - COB Module 9">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Green - COB Module 9">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Blue - COB Module 9">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Red - COB Module 10">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Green - COB Module 10">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Blue - COB Module 10">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Red - COB Module 11">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Green - COB Module 11">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Blue - COB Module 11">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Red - COB Module 12">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Green - COB Module 12">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Blue - COB Module 12">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Red - COB Module 13">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Green - COB Module 13">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Blue - COB Module 13">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Red - COB Module 14">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Green - COB Module 14">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Blue - COB Module 14">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Red - COB Module 15">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Green - COB Module 15">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Blue - COB Module 15">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Red - COB Module 16">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Green - COB Module 16">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Blue - COB Module 16">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Red - COB Module 17">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Green - COB Module 17">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Blue - COB Module 17">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Red - COB Module 18">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Green - COB Module 18">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Blue - COB Module 18">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Red - COB Module 19">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Green - COB Module 19">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Blue - COB Module 19">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Red - COB Module 20">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Green - COB Module 20">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Blue - COB Module 20">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Red - COB Module 21">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Green - COB Module 21">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Blue - COB Module 21">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Red - COB Module 22">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Green - COB Module 22">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Blue - COB Module 22">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Red - COB Module 23">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Green - COB Module 23">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Blue - COB Module 23">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Red - COB Module 24">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Green - COB Module 24">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Blue - COB Module 24">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Red - COB Module 25">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Green - COB Module 25">
-  <Group Byte="0">Colour</Group>
- </Channel>
- <Channel Name="Blue - COB Module 25">
-  <Group Byte="0">Colour</Group>
- </Channel>
+ <Channel Name="Red - COB Module 1" Preset="IntensityRed"/>
+ <Channel Name="Green - COB Module 1" Preset="IntensityGreen"/>
+ <Channel Name="Blue - COB Module 1" Preset="IntensityBlue"/>
+ <Channel Name="Red - COB Module 2" Preset="IntensityRed"/>
+ <Channel Name="Green - COB Module 2" Preset="IntensityGreen"/>
+ <Channel Name="Blue - COB Module 2" Preset="IntensityBlue"/>
+ <Channel Name="Red - COB Module 3" Preset="IntensityRed"/>
+ <Channel Name="Green - COB Module 3" Preset="IntensityGreen"/>
+ <Channel Name="Blue - COB Module 3" Preset="IntensityBlue"/>
+ <Channel Name="Red - COB Module 4" Preset="IntensityRed"/>
+ <Channel Name="Green - COB Module 4" Preset="IntensityGreen"/>
+ <Channel Name="Blue - COB Module 4" Preset="IntensityBlue"/>
+ <Channel Name="Red - COB Module 5" Preset="IntensityRed"/>
+ <Channel Name="Green - COB Module 5" Preset="IntensityGreen"/>
+ <Channel Name="Blue - COB Module 5" Preset="IntensityBlue"/>
+ <Channel Name="Red - COB Module 6" Preset="IntensityRed"/>
+ <Channel Name="Green - COB Module 6" Preset="IntensityGreen"/>
+ <Channel Name="Blue - COB Module 6" Preset="IntensityBlue"/>
+ <Channel Name="Red - COB Module 7" Preset="IntensityRed"/>
+ <Channel Name="Green - COB Module 7" Preset="IntensityGreen"/>
+ <Channel Name="Blue - COB Module 7" Preset="IntensityBlue"/>
+ <Channel Name="Red - COB Module 8" Preset="IntensityRed"/>
+ <Channel Name="Green - COB Module 8" Preset="IntensityGreen"/>
+ <Channel Name="Blue - COB Module 8" Preset="IntensityBlue"/>
+ <Channel Name="Red - COB Module 9" Preset="IntensityRed"/>
+ <Channel Name="Green - COB Module 9" Preset="IntensityGreen"/>
+ <Channel Name="Blue - COB Module 9" Preset="IntensityBlue"/>
+ <Channel Name="Red - COB Module 10" Preset="IntensityRed"/>
+ <Channel Name="Green - COB Module 10" Preset="IntensityGreen"/>
+ <Channel Name="Blue - COB Module 10" Preset="IntensityBlue"/>
+ <Channel Name="Red - COB Module 11" Preset="IntensityRed"/>
+ <Channel Name="Green - COB Module 11" Preset="IntensityGreen"/>
+ <Channel Name="Blue - COB Module 11" Preset="IntensityBlue"/>
+ <Channel Name="Red - COB Module 12" Preset="IntensityRed"/>
+ <Channel Name="Green - COB Module 12" Preset="IntensityGreen"/>
+ <Channel Name="Blue - COB Module 12" Preset="IntensityBlue"/>
+ <Channel Name="Red - COB Module 13" Preset="IntensityRed"/>
+ <Channel Name="Green - COB Module 13" Preset="IntensityGreen"/>
+ <Channel Name="Blue - COB Module 13" Preset="IntensityBlue"/>
+ <Channel Name="Red - COB Module 14" Preset="IntensityRed"/>
+ <Channel Name="Green - COB Module 14" Preset="IntensityGreen"/>
+ <Channel Name="Blue - COB Module 14" Preset="IntensityBlue"/>
+ <Channel Name="Red - COB Module 15" Preset="IntensityRed"/>
+ <Channel Name="Green - COB Module 15" Preset="IntensityGreen"/>
+ <Channel Name="Blue - COB Module 15" Preset="IntensityBlue"/>
+ <Channel Name="Red - COB Module 16" Preset="IntensityRed"/>
+ <Channel Name="Green - COB Module 16" Preset="IntensityGreen"/>
+ <Channel Name="Blue - COB Module 16" Preset="IntensityBlue"/>
+ <Channel Name="Red - COB Module 17" Preset="IntensityRed"/>
+ <Channel Name="Green - COB Module 17" Preset="IntensityGreen"/>
+ <Channel Name="Blue - COB Module 17" Preset="IntensityBlue"/>
+ <Channel Name="Red - COB Module 18" Preset="IntensityRed"/>
+ <Channel Name="Green - COB Module 18" Preset="IntensityGreen"/>
+ <Channel Name="Blue - COB Module 18" Preset="IntensityBlue"/>
+ <Channel Name="Red - COB Module 19" Preset="IntensityRed"/>
+ <Channel Name="Green - COB Module 19" Preset="IntensityGreen"/>
+ <Channel Name="Blue - COB Module 19" Preset="IntensityBlue"/>
+ <Channel Name="Red - COB Module 20" Preset="IntensityRed"/>
+ <Channel Name="Green - COB Module 20" Preset="IntensityGreen"/>
+ <Channel Name="Blue - COB Module 20" Preset="IntensityBlue"/>
+ <Channel Name="Red - COB Module 21" Preset="IntensityRed"/>
+ <Channel Name="Green - COB Module 21" Preset="IntensityGreen"/>
+ <Channel Name="Blue - COB Module 21" Preset="IntensityBlue"/>
+ <Channel Name="Red - COB Module 22" Preset="IntensityRed"/>
+ <Channel Name="Green - COB Module 22" Preset="IntensityGreen"/>
+ <Channel Name="Blue - COB Module 22" Preset="IntensityBlue"/>
+ <Channel Name="Red - COB Module 23" Preset="IntensityRed"/>
+ <Channel Name="Green - COB Module 23" Preset="IntensityGreen"/>
+ <Channel Name="Blue - COB Module 23" Preset="IntensityBlue"/>
+ <Channel Name="Red - COB Module 24" Preset="IntensityRed"/>
+ <Channel Name="Green - COB Module 24" Preset="IntensityGreen"/>
+ <Channel Name="Blue - COB Module 24" Preset="IntensityBlue"/>
+ <Channel Name="Red - COB Module 25" Preset="IntensityRed"/>
+ <Channel Name="Green - COB Module 25" Preset="IntensityGreen"/>
+ <Channel Name="Blue - COB Module 25" Preset="IntensityBlue"/>
  <Channel Name="Macros">
   <Group Byte="0">Colour</Group>
   <Capability Min="0" Max="15">No function</Capability>

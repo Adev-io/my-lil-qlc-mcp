@@ -62,10 +62,14 @@ describe("Huntley homecoming rig", () => {
 
   it("layers gobo, prism and beat hits on page 3 without stopping the running look", () => {
     for (const pad of ["GOBO OPEN", "GOBO A", "GOBO B"]) expect(frameOf(`${pad} P3 R6C${pad === "GOBO OPEN" ? 1 : pad === "GOBO A" ? 2 : 3}`)).toEqual({ solo: true, name: "GOBO-P3" });
-    for (const [pad, cell] of [["PRISM", "R6C4"], ["HIT FLOOR", "R6C5"], ["HIT UP", "R6C6"]]) {
-      expect(frameOf(`${pad} P3 ${cell}`).name).not.toBe("MOVE-P3");
+    expect(frameOf("PRISM P3 R6C4").name).not.toBe("MOVE-P3");
+    // HITs are TOGGLES in the mover solo frame: a running chaser rewrites pan/tilt every step, so a
+    // held scene outside the frame, or a Flash inside it, never won (loopback 2026-09-22). A toggle
+    // makes the frame stop the look; the heads stay on the hit until the next look is pressed.
+    for (const pad of ["HIT FLOOR P3 R4C5", "HIT UP P3 R4C6"]) {
+      expect(frameOf(pad)).toEqual({ solo: true, name: "MOVE-P3" });
+      expect(button(pad)).toContain("<Action>Toggle</Action>");
     }
-    expect(button("HIT FLOOR P3 R6C5")).toContain("<Action>Flash</Action>");
     // A gobo pad touches only gobo, gobo rotation and prism: 140SR ch 6-7, 375ZX ch 6-8.
     const beamIds = ["Beam L", "Beam R"].map((n) => qxw.match(new RegExp(`<ID>(\\d+)</ID>\\s*<Name>${n}</Name>`))![1]);
     for (const name of ["HEAD · Gobo Open", "HEAD · Gobo A", "HEAD · Gobo B", "HEAD · Prism"]) {
@@ -74,6 +78,17 @@ describe("Huntley homecoming rig", () => {
         expect(channels.every((ch) => (beamIds.includes(id) ? [6, 7] : [6, 7, 8]).includes(ch))).toBe(true);
       }
     }
+  });
+
+  // OSC paths map to QLC+ input channels by CRC16, so two captions can collide: "GAP BAR P1 R6C5"
+  // and "AMBER P1 R1C2" both hashed to 34401 and one dashboard press fired both (loopback 2026-09-22).
+  it("gives every pad its own OSC input channel", () => {
+    const seen = new Map<string, string>();
+    for (const [, caption, channel] of qxw.matchAll(/<Button Caption="([^"]+)" ID="\d+" Icon="">(?:(?!<\/Button>)[\s\S])*?<Input Universe="0" Channel="(\d+)"\/>/g)) {
+      expect(seen.get(channel) ?? caption).toBe(caption);
+      seen.set(channel, caption);
+    }
+    expect(seen.size).toBeGreaterThan(100);
   });
 
   it("gives the movers their own speed dial", () => {
@@ -108,6 +123,11 @@ describe("Huntley homecoming rig", () => {
     const matrices = [...qxw.matchAll(/Type="RGBMatrix" Name="([^"]+)">[\s\S]*?<Algorithm Type="Script">([^<]+)<\/Algorithm>[\s\S]*?<FixtureGroup>(\d+)<\/FixtureGroup>/g)];
     expect(matrices.map((m) => m[2]).sort()).toEqual(["3D Starfield", "Fill Unfill", "Plasma", "Stripes", "Vertical fall"]);
     expect(matrices.every((m) => m[3] === group[1])).toBe(true);
+    // Fill Drain fills the towers floor to apex: Vertical fills top-down, so it runs Backward
+    // (seen on loopback 2026-09-22: the default filled column by column, left tower first).
+    const fill = fnBlock("PIX · Fill Drain")!;
+    expect(fill).toContain("<Direction>Backward</Direction>");
+    expect(fill).toContain('<Property Name="orientation" Value="Vertical"/>');
     for (const pad of ["FILL DRAIN P1 R6C1", "V COMET P1 R6C6", "FIRE P1 R5C8"]) expect(frameOf(pad)).toEqual({ solo: true, name: "FX-P1" });
     // Custom pixel steps write panel RGB channels only (0-74), never the panel dimmer or strobe.
     const comet = fnBlock("PIX · V Comet")!;

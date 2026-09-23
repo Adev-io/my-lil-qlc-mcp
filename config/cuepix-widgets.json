@@ -296,10 +296,10 @@
     },
     {
       "id": "184",
-      "name": "GAP BAR P1 R6C5",
-      "path": "/gap_bar_p1_r6c5",
+      "name": "GAP SWEEP P1 R6C5",
+      "path": "/gap_sweep_p1_r6c5",
       "type": "button",
-      "description": "Button: GAP BAR P1 R6C5 (Input Universe 0, Channel 34401)"
+      "description": "Button: GAP SWEEP P1 R6C5 (Input Universe 0, Channel 16338)"
     },
     {
       "id": "186",
@@ -323,28 +323,28 @@
       "description": "Button: APEX PULSE P1 R6C8 (Input Universe 0, Channel 31005)"
     },
     {
-      "id": "346",
+      "id": "350",
       "name": "25% P1 R7C1",
       "path": "/25%_p1_r7c1",
       "type": "button",
       "description": "Button: 25% P1 R7C1 (Input Universe 0, Channel 55351)"
     },
     {
-      "id": "348",
+      "id": "352",
       "name": "50% P1 R7C2",
       "path": "/50%_p1_r7c2",
       "type": "button",
       "description": "Button: 50% P1 R7C2 (Input Universe 0, Channel 55025)"
     },
     {
-      "id": "350",
+      "id": "354",
       "name": "75% P1 R7C3",
       "path": "/75%_p1_r7c3",
       "type": "button",
       "description": "Button: 75% P1 R7C3 (Input Universe 0, Channel 61665)"
     },
     {
-      "id": "352",
+      "id": "356",
       "name": "FULL P1 R7C4",
       "path": "/full_p1_r7c4",
       "type": "button",
@@ -519,28 +519,28 @@
       "description": "Button: HD WHITE P2 R3C8 (Input Universe 0, Channel 15882)"
     },
     {
-      "id": "376",
+      "id": "380",
       "name": "25% P2 R7C1",
       "path": "/25%_p2_r7c1",
       "type": "button",
       "description": "Button: 25% P2 R7C1 (Input Universe 0, Channel 54346)"
     },
     {
-      "id": "378",
+      "id": "382",
       "name": "50% P2 R7C2",
       "path": "/50%_p2_r7c2",
       "type": "button",
       "description": "Button: 50% P2 R7C2 (Input Universe 0, Channel 55948)"
     },
     {
-      "id": "380",
+      "id": "384",
       "name": "75% P2 R7C3",
       "path": "/75%_p2_r7c3",
       "type": "button",
       "description": "Button: 75% P2 R7C3 (Input Universe 0, Channel 64668)"
     },
     {
-      "id": "382",
+      "id": "386",
       "name": "FULL P2 R7C4",
       "path": "/full_p2_r7c4",
       "type": "button",
@@ -800,97 +800,111 @@
     },
     {
       "id": "328",
+      "name": "HIT FLOOR P3 R4C5",
+      "path": "/hit_floor_p3_r4c5",
+      "type": "button",
+      "description": "Button: HIT FLOOR P3 R4C5 (Input Universe 0, Channel 26130)"
+    },
+    {
+      "id": "330",
+      "name": "HIT UP P3 R4C6",
+      "path": "/hit_up_p3_r4c6",
+      "type": "button",
+      "description": "Button: HIT UP P3 R4C6 (Input Universe 0, Channel 25037)"
+    },
+    {
+      "id": "332",
       "name": "HOLD P3 R4C8",
       "path": "/hold_p3_r4c8",
       "type": "button",
       "description": "Button: HOLD P3 R4C8 (Input Universe 0, Channel 15893)"
     },
     {
-      "id": "330",
+      "id": "334",
       "name": "GOBO OPEN P3 R6C1",
       "path": "/gobo_open_p3_r6c1",
       "type": "button",
       "description": "Button: GOBO OPEN P3 R6C1 (Input Universe 0, Channel 37735)"
     },
     {
-      "id": "332",
+      "id": "336",
       "name": "GOBO A P3 R6C2",
       "path": "/gobo_a_p3_r6c2",
       "type": "button",
       "description": "Button: GOBO A P3 R6C2 (Input Universe 0, Channel 48698)"
     },
     {
-      "id": "334",
+      "id": "338",
       "name": "GOBO B P3 R6C3",
       "path": "/gobo_b_p3_r6c3",
       "type": "button",
       "description": "Button: GOBO B P3 R6C3 (Input Universe 0, Channel 31156)"
     },
     {
-      "id": "406",
+      "id": "410",
       "name": "25% P3 R7C1",
       "path": "/25%_p3_r7c1",
       "type": "button",
       "description": "Button: 25% P3 R7C1 (Input Universe 0, Channel 53345)"
     },
     {
-      "id": "408",
+      "id": "412",
       "name": "50% P3 R7C2",
       "path": "/50%_p3_r7c2",
       "type": "button",
       "description": "Button: 50% P3 R7C2 (Input Universe 0, Channel 56999)"
     },
     {
-      "id": "410",
+      "id": "414",
       "name": "75% P3 R7C3",
       "path": "/75%_p3_r7c3",
       "type": "button",
       "description": "Button: 75% P3 R7C3 (Input Universe 0, Channel 63671)"
     },
     {
-      "id": "412",
+      "id": "416",
       "name": "FULL P3 R7C4",
       "path": "/full_p3_r7c4",
       "type": "button",
       "description": "Button: FULL P3 R7C4 (Input Universe 0, Channel 3899)"
     },
     {
-      "id": "362",
+      "id": "366",
       "name": "BLACK P1 R8C1",
       "path": "/black_p1_r8c1",
       "type": "button",
       "description": "Button: BLACK P1 R8C1 (Input Universe 0, Channel 30852)"
     },
     {
-      "id": "364",
+      "id": "368",
       "name": "STOP FX P1 R8C2",
       "path": "/stop_fx_p1_r8c2",
       "type": "button",
       "description": "Button: STOP FX P1 R8C2 (Input Universe 0, Channel 64327)"
     },
     {
-      "id": "366",
+      "id": "370",
       "name": "WHITE P1 R8C3",
       "path": "/white_p1_r8c3",
       "type": "button",
       "description": "Button: WHITE P1 R8C3 (Input Universe 0, Channel 26353)"
     },
     {
-      "id": "368",
+      "id": "372",
       "name": "FLASH P1 R8C5",
       "path": "/flash_p1_r8c5",
       "type": "button",
       "description": "Button: FLASH P1 R8C5 (Input Universe 0, Channel 11329)"
     },
     {
-      "id": "370",
+      "id": "374",
       "name": "RESET P1 R8C6",
       "path": "/reset_p1_r8c6",
       "type": "button",
       "description": "Button: RESET P1 R8C6 (Input Universe 0, Channel 33371)"
     },
     {
-      "id": "372",
+      "id": "376",
       "name": "PANIC P1 R8C7",
       "path": "/panic_p1_r8c7",
       "type": "button",
@@ -953,42 +967,42 @@
       "description": "Button: HD STROBE P2 R6C8 (Input Universe 0, Channel 11765)"
     },
     {
-      "id": "392",
+      "id": "396",
       "name": "BLACK P2 R8C1",
       "path": "/black_p2_r8c1",
       "type": "button",
       "description": "Button: BLACK P2 R8C1 (Input Universe 0, Channel 29945)"
     },
     {
-      "id": "394",
+      "id": "398",
       "name": "STOP FX P2 R8C2",
       "path": "/stop_fx_p2_r8c2",
       "type": "button",
       "description": "Button: STOP FX P2 R8C2 (Input Universe 0, Channel 63290)"
     },
     {
-      "id": "396",
+      "id": "400",
       "name": "WHITE P2 R8C3",
       "path": "/white_p2_r8c3",
       "type": "button",
       "description": "Button: WHITE P2 R8C3 (Input Universe 0, Channel 27276)"
     },
     {
-      "id": "398",
+      "id": "402",
       "name": "FLASH P2 R8C5",
       "path": "/flash_p2_r8c5",
       "type": "button",
       "description": "Button: FLASH P2 R8C5 (Input Universe 0, Channel 8252)"
     },
     {
-      "id": "400",
+      "id": "404",
       "name": "RESET P2 R8C6",
       "path": "/reset_p2_r8c6",
       "type": "button",
       "description": "Button: RESET P2 R8C6 (Input Universe 0, Channel 36390)"
     },
     {
-      "id": "402",
+      "id": "406",
       "name": "PANIC P2 R8C7",
       "path": "/panic_p2_r8c7",
       "type": "button",
@@ -996,76 +1010,76 @@
     },
     {
       "id": "342",
+      "name": "BM OPEN P3 R6C5",
+      "path": "/bm_open_p3_r6c5",
+      "type": "button",
+      "description": "Button: BM OPEN P3 R6C5 (Input Universe 0, Channel 39389)"
+    },
+    {
+      "id": "344",
+      "name": "SP OPEN P3 R6C6",
+      "path": "/sp_open_p3_r6c6",
+      "type": "button",
+      "description": "Button: SP OPEN P3 R6C6 (Input Universe 0, Channel 62831)"
+    },
+    {
+      "id": "346",
       "name": "HD OPEN P3 R6C7",
       "path": "/hd_open_p3_r6c7",
       "type": "button",
       "description": "Button: HD OPEN P3 R6C7 (Input Universe 0, Channel 60000)"
     },
     {
-      "id": "344",
+      "id": "348",
       "name": "HD STROBE P3 R6C8",
       "path": "/hd_strobe_p3_r6c8",
       "type": "button",
       "description": "Button: HD STROBE P3 R6C8 (Input Universe 0, Channel 10718)"
     },
     {
-      "id": "336",
+      "id": "340",
       "name": "PRISM P3 R6C4",
       "path": "/prism_p3_r6c4",
       "type": "button",
       "description": "Button: PRISM P3 R6C4 (Input Universe 0, Channel 46320)"
     },
     {
-      "id": "338",
-      "name": "HIT FLOOR P3 R6C5",
-      "path": "/hit_floor_p3_r6c5",
-      "type": "button",
-      "description": "Button: HIT FLOOR P3 R6C5 (Input Universe 0, Channel 54186)"
-    },
-    {
-      "id": "340",
-      "name": "HIT UP P3 R6C6",
-      "path": "/hit_up_p3_r6c6",
-      "type": "button",
-      "description": "Button: HIT UP P3 R6C6 (Input Universe 0, Channel 54389)"
-    },
-    {
-      "id": "422",
+      "id": "426",
       "name": "BLACK P3 R8C1",
       "path": "/black_p3_r8c1",
       "type": "button",
       "description": "Button: BLACK P3 R8C1 (Input Universe 0, Channel 28882)"
     },
     {
-      "id": "424",
+      "id": "428",
       "name": "STOP FX P3 R8C2",
       "path": "/stop_fx_p3_r8c2",
       "type": "button",
       "description": "Button: STOP FX P3 R8C2 (Input Universe 0, Channel 62225)"
     },
     {
-      "id": "426",
+      "id": "430",
       "name": "WHITE P3 R8C3",
       "path": "/white_p3_r8c3",
       "type": "button",
       "description": "Button: WHITE P3 R8C3 (Input Universe 0, Channel 28327)"
     },
     {
-      "id": "428",
+      "id": "432",
       "name": "FLASH P3 R8C5",
       "path": "/flash_p3_r8c5",
       "type": "button",
       "description": "Button: FLASH P3 R8C5 (Input Universe 0, Channel 9239)"
     },
     {
-      "id": "430",
+      "id": "434",
       "name": "RESET P3 R8C6",
       "path": "/reset_p3_r8c6",
       "type": "button",
       "description": "Button: RESET P3 R8C6 (Input Universe 0, Channel 35341)"
     },
     {
-      "id": "432",
+      "id": "436",
       "name": "PANIC P3 R8C7",
       "path": "/panic_p3_r8c7",
       "type": "button",

@@ -1072,12 +1072,13 @@
   </Function>
   <Function ID="124" Type="RGBMatrix" Name="PIX · Fill Drain">
    <Speed FadeIn="0" FadeOut="0" Duration="120"/>
-   <Direction>Forward</Direction>
+   <Direction>Backward</Direction>
    <RunOrder>Loop</RunOrder>
    <Algorithm Type="Script">Fill Unfill</Algorithm>
    <Color Index="0">4282173695</Color>
    <ControlMode>RGB</ControlMode>
    <FixtureGroup>0</FixtureGroup>
+   <Property Name="orientation" Value="Vertical"/>
   </Function>
   <Function ID="125" Type="RGBMatrix" Name="PIX · Rain">
    <Speed FadeIn="0" FadeOut="0" Duration="90"/>
@@ -1087,6 +1088,7 @@
    <Color Index="0">4283469055</Color>
    <ControlMode>RGB</ControlMode>
    <FixtureGroup>0</FixtureGroup>
+
   </Function>
   <Function ID="126" Type="RGBMatrix" Name="PIX · Twinkle">
    <Speed FadeIn="0" FadeOut="0" Duration="80"/>
@@ -1096,6 +1098,7 @@
    <Color Index="0">4294964444</Color>
    <ControlMode>RGB</ControlMode>
    <FixtureGroup>0</FixtureGroup>
+
   </Function>
   <Function ID="127" Type="RGBMatrix" Name="PIX · Plasma">
    <Speed FadeIn="0" FadeOut="0" Duration="100"/>
@@ -1105,6 +1108,7 @@
 
    <ControlMode>RGB</ControlMode>
    <FixtureGroup>0</FixtureGroup>
+
   </Function>
   <Function ID="128" Type="RGBMatrix" Name="PIX · Gap Bar">
    <Speed FadeIn="0" FadeOut="0" Duration="60"/>
@@ -1114,6 +1118,7 @@
    <Color Index="0">4294967295</Color>
    <ControlMode>RGB</ControlMode>
    <FixtureGroup>0</FixtureGroup>
+
   </Function>
   <Function ID="129" Type="Scene" Name="_STEP · Pix V Comet 1">
    <Speed FadeIn="0" FadeOut="0" Duration="0"/>
@@ -8388,14 +8393,14 @@
      <Action>Toggle</Action>
      <Input Universe="2" Channel="162" LowerValue="94" UpperValue="90"/>
     </Button>
-    <Button Caption="GAP BAR P1 R6C5" ID="184" Icon="">
+    <Button Caption="GAP SWEEP P1 R6C5" ID="184" Icon="">
      <WindowState Visible="True" X="388" Y="154" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4291348680</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="128"/>
      <Action>Toggle</Action>
-     <Input Universe="0" Channel="34401"/>
+     <Input Universe="0" Channel="16338"/>
     </Button>
-    <Button Caption="GAP BAR P1 R6C5" ID="185" Icon="">
+    <Button Caption="GAP SWEEP P1 R6C5" ID="185" Icon="">
      <WindowState Visible="True" X="388" Y="154" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4291348680</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="128"/>
@@ -8449,56 +8454,56 @@
     <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4280295975</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
     <WindowState Visible="True" X="8" Y="308" Width="386" Height="52"/>
     <AllowChildren>True</AllowChildren><AllowResize>True</AllowResize><ShowHeader>False</ShowHeader><ShowEnableButton>False</ShowEnableButton><Collapsed>False</Collapsed><Disabled>False</Disabled>
-    <Button Caption="25% P1 R7C1" ID="346" Icon="">
+    <Button Caption="25% P1 R7C1" ID="350" Icon="">
      <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4281815185</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="16"/>
      <Action>Toggle</Action>
      <Input Universe="0" Channel="55351"/>
     </Button>
-    <Button Caption="25% P1 R7C1" ID="347" Icon="">
+    <Button Caption="25% P1 R7C1" ID="351" Icon="">
      <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4281815185</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="16"/>
      <Action>Toggle</Action>
      <Input Universe="2" Channel="149" LowerValue="70" UpperValue="66"/>
     </Button>
-    <Button Caption="50% P1 R7C2" ID="348" Icon="">
+    <Button Caption="50% P1 R7C2" ID="352" Icon="">
      <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4282475695</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="17"/>
      <Action>Toggle</Action>
      <Input Universe="0" Channel="55025"/>
     </Button>
-    <Button Caption="50% P1 R7C2" ID="349" Icon="">
+    <Button Caption="50% P1 R7C2" ID="353" Icon="">
      <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4282475695</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="17"/>
      <Action>Toggle</Action>
      <Input Universe="2" Channel="150" LowerValue="70" UpperValue="66"/>
     </Button>
-    <Button Caption="75% P1 R7C3" ID="350" Icon="">
+    <Button Caption="75% P1 R7C3" ID="354" Icon="">
      <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4282487220</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="18"/>
      <Action>Toggle</Action>
      <Input Universe="0" Channel="61665"/>
     </Button>
-    <Button Caption="75% P1 R7C3" ID="351" Icon="">
+    <Button Caption="75% P1 R7C3" ID="355" Icon="">
      <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4282487220</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="18"/>
      <Action>Toggle</Action>
      <Input Universe="2" Channel="151" LowerValue="54" UpperValue="50"/>
     </Button>
-    <Button Caption="FULL P1 R7C4" ID="352" Icon="">
+    <Button Caption="FULL P1 R7C4" ID="356" Icon="">
      <WindowState Visible="True" X="292" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4291677645</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="19"/>
      <Action>Toggle</Action>
      <Input Universe="0" Channel="1901"/>
     </Button>
-    <Button Caption="FULL P1 R7C4" ID="353" Icon="">
+    <Button Caption="FULL P1 R7C4" ID="357" Icon="">
      <WindowState Visible="True" X="292" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4291677645</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="19"/>
@@ -8510,22 +8515,22 @@
     <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4280295975</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
     <WindowState Visible="True" X="392" Y="308" Width="386" Height="52"/>
     <AllowChildren>True</AllowChildren><AllowResize>True</AllowResize><ShowHeader>False</ShowHeader><ShowEnableButton>False</ShowEnableButton><Collapsed>False</Collapsed><Disabled>False</Disabled>
-    <Button Caption="SLOW P1 R7C5" ID="354" Icon="">
+    <Button Caption="SLOW P1 R7C5" ID="358" Icon="">
      <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4290342435</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Action>Toggle</Action>
     </Button>
-    <Button Caption="MED P1 R7C6" ID="356" Icon="">
+    <Button Caption="MED P1 R7C6" ID="360" Icon="">
      <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4290342435</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Action>Toggle</Action>
     </Button>
-    <Button Caption="FAST P1 R7C7" ID="358" Icon="">
+    <Button Caption="FAST P1 R7C7" ID="362" Icon="">
      <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4290342435</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Action>Toggle</Action>
     </Button>
-    <Button Caption="TAP P1 R7C8" ID="360" Icon="">
+    <Button Caption="TAP P1 R7C8" ID="364" Icon="">
      <WindowState Visible="True" X="292" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4290342435</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Action>Toggle</Action>
@@ -8535,89 +8540,89 @@
     <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4280295975</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
     <WindowState Visible="True" X="8" Y="358" Width="770" Height="52"/>
     <AllowChildren>True</AllowChildren><AllowResize>True</AllowResize><ShowHeader>False</ShowHeader><ShowEnableButton>False</ShowEnableButton><Collapsed>False</Collapsed><Disabled>False</Disabled>
-    <Button Caption="BLACK P1 R8C1" ID="362" Icon="">
+    <Button Caption="BLACK P1 R8C1" ID="366" Icon="">
      <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4294967295</ForegroundColor><BackgroundColor>4279505944</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Action>Blackout</Action>
      <Input Universe="0" Channel="30852"/>
     </Button>
-    <Button Caption="BLACK P1 R8C1" ID="363" Icon="">
+    <Button Caption="BLACK P1 R8C1" ID="367" Icon="">
      <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4294967295</ForegroundColor><BackgroundColor>4279505944</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Action>Blackout</Action>
      <Input Universe="2" Channel="139" LowerValue="5" UpperValue="1"/>
     </Button>
-    <Button Caption="STOP FX P1 R8C2" ID="364" Icon="">
+    <Button Caption="STOP FX P1 R8C2" ID="368" Icon="">
      <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4288358445</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="23"/>
      <Action>Toggle</Action>
      <Input Universe="0" Channel="64327"/>
     </Button>
-    <Button Caption="STOP FX P1 R8C2" ID="365" Icon="">
+    <Button Caption="STOP FX P1 R8C2" ID="369" Icon="">
      <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4288358445</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="23"/>
      <Action>Toggle</Action>
      <Input Universe="2" Channel="140" LowerValue="14" UpperValue="10"/>
     </Button>
-    <Button Caption="WHITE P1 R8C3" ID="366" Icon="">
+    <Button Caption="WHITE P1 R8C3" ID="370" Icon="">
      <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4292993500</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="7"/>
      <Action>Toggle</Action>
      <Input Universe="0" Channel="26353"/>
     </Button>
-    <Button Caption="WHITE P1 R8C3" ID="367" Icon="">
+    <Button Caption="WHITE P1 R8C3" ID="371" Icon="">
      <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4292993500</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="7"/>
      <Action>Toggle</Action>
      <Input Universe="2" Channel="141" LowerValue="2" UpperValue="6"/>
     </Button>
-    <Button Caption="FLASH P1 R8C5" ID="368" Icon="">
+    <Button Caption="FLASH P1 R8C5" ID="372" Icon="">
      <WindowState Visible="True" X="388" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4293651430</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="24"/>
      <Action>Flash</Action>
      <Input Universe="0" Channel="11329"/>
     </Button>
-    <Button Caption="FLASH P1 R8C5" ID="369" Icon="">
+    <Button Caption="FLASH P1 R8C5" ID="373" Icon="">
      <WindowState Visible="True" X="388" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4293651430</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="24"/>
      <Action>Flash</Action>
      <Input Universe="2" Channel="143" LowerValue="2" UpperValue="6"/>
     </Button>
-    <Button Caption="RESET P1 R8C6" ID="370" Icon="">
+    <Button Caption="RESET P1 R8C6" ID="374" Icon="">
      <WindowState Visible="True" X="484" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4290672680</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="284"/>
      <Action>Toggle</Action>
      <Input Universe="0" Channel="33371"/>
     </Button>
-    <Button Caption="RESET P1 R8C6" ID="371" Icon="">
+    <Button Caption="RESET P1 R8C6" ID="375" Icon="">
      <WindowState Visible="True" X="484" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4290672680</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="284"/>
      <Action>Toggle</Action>
      <Input Universe="2" Channel="144" LowerValue="22" UpperValue="18"/>
     </Button>
-    <Button Caption="PANIC P1 R8C7" ID="372" Icon="">
+    <Button Caption="PANIC P1 R8C7" ID="376" Icon="">
      <WindowState Visible="True" X="580" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4290649630</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="281"/>
      <Action>Toggle</Action>
      <Input Universe="0" Channel="37910"/>
     </Button>
-    <Button Caption="PANIC P1 R8C7" ID="373" Icon="">
+    <Button Caption="PANIC P1 R8C7" ID="377" Icon="">
      <WindowState Visible="True" X="580" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4290649630</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="281"/>
      <Action>Toggle</Action>
      <Input Universe="2" Channel="145" LowerValue="14" UpperValue="10"/>
     </Button>
-    <Button Caption="PAGE P1 R8C8" ID="374" Icon="">
+    <Button Caption="PAGE P1 R8C8" ID="378" Icon="">
      <WindowState Visible="True" X="676" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4281178965</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Action>Toggle</Action>
@@ -9098,56 +9103,56 @@
     <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4280295975</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
     <WindowState Visible="True" X="8" Y="308" Width="386" Height="52"/>
     <AllowChildren>True</AllowChildren><AllowResize>True</AllowResize><ShowHeader>False</ShowHeader><ShowEnableButton>False</ShowEnableButton><Collapsed>False</Collapsed><Disabled>False</Disabled>
-    <Button Caption="25% P2 R7C1" ID="376" Icon="">
+    <Button Caption="25% P2 R7C1" ID="380" Icon="">
      <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4281815185</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="16"/>
      <Action>Toggle</Action>
      <Input Universe="0" Channel="54346"/>
     </Button>
-    <Button Caption="25% P2 R7C1" ID="377" Icon="">
+    <Button Caption="25% P2 R7C1" ID="381" Icon="">
      <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4281815185</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="16"/>
      <Action>Toggle</Action>
      <Input Universe="2" Channel="149" LowerValue="70" UpperValue="66"/>
     </Button>
-    <Button Caption="50% P2 R7C2" ID="378" Icon="">
+    <Button Caption="50% P2 R7C2" ID="382" Icon="">
      <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4282475695</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="17"/>
      <Action>Toggle</Action>
      <Input Universe="0" Channel="55948"/>
     </Button>
-    <Button Caption="50% P2 R7C2" ID="379" Icon="">
+    <Button Caption="50% P2 R7C2" ID="383" Icon="">
      <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4282475695</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="17"/>
      <Action>Toggle</Action>
      <Input Universe="2" Channel="150" LowerValue="70" UpperValue="66"/>
     </Button>
-    <Button Caption="75% P2 R7C3" ID="380" Icon="">
+    <Button Caption="75% P2 R7C3" ID="384" Icon="">
      <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4282487220</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="18"/>
      <Action>Toggle</Action>
      <Input Universe="0" Channel="64668"/>
     </Button>
-    <Button Caption="75% P2 R7C3" ID="381" Icon="">
+    <Button Caption="75% P2 R7C3" ID="385" Icon="">
      <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4282487220</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="18"/>
      <Action>Toggle</Action>
      <Input Universe="2" Channel="151" LowerValue="54" UpperValue="50"/>
     </Button>
-    <Button Caption="FULL P2 R7C4" ID="382" Icon="">
+    <Button Caption="FULL P2 R7C4" ID="386" Icon="">
      <WindowState Visible="True" X="292" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4291677645</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="19"/>
      <Action>Toggle</Action>
      <Input Universe="0" Channel="2832"/>
     </Button>
-    <Button Caption="FULL P2 R7C4" ID="383" Icon="">
+    <Button Caption="FULL P2 R7C4" ID="387" Icon="">
      <WindowState Visible="True" X="292" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4291677645</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="19"/>
@@ -9159,22 +9164,22 @@
     <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4280295975</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
     <WindowState Visible="True" X="392" Y="308" Width="386" Height="52"/>
     <AllowChildren>True</AllowChildren><AllowResize>True</AllowResize><ShowHeader>False</ShowHeader><ShowEnableButton>False</ShowEnableButton><Collapsed>False</Collapsed><Disabled>False</Disabled>
-    <Button Caption="SLOW P2 R7C5" ID="384" Icon="">
+    <Button Caption="SLOW P2 R7C5" ID="388" Icon="">
      <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4290342435</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Action>Toggle</Action>
     </Button>
-    <Button Caption="MED P2 R7C6" ID="386" Icon="">
+    <Button Caption="MED P2 R7C6" ID="390" Icon="">
      <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4290342435</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Action>Toggle</Action>
     </Button>
-    <Button Caption="FAST P2 R7C7" ID="388" Icon="">
+    <Button Caption="FAST P2 R7C7" ID="392" Icon="">
      <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4290342435</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Action>Toggle</Action>
     </Button>
-    <Button Caption="TAP P2 R7C8" ID="390" Icon="">
+    <Button Caption="TAP P2 R7C8" ID="394" Icon="">
      <WindowState Visible="True" X="292" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4290342435</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Action>Toggle</Action>
@@ -9184,89 +9189,89 @@
     <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4280295975</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
     <WindowState Visible="True" X="8" Y="358" Width="770" Height="52"/>
     <AllowChildren>True</AllowChildren><AllowResize>True</AllowResize><ShowHeader>False</ShowHeader><ShowEnableButton>False</ShowEnableButton><Collapsed>False</Collapsed><Disabled>False</Disabled>
-    <Button Caption="BLACK P2 R8C1" ID="392" Icon="">
+    <Button Caption="BLACK P2 R8C1" ID="396" Icon="">
      <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4294967295</ForegroundColor><BackgroundColor>4279505944</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Action>Blackout</Action>
      <Input Universe="0" Channel="29945"/>
     </Button>
-    <Button Caption="BLACK P2 R8C1" ID="393" Icon="">
+    <Button Caption="BLACK P2 R8C1" ID="397" Icon="">
      <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4294967295</ForegroundColor><BackgroundColor>4279505944</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Action>Blackout</Action>
      <Input Universe="2" Channel="139" LowerValue="5" UpperValue="1"/>
     </Button>
-    <Button Caption="STOP FX P2 R8C2" ID="394" Icon="">
+    <Button Caption="STOP FX P2 R8C2" ID="398" Icon="">
      <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4288358445</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="23"/>
      <Action>Toggle</Action>
      <Input Universe="0" Channel="63290"/>
     </Button>
-    <Button Caption="STOP FX P2 R8C2" ID="395" Icon="">
+    <Button Caption="STOP FX P2 R8C2" ID="399" Icon="">
      <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4288358445</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="23"/>
      <Action>Toggle</Action>
      <Input Universe="2" Channel="140" LowerValue="14" UpperValue="10"/>
     </Button>
-    <Button Caption="WHITE P2 R8C3" ID="396" Icon="">
+    <Button Caption="WHITE P2 R8C3" ID="400" Icon="">
      <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4292993500</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="7"/>
      <Action>Toggle</Action>
      <Input Universe="0" Channel="27276"/>
     </Button>
-    <Button Caption="WHITE P2 R8C3" ID="397" Icon="">
+    <Button Caption="WHITE P2 R8C3" ID="401" Icon="">
      <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4292993500</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="7"/>
      <Action>Toggle</Action>
      <Input Universe="2" Channel="141" LowerValue="2" UpperValue="6"/>
     </Button>
-    <Button Caption="FLASH P2 R8C5" ID="398" Icon="">
+    <Button Caption="FLASH P2 R8C5" ID="402" Icon="">
      <WindowState Visible="True" X="388" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4293651430</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="24"/>
      <Action>Flash</Action>
      <Input Universe="0" Channel="8252"/>
     </Button>
-    <Button Caption="FLASH P2 R8C5" ID="399" Icon="">
+    <Button Caption="FLASH P2 R8C5" ID="403" Icon="">
      <WindowState Visible="True" X="388" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4293651430</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="24"/>
      <Action>Flash</Action>
      <Input Universe="2" Channel="143" LowerValue="2" UpperValue="6"/>
     </Button>
-    <Button Caption="RESET P2 R8C6" ID="400" Icon="">
+    <Button Caption="RESET P2 R8C6" ID="404" Icon="">
      <WindowState Visible="True" X="484" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4290672680</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="284"/>
      <Action>Toggle</Action>
      <Input Universe="0" Channel="36390"/>
     </Button>
-    <Button Caption="RESET P2 R8C6" ID="401" Icon="">
+    <Button Caption="RESET P2 R8C6" ID="405" Icon="">
      <WindowState Visible="True" X="484" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4290672680</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="284"/>
      <Action>Toggle</Action>
      <Input Universe="2" Channel="144" LowerValue="22" UpperValue="18"/>
     </Button>
-    <Button Caption="PANIC P2 R8C7" ID="402" Icon="">
+    <Button Caption="PANIC P2 R8C7" ID="406" Icon="">
      <WindowState Visible="True" X="580" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4290649630</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="281"/>
      <Action>Toggle</Action>
      <Input Universe="0" Channel="39019"/>
     </Button>
-    <Button Caption="PANIC P2 R8C7" ID="403" Icon="">
+    <Button Caption="PANIC P2 R8C7" ID="407" Icon="">
      <WindowState Visible="True" X="580" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4290649630</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="281"/>
      <Action>Toggle</Action>
      <Input Universe="2" Channel="145" LowerValue="14" UpperValue="10"/>
     </Button>
-    <Button Caption="PAGE P2 R8C8" ID="404" Icon="">
+    <Button Caption="PAGE P2 R8C8" ID="408" Icon="">
      <WindowState Visible="True" X="676" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4281178965</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Action>Toggle</Action>
@@ -9391,31 +9396,59 @@
    </SoloFrame>
    <Frame Caption="HEADUTIL-P3" ID="24" Page="2">
     <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4280295975</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
-    <WindowState Visible="True" X="584" Y="258" Width="194" Height="52"/>
+    <WindowState Visible="True" X="392" Y="258" Width="386" Height="52"/>
     <AllowChildren>True</AllowChildren><AllowResize>True</AllowResize><ShowHeader>False</ShowHeader><ShowEnableButton>False</ShowEnableButton><Collapsed>False</Collapsed><Disabled>False</Disabled>
-    <Button Caption="HD OPEN P3 R6C7" ID="342" Icon="">
+    <Button Caption="BM OPEN P3 R6C5" ID="342" Icon="">
      <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
+     <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4288716970</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
+     <Function ID="276"/>
+     <Action>Toggle</Action>
+     <Input Universe="0" Channel="39389"/>
+    </Button>
+    <Button Caption="BM OPEN P3 R6C5" ID="343" Icon="">
+     <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
+     <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4288716970</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
+     <Function ID="276"/>
+     <Action>Toggle</Action>
+     <Input Universe="2" Channel="163" LowerValue="2" UpperValue="6"/>
+    </Button>
+    <Button Caption="SP OPEN P3 R6C6" ID="344" Icon="">
+     <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
+     <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4288716970</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
+     <Function ID="277"/>
+     <Action>Toggle</Action>
+     <Input Universe="0" Channel="62831"/>
+    </Button>
+    <Button Caption="SP OPEN P3 R6C6" ID="345" Icon="">
+     <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
+     <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4288716970</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
+     <Function ID="277"/>
+     <Action>Toggle</Action>
+     <Input Universe="2" Channel="164" LowerValue="2" UpperValue="6"/>
+    </Button>
+    <Button Caption="HD OPEN P3 R6C7" ID="346" Icon="">
+     <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4281505360</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="279"/>
      <Action>Toggle</Action>
      <Input Universe="0" Channel="60000"/>
     </Button>
-    <Button Caption="HD OPEN P3 R6C7" ID="343" Icon="">
-     <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
+    <Button Caption="HD OPEN P3 R6C7" ID="347" Icon="">
+     <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4281505360</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="279"/>
      <Action>Toggle</Action>
      <Input Universe="2" Channel="165" LowerValue="46" UpperValue="42"/>
     </Button>
-    <Button Caption="HD STROBE P3 R6C8" ID="344" Icon="">
-     <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
+    <Button Caption="HD STROBE P3 R6C8" ID="348" Icon="">
+     <WindowState Visible="True" X="292" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4292993505</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="280"/>
      <Action>Flash</Action>
      <Input Universe="0" Channel="10718"/>
     </Button>
-    <Button Caption="HD STROBE P3 R6C8" ID="345" Icon="">
-     <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
+    <Button Caption="HD STROBE P3 R6C8" ID="349" Icon="">
+     <WindowState Visible="True" X="292" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4292993505</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="280"/>
      <Action>Flash</Action>
@@ -9818,14 +9851,42 @@
      <Action>Toggle</Action>
      <Input Universe="2" Channel="182" LowerValue="70" UpperValue="66"/>
     </Button>
-    <Button Caption="HOLD P3 R4C8" ID="328" Icon="">
+    <Button Caption="HIT FLOOR P3 R4C5" ID="328" Icon="">
+     <WindowState Visible="True" X="388" Y="154" Width="90" Height="44"/>
+     <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4291983390</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
+     <Function ID="955"/>
+     <Action>Toggle</Action>
+     <Input Universe="0" Channel="26130"/>
+    </Button>
+    <Button Caption="HIT FLOOR P3 R4C5" ID="329" Icon="">
+     <WindowState Visible="True" X="388" Y="154" Width="90" Height="44"/>
+     <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4291983390</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
+     <Function ID="955"/>
+     <Action>Toggle</Action>
+     <Input Universe="2" Channel="183" LowerValue="22" UpperValue="18"/>
+    </Button>
+    <Button Caption="HIT UP P3 R4C6" ID="330" Icon="">
+     <WindowState Visible="True" X="484" Y="154" Width="90" Height="44"/>
+     <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4291983390</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
+     <Function ID="956"/>
+     <Action>Toggle</Action>
+     <Input Universe="0" Channel="25037"/>
+    </Button>
+    <Button Caption="HIT UP P3 R4C6" ID="331" Icon="">
+     <WindowState Visible="True" X="484" Y="154" Width="90" Height="44"/>
+     <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4291983390</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
+     <Function ID="956"/>
+     <Action>Toggle</Action>
+     <Input Universe="2" Channel="184" LowerValue="22" UpperValue="18"/>
+    </Button>
+    <Button Caption="HOLD P3 R4C8" ID="332" Icon="">
      <WindowState Visible="True" X="676" Y="154" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4284111460</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="282"/>
      <Action>Toggle</Action>
      <Input Universe="0" Channel="15893"/>
     </Button>
-    <Button Caption="HOLD P3 R4C8" ID="329" Icon="">
+    <Button Caption="HOLD P3 R4C8" ID="333" Icon="">
      <WindowState Visible="True" X="676" Y="154" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4284111460</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="282"/>
@@ -9837,42 +9898,42 @@
     <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4280295975</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
     <WindowState Visible="True" X="8" Y="258" Width="290" Height="52"/>
     <AllowChildren>True</AllowChildren><AllowResize>True</AllowResize><ShowHeader>False</ShowHeader><ShowEnableButton>False</ShowEnableButton><Collapsed>False</Collapsed><Disabled>False</Disabled>
-    <Button Caption="GOBO OPEN P3 R6C1" ID="330" Icon="">
+    <Button Caption="GOBO OPEN P3 R6C1" ID="334" Icon="">
      <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4288716970</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="951"/>
      <Action>Toggle</Action>
      <Input Universe="0" Channel="37735"/>
     </Button>
-    <Button Caption="GOBO OPEN P3 R6C1" ID="331" Icon="">
+    <Button Caption="GOBO OPEN P3 R6C1" ID="335" Icon="">
      <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4288716970</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="951"/>
      <Action>Toggle</Action>
      <Input Universe="2" Channel="159" LowerValue="2" UpperValue="6"/>
     </Button>
-    <Button Caption="GOBO A P3 R6C2" ID="332" Icon="">
+    <Button Caption="GOBO A P3 R6C2" ID="336" Icon="">
      <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4280850090</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="952"/>
      <Action>Toggle</Action>
      <Input Universe="0" Channel="48698"/>
     </Button>
-    <Button Caption="GOBO A P3 R6C2" ID="333" Icon="">
+    <Button Caption="GOBO A P3 R6C2" ID="337" Icon="">
      <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4280850090</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="952"/>
      <Action>Toggle</Action>
      <Input Universe="2" Channel="160" LowerValue="54" UpperValue="50"/>
     </Button>
-    <Button Caption="GOBO B P3 R6C3" ID="334" Icon="">
+    <Button Caption="GOBO B P3 R6C3" ID="338" Icon="">
      <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4280850090</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="953"/>
      <Action>Toggle</Action>
      <Input Universe="0" Channel="31156"/>
     </Button>
-    <Button Caption="GOBO B P3 R6C3" ID="335" Icon="">
+    <Button Caption="GOBO B P3 R6C3" ID="339" Icon="">
      <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4280850090</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="953"/>
@@ -9884,14 +9945,14 @@
     <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4280295975</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
     <WindowState Visible="True" X="296" Y="258" Width="98" Height="52"/>
     <AllowChildren>True</AllowChildren><AllowResize>True</AllowResize><ShowHeader>False</ShowHeader><ShowEnableButton>False</ShowEnableButton><Collapsed>False</Collapsed><Disabled>False</Disabled>
-    <Button Caption="PRISM P3 R6C4" ID="336" Icon="">
+    <Button Caption="PRISM P3 R6C4" ID="340" Icon="">
      <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4287381950</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="954"/>
      <Action>Toggle</Action>
      <Input Universe="0" Channel="46320"/>
     </Button>
-    <Button Caption="PRISM P3 R6C4" ID="337" Icon="">
+    <Button Caption="PRISM P3 R6C4" ID="341" Icon="">
      <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4287381950</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="954"/>
@@ -9899,93 +9960,60 @@
      <Input Universe="2" Channel="162" LowerValue="94" UpperValue="90"/>
     </Button>
    </Frame>
-   <Frame Caption="HIT-P3" ID="28" Page="2">
-    <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4280295975</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
-    <WindowState Visible="True" X="392" Y="258" Width="194" Height="52"/>
-    <AllowChildren>True</AllowChildren><AllowResize>True</AllowResize><ShowHeader>False</ShowHeader><ShowEnableButton>False</ShowEnableButton><Collapsed>False</Collapsed><Disabled>False</Disabled>
-    <Button Caption="HIT FLOOR P3 R6C5" ID="338" Icon="">
-     <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
-     <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4291983390</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
-     <Function ID="955"/>
-     <Action>Flash</Action>
-     <Input Universe="0" Channel="54186"/>
-    </Button>
-    <Button Caption="HIT FLOOR P3 R6C5" ID="339" Icon="">
-     <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
-     <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4291983390</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
-     <Function ID="955"/>
-     <Action>Flash</Action>
-     <Input Universe="2" Channel="163" LowerValue="22" UpperValue="18"/>
-    </Button>
-    <Button Caption="HIT UP P3 R6C6" ID="340" Icon="">
-     <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
-     <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4291983390</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
-     <Function ID="956"/>
-     <Action>Flash</Action>
-     <Input Universe="0" Channel="54389"/>
-    </Button>
-    <Button Caption="HIT UP P3 R6C6" ID="341" Icon="">
-     <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
-     <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4291983390</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
-     <Function ID="956"/>
-     <Action>Flash</Action>
-     <Input Universe="2" Channel="164" LowerValue="22" UpperValue="18"/>
-    </Button>
-   </Frame>
-   <SoloFrame Caption="LEVEL-P3" ID="29" Page="2">
+   <SoloFrame Caption="LEVEL-P3" ID="28" Page="2">
     <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4280295975</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
     <WindowState Visible="True" X="8" Y="308" Width="386" Height="52"/>
     <AllowChildren>True</AllowChildren><AllowResize>True</AllowResize><ShowHeader>False</ShowHeader><ShowEnableButton>False</ShowEnableButton><Collapsed>False</Collapsed><Disabled>False</Disabled>
-    <Button Caption="25% P3 R7C1" ID="406" Icon="">
+    <Button Caption="25% P3 R7C1" ID="410" Icon="">
      <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4281815185</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="16"/>
      <Action>Toggle</Action>
      <Input Universe="0" Channel="53345"/>
     </Button>
-    <Button Caption="25% P3 R7C1" ID="407" Icon="">
+    <Button Caption="25% P3 R7C1" ID="411" Icon="">
      <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4281815185</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="16"/>
      <Action>Toggle</Action>
      <Input Universe="2" Channel="149" LowerValue="70" UpperValue="66"/>
     </Button>
-    <Button Caption="50% P3 R7C2" ID="408" Icon="">
+    <Button Caption="50% P3 R7C2" ID="412" Icon="">
      <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4282475695</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="17"/>
      <Action>Toggle</Action>
      <Input Universe="0" Channel="56999"/>
     </Button>
-    <Button Caption="50% P3 R7C2" ID="409" Icon="">
+    <Button Caption="50% P3 R7C2" ID="413" Icon="">
      <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4282475695</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="17"/>
      <Action>Toggle</Action>
      <Input Universe="2" Channel="150" LowerValue="70" UpperValue="66"/>
     </Button>
-    <Button Caption="75% P3 R7C3" ID="410" Icon="">
+    <Button Caption="75% P3 R7C3" ID="414" Icon="">
      <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4282487220</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="18"/>
      <Action>Toggle</Action>
      <Input Universe="0" Channel="63671"/>
     </Button>
-    <Button Caption="75% P3 R7C3" ID="411" Icon="">
+    <Button Caption="75% P3 R7C3" ID="415" Icon="">
      <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4282487220</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="18"/>
      <Action>Toggle</Action>
      <Input Universe="2" Channel="151" LowerValue="54" UpperValue="50"/>
     </Button>
-    <Button Caption="FULL P3 R7C4" ID="412" Icon="">
+    <Button Caption="FULL P3 R7C4" ID="416" Icon="">
      <WindowState Visible="True" X="292" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4291677645</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="19"/>
      <Action>Toggle</Action>
      <Input Universe="0" Channel="3899"/>
     </Button>
-    <Button Caption="FULL P3 R7C4" ID="413" Icon="">
+    <Button Caption="FULL P3 R7C4" ID="417" Icon="">
      <WindowState Visible="True" X="292" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4291677645</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="19"/>
@@ -9993,118 +10021,118 @@
      <Input Universe="2" Channel="152" LowerValue="2" UpperValue="6"/>
     </Button>
    </SoloFrame>
-   <Frame Caption="SPEED-P3" ID="30" Page="2">
+   <Frame Caption="SPEED-P3" ID="29" Page="2">
     <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4280295975</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
     <WindowState Visible="True" X="392" Y="308" Width="386" Height="52"/>
     <AllowChildren>True</AllowChildren><AllowResize>True</AllowResize><ShowHeader>False</ShowHeader><ShowEnableButton>False</ShowEnableButton><Collapsed>False</Collapsed><Disabled>False</Disabled>
-    <Button Caption="SLOW P3 R7C5" ID="414" Icon="">
+    <Button Caption="SLOW P3 R7C5" ID="418" Icon="">
      <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4290342435</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Action>Toggle</Action>
     </Button>
-    <Button Caption="MED P3 R7C6" ID="416" Icon="">
+    <Button Caption="MED P3 R7C6" ID="420" Icon="">
      <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4290342435</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Action>Toggle</Action>
     </Button>
-    <Button Caption="FAST P3 R7C7" ID="418" Icon="">
+    <Button Caption="FAST P3 R7C7" ID="422" Icon="">
      <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4290342435</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Action>Toggle</Action>
     </Button>
-    <Button Caption="TAP P3 R7C8" ID="420" Icon="">
+    <Button Caption="TAP P3 R7C8" ID="424" Icon="">
      <WindowState Visible="True" X="292" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4290342435</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Action>Toggle</Action>
     </Button>
    </Frame>
-   <Frame Caption="UTILITY-P3" ID="31" Page="2">
+   <Frame Caption="UTILITY-P3" ID="30" Page="2">
     <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4280295975</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
     <WindowState Visible="True" X="8" Y="358" Width="770" Height="52"/>
     <AllowChildren>True</AllowChildren><AllowResize>True</AllowResize><ShowHeader>False</ShowHeader><ShowEnableButton>False</ShowEnableButton><Collapsed>False</Collapsed><Disabled>False</Disabled>
-    <Button Caption="BLACK P3 R8C1" ID="422" Icon="">
+    <Button Caption="BLACK P3 R8C1" ID="426" Icon="">
      <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4294967295</ForegroundColor><BackgroundColor>4279505944</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Action>Blackout</Action>
      <Input Universe="0" Channel="28882"/>
     </Button>
-    <Button Caption="BLACK P3 R8C1" ID="423" Icon="">
+    <Button Caption="BLACK P3 R8C1" ID="427" Icon="">
      <WindowState Visible="True" X="4" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4294967295</ForegroundColor><BackgroundColor>4279505944</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Action>Blackout</Action>
      <Input Universe="2" Channel="139" LowerValue="5" UpperValue="1"/>
     </Button>
-    <Button Caption="STOP FX P3 R8C2" ID="424" Icon="">
+    <Button Caption="STOP FX P3 R8C2" ID="428" Icon="">
      <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4288358445</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="23"/>
      <Action>Toggle</Action>
      <Input Universe="0" Channel="62225"/>
     </Button>
-    <Button Caption="STOP FX P3 R8C2" ID="425" Icon="">
+    <Button Caption="STOP FX P3 R8C2" ID="429" Icon="">
      <WindowState Visible="True" X="100" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4288358445</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="23"/>
      <Action>Toggle</Action>
      <Input Universe="2" Channel="140" LowerValue="14" UpperValue="10"/>
     </Button>
-    <Button Caption="WHITE P3 R8C3" ID="426" Icon="">
+    <Button Caption="WHITE P3 R8C3" ID="430" Icon="">
      <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4292993500</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="7"/>
      <Action>Toggle</Action>
      <Input Universe="0" Channel="28327"/>
     </Button>
-    <Button Caption="WHITE P3 R8C3" ID="427" Icon="">
+    <Button Caption="WHITE P3 R8C3" ID="431" Icon="">
      <WindowState Visible="True" X="196" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4292993500</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="7"/>
      <Action>Toggle</Action>
      <Input Universe="2" Channel="141" LowerValue="2" UpperValue="6"/>
     </Button>
-    <Button Caption="FLASH P3 R8C5" ID="428" Icon="">
+    <Button Caption="FLASH P3 R8C5" ID="432" Icon="">
      <WindowState Visible="True" X="388" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4293651430</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="24"/>
      <Action>Flash</Action>
      <Input Universe="0" Channel="9239"/>
     </Button>
-    <Button Caption="FLASH P3 R8C5" ID="429" Icon="">
+    <Button Caption="FLASH P3 R8C5" ID="433" Icon="">
      <WindowState Visible="True" X="388" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4293651430</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="24"/>
      <Action>Flash</Action>
      <Input Universe="2" Channel="143" LowerValue="2" UpperValue="6"/>
     </Button>
-    <Button Caption="RESET P3 R8C6" ID="430" Icon="">
+    <Button Caption="RESET P3 R8C6" ID="434" Icon="">
      <WindowState Visible="True" X="484" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4290672680</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="284"/>
      <Action>Toggle</Action>
      <Input Universe="0" Channel="35341"/>
     </Button>
-    <Button Caption="RESET P3 R8C6" ID="431" Icon="">
+    <Button Caption="RESET P3 R8C6" ID="435" Icon="">
      <WindowState Visible="True" X="484" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4290672680</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="284"/>
      <Action>Toggle</Action>
      <Input Universe="2" Channel="144" LowerValue="22" UpperValue="18"/>
     </Button>
-    <Button Caption="PANIC P3 R8C7" ID="432" Icon="">
+    <Button Caption="PANIC P3 R8C7" ID="436" Icon="">
      <WindowState Visible="True" X="580" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4290649630</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="281"/>
      <Action>Toggle</Action>
      <Input Universe="0" Channel="40000"/>
     </Button>
-    <Button Caption="PANIC P3 R8C7" ID="433" Icon="">
+    <Button Caption="PANIC P3 R8C7" ID="437" Icon="">
      <WindowState Visible="True" X="580" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4290649630</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Function ID="281"/>
      <Action>Toggle</Action>
      <Input Universe="2" Channel="145" LowerValue="14" UpperValue="10"/>
     </Button>
-    <Button Caption="PAGE P3 R8C8" ID="434" Icon="">
+    <Button Caption="PAGE P3 R8C8" ID="438" Icon="">
      <WindowState Visible="True" X="676" Y="4" Width="90" Height="44"/>
      <Appearance><FrameStyle>None</FrameStyle><ForegroundColor>4278190080</ForegroundColor><BackgroundColor>4281178965</BackgroundColor><BackgroundImage>None</BackgroundImage><Font>Default</Font></Appearance>
      <Action>Toggle</Action>

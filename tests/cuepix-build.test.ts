@@ -326,7 +326,8 @@ describe("Cuepix routing workspace", () => {
 
     const moveFrame = qxw.match(/<SoloFrame Caption="MOVE-P3"[\s\S]*?<\/SoloFrame>/)?.[0] ?? "";
     const moveFnIds = [...new Set([...moveFrame.matchAll(/<Function ID="(\d+)"\/>/g)].map((match) => match[1]))];
-    expect(moveFnIds.length).toBeGreaterThanOrEqual(30);
+    // 28 looks + HOLD: FLOOR · Sweep, FLOOR · X and CEIL · Sweep were merged away on 2026-09-22.
+    expect(moveFnIds.length).toBeGreaterThanOrEqual(29);
     // No mover look may sit on a pad anywhere else, or two frames would drive the heads at once.
     for (const block of qxw.replace(moveFrame, "").match(/<Button\b[\s\S]*?<\/Button>/g) ?? []) {
       const id = block.match(/<Function ID="(\d+)"\/>/)?.[1];

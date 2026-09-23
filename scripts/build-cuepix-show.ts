@@ -25,7 +25,8 @@ type Fixture = {
 type FixtureValue = { id: number; pairs: number[] };
 type Scene = { id: number; type: "Scene"; name: string; values: FixtureValue[]; fadeIn: number; fadeOut: number };
 type Chaser = { id: number; type: "Chaser"; name: string; steps: number[]; fade: number; hold: number; runOrder: "Loop" | "SingleShot" };
-type FunctionDef = Scene | Chaser;
+type RGBMatrix = { id: number; type: "RGBMatrix"; name: string; script: string; colors: [number, number, number][]; duration: number; group: number };
+type FunctionDef = Scene | Chaser | RGBMatrix;
 
 function esc(value: string): string {
   return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -261,6 +262,90 @@ fadeChaser("Crossfade", [[255, 0, 0], [0, 0, 255]], 700, 700);
 fadeChaser("Pastel", [[255, 80, 120], [80, 180, 255], [120, 255, 160], [220, 120, 255]], 900, 700);
 fadeChaser("Gradient", [[255, 60, 0], [0, 120, 255], [180, 0, 255]], 750, 600);
 
+// ---------------------------------------------------------------------------
+// PIXELS — the panels as ONE grid laid out like the rig, for QLC+ RGB Matrix effects and the custom
+// pixel chases below. Trusses sit 15 px apart (6 ft between centres at 5 px per 2 ft panel), unused
+// outer trusses are trimmed, and a stack's slot 0 is its bottom panel. Stacks hung from stackTopFt
+// share a top row; stacks on the deck share a bottom row. Huntley: 20 x 10, towers at columns 0-4
+// and 15-19, so an effect crossing the grid goes dark in the gap between the towers.
+// ponytail: pixelOrigin (where pixel 1 sits on a panel) is the load-in calibration knob — fire
+// BASE · Bands and see which row lights as band 1; default top-left, row by row.
+// ---------------------------------------------------------------------------
+type Cell = { x: number; y: number; panel: number; pixel: number };   // panel = index into panels
+const PIXEL_ORIGIN = rig.cuepix?.pixelOrigin ?? "top-left";
+const TRUSS_PX = 15;
+const stacks = (rig.cuepix?.trusses ?? []).map((group, t) => ({ t, group })).filter((st) => st.group.length);
+const tallest = Math.max(0, ...stacks.map((st) => st.group.length));
+const firstTruss = Math.min(...stacks.map((st) => st.t));
+const GRID_W = stacks.length ? (Math.max(...stacks.map((st) => st.t)) - firstTruss) * TRUSS_PX + 5 : 0;
+const GRID_H = tallest * 5;
+const cells: Cell[] = stacks.flatMap(({ t, group }) => group.flatMap((panelNo, slot) => {
+  const fromTop = rig.cuepix?.stackTopFt !== undefined ? group.length - 1 - slot : tallest - 1 - slot;
+  return Array.from({ length: 25 }, (_, pixel) => {
+    const px = PIXEL_ORIGIN.endsWith("right") ? 4 - (pixel % 5) : pixel % 5;
+    const py = PIXEL_ORIGIN.startsWith("bottom") ? 4 - Math.floor(pixel / 5) : Math.floor(pixel / 5);
+    return { x: (t - firstTruss) * TRUSS_PX + px, y: fromTop * 5 + py, panel: panelNo - 1, pixel };
+  });
+}));
+const PIXEL_GROUP = 0;
+const addMatrix = (name: string, script: string, colors: RGB[], duration: number): void => {
+  functions.push({ id: functions.length, type: "RGBMatrix", name, script, colors, duration, group: PIXEL_GROUP });
+};
+// Native effects (QLC+ RGBScripts; the names are each script's algo.name).
+addMatrix("PIX · Fill Drain", "Fill Unfill", [[60, 200, 255]], 120);
+addMatrix("PIX · Rain", "Vertical fall", [[80, 140, 255]], 90);
+addMatrix("PIX · Twinkle", "3D Starfield", [[255, 244, 220]], 80);
+addMatrix("PIX · Plasma", "Plasma", [], 100);
+addMatrix("PIX · Gap Bar", "Stripes", [[255, 255, 255]], 60);   // default orientation: a vertical bar crossing the grid
+// Custom designs, one scene per step. Every step writes only pixel RGB (channels 0-74): the panel
+// dimmer stays on the LEVEL pads, exactly like the BASE looks.
+const hsv = (h: number, sat: number, val: number): RGB => {
+  const f = (n: number) => { const k = (n + h * 6) % 6; return Math.round(255 * (val - val * sat * Math.max(0, Math.min(k, 4 - k, 1)))); };
+  return [f(5), f(3), f(1)];
+};
+const noise = (a: number, b: number): number => { const v = Math.sin(a * 127.1 + b * 311.7) * 43758.5453; return v - Math.floor(v); };
+const pixelChaser = (name: string, steps: number, fade: number, hold: number, at: (c: Cell, i: number) => RGB | null): void => {
+  addChaser(`PIX · ${name}`, Array.from({ length: steps }, (_, i) => {
+    const byPanel = new Map<number, number[]>();
+    for (const c of cells) {
+      const rgb = at(c, i) ?? [0, 0, 0];
+      byPanel.set(c.panel, [...(byPanel.get(c.panel) ?? []), c.pixel * 3, rgb[0], c.pixel * 3 + 1, rgb[1], c.pixel * 3 + 2, rgb[2]]);
+    }
+    return addScene(`_STEP · Pix ${name} ${i + 1}`, [...byPanel].map(([panel, pairs]) => ({ id: panels[panel].id, pairs })), fade, fade);
+  }), fade, hold);
+};
+if (cells.length) {
+  // V Comet: up the left side, over the top, down the right, snaking row by row, tail fading.
+  const leftSide = (c: Cell) => c.x < GRID_W / 2;
+  const vPath = [...cells].sort((a, b) => {
+    if (leftSide(a) !== leftSide(b)) return leftSide(a) ? -1 : 1;
+    if (a.y !== b.y) return leftSide(a) ? b.y - a.y : a.y - b.y;
+    return (leftSide(a) ? GRID_H - 1 - a.y : a.y) % 2 ? b.x - a.x : a.x - b.x;
+  });
+  const vPos = new Map(vPath.map((c, i) => [c, i]));
+  const TAIL = 10, COMET_STEPS = 50;
+  pixelChaser("V Comet", COMET_STEPS, 0, 60, (c, i) => {
+    const d = (i * cells.length / COMET_STEPS - vPos.get(c)! + cells.length) % cells.length;
+    return d < TAIL ? hsv(vPos.get(c)! / cells.length, 0.8, (1 - d / TAIL) ** 1.6) : null;
+  });
+  // Chevrons climbing both towers, peaked toward the centre: the rig's own shape, repeated upward.
+  pixelChaser("Chevrons", 5, 0, 140, (c, i) => {
+    const fromOuter = Math.min(c.x, GRID_W - 1 - c.x);
+    return (c.y + Math.round(fromOuter * 0.8)) % 5 === (5 - i) % 5 ? [255, 120, 30] : null;
+  });
+  // Apex Pulse: rings leave the point above the gap between the tower tops and roll down and out.
+  const apexX = (GRID_W - 1) / 2, APEX_STEPS = Math.ceil(Math.hypot(apexX, GRID_H * 1.1)) + 2;
+  pixelChaser("Apex Pulse", APEX_STEPS, 0, 60, (c, i) => {
+    const e = Math.abs(Math.hypot(c.x - apexX, (c.y + 1) * 1.1) - i);
+    return e < 1.4 ? hsv(0.83, 0.7, 1 - e / 1.4) : null;
+  });
+  // Fire: warm flicker, hottest at the bottom of each tower. Deterministic noise, so every build matches.
+  pixelChaser("Fire", 12, 90, 0, (c, i) => {
+    const heat = (c.y / (GRID_H - 1)) * 1.25 - noise(c.x, i * 7 + c.y * 3) * 0.55;
+    return heat > 0.15 ? hsv(0.03 + (1 - heat) * 0.08, 1, Math.min(1, heat)) : null;
+  });
+}
+
 const colors: [string, RGB][] = [
   ["Red", [255, 0, 0]],
   ["Green", [0, 255, 0]],
@@ -377,8 +462,9 @@ addScene("FLOOR · Full", panels.map((panel) => ({ id: panel.id, pairs: [...rgbP
 // CEILING — aerial mover looks for the big gym. Movers aim UP (tilt < 92), so these need NO plotting:
 // the fence already keeps every beam at/above horizontal, and up is the ceiling. Beams read across
 // the room. Colour is left unset so a HEAD colour pad layers on top. Pan spreads are keyed by head
-// name in truss-line order (Beam L | 375ZX L | 375ZX R | Beam R). CEIL · Sweep/Circle ride the FX
-// Speed dial. All values fenced by headSafety.
+// name in truss-line order (Beam L | 375ZX L | 375ZX R | Beam R). CEIL · Circle rides the mover
+// Speed dial. CEIL · Sweep, FLOOR · Sweep and FLOOR · X were cut 2026-09-22 as near-duplicates of
+// WAVE, ROOM · Sweep and FLOOR · Scissor. All values fenced by headSafety.
 // ---------------------------------------------------------------------------
 // ROOM COORDINATES. Every mover look below is written in the room, never in raw DMX. u runs -1 at
 // the dance floor's house-left edge to +1 at its house-right edge (|u| > 1 throws wider than the
@@ -413,15 +499,6 @@ const lookScene = (name: string, uv: (k: number) => [number, number]): void => {
 };
 lookScene("CEIL · Fan", (k) => [FAN_U[k], CEIL_V]);
 lookScene("CEIL · Cross", (k) => [CROSS_U[k], CEIL_V]);
-// Sweep: all four travel together across the room, eased so they hang at the ends instead of
-// snapping round — a triangle ramp reads as a machine, a cosine reads as a hand on a fader.
-const SWEEP_STEPS = 24, SWEEP_FADE = 190;
-const ceilSweep = Array.from({ length: SWEEP_STEPS }, (_, i) =>
-  addScene(`_STEP · Ceil Sweep ${i + 1}`, heads.map((head) => {
-    const [pan, tilt] = atUV(head, -Math.cos((2 * Math.PI * i) / SWEEP_STEPS), CEIL_V);
-    return { id: head.id, pairs: headPartial(head, { pan, tilt, shutter: 255 }) };
-  }), SWEEP_FADE, SWEEP_FADE));
-addChaser("CEIL · Sweep", ceilSweep, SWEEP_FADE, 0, "Loop");
 // Circle/windmill: four beams a quarter-turn apart on one circle overhead, rotating together.
 const CIRC_STEPS = 24, CIRC_FADE = 150;
 const ceilCircle = Array.from({ length: CIRC_STEPS }, (_, i) =>
@@ -431,14 +508,6 @@ const ceilCircle = Array.from({ length: CIRC_STEPS }, (_, i) =>
     return { id: head.id, pairs: headPartial(head, { pan, tilt, shutter: 255 }) };
   }), CIRC_FADE, CIRC_FADE));
 addChaser("CEIL · Circle", ceilCircle, CIRC_FADE, 0, "Loop");
-// FLOOR sweep: the beams stay on the deck and walk the plotted floor, end to end.
-const FSWEEP_STEPS = 24, FSWEEP_FADE = 200;
-const floorSweep = Array.from({ length: FSWEEP_STEPS }, (_, i) =>
-  addScene(`_STEP · Floor Sweep ${i + 1}`, heads.map((head) => {
-    const [pan, tilt] = atUV(head, -Math.cos((2 * Math.PI * i) / FSWEEP_STEPS), DECK_V);
-    return { id: head.id, pairs: headPartial(head, { pan, tilt, shutter: 255 }) };
-  }), FSWEEP_FADE, FSWEEP_FADE));
-addChaser("FLOOR · Sweep", floorSweep, FSWEEP_FADE, 0, "Loop");
 
 // ---------------------------------------------------------------------------
 // MOVE — more aerial movement, all up on the ceiling so none of it needs plotting (fence holds
@@ -475,10 +544,11 @@ moveChaser("CEIL · Fan Chase", BOUNCE.length, 80, 250, (k, _th, i) => [FAN_U[k]
 // Rise & Fall: pan held at the fan, every beam lifts off the deck to the ceiling together and drops
 // back. The one look that shows the room's height.
 moveChaser("MOVE · Rise Fall", 20, 220, 0, (k, th) => [FAN_U[k], 0.5 - 0.5 * Math.cos(th)]);
-// Look sequence: slow walk through static pictures — fan, cross, tight column, floor fan, floor
+// Look sequence: slow walk through static pictures — fan, cross, tight column (up at v 0.7: at 0.35 it
+// parked all four beams at head height for 4 s), floor fan, floor
 // cross, and a high/low split. Positions only: colour and dimmer stay under the pads.
 const SEQ_LOOKS: Array<(k: number) => [number, number]> = [
-  (k) => [FAN_U[k], CEIL_V], (k) => [CROSS_U[k], CEIL_V], () => [0, 0.35],
+  (k) => [FAN_U[k], CEIL_V], (k) => [CROSS_U[k], CEIL_V], () => [0, 0.7],
   (k) => [FAN_U[k], DECK_V], (k) => [CROSS_U[k], 0.12], (k) => [FAN_U[k], k % 2 ? CEIL_V : DECK_V],
 ];
 moveChaser("SEQ · Ceiling Looks", SEQ_LOOKS.length, 2500, 4000, (k, _th, i) => SEQ_LOOKS[i](k), "Seq Look");
@@ -510,8 +580,6 @@ moveChaser("FLOOR · Circle", 24, 170, 0, (k, th) => [0.85 * Math.cos(th + k * Q
 // Scissor: pairs mirror through the middle of the floor, outer heads on the near lane, inner on the far.
 moveChaser("FLOOR · Scissor", 24, 180, 0, (k, th) => [(k < 2 ? 1 : -1) * (k === 0 || k === 3 ? 1 : 0.6) * Math.sin(th), FLOOR_V + (k === 0 || k === 3 ? -0.6 : 0.6) * DEPTH]);
 moveChaser("FLOOR · Ballyhoo", 48, 140, 0, (k, th) => [Math.sin(2 * th + k * Q), FLOOR_V + DEPTH * Math.sin(3 * th + k * Math.PI / 3)]);
-// X: left pair and right pair sweep the floor in opposite directions on two lanes, crossing mid-floor.
-moveChaser("FLOOR · X", 24, 180, 0, (k, th) => [(k < 2 ? -1 : 1) * Math.cos(th), FLOOR_V + (k % 2 ? 0.8 : -0.8) * DEPTH]);
 // Zigzag: all four cross the floor end to end while snaking near-far, a quarter-snake apart.
 moveChaser("FLOOR · Zigzag", 48, 120, 0, (k, th) => [-Math.cos(th), FLOOR_V + DEPTH * Math.cos(6 * th + k * Q)]);
 // Chase: fanned across the floor, one beam lit at a time bouncing along the line (shutter only).
@@ -522,8 +590,9 @@ moveChaser("FLOOR · Spiral", 48, 130, 0, (k, th) => {
   return [r * Math.cos(a), FLOOR_V + r * DEPTH * Math.sin(a)];
 });
 // Scatter: quick hops between spread-out floor spots, never two heads on one spot. Deterministic
-// (step and head index mod 9 / mod 5), so every generate gives the same show.
-moveChaser("FLOOR · Scatter", 12, 90, 260, (k, _th, i) => [((i * 7 + k * 5) % 9) / 4 - 1, FLOOR_V + DEPTH * (((i * 3 + k * 2) % 5) / 2 - 1)]);
+// (step and head index mod 9 / mod 5), so every generate gives the same show. 180 ms hops: at 90 ms
+// the heads snapped hard enough to be noisy and jerky (2026-09-22 review).
+moveChaser("FLOOR · Scatter", 12, 180, 260, (k, _th, i) => [((i * 7 + k * 5) % 9) / 4 - 1, FLOOR_V + DEPTH * (((i * 3 + k * 2) % 5) / 2 - 1)]);
 // Burst: all four pull into one hot spot mid-floor, then fly out to the floor's edges and corners.
 const BURST_TO: Array<[number, number]> = [[-1, FLOOR_V - DEPTH], [-0.5, FLOOR_V + DEPTH], [0.5, FLOOR_V + DEPTH], [1, FLOOR_V - DEPTH]];
 moveChaser("FLOOR · Burst", 16, 150, 0, (k, th) => {
@@ -569,6 +638,26 @@ moveChaser("ROOM · Dive", 20, 200, 0, (k, th) => {
 // Room circle: one floor-to-ceiling circle across the room, four beams a quarter-turn apart — a windmill.
 moveChaser("ROOM · Circle", 24, 170, 0, (k, th) => [Math.cos(th + k * Q), V_MID + V_HALF * Math.sin(th + k * Q)], undefined, atRoom);
 
+// ---------------------------------------------------------------------------
+// LAYERS (page 3 row 6) — nothing in a movement look touches gobo or prism, so these stack on top of
+// whatever is running. Values from the fixture definitions: 375ZX 15ch gobo ch 6 (8-15 Gobo 1,
+// 32-39 Gobo 4), gobo rotation ch 7 (64-145 rotate slow->fast), prism ch 8 (7-65 6-facet rotate);
+// Beam 140SR 14ch gobo ch 6 (12-15 Gobo 3, 36-39 Gobo 9), prism ch 7 (13-130 rotate).
+// ponytail: A/B are picked blind by wheel slot; swap the slot numbers once they are seen on the floor.
+// ---------------------------------------------------------------------------
+const gobo = (head: Fixture, spot: number[], beam: number[]): FixtureValue => ({ id: head.id, pairs: isBeam(head) ? beam : spot });
+addScene("HEAD · Gobo Open", heads.map((h) => gobo(h, [6, 0, 7, 0, 8, 0], [6, 0, 7, 0])));
+addScene("HEAD · Gobo A", heads.map((h) => gobo(h, [6, 12, 7, 80], [6, 13])));
+addScene("HEAD · Gobo B", heads.map((h) => gobo(h, [6, 36, 7, 80], [6, 37])));
+addScene("HEAD · Prism", heads.map((h) => gobo(h, [8, 20], [7, 30])));
+// HITS — flash pads for a drop: every beam snaps to one spot and opens. Held, a scene started after
+// the running chaser outranks it on pan/tilt; released, the look's next step takes the heads back.
+const hitScene = (name: string, u: number, v: number): void => {
+  addScene(name, heads.map((head) => { const [pan, tilt] = atUV(head, u, v); return { id: head.id, pairs: headPartial(head, { pan, tilt, shutter: 255 }) }; }));
+};
+hitScene("HIT · Floor", 0, FLOOR_V);
+hitScene("HIT · Up", 0, CEIL_V);
+
 const outputUniverses = [...new Set(fixtures.map((fixture) => fixture.universe))].sort((a, b) => a - b);
 const controller = rig.controller ?? {
   launchpad: false, profile: "Novation Launchpad Mini MK3",
@@ -611,6 +700,17 @@ const fixturesXml = fixtures.map((fixture) => `  <Fixture>
    <Channels>${fixture.channels}</Channels>
   </Fixture>`).join("\n");
 const functionsXml = functions.map((fn) => {
+  if (fn.type === "RGBMatrix") {
+    return `  <Function ID="${fn.id}" Type="RGBMatrix" Name="${esc(fn.name)}">
+   <Speed FadeIn="0" FadeOut="0" Duration="${fn.duration}"/>
+   <Direction>Forward</Direction>
+   <RunOrder>Loop</RunOrder>
+   <Algorithm Type="Script">${esc(fn.script)}</Algorithm>
+${fn.colors.map((rgb, index) => `   <Color Index="${index}">${argb(...rgb) >>> 0}</Color>`).join("\n")}
+   <ControlMode>RGB</ControlMode>
+   <FixtureGroup>${fn.group}</FixtureGroup>
+  </Function>`;
+  }
   if (fn.type === "Scene") {
     return `  <Function ID="${fn.id}" Type="Scene" Name="${esc(fn.name)}">
    <Speed FadeIn="${fn.fadeIn}" FadeOut="${fn.fadeOut}" Duration="0"/>
@@ -680,7 +780,14 @@ addRow(0, 4, "FX-P1", [
   ["STROBE SLOW", "FX · Strobe Slow", LED.white, [180, 180, 180]], ["STROBE MED", "FX · Strobe Medium", LED.white, [195, 195, 195]],
   ["STROBE FAST", "FX · Strobe Fast", LED.white, [220, 220, 220]], ["CHASE STROBE", "FX · Chase Strobe", LED.white, [165, 165, 180]],
   ["WAVE STROBE", "FX · Wave Strobe", LED.white, [165, 175, 185]], ["BURST", "FLASH · Burst", LED.white, [225, 225, 225], "Flash"],
-  ["FLOOR FULL", "FLOOR · Full", LED.white, [205, 205, 205]],
+  ["FLOOR FULL", "FLOOR · Full", LED.white, [205, 205, 205]], ["FIRE", "PIX · Fire", LED.red, [210, 70, 30]],
+]);
+// Row 6 = pixel effects, in the same solo frame as the panel FX so one never mixes into another.
+addRow(0, 5, "FX-P1", [
+  ["FILL DRAIN", "PIX · Fill Drain", LED.cyan, [40, 150, 190]], ["RAIN", "PIX · Rain", LED.blue, [50, 90, 200]],
+  ["TWINKLE", "PIX · Twinkle", LED.white, [190, 190, 200]], ["PLASMA", "PIX · Plasma", LED.purple, [150, 70, 190]],
+  ["GAP BAR", "PIX · Gap Bar", LED.white, [200, 200, 200]], ["V COMET", "PIX · V Comet", LED.purple, [120, 80, 200]],
+  ["CHEVRONS", "PIX · Chevrons", LED.amber, [220, 120, 30]], ["APEX PULSE", "PIX · Apex Pulse", LED.purple, [190, 60, 180]],
 ]);
 
 addRow(1, 0, "BASE-P2", [
@@ -700,13 +807,14 @@ addRow(1, 1, "FX-P2", [
 
 // Head colour (solo), aims (one-shot) and shutter utilities: page 2 rows 3 + 6, and again on the
 // mover page (page 3 rows 5-6) so colour and aim are one press away from the looks.
-const headRows = (page: number, colRow: number, aimRow: number): void => {
+const headRows = (page: number, colRow: number, aimRow?: number): void => {
   addRow(page, colRow, `HEADCOL-P${page + 1}`, [
     ["HD RED", "HEAD · Red", LED.red, [200, 30, 30]], ["HD AMBER", "HEAD · Amber", LED.amber, [225, 120, 25]],
     ["HD YELLOW", "HEAD · Yellow", LED.yellow, [225, 205, 35]], ["HD GREEN", "HEAD · Green", LED.green, [40, 185, 75]],
     ["HD BLUE", "HEAD · Blue", LED.blue, [40, 90, 215]], ["HD CYAN", "HEAD · Cyan", LED.cyan, [30, 170, 190]],
     ["HD MAGENTA", "HEAD · Magenta", LED.purple, [190, 50, 190]], ["HD WHITE", "HEAD · White", LED.white, [225, 225, 220]],
   ]);
+  if (aimRow === undefined) return;
   // Aims and shutter sit OUT of the mover solo frame: they must layer on top of a running look.
   addRow(page, aimRow, `HEADAIM-P${page + 1}`, [
     ["HOME", "HEAD · Home Go", LED.gray, [90, 90, 100]], ["CENTRE", "HEAD · Centre Go", LED.gray, [90, 90, 100]],
@@ -718,36 +826,42 @@ const headRows = (page: number, colRow: number, aimRow: number): void => {
   ], 4);
 };
 headRows(1, 2, 5);
-headRows(2, 4, 5);
+headRows(2, 4);
 // PAGE 3 = MOVERS. Rows 1-4 are ONE solo frame holding EVERY mover look. Separate frames let a
 // running CEIL chaser keep writing pan/tilt over a FLOOR look pressed after it (found live
 // 2026-09-19), and a second page with its own frame would do the same — so no mover look lives on
 // any other page. One frame, one look at a time. HOLD parks the heads and stops whatever is running.
-// Rows run floor -> floor FX + room -> floor/ceiling -> ceiling.
+// Order runs floor -> floor FX -> room (floor to ceiling) -> ceiling, packed left to right.
 const FLR: [number, RGB] = [LED.cyan, [35, 150, 185]], FLX: [number, RGB] = [LED.green, [55, 165, 85]];
 const RM: [number, RGB] = [LED.purple, [140, 65, 190]], CL: [number, RGB] = [LED.blue, [60, 90, 200]];
-const moveRow = (row: number, looks: Array<[string, string, [number, RGB]]>): void =>
-  addRow(2, row, "MOVE-P3", looks.map(([label, fn, [led, bg]]) => [label, fn, led, bg] as [string, string, number, RGB]));
-moveRow(0, [
-  ["FIGURE 8", "FLOOR · Figure 8", FLR], ["FLR SWEEP", "FLOOR · Sweep", FLR], ["FLR WAVE", "FLOOR · Wave", FLR],
-  ["FLR CIRCLE", "FLOOR · Circle", FLR], ["FLR SCISSOR", "FLOOR · Scissor", FLR], ["FLR BALLYHOO", "FLOOR · Ballyhoo", FLR],
-  ["FLR X", "FLOOR · X", FLR], ["FLR ZIGZAG", "FLOOR · Zigzag", FLR],
+const MOVER_PADS: Array<[string, string, [number, RGB]]> = [
+  ["FIGURE 8", "FLOOR · Figure 8", FLR], ["FLR WAVE", "FLOOR · Wave", FLR], ["FLR CIRCLE", "FLOOR · Circle", FLR],
+  ["FLR SCISSOR", "FLOOR · Scissor", FLR], ["FLR BALLYHOO", "FLOOR · Ballyhoo", FLR], ["FLR ZIGZAG", "FLOOR · Zigzag", FLR],
+  ["FLR CHASE", "FLOOR · Chase", FLX], ["FLR SPIRAL", "FLOOR · Spiral", FLX],
+  ["FLR SCATTER", "FLOOR · Scatter", FLX], ["FLR BURST", "FLOOR · Burst", FLX], ["FLR CORNERS", "FLOOR · Corners", FLX],
+  ["ROOM SWEEP", "ROOM · Sweep", RM], ["ARC", "ROOM · Arc", RM], ["X SWEEP", "ROOM · X Sweep", RM],
+  ["FLIP", "ROOM · Flip", RM], ["PERIMETER", "ROOM · Perimeter", RM],
+  ["DIVE", "ROOM · Dive", RM], ["ROOM CIRCLE", "ROOM · Circle", RM], ["RISE FALL", "MOVE · Rise Fall", RM],
+  ["TILT WAVE", "CEIL · Tilt Wave", RM], ["BALLYHOO", "CEIL · Ballyhoo", RM], ["LOOK SEQ", "SEQ · Ceiling Looks", [LED.amber, [200, 125, 35]]],
+  ["CEIL FAN", "CEIL · Fan", CL], ["CEIL CROSS", "CEIL · Cross", CL],
+  ["CEIL CIRCLE", "CEIL · Circle", CL], ["WAVE", "CEIL · Wave", CL], ["SCISSOR", "CEIL · Scissor", CL], ["FAN CHASE", "CEIL · Fan Chase", CL],
+];
+MOVER_PADS.forEach(([label, fn, [led, bg]], i) => place({ label, fn, led, bg, page: 2, row: Math.floor(i / 8), col: i % 8, frame: "MOVE-P3" }));
+place({ label: "HOLD", fn: "MOVE · Hold", led: LED.gray, bg: [90, 90, 100], page: 2, row: 3, col: 7, frame: "MOVE-P3" });
+// Page 3 row 6: layers that sit OUT of the mover solo frame, so pressing one never stops the running
+// look. Gobo pads are solo among themselves; PRISM toggles on top; HITs are flash pads for a drop:
+// while held they outrank the running chaser on pan/tilt, on release the look carries on.
+addRow(2, 5, "GOBO-P3", [
+  ["GOBO OPEN", "HEAD · Gobo Open", LED.white, [160, 160, 170]], ["GOBO A", "HEAD · Gobo A", LED.cyan, [40, 150, 170]],
+  ["GOBO B", "HEAD · Gobo B", LED.cyan, [40, 150, 170]],
 ]);
-moveRow(1, [
-  ["FLR CHASE", "FLOOR · Chase", FLX], ["FLR SPIRAL", "FLOOR · Spiral", FLX], ["FLR SCATTER", "FLOOR · Scatter", FLX],
-  ["FLR BURST", "FLOOR · Burst", FLX], ["FLR CORNERS", "FLOOR · Corners", FLX], ["ROOM SWEEP", "ROOM · Sweep", RM],
-  ["ARC", "ROOM · Arc", RM], ["X SWEEP", "ROOM · X Sweep", RM],
-]);
-moveRow(2, [
-  ["FLIP", "ROOM · Flip", RM], ["PERIMETER", "ROOM · Perimeter", RM], ["DIVE", "ROOM · Dive", RM],
-  ["ROOM CIRCLE", "ROOM · Circle", RM], ["RISE FALL", "MOVE · Rise Fall", RM], ["TILT WAVE", "CEIL · Tilt Wave", RM],
-  ["BALLYHOO", "CEIL · Ballyhoo", RM], ["LOOK SEQ", "SEQ · Ceiling Looks", [LED.amber, [200, 125, 35]]],
-]);
-moveRow(3, [
-  ["CEIL FAN", "CEIL · Fan", CL], ["CEIL CROSS", "CEIL · Cross", CL], ["CEIL SWEEP", "CEIL · Sweep", CL],
-  ["CEIL CIRCLE", "CEIL · Circle", CL], ["WAVE", "CEIL · Wave", CL], ["SCISSOR", "CEIL · Scissor", CL],
-  ["FAN CHASE", "CEIL · Fan Chase", CL], ["HOLD", "MOVE · Hold", [LED.gray, [90, 90, 100]]],
-]);
+addRow(2, 5, "PRISM-P3", [["PRISM", "HEAD · Prism", LED.purple, [140, 65, 190]]], 3);
+addRow(2, 5, "HIT-P3", [
+  ["HIT FLOOR", "HIT · Floor", LED.amber, [210, 120, 30], "Flash"], ["HIT UP", "HIT · Up", LED.amber, [210, 120, 30], "Flash"],
+], 4);
+addRow(2, 5, "HEADUTIL-P3", [
+  ["HD OPEN", "HEAD · Open", LED.green, [50, 150, 80]], ["HD STROBE", "HEAD · Strobe", LED.white, [225, 225, 225], "Flash"],
+], 6);
 
 for (const page of [0, 1, 2]) {
   addRow(page, 6, `LEVEL-P${page + 1}`, [
@@ -803,9 +917,9 @@ ${inner}
 const performanceFrames: string[] = [];
 let frameId = 10;
 for (const page of [0, 1, 2]) {
-  for (const name of [`BASE-P${page + 1}`, `FX-P${page + 1}`, `HEADCOL-P${page + 1}`, `HEADAIM-P${page + 1}`, `HEADDIM-P${page + 1}`, `HEADUTIL-P${page + 1}`, `FLOOR-P${page + 1}`, `CEIL-P${page + 1}`, `MOVE-P${page + 1}`, `MOVESEQ-P${page + 1}`, `LEVEL-P${page + 1}`, `SPEED-P${page + 1}`, `UTILITY-P${page + 1}`]) {
+  for (const name of [`BASE-P${page + 1}`, `FX-P${page + 1}`, `HEADCOL-P${page + 1}`, `HEADAIM-P${page + 1}`, `HEADDIM-P${page + 1}`, `HEADUTIL-P${page + 1}`, `FLOOR-P${page + 1}`, `CEIL-P${page + 1}`, `MOVE-P${page + 1}`, `MOVESEQ-P${page + 1}`, `GOBO-P${page + 1}`, `PRISM-P${page + 1}`, `HIT-P${page + 1}`, `LEVEL-P${page + 1}`, `SPEED-P${page + 1}`, `UTILITY-P${page + 1}`]) {
     const buttons = placed.filter((button) => button.page === page && button.frame === name);
-    if (buttons.length) performanceFrames.push(frameXml(/^(BASE|FX|HEADCOL|HEADDIM|LEVEL|MOVE)/.test(name) ? "SoloFrame" : "Frame", name, frameId++, page, buttons));
+    if (buttons.length) performanceFrames.push(frameXml(/^(BASE|FX|HEADCOL|HEADDIM|LEVEL|MOVE|GOBO)/.test(name) ? "SoloFrame" : "Frame", name, frameId++, page, buttons));
   }
 }
 
@@ -837,11 +951,16 @@ ${[...keys, ...pads].join("\n")}
    </Frame>`;
 }).join("\n") : "";
 
-const chaserIds = functions.filter((fn) => fn.type === "Chaser" && !fn.name.startsWith("TEST ·") && !fn.name.startsWith("HEAD ·") && !fn.name.startsWith("SEQ ·")).map((fn) => fn.id);
-const speedFunctionsXml = chaserIds.map((id) => `     <Function FadeIn="0" FadeOut="0" Duration="6">${id}</Function>`).join("\n");
+// Two dials: panels (FX Speed, with TAP) and movers (Mover Speed). One shared dial dragged the heads
+// into a frantic pace whenever a fast panel chase was tapped in (2026-09-22 review).
+const isMover = (name: string): boolean => /^(FLOOR|ROOM|CEIL|MOVE) · /.test(name);
+const chaserIds = functions.filter((fn) => (fn.type === "Chaser" || fn.type === "RGBMatrix") && !fn.name.startsWith("TEST ·") && !fn.name.startsWith("HEAD ·") && !fn.name.startsWith("SEQ ·") && !isMover(fn.name)).map((fn) => fn.id);
+const moverIds = functions.filter((fn) => fn.type === "Chaser" && isMover(fn.name)).map((fn) => fn.id);
+const dialFunctionsXml = (ids: number[]): string => ids.map((id) => `     <Function FadeIn="0" FadeOut="0" Duration="6">${id}</Function>`).join("\n");
+const speedFunctionsXml = dialFunctionsXml(chaserIds);
 const speedDial = `   <Frame Caption="FX SPEED" ID="40">
     ${appearance([32, 34, 39])}
-    <WindowState Visible="True" X="790" Y="8" Width="196" Height="142"/>
+    <WindowState Visible="True" X="790" Y="8" Width="196" Height="270"/>
     <AllowChildren>True</AllowChildren><AllowResize>True</AllowResize><ShowHeader>True</ShowHeader><ShowEnableButton>False</ShowEnableButton><Collapsed>False</Collapsed><Disabled>False</Disabled>
     <SpeedDial Caption="FX Speed" ID="900">
      ${appearance([52, 56, 65], argb(245, 245, 245))}
@@ -849,6 +968,13 @@ const speedDial = `   <Frame Caption="FX SPEED" ID="40">
      <AbsoluteValue Minimum="100" Maximum="4000"><Input Universe="0" Channel="${crc16(oscPath("FX Speed"))}"/></AbsoluteValue>
      <Tap><Input Universe="${ML ? 3 : 2}" Channel="${ML ? 128 + MINILAB_PADS.tap : 156}"/></Tap><Time>500</Time>
 ${speedFunctionsXml}
+    </SpeedDial>
+    <SpeedDial Caption="Mover Speed" ID="904">
+     ${appearance([52, 56, 65], argb(245, 245, 245))}
+     <WindowState Visible="True" X="8" Y="136" Width="180" Height="120"/>
+     <AbsoluteValue Minimum="100" Maximum="4000"><Input Universe="0" Channel="${crc16(oscPath("Mover Speed"))}"/></AbsoluteValue>
+     <Time>500</Time>
+${dialFunctionsXml(moverIds)}
     </SpeedDial>
 ${[[901, 153, 1199, 1200], [902, 154, 599, 600], [903, 155, 249, 250]].map(([id, channel, minimum, maximum]) => `    <SpeedDial Caption="_Speed ${maximum}" ID="${id}">
      ${appearance([32, 34, 39])}<WindowState Visible="True" X="1" Y="1" Width="1" Height="1"/>
@@ -944,6 +1070,11 @@ const qxw = `<?xml version="1.0" encoding="UTF-8"?>
 ${universesXml}${minilabUniverseXml}
   </InputOutputMap>
 ${fixturesXml}
+${cells.length ? `  <FixtureGroup ID="${PIXEL_GROUP}">
+   <Name>Cuepix V</Name>
+   <Size X="${GRID_W}" Y="${GRID_H}"/>
+${cells.map((c) => `   <Head X="${c.x}" Y="${c.y}" Fixture="${panels[c.panel].id}">${c.pixel}</Head>`).join("\n")}
+  </FixtureGroup>` : ""}
 ${functionsXml}
 ${monitorXml}
  </Engine>
@@ -1034,8 +1165,9 @@ If Launchpad is absent, launcher removes MIDI routes from runtime copy. QLC+ Vir
 
 - Page 1: full Cuepix colors, pixel patterns, chasers, fades, strobes, burst, levels, speed, tap, blackout, stop, white flash, page switch.
 - Page 2: compact Cuepix controls plus the HEAD rows — colours R3, aims + shutter R6.
-- Page 3: MOVERS. R1 floor looks, R2 floor FX + room sweeps, R3 floor-to-ceiling room looks, R4 ceiling looks + HOLD (one solo frame: one look at a time). R5 head colours, R6 aims + shutter.
-- Page 1 R5C7: FLOOR FULL (whole panel floor white).
+- Page 3: MOVERS. R1-R4 = 28 mover looks + HOLD at R4C8 (one solo frame: one look at a time; floor, then room, then ceiling). R5 head colours. R6 layers that never stop the look: C1-C3 GOBO OPEN/A/B, C4 PRISM, C5-C6 HIT FLOOR/HIT UP (hold), C7 HD OPEN, C8 HD STROBE.
+- Page 1 R6: pixel effects (FILL DRAIN, RAIN, TWINKLE, PLASMA, GAP BAR, V COMET, CHEVRONS, APEX PULSE) + R5C8 FIRE, in the panel FX solo frame. Two speed dials: FX Speed (panels, TAP) and Mover Speed (movers).
+- Page 1 R5C7: FLOOR FULL (whole panel floor white). Load-in: fire BANDS and set cuepix.pixelOrigin if band 1 is not the top row.
 - R7C1-R7C4: 25%, 50%, 75%, Full. R7C5-R7C7: Slow, Medium, Fast. R7C8: Tap.
 - R8C1: Blackout. R8C2: Stop FX. R8C3: White. R8C5: Flash. R8C8: Page.
 - Use visible \`FX Speed\` dial for exact speed. Use QLC+ Grand Master for overall output.

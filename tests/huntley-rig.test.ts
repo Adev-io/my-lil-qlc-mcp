@@ -45,6 +45,79 @@ describe("Huntley homecoming rig", () => {
     expect(lit).toEqual([fixtureId("Cuepix 2"), fixtureId("Cuepix 3")].sort());
   });
 
+  // 2026-09-22 looks review (Huntley Looks Review artifact): merge near-duplicates, fix two looks,
+  // add gobo/prism/hit layers and a mover speed dial, and give the panels real pixel effects.
+  const button = (caption: string) => qxw.match(new RegExp(`<Button Caption="${caption}"[\\s\\S]*?</Button>`))?.[0] ?? "";
+  const frameOf = (caption: string) => {
+    const at = qxw.indexOf(`<Button Caption="${caption}"`);
+    const open = [...qxw.slice(0, at).matchAll(/<(SoloFrame|Frame) Caption="([^"]*)"/g)].pop()!;
+    return { solo: open[1] === "SoloFrame", name: open[2] };
+  };
+  const fnBlock = (name: string) => qxw.match(new RegExp(`<Function ID="\\d+" Type="\\w+" Name="${name}">([\\s\\S]*?)</Function>`))?.[1];
+
+  it("merges the near-duplicate mover looks and fixes Scatter", () => {
+    for (const gone of ["FLOOR · Sweep", "FLOOR · X", "CEIL · Sweep"]) expect(fnBlock(gone)).toBeUndefined();
+    expect(fnBlock("FLOOR · Scatter")).toMatch(/<Step Number="0" FadeIn="180"/);
+  });
+
+  it("layers gobo, prism and beat hits on page 3 without stopping the running look", () => {
+    for (const pad of ["GOBO OPEN", "GOBO A", "GOBO B"]) expect(frameOf(`${pad} P3 R6C${pad === "GOBO OPEN" ? 1 : pad === "GOBO A" ? 2 : 3}`)).toEqual({ solo: true, name: "GOBO-P3" });
+    for (const [pad, cell] of [["PRISM", "R6C4"], ["HIT FLOOR", "R6C5"], ["HIT UP", "R6C6"]]) {
+      expect(frameOf(`${pad} P3 ${cell}`).name).not.toBe("MOVE-P3");
+    }
+    expect(button("HIT FLOOR P3 R6C5")).toContain("<Action>Flash</Action>");
+    // A gobo pad touches only gobo, gobo rotation and prism: 140SR ch 6-7, 375ZX ch 6-8.
+    const beamIds = ["Beam L", "Beam R"].map((n) => qxw.match(new RegExp(`<ID>(\\d+)</ID>\\s*<Name>${n}</Name>`))![1]);
+    for (const name of ["HEAD · Gobo Open", "HEAD · Gobo A", "HEAD · Gobo B", "HEAD · Prism"]) {
+      for (const [, id, pairs] of fnBlock(name)!.matchAll(/<FixtureVal ID="(\d+)">([^<]*)</g)) {
+        const channels = pairs.split(",").map(Number).filter((_, i) => i % 2 === 0);
+        expect(channels.every((ch) => (beamIds.includes(id) ? [6, 7] : [6, 7, 8]).includes(ch))).toBe(true);
+      }
+    }
+  });
+
+  it("gives the movers their own speed dial", () => {
+    const dial = (caption: string) => new Set([...qxw.match(new RegExp(`<SpeedDial Caption="${caption}"[\\s\\S]*?</SpeedDial>`))![0]
+      .matchAll(/Duration="6">(\d+)</g)].map((m) => m[1]));
+    const idOf = (name: string) => qxw.match(new RegExp(`<Function ID="(\\d+)" Type="\\w+" Name="${name}">`))![1];
+    const panelsDial = dial("FX Speed"), moversDial = dial("Mover Speed");
+    expect(moversDial.has(idOf("FLOOR · Figure 8"))).toBe(true);
+    expect(panelsDial.has(idOf("FLOOR · Figure 8"))).toBe(false);
+    expect(panelsDial.has(idOf("FX · Left to Right"))).toBe(true);
+    expect([...moversDial].some((id) => panelsDial.has(id))).toBe(false);
+  });
+
+  it("maps the 100 panel pixels as the V and runs pixel effects on them", () => {
+    const qxf = readFileSync(path.join(ROOT, "fixtures", "Elation-Cuepix-Panel-79CH.qxf"), "utf8");
+    const heads = [...qxf.matchAll(/<Head>([\s\S]*?)<\/Head>/g)].map((m) => [...m[1].matchAll(/<Channel>(\d+)<\/Channel>/g)].map((c) => Number(c[1])));
+    expect(heads).toHaveLength(25);
+    expect(heads[0]).toEqual([0, 1, 2]);
+    expect(heads[24]).toEqual([72, 73, 74]);
+
+    const group = qxw.match(/<FixtureGroup ID="(\d+)">\s*<Name>Cuepix V<\/Name>\s*<Size X="20" Y="10"\/>([\s\S]*?)<\/FixtureGroup>/)!;
+    const cells = [...group[2].matchAll(/<Head X="(\d+)" Y="(\d+)" Fixture="(\d+)">(\d+)<\/Head>/g)].map((m) => m.slice(1).map(Number));
+    expect(cells).toHaveLength(100);
+    const fixtureId = (name: string) => Number(qxw.match(new RegExp(`<ID>(\\d+)</ID>\\s*<Name>${name}</Name>`))![1]);
+    const p3 = cells.filter(([, , f]) => f === fixtureId("Cuepix 3"));   // top of the right tower
+    expect(Math.min(...p3.map(([x]) => x))).toBe(15);
+    expect(Math.max(...p3.map(([, y]) => y))).toBe(4);
+    const p1 = cells.filter(([, , f]) => f === fixtureId("Cuepix 1"));   // bottom of the left tower
+    expect(Math.max(...p1.map(([x]) => x))).toBe(4);
+    expect(Math.min(...p1.map(([, y]) => y))).toBe(5);
+
+    const matrices = [...qxw.matchAll(/Type="RGBMatrix" Name="([^"]+)">[\s\S]*?<Algorithm Type="Script">([^<]+)<\/Algorithm>[\s\S]*?<FixtureGroup>(\d+)<\/FixtureGroup>/g)];
+    expect(matrices.map((m) => m[2]).sort()).toEqual(["3D Starfield", "Fill Unfill", "Plasma", "Stripes", "Vertical fall"]);
+    expect(matrices.every((m) => m[3] === group[1])).toBe(true);
+    for (const pad of ["FILL DRAIN P1 R6C1", "V COMET P1 R6C6", "FIRE P1 R5C8"]) expect(frameOf(pad)).toEqual({ solo: true, name: "FX-P1" });
+    // Custom pixel steps write panel RGB channels only (0-74), never the panel dimmer or strobe.
+    const comet = fnBlock("PIX · V Comet")!;
+    const stepId = comet.match(/<Step[^>]*>(\d+)<\/Step>/)![1];
+    const step = qxw.match(new RegExp(`<Function ID="${stepId}" Type="Scene"[^>]*>([\\s\\S]*?)</Function>`))![1];
+    for (const [, , pairs] of step.matchAll(/<FixtureVal ID="(\d+)">([^<]*)</g)) {
+      expect(pairs.split(",").map(Number).filter((_, i) => i % 2 === 0).every((ch) => ch <= 74)).toBe(true);
+    }
+  });
+
   it("hangs the stacks from 10 ft with the Beams on top and the 375ZX at 8 ft", () => {
     const monitor = JSON.parse(readFileSync(path.join(out, "monitor", "cuepix-fixtures.json"), "utf8"));
     const z = Object.fromEntries(monitor.fixtures.map((f: { name: string; pos: number[] }) => [f.name, f.pos[2]]));

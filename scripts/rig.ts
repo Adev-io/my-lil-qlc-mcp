@@ -56,7 +56,7 @@ const FixtureGroup = z
 const CuepixShow = z
   .object({
     // Four trusses left to right; each lists its panel numbers bottom to top. An outer truss
-    // may be empty (2026-09-19: the 4 ft trusses carry a head and no panels).
+    // may be empty (2026-09-19 homecoming: panels on the outer trusses, the inner two carry a Beam and no panels).
     trusses: z.array(z.array(z.number().int().min(1).max(64))).length(4),
     moversCalibrated: z.boolean().default(false),
   })
@@ -139,6 +139,10 @@ export const RigSchema = z.object({
   // the 3 measured settings. Kept permissive (passthrough) — build-show.ts reads them as data.
   headSafety: z.any().optional(),
   movingHeadSettings: z.any().optional(),
+  // Per-head floor box that maps room coordinates to pan/tilt (build-cuepix-show.ts). Missing from
+  // this schema on 2026-09-19, so zod stripped it and every mover look ran on pre-plot defaults
+  // clamped by the fence: heads parked on one pan edge, floor looks up at the ceiling limit.
+  headPlot: z.any().optional(),
   // Party-show backdrop banner (floor heads aim at it); consumed by build-party.ts + the 3D monitor.
   banner: z
     .object({

@@ -144,13 +144,14 @@ for (const g of rig.fixtures) {
     // they share the truss X and differ only in height.
     const prefix = g.namePrefix ?? "Head";
     const isFloor = /floor/i.test(prefix);
-    // Cuepix rig: "Beam" heads sit ABOVE the two inside towers; every other head pair takes the
+    // Cuepix rig: "Beam" heads take the two inside trusses; every other head pair takes the
     // outside trusses. Other rigs: spread across headSeparationFt (a pair lands at ±HAP/2).
     const cuepixSlots = rig.cuepix ? (/beam/i.test(prefix) ? [1, 2] : [0, 3]) : null;
     const headXs = Array.from({ length: g.count }, (_, i) =>
       cuepixSlots ? trussCenters[cuepixSlots[i]] : g.count === 1 ? 0 : -HAP / 2 + (i * HAP) / (g.count - 1),
     );
-    const headZ = (i: number) => (cuepixSlots ? (/beam/i.test(prefix) ? trussTop[cuepixSlots[i]] : HZ) : isFloor ? 0.5 : HZ);
+    // Cuepix rig: a head clears whatever panel stack shares its truss, and never sits below truss height.
+    const headZ = (i: number) => (cuepixSlots ? Math.max(HZ, trussTop[cuepixSlots[i]]) : isFloor ? 0.5 : HZ);
     for (let i = 0; i < g.count; i++) {
       fixtures.push({
         id: fxId++,

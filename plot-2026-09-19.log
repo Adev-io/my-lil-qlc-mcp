@@ -1,0 +1,90 @@
+375ZXL left  pan=140 tilt=36
+375ZXL right pan=118 tilt=36
+375ZXL low   pan=130 tilt=15
+375ZXL high  pan=126 tilt=70
+375ZXL floor pan=136 tilt=24
+375ZXL crowd pan=136 tilt=15
+375ZXL home  pan=142 tilt=92
+beamL left  pan=166 tilt=23
+beamL right pan=186 tilt=37
+beamL low   pan=164 tilt=26
+beamL high  pan=170 tilt=80
+beamL floor pan=170 tilt=25
+beamL crowd pan=170 tilt=23
+beamL home  pan=160 tilt=75
+# rule: fences = min/max across ALL captured aims for that head (limits + areas), no margin.
+# 375ZXL fence pan 118-142 tilt 15-92 ; beamL fence pan 160-186 tilt 23-80
+# --- shared LEFT edge, all four heads (supersedes earlier per-head left) ---
+375ZXL left2 pan=146 tilt=35
+beamL  left2 pan=158 tilt=37
+beamR  left2 pan=166 tilt=2   (tilt near floor - beamR dark, power fault)
+375ZXR left2 pan=142 tilt=35
+# --- shared RIGHT edge, all four heads (confirmed by user) ---
+375ZXL right2 pan=116 tilt=35
+beamL  right2 pan=188 tilt=37
+beamR  right2 pan=78  tilt=2   (provisional, head dark)
+375ZXR right2 pan=112 tilt=35
+# pan fences: 375ZXL 116-146 | beamL 158-188 | beamR 78-166 (prov) | 375ZXR 112-142
+# pan direction: 375ZXL/375ZXR higher pan = house-LEFT ; beamL/beamR higher pan = house-RIGHT
+# --- shared LOW edge, all four heads ---
+375ZXL low2 pan=134 tilt=0   (at channel floor; earlier solo low was tilt=15)
+beamL  low2 pan=180 tilt=12
+beamR  low2 pan=134 tilt=0   (CHANNEL FLOOR - knob cannot go lower, hardware limit not fence)
+375ZXR low2 pan=126 tilt=7
+# --- shared LOW edge, recapture after beamR re-hung/fixed (supersedes low2 for beamR) ---
+375ZXL low3 pan=134 tilt=0
+beamL  low3 pan=180 tilt=12
+beamR  low3 pan=168 tilt=17   (off channel floor now - head re-aimed physically)
+375ZXR low3 pan=126 tilt=7
+# --- shared HIGH edge, all four heads ---
+375ZXL high2 pan=134 tilt=70
+beamL  high2 pan=180 tilt=73
+beamR  high2 pan=168 tilt=67
+375ZXR high2 pan=126 tilt=69
+# tilt fences (pending 375ZXL floor decision 0 vs 15): 375ZXL ?-70 | beamL 12-73 | beamR 17-67 | 375ZXR 7-69
+# --- AREA: dance floor centre, all four heads ---
+375ZXL floor2 pan=134 tilt=25
+beamL  floor2 pan=170 tilt=25
+beamR  floor2 pan=170 tilt=23
+375ZXR floor2 pan=126 tilt=25
+# NOTE beamR pan=170 is OUTSIDE its captured pan fence 78-166 -> fence must widen to 78-170 (or re-plot right edge)
+# --- AREA: floor CENTRE (accepted) ---
+375ZXL floorC pan=134 tilt=25
+beamL  floorC pan=170 tilt=25
+beamR  floorC pan=0   tilt=18   (user accepted as-is; pan at channel floor, verify by eye)
+375ZXR floorC pan=126 tilt=25
+# --- FLOOR BOX: left edge ---
+375ZXL floorL pan=148 tilt=25
+beamL  floorL pan=158 tilt=25
+beamR  floorL pan=12  tilt=23
+375ZXR floorL pan=138 tilt=25
+# --- FLOOR BOX: right edge ---
+375ZXL floorR pan=124 tilt=25
+beamL  floorR pan=180 tilt=25
+beamR  floorR pan=160 tilt=25
+375ZXR floorR pan=114 tilt=25
+# floor pan span: 375ZXL 124-148 | beamL 158-180 | beamR 12-160 (?) | 375ZXR 114-138
+# --- FLOOR BOX: rear edge ---
+375ZXL floorRear pan=134 tilt=23
+beamL  floorRear pan=172 tilt=27
+beamR  floorRear pan=168 tilt=26
+375ZXR floorRear pan=126 tilt=22
+# NOTE beamR pan=168 here vs floorL pan=12 -> pan wrapped; recapture beamR alone on one lap
+# --- BEAM R re-plot, single lap (supersedes all earlier beamR floor numbers) ---
+beamR floorC pan=170 tilt=24   (matches twin beamL 172/27 - lap now consistent)
+beamR floorL pan=180 tilt=24
+# beamR pan direction: HIGHER pan = house-LEFT (opposite of beamL). Supersedes earlier direction note.
+beamR floorR pan=158 tilt=24   (floor pan span 158-180, 22 steps - matches beamL 22, 375ZX 24)
+beamR floorRear pan=170 tilt=27   (beamR box complete, one lap: C 170/24 L 180/24 R 158/24 rear 170/27)
+# STILL NEEDED: crowd + home (all four heads); 375ZXL tilt floor decision 0 vs 15
+# --- AREA: crowd wash ---
+375ZXL crowd2 pan=136 tilt=16
+beamL  crowd2 pan=174 tilt=25
+beamR  crowd2 pan=162 tilt=25
+375ZXR crowd2 pan=132 tilt=24
+# --- AREA: home / rest ---
+375ZXL home2 pan=136 tilt=54
+beamL  home2 pan=174 tilt=52
+beamR  home2 pan=162 tilt=51
+375ZXR home2 pan=134 tilt=49
+# PLOT COMPLETE except 375ZXL tilt floor decision (0 vs 15)

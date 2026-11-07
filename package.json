@@ -1,6 +1,7 @@
 {
   "name": "qlcplus-mcp",
   "version": "1.0.0",
+  "license": "MIT",
   "description": "Model Context Protocol server for controlling QLC+ lighting software through OSC",
   "type": "module",
   "main": "./dist/src/index.js",

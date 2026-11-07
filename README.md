@@ -31,7 +31,7 @@ A complete, agent-driven lighting rig for [QLC+](https://www.qlcplus.org/) 4:
 ## Quickstart
 
 ```powershell
-git clone <this repo> && cd QLCPlus-MCP
+git clone https://github.com/Adev-io/my-lil-qlc-mcp.git && cd my-lil-qlc-mcp
 npm install && npm run build
 claude        # open Claude Code in the repo
 ```

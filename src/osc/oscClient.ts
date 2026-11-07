@@ -178,10 +178,9 @@ export async function initOsc(config: Config): Promise<void> {
   const plugin = new (OSC as any).DatagramPlugin();
   oscInstance = new (OSC as any)({ plugin });
 
-  await oscInstance!.open({
-    host: config.qlcHost,
-    port: config.qlcOscInputPort,
-  });
+  // Local bind only: an ephemeral port. The target host/port is passed per send().
+  // Binding qlcHost:qlcOscInputPort here would shadow QLC+ itself on the same machine.
+  await oscInstance!.open({ host: "0.0.0.0", port: 0 });
 
   runtimeState.initialized = true;
   await initFeedbackListener(config);

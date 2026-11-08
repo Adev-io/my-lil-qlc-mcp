@@ -1,4 +1,5 @@
 import OSC from "osc-js";
+import dgram from "node:dgram";
 import { getLogger } from "../logger.js";
 import { Config } from "../config.js";
 import { OscMessage, OscSendOptions } from "../types.js";
@@ -11,7 +12,38 @@ type OscInstance = {
 };
 
 let oscInstance: OscInstance | null = null;
-let feedbackOscInstance: OscInstance | null = null;
+let feedbackSocket: dgram.Socket | null = null;
+
+// QLC+ 4.14 sends VC button feedback with the address "-1" (no leading slash), which osc-js
+// rejects as malformed. Read the datagram by hand: address, type tags, then f/i/s arguments.
+export function parseFeedbackPacket(buf: Buffer): { address: string; args: unknown[] } | null {
+  const cstr = (at: number): [string, number] => {
+    const end = buf.indexOf(0, at);
+    if (end < 0) throw new Error("unterminated string");
+    return [buf.toString("utf8", at, end), (end + 4) & ~3]; // string + NUL, padded to 4 bytes
+  };
+  try {
+    let [address, at] = cstr(0);
+    if (!address || address.startsWith("#bundle")) return null;
+    const args: unknown[] = [];
+    if (at < buf.length && buf[at] === 0x2c) {
+      let tags: string;
+      [tags, at] = cstr(at);
+      for (const tag of tags.slice(1)) {
+        if (tag === "f") { args.push(buf.readFloatBE(at)); at += 4; }
+        else if (tag === "i") { args.push(buf.readInt32BE(at)); at += 4; }
+        else if (tag === "s") { let s: string; [s, at] = cstr(at); args.push(s); }
+        else if (tag === "T") args.push(true);
+        else if (tag === "F") args.push(false);
+        else if (tag === "N") args.push(null);
+        else break; // unknown type: keep what we have
+      }
+    }
+    return { address, args };
+  } catch {
+    return null;
+  }
+}
 
 const RECENT_FEEDBACK_LIMIT = 25;
 
@@ -131,23 +163,27 @@ async function initFeedbackListener(config: Config): Promise<void> {
   runtimeState.lastFeedbackErrorAt = null;
 
   try {
-    const plugin = new (OSC as any).DatagramPlugin();
-    const listener: OscInstance = new (OSC as any)({ plugin });
-    feedbackOscInstance = listener;
-
-    if (listener.on) {
-      listener.on("*", recordFeedback);
-      listener.on("error", (err: unknown) => {
-        const message = err instanceof Error ? err.message : String(err);
-        runtimeState.lastFeedbackError = message;
-        runtimeState.lastFeedbackErrorAt = nowIso();
-        logger.warn(`QLC+ OSC feedback listener error: ${message}`);
+    // Plain UDP socket + our own parser: QLC+ feedback is not always strict OSC (see parseFeedbackPacket).
+    const sock = dgram.createSocket("udp4");
+    feedbackSocket = sock;
+    const fail = (err: unknown) => {
+      const message = err instanceof Error ? err.message : String(err);
+      runtimeState.lastFeedbackError = message;
+      runtimeState.lastFeedbackErrorAt = nowIso();
+      logger.warn(`QLC+ OSC feedback listener error: ${message}`);
+    };
+    sock.on("error", fail);
+    sock.on("message", (msg, rinfo) => {
+      const parsed = parseFeedbackPacket(msg);
+      if (parsed) recordFeedback(parsed, { address: rinfo.address, port: rinfo.port });
+      else fail(new Error("unparseable OSC feedback packet"));
+    });
+    await new Promise<void>((resolve, reject) => {
+      sock.once("error", reject);
+      sock.bind(runtimeState.feedbackListenPort!, runtimeState.feedbackListenHost!, () => {
+        sock.off("error", reject);
+        resolve();
       });
-    }
-
-    await listener.open({
-      host: runtimeState.feedbackListenHost,
-      port: runtimeState.feedbackListenPort,
     });
 
     runtimeState.feedbackListening = true;
@@ -158,7 +194,8 @@ async function initFeedbackListener(config: Config): Promise<void> {
     const message = error instanceof Error ? error.message : String(error);
     runtimeState.lastFeedbackError = message;
     runtimeState.lastFeedbackErrorAt = nowIso();
-    feedbackOscInstance = null;
+    feedbackSocket?.close();
+    feedbackSocket = null;
     logger.warn(`QLC+ OSC feedback listener unavailable: ${message}`);
   }
 }
@@ -198,9 +235,10 @@ export function getOsc() {
 }
 
 export async function closeOsc(): Promise<void> {
-  if (feedbackOscInstance) {
-    await feedbackOscInstance.close();
-    feedbackOscInstance = null;
+  if (feedbackSocket) {
+    const sock = feedbackSocket;
+    feedbackSocket = null;
+    await new Promise<void>((resolve) => sock.close(() => resolve()));
   }
   runtimeState.feedbackListening = false;
 

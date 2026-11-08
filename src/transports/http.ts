@@ -1,8 +1,16 @@
-import { type ToolDefinition, MCPServer } from "mcp-use/server";
+import { Hono } from "hono";
+import { serve, type ServerType } from "@hono/node-server";
+import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
 import { getLogger } from "../logger.js";
 import { Config } from "../config.js";
-import { registerAgentPrompt } from "../agentPrompt.js";
+import { createMcpServer } from "../mcp/server.js";
+import type { ToolDefinition } from "../mcp/tool.js";
 import { registerDashboard } from "../dashboard/registerDashboard.js";
+
+export type HttpServerHandle = {
+  port: number;
+  close: () => Promise<void>;
+};
 
 function getConnectableHost(host: string): string {
   if (host === "0.0.0.0" || host === "::") {
@@ -14,26 +22,20 @@ function getConnectableHost(host: string): string {
 export async function startHttpServer(
   config: Config,
   tools: ToolDefinition[]
-): Promise<void> {
+): Promise<HttpServerHandle> {
   const logger = getLogger();
 
   logger.info("Starting MCP server in HTTP mode");
   logger.debug({ tools: tools.map((t) => t.name) }, "Tools registered");
 
-  const server = new MCPServer({
-    name: "qlcplus-mcp",
-    version: "1.0.0",
-    host: config.httpHost,
-    description: "QLC+ MCP server for HTTP transport",
-  });
+  // Build once at boot so a bad tool definition (e.g. a duplicate name) fails here,
+  // at startup, instead of as a 500 on every /mcp request.
+  createMcpServer(tools);
 
-  tools.forEach((tool) => {
-    server.tool(tool);
-  });
-  registerAgentPrompt(server);
+  const app = new Hono();
 
   if (config.authMode === "bearer") {
-    server.app.use("*", async (c, next) => {
+    app.use("*", async (c, next) => {
       // /health and the dashboard page itself are public; the dashboard's
       // /dashboard/api/* control endpoints stay behind the bearer check.
       if (
@@ -58,7 +60,7 @@ export async function startHttpServer(
     });
   }
 
-  server.app.get("/health", (c) =>
+  app.get("/health", (c) =>
     c.json({
       status: "ok",
       service: "qlcplus-mcp",
@@ -68,14 +70,40 @@ export async function startHttpServer(
     })
   );
 
-  registerDashboard(server, tools, config);
+  registerDashboard(app, tools, config);
 
-  await server.listen(config.httpPort);
+  // ponytail: stateless per-request server + transport (the SDK's documented-safe
+  // stateless pattern); switch to a session map if a client ever needs resumable SSE.
+  // A stateless server has no stream to resume, so GET/DELETE answer 405 like the SDK's
+  // own stateless example — otherwise every client would park an idle SSE stream here.
+  app.on(["GET", "DELETE"], config.httpMcpPath, (c) =>
+    c.json(
+      { jsonrpc: "2.0", error: { code: -32000, message: "Method not allowed." }, id: null },
+      405
+    )
+  );
+  app.post(config.httpMcpPath, async (c) => {
+    const server = createMcpServer(tools);
+    const transport = new WebStandardStreamableHTTPServerTransport({
+      sessionIdGenerator: undefined,
+    });
+    await server.connect(transport);
+    return transport.handleRequest(c.req.raw);
+  });
+
+  const { nodeServer, port } = await new Promise<{ nodeServer: ServerType; port: number }>(
+    (resolve, reject) => {
+      const s = serve(
+        { fetch: app.fetch, hostname: config.httpHost, port: config.httpPort },
+        (info) => resolve({ nodeServer: s, port: info.port })
+      );
+      s.once("error", reject);
+    }
+  );
 
   const connectableHost = getConnectableHost(config.httpHost);
-  const mcpUrl =
-    "http://" + connectableHost + ":" + config.httpPort + config.httpMcpPath;
-  const healthUrl = "http://" + connectableHost + ":" + config.httpPort + "/health";
+  const mcpUrl = "http://" + connectableHost + ":" + port + config.httpMcpPath;
+  const healthUrl = "http://" + connectableHost + ":" + port + "/health";
   const agentConfig = {
     mcpServers: {
       qlcplus: {
@@ -93,15 +121,9 @@ export async function startHttpServer(
     },
   };
 
-  logger.info(
-    "MCP server listening on http://" +
-      config.httpHost +
-      ":" +
-      config.httpPort +
-      config.httpMcpPath
-  );
-  logger.info("Health endpoint: http://" + config.httpHost + ":" + config.httpPort + "/health");
-  logger.info("Dashboard: http://" + connectableHost + ":" + config.httpPort + "/dashboard");
+  logger.info("MCP server listening on http://" + config.httpHost + ":" + port + config.httpMcpPath);
+  logger.info("Health endpoint: http://" + config.httpHost + ":" + port + "/health");
+  logger.info("Dashboard: http://" + connectableHost + ":" + port + "/dashboard");
   logger.info("Agent MCP URL: " + mcpUrl);
   logger.info("Agent health URL: " + healthUrl);
   if (config.authMode === "bearer") {
@@ -111,4 +133,12 @@ export async function startHttpServer(
   }
   logger.info("Agent HTTP MCP config:");
   logger.info(JSON.stringify(agentConfig, null, 2));
+
+  return {
+    port,
+    close: () =>
+      new Promise<void>((resolve, reject) => {
+        nodeServer.close((err) => (err ? reject(err) : resolve()));
+      }),
+  };
 }

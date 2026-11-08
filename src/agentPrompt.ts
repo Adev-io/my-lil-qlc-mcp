@@ -1,6 +1,6 @@
 import { readFile } from "fs/promises";
 import path from "path";
-import { text, type ToolDefinition } from "mcp-use/server";
+import { text, type ToolDefinition } from "./mcp/tool.js";
 import { z } from "zod";
 
 export const PROMPT_RESOURCE_URI = "agent://prompt/system";
@@ -12,60 +12,6 @@ export const PROMPT_FILE = process.env.MCP_PROMPT_FILE
 
 export async function readAgentPrompt(): Promise<string> {
   return readFile(PROMPT_FILE, "utf8");
-}
-
-function registerPromptName(server: any, name: string): void {
-  server.prompt(
-    {
-      name,
-      title: "QLCPlus Lighting Assistant",
-      description: "Recommended system prompt for agents controlling QLC+ lighting through this MCP server.",
-    },
-    async () => {
-      const prompt = await readAgentPrompt();
-      return {
-        description: "Recommended system prompt for agents controlling QLC+ lighting through this MCP server.",
-        messages: [
-          {
-            role: "user",
-            content: {
-              type: "text",
-              text: prompt,
-            },
-          },
-        ],
-      };
-    }
-  );
-}
-
-function registerPromptResource(server: any, uri: string): void {
-  server.resource(
-    {
-      name: "QLCPlus MCP Agent Prompt",
-      title: "QLCPlus Lighting Assistant Prompt",
-      uri,
-      description: "Contents of PROMPT.md for agents that inject MCP resources into model instructions.",
-      mimeType: "text/markdown",
-    },
-    async () => {
-      const prompt = await readAgentPrompt();
-      return {
-        contents: [
-          {
-            uri,
-            mimeType: "text/markdown",
-            text: prompt,
-          },
-        ],
-      };
-    }
-  );
-}
-
-export function registerAgentPrompt(server: any): void {
-  registerPromptName(server, PROMPT_NAME);
-  registerPromptResource(server, PROMPT_RESOURCE_URI);
 }
 
 export function createAgentPromptTool(): ToolDefinition {

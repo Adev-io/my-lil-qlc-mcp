@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
-import { mkdtempSync, writeFileSync } from "node:fs";
+import { mkdtempSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { z } from "zod";
@@ -57,6 +57,7 @@ describe("HTTP transport", () => {
 
   afterAll(async () => {
     await handle?.close();
+    rmSync(dir, { recursive: true, force: true });
   });
 
   const call = (body: unknown, token?: string) =>
@@ -127,6 +128,34 @@ describe("HTTP transport", () => {
     const body = await r.text();
     expect(body).not.toContain(TOKEN);
     expect(JSON.parse(body).tools.map((t: any) => t.name)).toContain("ok_tool");
+  });
+
+  it("GET /dashboard/ (trailing slash) is public too", async () => {
+    const r = await fetch(`${base}/dashboard/`);
+    expect(r.status).toBe(200);
+    expect(r.headers.get("content-type")).toContain("text/html");
+  });
+
+  it("GET /dashboard/api/meta is behind the token", async () => {
+    const r = await fetch(`${base}/dashboard/api/meta`);
+    expect(r.status).toBe(401);
+  });
+
+  it("GET /dashboard/api/patch-chart is behind the token", async () => {
+    const r = await fetch(`${base}/dashboard/api/patch-chart`);
+    expect(r.status).toBe(401);
+  });
+
+  it("dashboard API: 400 isError when input fails the tool schema", async () => {
+    const r = await call({ name: "ok_tool", input: { n: "x" } }, TOKEN);
+    expect(r.status).toBe(400);
+    const j = await r.json();
+    expect(j.isError).toBe(true);
+  });
+
+  it("GET /mcp with a token answers 405 (stateless, nothing to stream)", async () => {
+    const r = await fetch(`${base}/mcp`, { headers: { authorization: `Bearer ${TOKEN}` } });
+    expect(r.status).toBe(405);
   });
 
   it("POST /mcp is behind the bearer token", async () => {

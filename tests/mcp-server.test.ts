@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
-import { mkdtempSync, writeFileSync } from "node:fs";
+import { mkdtempSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { z } from "zod";
@@ -45,6 +45,7 @@ describe("createMcpServer", () => {
 
   afterAll(async () => {
     await client.close();
+    rmSync(dir, { recursive: true, force: true });
   });
 
   it("identifies as qlcplus-mcp", () => {

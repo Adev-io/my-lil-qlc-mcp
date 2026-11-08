@@ -1,15 +1,14 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-import type { ToolDefinition } from "mcp-use/server";
+import type { Hono } from "hono";
+import type { ToolDefinition } from "../mcp/tool.js";
+import { SERVER_INFO } from "../mcp/server.js";
 import type { Config } from "../config.js";
 import { getLogger } from "../logger.js";
 import { DASHBOARD_HTML } from "./dashboardPage.js";
 
-// Minimal shape we need from the MCPServer instance.
-type AppHost = { app: { get: Function; post: Function } };
-
 /**
- * Mount the control + docs dashboard onto the MCP server's Hono app.
+ * Mount the control + docs dashboard onto the server's Hono app.
  *
  * - GET  /dashboard            -> static single-page UI (exempted from bearer auth in http.ts)
  * - GET  /dashboard/api/meta   -> safe server config + registered tool list (token never returned)
@@ -19,7 +18,7 @@ type AppHost = { app: { get: Function; post: Function } };
  * code path as MCP clients without a second JSON-RPC handshake or any CORS setup.
  */
 export function registerDashboard(
-  server: AppHost,
+  app: Hono,
   tools: ToolDefinition[],
   config: Config
 ): void {
@@ -27,12 +26,12 @@ export function registerDashboard(
   const toolMap = new Map(tools.map((t) => [t.name, t]));
 
   const servePage = (c: any) => c.html(DASHBOARD_HTML);
-  server.app.get("/dashboard", servePage);
-  server.app.get("/dashboard/", servePage);
+  app.get("/dashboard", servePage);
+  app.get("/dashboard/", servePage);
 
-  server.app.get("/dashboard/api/meta", (c: any) =>
+  app.get("/dashboard/api/meta", (c: any) =>
     c.json({
-      server: { name: "qlcplus-mcp", version: "1.0.0" },
+      server: SERVER_INFO,
       config: {
         transport: config.transport,
         httpHost: config.httpHost,
@@ -54,7 +53,7 @@ export function registerDashboard(
   // Serves the generated ASCII patch chart (read fresh so a rebuild shows up
   // without restarting the server). Resolved relative to the process cwd, the
   // same convention used for config/widgets.json.
-  server.app.get("/dashboard/api/patch-chart", async (c: any) => {
+  app.get("/dashboard/api/patch-chart", async (c: any) => {
     try {
       const text = await readFile(path.resolve(process.cwd(), "PATCH-CHART.md"), "utf8");
       return c.text(text);
@@ -63,7 +62,7 @@ export function registerDashboard(
     }
   });
 
-  server.app.post("/dashboard/api/call", async (c: any) => {
+  app.post("/dashboard/api/call", async (c: any) => {
     let payload: any;
     try {
       payload = await c.req.json();

@@ -200,3 +200,42 @@ both transports share without spawning a stdio child.
 1. `test: HTTP transport + dashboard smoke test, in-memory MCP core test` (green on mcp-use)
 2. `feat: serve MCP on the official SDK + Hono, drop mcp-use` (package.json, lockfile, src)
 3. `chore: restore MIT licence field in package.json`
+
+## Implementation notes (2026-11-08)
+
+Landed on `feat/nx-touch` as `a94c191..85ae381`. Deviations from the design above, all deliberate:
+
+- **`src/mcp/tool.ts` holds `ToolDefinition`, `ToolResult`, `text()`, `error()`.** The design put them in
+  `server.ts`; that would have made `agentPrompt.ts` (imports `text`) and `server.ts` (imports
+  `readAgentPrompt`) an import cycle. Tool files import `../mcp/tool.js`.
+- **`text()` no longer adds `_meta: { mimeType: "text/plain" }`.** `mcp-use` did. Nothing in `src/` or the
+  dashboard reads it.
+- **`GET`/`DELETE` on `/mcp` answer 405.** The design said `app.all`. In stateless mode a GET would have
+  parked an idle SSE stream plus an orphan `McpServer` per client; the SDK's own stateless example
+  answers 405 and the SDK client tolerates it silently.
+- **`/mcp` requires `Accept: application/json, text/event-stream`** (SDK default; JSON-only `Accept`
+  gets 406). `mcp-use` rewrote the header. Claude Code and the SDK client send both; the curl examples in
+  `docs/MCP-CONFIG.md` were fixed.
+- **`createMcpServer(tools)` also runs once at boot** so a duplicate tool name dies at startup instead of
+  as a 500 per request.
+- **Dashboard API hardening (not in the design, found in review):** `POST /dashboard/api/call` returns 415
+  unless `Content-Type` is `application/json`, and `/dashboard/api/*` bodies are capped at 64 KB. Without
+  it, in the default `authMode: none`, any open web page could fire a lighting tool with a cross-site
+  `text/plain` POST that needs no preflight. The old server also sent `Access-Control-Allow-Origin: *`;
+  the new one sends no CORS headers.
+- **Tests were red-then-green, not green-on-mcp-use-first.** `mcp-use`'s `listen(0)` binds 3000 and hides
+  its close handle, so the "known-good on the old build" step was impossible.
+- **`vitest.config.ts` excludes `.claude/**`.** Stale worktree checkouts under `.claude/worktrees/` were
+  being collected (9 red files).
+- **`npm audit fix` was needed after the swap** (lockfile only, no majors): `mcp-use` was the unfixable
+  root, but it was also blocking non-breaking bumps of express/ajv/vite transitive deps and `zod`.
+
+Result: `npm audit` 0 critical / 0 high / 6 moderate (none in the runtime path: `@hono/node-server`
+`serveStatic` which we never call, `qs` via the SDK's unused express router, vitest dev deps).
+Suite 13 files / 172 passed. Live check on the real stack passed: dashboard press, SDK client round-trip,
+`claude mcp list` connected, stdio.
+
+Follow-ups, not done here: the stdio server stays alive after stdin closes (OSC socket + Launchpad
+driver), and a client that spawns it via `npx` on Windows kills `npx` but not the `node` child, which
+then holds UDP :9000 — pre-existing, same under `mcp-use`; dry-run sends do not bump `sendCount`;
+`close()` waits on keep-alive sockets (production never calls it).

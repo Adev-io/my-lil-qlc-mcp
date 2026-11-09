@@ -222,6 +222,7 @@ npm run start:http
 #### Dependencies
 - **@modelcontextprotocol/sdk**: The official MCP TypeScript SDK
 - **hono**: HTTP server for `/mcp`, `/health` and the dashboard
+- **@hono/node-server**: Node HTTP adapter that serves the Hono app
 - **zod**: Runtime validation
 - **dotenv**: Environment variables
 - **pino**: Logging

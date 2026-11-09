@@ -232,7 +232,7 @@ Landed on `feat/nx-touch` as `a94c191..85ae381`. Deviations from the design abov
 
 Result: `npm audit` 0 critical / 0 high / 6 moderate (none in the runtime path: `@hono/node-server`
 `serveStatic` which we never call, `qs` via the SDK's unused express router, vitest dev deps).
-Suite 13 files / 172 passed. Live check on the real stack passed: dashboard press, SDK client round-trip,
+Suite 13 files / 172 passed in the owner's working tree; a clean checkout shows 169 passed plus one pre-existing red (`rig-parameterization` byte-match vs the committed `.qxw`, present on the base commit too, untouched here). Live check on the real stack passed: dashboard press, SDK client round-trip,
 `claude mcp list` connected, stdio.
 
 Follow-ups, not done here: the stdio server stays alive after stdin closes (OSC socket + Launchpad

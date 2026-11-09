@@ -1,7 +1,6 @@
 # dependencies / build output
 node_modules
 dist/
-.mcp-use
 
 # machine-specific config — the rig-setup-wizard writes these per machine
 config/.env

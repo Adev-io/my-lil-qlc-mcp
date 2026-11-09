@@ -10,7 +10,7 @@ import { text, type ToolDefinition } from "../src/mcp/tool";
 import type { HttpServerHandle } from "../src/transports/http";
 
 // agentPrompt.ts resolves PROMPT_FILE at import time, so the env var must be set before the dynamic imports in beforeAll.
-const dir =mkdtempSync(path.join(tmpdir(), "qlc-mcp-http-"));
+const dir = mkdtempSync(path.join(tmpdir(), "qlc-mcp-http-"));
 const promptFile = path.join(dir, "PROMPT.md");
 writeFileSync(promptFile, "# http prompt\n");
 process.env.MCP_PROMPT_FILE = promptFile;

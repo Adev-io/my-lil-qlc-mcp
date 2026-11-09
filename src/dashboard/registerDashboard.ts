@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import type { Hono } from "hono";
+import { bodyLimit } from "hono/body-limit";
 import type { ToolDefinition } from "../mcp/tool.js";
 import { SERVER_INFO } from "../mcp/server.js";
 import type { Config } from "../config.js";
@@ -22,6 +23,9 @@ export function registerDashboard(
   tools: ToolDefinition[],
   config: Config
 ): void {
+  // ponytail: 64 KB is far above any tool input; raise if a tool ever takes bulk data.
+  app.use("/dashboard/api/*", bodyLimit({ maxSize: 64 * 1024 }));
+
   const logger = getLogger();
   const toolMap = new Map(tools.map((t) => [t.name, t]));
 
@@ -63,6 +67,15 @@ export function registerDashboard(
   });
 
   app.post("/dashboard/api/call", async (c: any) => {
+    // JSON only: a browser can fire text/plain cross-site without a preflight.
+    const contentType = c.req.header("content-type") || "";
+    if (!contentType.toLowerCase().startsWith("application/json")) {
+      return c.json(
+        { isError: true, content: [{ type: "text", text: "Content-Type must be application/json" }] },
+        415
+      );
+    }
+
     let payload: any;
     try {
       payload = await c.req.json();

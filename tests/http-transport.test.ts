@@ -7,8 +7,10 @@ import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
 import { ConfigSchema, type Config } from "../src/config";
 import { text, type ToolDefinition } from "../src/mcp/tool";
+import type { HttpServerHandle } from "../src/transports/http";
 
-const dir = mkdtempSync(path.join(tmpdir(), "qlc-mcp-http-"));
+// agentPrompt.ts resolves PROMPT_FILE at import time, so the env var must be set before the dynamic imports in beforeAll.
+const dir =mkdtempSync(path.join(tmpdir(), "qlc-mcp-http-"));
 const promptFile = path.join(dir, "PROMPT.md");
 writeFileSync(promptFile, "# http prompt\n");
 process.env.MCP_PROMPT_FILE = promptFile;
@@ -31,10 +33,8 @@ const boomTool: ToolDefinition = {
   },
 };
 
-type Handle = { port: number; close: () => Promise<void> };
-
 describe("HTTP transport", () => {
-  let handle: Handle;
+  let handle: HttpServerHandle;
   let base: string;
 
   beforeAll(async () => {
@@ -202,5 +202,71 @@ describe("HTTP transport", () => {
     } finally {
       await client.close();
     }
+  });
+
+  it("dashboard API: 415 when the body is not application/json", async () => {
+    const r = await fetch(`${base}/dashboard/api/call`, {
+      method: "POST",
+      headers: { "content-type": "text/plain", authorization: `Bearer ${TOKEN}` },
+      body: JSON.stringify({ name: "ok_tool", input: {} }),
+    });
+    expect(r.status).toBe(415);
+    const j = await r.json();
+    expect(j.isError).toBe(true);
+  });
+
+  it("dashboard API: 413 when the body exceeds the limit", async () => {
+    const r = await call({ name: "ok_tool", input: { pad: "x".repeat(70 * 1024) } }, TOKEN);
+    expect(r.status).toBe(413);
+  });
+
+  it("POST /mcp without an SSE-capable Accept header answers 406", async () => {
+    const r = await fetch(`${base}/mcp`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        accept: "application/json",
+        authorization: `Bearer ${TOKEN}`,
+      },
+      body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "ping" }),
+    });
+    expect(r.status).toBe(406);
+  });
+});
+
+describe("HTTP transport with authMode none", () => {
+  let handle: HttpServerHandle;
+  let base: string;
+
+  beforeAll(async () => {
+    const { startHttpServer } = await import("../src/transports/http");
+    const config: Config = {
+      ...ConfigSchema.parse({ transport: "http", httpHost: "127.0.0.1", qlcDryRun: true }),
+      httpPort: 0,
+    };
+    handle = await startHttpServer(config, [okTool]);
+    base = `http://127.0.0.1:${handle.port}`;
+  });
+
+  afterAll(async () => {
+    await handle?.close();
+  });
+
+  it("serves the dashboard API without a token", async () => {
+    const r = await fetch(`${base}/dashboard/api/meta`);
+    expect(r.status).toBe(200);
+    const j = await r.json();
+    expect(j.config.authMode).toBe("none");
+    expect(j.tools.map((t: any) => t.name)).toEqual(["ok_tool"]);
+  });
+
+  it("runs a tool without a token", async () => {
+    const r = await fetch(`${base}/dashboard/api/call`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ name: "ok_tool", input: {} }),
+    });
+    expect(r.status).toBe(200);
+    expect((await r.json()).content[0].text).toBe("ok");
   });
 });

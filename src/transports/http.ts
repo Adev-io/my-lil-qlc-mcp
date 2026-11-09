@@ -3,7 +3,7 @@ import { serve, type ServerType } from "@hono/node-server";
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
 import { getLogger } from "../logger.js";
 import { Config } from "../config.js";
-import { createMcpServer } from "../mcp/server.js";
+import { createMcpServer, SERVER_INFO } from "../mcp/server.js";
 import type { ToolDefinition } from "../mcp/tool.js";
 import { registerDashboard } from "../dashboard/registerDashboard.js";
 
@@ -63,8 +63,8 @@ export async function startHttpServer(
   app.get("/health", (c) =>
     c.json({
       status: "ok",
-      service: "qlcplus-mcp",
-      version: "1.0.0",
+      service: SERVER_INFO.name,
+      version: SERVER_INFO.version,
       transport: "http",
       uptime: process.uptime(),
     })
@@ -95,7 +95,10 @@ export async function startHttpServer(
     (resolve, reject) => {
       const s = serve(
         { fetch: app.fetch, hostname: config.httpHost, port: config.httpPort },
-        (info) => resolve({ nodeServer: s, port: info.port })
+        (info) => {
+          s.off("error", reject);
+          resolve({ nodeServer: s, port: info.port });
+        }
       );
       s.once("error", reject);
     }

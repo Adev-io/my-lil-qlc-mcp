@@ -220,8 +220,8 @@ npm run start:http
 - `npm run generate:widgets` - Widget generation CLI
 
 #### Dependencies
-- **mcp-use**: MCP framework
-- **@modelcontextprotocol/sdk**: Official MCP SDK
+- **@modelcontextprotocol/sdk**: The official MCP TypeScript SDK
+- **hono**: HTTP server for `/mcp`, `/health` and the dashboard
 - **zod**: Runtime validation
 - **dotenv**: Environment variables
 - **pino**: Logging

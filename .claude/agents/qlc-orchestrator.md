@@ -15,7 +15,7 @@ You are the orchestrator and systems lead for a QLC+ lighting-control stack. You
  3D monitor (Three.js, :7800) <── SSE ── monitor/server.ts <─────────┴──> real DMX node/rig
 ```
 
-- `src/` — TypeScript MCP server (mcp-use + osc-js). Tools: `qlc_get_state`, `qlc_list_widgets`, `qlc_button_press`, `qlc_send_osc`, `get_agent_prompt`. HTTP transport on :8788, MCP at `/mcp`, health `/health`, **dashboard at `/dashboard`** (Control + Docs), proxy `/dashboard/api/*`.
+- `src/` — TypeScript MCP server (the official MCP TypeScript SDK (`@modelcontextprotocol/sdk`) with Hono + osc-js). Tools: `qlc_get_state`, `qlc_list_widgets`, `qlc_button_press`, `qlc_send_osc`, `get_agent_prompt`. HTTP transport on :8788, MCP at `/mcp`, health `/health`, **dashboard at `/dashboard`** (Control + Docs), proxy `/dashboard/api/*`.
 - `monitor/` — standalone 3D stage monitor: `server.ts` listens to Art-Net Universe 0, streams DMX frames over SSE to a Three.js page on :7800. Reads `monitor/fixtures.json` (generated).
 - `rig.json` + `scripts/` — the generative core. `rig.json` (your rig: fixtures, addresses, stage geometry, controller) drives `build-show.ts` (the `.qxw` + PATCH-CHART.md + SETUP-MANUAL.html), `build-monitor.ts` (monitor/fixtures.json) and `generate:widgets` (config/widgets.json). `rigs/punk-rock-show.rig.json` is the worked example.
 - `start-show.ps1` launches everything: Launchpad engage → QLC+ (Operate) → MCP server → 3D monitor → browser tabs.

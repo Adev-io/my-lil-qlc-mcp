@@ -306,8 +306,11 @@ curl http://localhost:8788/health
 curl -X POST http://localhost:8788/mcp \
   -H "Authorization: Bearer your-token-here" \
   -H "Content-Type: application/json" \
-  -d '{"method":"tools/list"}'
+  -H "Accept: application/json, text/event-stream" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
 ```
+
+The endpoint is stateless streamable HTTP: POST only, both `Accept` types are required (a JSON-only `Accept` gets 406), and the reply arrives as a `text/event-stream` with one `data:` line holding the JSON-RPC result.
 
 **Advantages:**
 
@@ -358,7 +361,8 @@ Authorization: Bearer my-secure-token
 curl -X POST http://localhost:8788/mcp \
   -H "Authorization: Bearer my-secure-token" \
   -H "Content-Type: application/json" \
-  -d '{"method":"tools/list"}'
+  -H "Accept: application/json, text/event-stream" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
 ```
 
 **Token best practices:**
